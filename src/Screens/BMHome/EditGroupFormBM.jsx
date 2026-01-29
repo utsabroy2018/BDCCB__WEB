@@ -18,10 +18,7 @@ function EditGroupFormBM() {
 	const  loanAppData  = location.state || {}
 	const navigate = useNavigate()
 
-	useEffect(()=>{
-		console.log(loanAppData, 'ddddddddddddddddddd');
-		
-	}, [])
+
 
 	return (
 		<>

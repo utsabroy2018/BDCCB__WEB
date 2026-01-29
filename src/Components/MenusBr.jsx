@@ -2335,11 +2335,11 @@ const items_bdccb = [
 			icon: <DatabaseOutlined />,
 			label: "Master",
 			children: [
-				// {
-				// 	key: "sub5-1",
-				// 	icon: <DatabaseOutlined />,
-				// 	label: <Link to={"/homeadmin/masterdistricts"}>District</Link>,
-				// },
+				{
+					key: "sub5-1",
+					icon: <DatabaseOutlined />,
+					label: <Link to={"/homeadmin/masterdistricts"}>District</Link>,
+				},
 				{
 					key: "sub5-2",
 					icon: <DatabaseOutlined />,
@@ -2397,50 +2397,20 @@ const items_bdccb = [
 					key: "sub3-4",
 					icon: <FileSearchOutlined />,
 					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
+				}
+			],
+		},
+
+		{
+			key: "sub4",
+			icon: <ThunderboltOutlined />,
+			label: "Loans",
+			children: [
+				{
+					key: "sub4-1",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homebm/disburseloan/0"}>Disburse Loan</Link>,
 				},
-				// {
-				// 	key: "sub3-3",
-				// 	icon: <PlusCircleOutlined />,
-				// 	label: <Link to={"/homebm/editMemberGroupForm/0"}>Add Member</Link>,
-				// },
-				// {
-				// 	key: "sub3-4",
-				// 	icon: <FileSearchOutlined />,
-				// 	label: <Link to={"/homebm/searchGroupMember/"}>Edit Member</Link>,
-				// },
-				
-				// {
-				// 	key: "sub2-5",
-				// 	icon: <ContainerOutlined />,
-				// 	label: <Link to={"/homebm/searchmember/"}>Member</Link>,
-				// }
-
-
-				// {
-				// 	key: "sub3-3",
-				// 	icon: <SendOutlined />,
-				// 	label: <Link to={"/homebm/trancefercofrom/0"}>Transfer Group</Link>,
-				// },
-				// {
-				// 	key: "sub3-5",
-				// 	icon: <CheckCircleOutlined />,
-				// 	label: (
-				// 		<Link to={"/homebm/trancefercofromapprove-unic"}>
-				// 			Approve Group Transfer
-				// 		</Link>
-				// 	),
-				// },
-				// {
-				// 	key: "sub3-4",
-				// 	icon: <EyeOutlined />,
-				// 	label: <Link to={"/homebm/tranceferco"}>View Group Transfer</Link>,
-				// },
-
-				//    {
-				//      key: "sub3-3",
-				//      icon: <SubnodeOutlined />,
-				//      label: <Link to={"/homemis/assignmember"}>Assign Member</Link>,
-				//    },
 			],
 		},
 		

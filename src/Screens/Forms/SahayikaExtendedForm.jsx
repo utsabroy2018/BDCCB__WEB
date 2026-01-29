@@ -52,51 +52,51 @@ import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { saveMasterData } from "../../services/masterService"
 import Radiobtn from "../../Components/Radiobtn"
 
-const weaker_section = [
-	{
-		label: "Yes",
-		value: "Y",
-	},
-	{
-		label: "No",
-		value: "N",
-	},
-]
+// const weaker_section = [
+// 	{
+// 		label: "Yes",
+// 		value: "Y",
+// 	},
+// 	{
+// 		label: "No",
+// 		value: "N",
+// 	},
+// ]
 
-const groupLeader = [
-	{
-		label: "Yes",
-		value: "Y",
-	},
-	{
-		label: "No",
-		value: "N",
-	},
-]
+// const groupLeader = [
+// 	{
+// 		label: "Yes",
+// 		value: "Y",
+// 	},
+// 	{
+// 		label: "No",
+// 		value: "N",
+// 	},
+// ]
 
 
 
-const mapOptions = {
-  disableDefaultUI: true,
-  gestureHandling: 'none',
-  zoomControl: false,
-  draggable: false,
-  scrollwheel: false,
-  disableDoubleClickZoom: true,
-};
-const formatINR = (num) =>
-	new Intl.NumberFormat("en-IN", {
-		style: "currency",
-		currency: "INR",
-		minimumFractionDigits: 2,
-	}).format(num || 0)
+// const mapOptions = {
+//   disableDefaultUI: true,
+//   gestureHandling: 'none',
+//   zoomControl: false,
+//   draggable: false,
+//   scrollwheel: false,
+//   disableDoubleClickZoom: true,
+// };
+// const formatINR = (num) =>
+// 	new Intl.NumberFormat("en-IN", {
+// 		style: "currency",
+// 		currency: "INR",
+// 		minimumFractionDigits: 2,
+// 	}).format(num || 0)
 
-	const form_validationSchema = Yup.object({
-		member_from: Yup.string().required("** This field is mandatory"),
-		member_to: Yup.string().required("** This field is mandatory").test('not-same', 'From and To cannot be the same', function (value) {
-      		return value !== this.parent.member_from;
-    	}),
-	})
+// 	const form_validationSchema = Yup.object({
+// 		member_from: Yup.string().required("** This field is mandatory"),
+// 		member_to: Yup.string().required("** This field is mandatory").test('not-same', 'From and To cannot be the same', function (value) {
+//       		return value !== this.parent.member_from;
+//     	}),
+// 	})
 function SahayikaExtendedForm({ groupDataArr }) {
 // 	const markers = [
 //   { id: 1, position: { lat: 40.748817, lng: -73.985428 }, title: 'Empire State Building' },
@@ -154,35 +154,6 @@ const containerStyle = {
 	const [formValues, setValues] = useState(initialValues)
 
 	const validationSchema = Yup.object({
-		// g_group_name: Yup.string().required("Group name is required"),
-		// g_group_type: Yup.string().required("Group type is required"),
-		// g_bank_name: Yup.string().required("Bank Name is required"),
-		// // g_micr: Yup.string().required("MICR Code is required"),
-		// // g_micr: Yup.string(),
-
-		// g_branch:
-		// 	params?.id > 0
-		// 		? Yup.string()
-		// 		: Yup.string().required("Branch is required"),
-		// g_ceo:
-		// 	params?.id > 0 ? Yup.string() : Yup.string().required("CO is required"),
-		// // g_block:
-		// // 	params?.id > 0
-		// // 		? Yup.string()
-		// // 		: Yup.string().required("Block is required"),
-
-		// g_address: Yup.string().required("Group address is required"),
-		// g_pin: Yup.string().required("PIN No. is required"),
-		// // g_group_block: Yup.string().required("Group block is required"),
-		// g_phone1: Yup.string().required("Phone 1 is required"),
-		// // g_phone2: Yup.string(),
-		// // g_email: Yup.string(),
-		// // g_bank_name:  Yup.string().required("Bank is required"),
-		// // g_bank_branch: Yup.string(),
-		// // g_ifsc: Yup.string(),
-		// // g_micr: Yup.string(),
-		// // g_acc1: Yup.string(),
-		// // g_acc2: Yup.string().optional(),
 
 		sahayika_name: Yup.string().required("Sahayika name is required"),
 		phone_no: Yup.string().required("Phone is required"),
@@ -651,16 +622,7 @@ const fetchGroupsList = async () => {
 									mode={1}
 									// disabled={true}
 								/>
-								{/* <TDInputTemplateBr
-									placeholder="SB Account"
-									type="text"
-									label="SB Account"
-									name="g_acc1"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_acc1}
-									mode={1}
-								/> */}
+						
 								{formik.errors.sahayika_name && formik.touched.sahayika_name ? (
 									<VError title={formik.errors.sahayika_name} />
 								) : null}

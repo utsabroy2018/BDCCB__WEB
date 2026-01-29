@@ -31,9 +31,15 @@ const LandingOutlet = lazy(() => import("./Screens/Landing/LandingOutlet"));
 const DisbursedLoanApproveSingleBM =  lazy(() => import("./Screens/BMHome/DisbursedLoanApproveSingleBM"));
 const ApproveMemberTransfer = lazy(() => import("./Screens/BMHome/ApproveMemberTransfer"));
 const AttendanceBM = lazy(() => import("./Screens/BMHome/AttendanceBM"));
+
+
+////////////////////////////////////////////// BDCCB Start //////////////////////////////////////////////
+
 const Dashboard = lazy(() => import("./Screens/BMHome/Dashboard/Dashboard"));
-const EditMasterDistricts = lazy(() => import("./Screens/Admin/Master/Districts/EditMasterDistricts"));
+
 const MasterDistricts = lazy(() => import("./Screens/Admin/Master/Districts/MasterDistricts"));
+const EditMasterDistricts = lazy(() => import("./Screens/Admin/Master/Districts/EditMasterDistricts"));
+
 const MasterBlocks = lazy(() => import("./Screens/Admin/Master/Blocks/MasterBlocks"));
 const EditMasterBlocks = lazy(() => import("./Screens/Admin/Master/Blocks/EditMasterBlocks"));
 
@@ -61,6 +67,11 @@ const EditGroupFormBM = lazy(() => import("./Screens/BMHome/EditGroupFormBM.jsx"
 
 const SearchSahayikaBM = lazy(() => import("./Screens/BMHome/SearchSahayikaBM"))
 const EditSahayikaFormBM = lazy(() => import("./Screens/BMHome/EditSahayikaFormBM"))
+
+const EditDisburseFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditDisburseFormBM_BDCCB"))
+const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB"))
+
+////////////////////////////////////////////// BDCCB End //////////////////////////////////////////////
 
 
 
@@ -159,12 +170,7 @@ const SearchGRTFormCO = lazy(() => import("./Screens/COHome/SearchGRTFormCO"))
 const EditGRTFormCO = lazy(() => import("./Screens/COHome/EditGRTFormCO"))
 const SearchMemberCO = lazy(() => import("./Screens/COHome/SearchMemberCO"))
 // const EditGroupFormCO = lazy(() => import("./Screens/COHome/EditGroupFormCO"))
-const EditDisburseFormBM = lazy(() =>
-	import("./Screens/BMHome/EditDisburseFormBM")
-)
-const SearchMemberForDisburseBM = lazy(() =>
-	import("./Screens/BMHome/SearchMemberForDisburseBM")
-)
+
 const SearchMemberForDisburseCO = lazy(() =>
 	import("./Screens/COHome/SearchMemberForDisburseCO")
 )
@@ -314,14 +320,14 @@ const router = createBrowserRouter([
 							// 	path: "attendancebm",
 							// 	element: <AttendanceBM />,
 							// },
-							// {
-							// 	path: "disburseloan",
-							// 	element: <SearchMemberForDisburseBM />,
-							// },
-							// {
-							// 	path: "disburseloan/:id",
-							// 	element: <EditDisburseFormBM />,
-							// },
+							{
+								path: "disburseloan",
+								element: <SearchMemberForDisburseBM_BDCCB />,
+							},
+							{
+								path: "disburseloan/:id",
+								element: <EditDisburseFormBM_BDCCB />,
+							},
 							// {
 							// 	path: "transfermember",
 							// 	element: <MemberTransfer />,

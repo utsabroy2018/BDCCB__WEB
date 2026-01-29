@@ -10,8 +10,9 @@ import { useLocation } from "react-router"
 import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
 import DisbursmentForm from "../Forms/DisbursmentForm"
+import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
 
-function EditDisburseFormBM() {
+function EditDisburseFormBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -32,7 +33,7 @@ function EditDisburseFormBM() {
 				{/* {JSON.stringify(loanAppData)} */}
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text="Loan Disburse Form" mode={2} />
+						<FormHeader text={`${params?.id == 0 ? "Loan Disburse Form" : "Edit/Preview Loan Disburse Form"}`} mode={2} />
 					</div>
 					<Spin
 						indicator={<LoadingOutlined spin />}
@@ -41,7 +42,7 @@ function EditDisburseFormBM() {
 						spinning={loading}
 					>
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-							<DisbursmentForm />
+							<DisbursmentForm_BDCCB />
 						</div>
 					</Spin>
 				</div>
@@ -99,4 +100,4 @@ function EditDisburseFormBM() {
 	)
 }
 
-export default EditDisburseFormBM
+export default EditDisburseFormBM_BDCCB
