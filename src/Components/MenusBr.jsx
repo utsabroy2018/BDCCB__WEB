@@ -2410,7 +2410,7 @@ const items_bdccb = [
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
 					label: <Link to={"/homebm/disburseloan/0"}>Disburse Loan</Link>,
-				},
+				}
 			],
 		},
 		
@@ -2527,6 +2527,77 @@ const items_bdccb = [
 		// },
 	]
 
+const items_bdccb_PACS = [
+		{
+			key: "sub1",
+			icon: <LineChartOutlined />,
+			label: <Link to={"/homebm/"}>Dashboard</Link>,
+		},
+		
+		{
+			key: "sub3",
+			icon: <DeploymentUnitOutlined />,
+			label: "Groups",
+			children: [
+				{
+					key: "sub3-1",
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/editSahayikaFormBM/0"}>Add Sahayika</Link>,
+				},
+				{
+					key: "sub3-2",
+					icon: <FileSearchOutlined />,
+					label: <Link to={"/homebm/searchSahayikaBM/"}>Edit Sahayika</Link>,
+				},
+				{
+					key: "sub3-3",
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/editgroupform/0"}>Add Group</Link>,
+				},
+				{
+					key: "sub3-4",
+					icon: <FileSearchOutlined />,
+					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
+				}
+			],
+		},
+
+		{
+			key: "sub4",
+			icon: <ThunderboltOutlined />,
+			label: "Loans",
+			children: [
+				{
+					key: "sub4-1",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homepacs/disburseloan/0"}>Disburse Loan</Link>,
+				},
+				{
+					key: "sub4-2",
+					icon: <CheckCircleOutlined />,
+					label: "Approve Transaction",
+					// hidden: data?.approve_transaction == "Y" ? false : true,
+					children: [
+						{
+							key: "sub4-2-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homepacs/approvedisbursed"}>Disburse</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+						// {
+						// 	key: "sub4-2-2",
+						// 	icon: <CheckCircleOutlined />,
+						// 	label: <Link to={"/homebm/approveloan"}>Recovery</Link>,
+						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+						// },
+					],
+				},
+			],
+		},
+		
+		
+	]
+
 
 
 	return (
@@ -2552,7 +2623,7 @@ const items_bdccb = [
 			<Menu
 			onClick={onClick}
 			selectedKeys={[current]}
-			items={items_bdccb}
+			items={userDetails[0]?.user_type == 'Super Admin' ? items_bdccb : userDetails[0]?.user_type == 'PACS' ? items_bdccb_PACS : items_bdccb}
 			// disabled={getMenuShow === "yes" ? true : false}
 
 			mode="horizontal"

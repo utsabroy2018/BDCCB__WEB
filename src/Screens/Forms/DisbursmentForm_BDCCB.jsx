@@ -65,6 +65,13 @@ const loan_to = [
 		}
 ]
 
+const loan_to_For_Pacs = [
+		{
+		code: "S",
+		name: "SHG",
+		}
+]
+
 const period_data = [
 		{
 		code: "12",
@@ -92,7 +99,7 @@ const pay_mode = [
 	]
 
 
-function DisbursmentForm_BDCCB({ groupDataArr }) {
+function DisbursmentForm_BDCCB({ flag }) {
 
 
 	const params = useParams()
@@ -206,7 +213,10 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 	return data.ip
 	}
 
-
+useEffect(()=>{
+	console.log(flag, 'flagflagflagflagflagflag');
+	
+}, [])
 
 
 	const editGroup = async (formData) => {
@@ -216,22 +226,22 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 				const ip = await getClientIP()
 			
 				const creds = {
-				group_code: groupDataArr?.group_code,
-				branch_code: userDetails[0]?.brn_code,
-				group_name: formData?.loan_id,
-				// gp_leader_id: 2, ///////////////
-				phone1: formData?.branch_shg_id,
-				loan_ac_no: formData?.loan_ac_no, ///////////////
-				curr_roi: formData?.curr_roi,
-				pay_mode: formData?.pay_mode,
-				disb_dt: formData?.disb_dt,
-				disb_amt: formData?.disb_amt,
-				gp_id: formData?.gp_id,
-				village_id: formData?.village_id,
-				pin_no: formData?.loan_to,
-				sb_ac_no: formData?.period,
-				created_by: userDetails[0]?.emp_id,
-				ip_address: ip,
+				// group_code: groupDataArr?.group_code,
+				// branch_code: userDetails[0]?.brn_code,
+				// group_name: formData?.loan_id,
+				// // gp_leader_id: 2, ///////////////
+				// phone1: formData?.branch_shg_id,
+				// loan_ac_no: formData?.loan_ac_no, ///////////////
+				// curr_roi: formData?.curr_roi,
+				// pay_mode: formData?.pay_mode,
+				// disb_dt: formData?.disb_dt,
+				// disb_amt: formData?.disb_amt,
+				// gp_id: formData?.gp_id,
+				// village_id: formData?.village_id,
+				// pin_no: formData?.loan_to,
+				// sb_ac_no: formData?.period,
+				// created_by: userDetails[0]?.emp_id,
+				// ip_address: ip,
 				}
 
 
@@ -310,12 +320,10 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 	setPACS_SHGList([])
 	setLoading(true)
 	const creds = {
-	// group_name: params?.id,
-	// branch_code: userDetails[0]?.brn_code,
-
 	loan_to : loan_toDroupDown,
     branch_code : userDetails[0]?.brn_code,
-    branch_shg_id : searchTxt
+    branch_shg_id : searchTxt,
+	tenant_id: loan_toDroupDown == 'P' ? userDetails[0]?.tenant_id : 0,
 	}
 
 	const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -328,6 +336,8 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 	})
 	.then((res) => {
 
+		console.log(res?.data, 'mmmmmmmmmmmmmmmmmmmmmmmmmmm');
+		
 	if(res?.data?.success){
 	if(loan_toDroupDown == "P"){
 		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
@@ -341,6 +351,12 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 			code: item?.group_code,
 			name: item?.group_name,
 			})))
+	}
+
+	if(res?.data?.data.length > 0){
+		Message("success", res?.data?.msg)
+	} else {
+		Message("error", res?.data?.msg)
 	}
 	
 
@@ -429,7 +445,9 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 
 							<div>
 								{/* {loan_toDroupDown} */}
-								<TDInputTemplateBr
+								{flag == 'BM' ? (
+									<>
+									<TDInputTemplateBr
 									placeholder="Select One"
 									type="text"
 									label="Loan To *"
@@ -444,13 +462,35 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 								{formik.errors.loan_to && formik.touched.loan_to ? (
 									<VError title={formik.errors.loan_to} />
 								) : null}
+									</>
+								) : (
+									<>
+									<TDInputTemplateBr
+									placeholder="Select One"
+									type="text"
+									label="Loan To *"
+									name="loan_to"
+									handleChange={formik.handleChange}
+									// handleChange={handleFormikMasterChange} 
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.loan_to}
+									data={loan_to_For_Pacs}
+									mode={2}
+								/>
+								{formik.errors.loan_to && formik.touched.loan_to ? (
+									<VError title={formik.errors.loan_to} />
+								) : null}
+									</>
+								)}
+								
 							</div>
 
 							<div>
+								{/* {JSON.stringify(formik.values.loan_to, null, 2)} */}
 								<TDInputTemplateBr
 									placeholder="Search Here.."
 									type="text"
-									label={formik.values.loan_to == 'P' ? 'Search By PACS *' : 'Search By SHG *'}
+									label={formik.values.loan_to === 'P' ? 'Search By PACS *' : formik.values.loan_to === 'S' ? 'Search By SHG *' : 'Search *'}
 									name="branch_shg_SearchField"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}
@@ -479,7 +519,7 @@ function DisbursmentForm_BDCCB({ groupDataArr }) {
 								<TDInputTemplateBr
 									placeholder="Select ..."
 									type="text"
-									label={formik.values.loan_to == 'P' ? 'Select PACS *' : 'Select SHG *'}
+									label={formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'}
 									name="branch_shg_id"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}

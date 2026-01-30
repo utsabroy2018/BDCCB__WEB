@@ -42,7 +42,7 @@ function EditDisburseFormBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-							<DisbursmentForm_BDCCB flag="BM"/>
+							<DisbursmentForm_BDCCB flag="PACS" />
 						</div>
 					</Spin>
 				</div>

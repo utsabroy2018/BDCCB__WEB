@@ -28,14 +28,17 @@ const Notfound = lazy(() => import("./Screens/Notfound/Notfound"));
 const SignInPage = lazy(() => import("./Screens/Login/SignInPage"));
 const Landing = lazy(() => import("./Screens/Landing/Landing"));
 const LandingOutlet = lazy(() => import("./Screens/Landing/LandingOutlet"));
-const DisbursedLoanApproveSingleBM =  lazy(() => import("./Screens/BMHome/DisbursedLoanApproveSingleBM"));
+// const DisbursedLoanApproveSingleBM =  lazy(() => import("./Screens/BMHome/DisbursedLoanApproveSingleBM"));
 const ApproveMemberTransfer = lazy(() => import("./Screens/BMHome/ApproveMemberTransfer"));
 const AttendanceBM = lazy(() => import("./Screens/BMHome/AttendanceBM"));
 
 
 ////////////////////////////////////////////// BDCCB Start //////////////////////////////////////////////
 
-const Dashboard = lazy(() => import("./Screens/BMHome/Dashboard/Dashboard"));
+
+//////////////// BDCCB ADMIN Start ////////////////
+const HomeAdmin = lazy(() => import("./Screens/Admin/HomeAdmin"));
+const AdminDashboard = lazy(() => import("./Screens/Admin/Dashboard/AdminDashboard"));
 
 const MasterDistricts = lazy(() => import("./Screens/Admin/Master/Districts/MasterDistricts"));
 const EditMasterDistricts = lazy(() => import("./Screens/Admin/Master/Districts/EditMasterDistricts"));
@@ -58,6 +61,12 @@ const EditVillageMaster = lazy(() => import("./Screens/Admin/Master/VillageMaste
 const BranchMaster = lazy(() => import("./Screens/Admin/Master/BranchMaster/BranchMaster"));
 const EditBranchMaster = lazy(() => import("./Screens/Admin/Master/BranchMaster/EditBranchMaster"));
 
+//////////////// BDCCB ADMIN End ////////////////
+
+//////////////// BDCCB BM Start ////////////////
+
+const HomeBM = lazy(() => import("./Screens/BMHome/HomeBM"))
+const Dashboard = lazy(() => import("./Screens/BMHome/Dashboard/Dashboard"));
 
 const SearchGroupBM = lazy(() => import("./Screens/BMHome/SearchGroupBM"))
 const EditGroupFormBM = lazy(() => import("./Screens/BMHome/EditGroupFormBM.jsx"))
@@ -71,14 +80,31 @@ const EditSahayikaFormBM = lazy(() => import("./Screens/BMHome/EditSahayikaFormB
 const EditDisburseFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditDisburseFormBM_BDCCB"))
 const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB"))
 
+//////////////// BDCCB BM End ////////////////
+
+//////////////// BDCCB PACS Start ////////////////
+
+const HomePACS = lazy(() => import("./Screens/PACSHome/HomePACS"))
+const PACSDashboard = lazy(() => import("./Screens/PACSHome/Dashboard/PACSDashboard"));
+
+const EditDisburseFormPACS_BDCCB = lazy(() => import("./Screens/PACSHome/EditDisburseFormPACS_BDCCB.jsx"))
+const SearchMemberForDisbursePACS_BDCCB = lazy(() => import("./Screens/PACSHome/SearchMemberForDisbursePACS_BDCCB.jsx"))
+
+const DisbursedLoanApproveSinglePACS_BDCCB =  lazy(() => import("./Screens/PACSHome/DisbursedLoanApproveSinglePACS_BDCCB.jsx"));
+
+//////////////// BDCCB PACS End ////////////////
+
+
+
+
 ////////////////////////////////////////////// BDCCB End //////////////////////////////////////////////
 
 
 
 const MasterEmployees = lazy(() => import("./Screens/Admin/Master/Employees/MasterEmployees"));
 const EditMasterEmployee = lazy(() => import("./Screens/Admin/Master/Employees/EditMasterEmployee"));
-const HomeAdmin = lazy(() => import("./Screens/Admin/HomeAdmin"));
-const AdminDashboard = lazy(() => import("./Screens/Admin/Dashboard/AdminDashboard"));
+
+
 const CreateUser = lazy(() => import("./Screens/Admin/UserManagement/CreateUser"));
 const ManageUser = lazy(() => import("./Screens/Admin/UserManagement/ManageUser"));
 const TransferUserManage = lazy(() => import("./Screens/Admin/UserManagement/TransferUserManage"));
@@ -145,7 +171,7 @@ const EditGRTFormMis = lazy(() =>
 	import("./Screens/MISAssistantHome/EditGRTFormMis")
 )
 // const EditGroupForm = lazy(() => import("./Screens/MISAssistantHome/EditGroupForm"))
-const HomeBM = lazy(() => import("./Screens/BMHome/HomeBM"))
+
 // const HomeScreenBM = lazy(() => import("./Screens/BMHome/HomeScreenBM.jsx__BDCCB"))
 // const EditGRTFormBM = lazy(() => import("./Screens/BMHome/EditGRTFormBM.jsx__BDCCB"))
 
@@ -254,26 +280,26 @@ const router = createBrowserRouter([
 							// 	path: "grtappls",
 							// 	element: <HomeScreenMis />,
 							// },
-							{
-								path: "searchform",
-								element: <SearchGRTFormMis />,
-							},
+							// {
+							// 	path: "searchform",
+							// 	element: <SearchGRTFormMis />,
+							// },
 							// {
 							// 	path: "searchgroup",
 							// 	element: <SearchGroupMis />,
 							// },
-							{
-								path: "searchmember",
-								element: <SearchMemberMis />,
-							},
+							// {
+							// 	path: "searchmember",
+							// 	element: <SearchMemberMis />,
+							// },
 							// {
 							// 	path: "editgroupform/:id",
 							// 	element: <EditGroupForm />,
 							// },
-							{
-								path: "editgrtform/:id",
-								element: <EditGRTFormMis />,
-							},
+							// {
+							// 	path: "editgrtform/:id",
+							// 	element: <EditGRTFormMis />,
+							// },
 						],
 					},
 					{
@@ -484,6 +510,28 @@ const router = createBrowserRouter([
 							// 	path: "viewmembertransfer/:id",
 							// 	element: <TransferMemberViewScreen />,
 							// },
+						],
+					},
+					{
+						path: "homepacs",
+						element: <HomePACS />,
+						children: [
+							{
+								path: "",
+								element: <PACSDashboard />,
+							},
+							{
+								path: "disburseloan",
+								element: <SearchMemberForDisbursePACS_BDCCB />,
+							},
+							{
+								path: "disburseloan/:id",
+								element: <EditDisburseFormPACS_BDCCB />,
+							},
+							{
+								path: "approvedisbursed",
+								element: <DisbursedLoanApproveSinglePACS_BDCCB />,
+							},
 						],
 					},
 					{
