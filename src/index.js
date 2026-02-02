@@ -91,6 +91,7 @@ const EditDisburseFormPACS_BDCCB = lazy(() => import("./Screens/PACSHome/EditDis
 const SearchMemberForDisbursePACS_BDCCB = lazy(() => import("./Screens/PACSHome/SearchMemberForDisbursePACS_BDCCB.jsx"))
 
 const DisbursedLoanApproveSinglePACS_BDCCB =  lazy(() => import("./Screens/PACSHome/DisbursedLoanApproveSinglePACS_BDCCB.jsx"));
+const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/AcceptDisburseFormPACS_BDCCB.jsx"));
 
 //////////////// BDCCB PACS End ////////////////
 
@@ -532,6 +533,11 @@ const router = createBrowserRouter([
 								path: "approvedisbursed",
 								element: <DisbursedLoanApproveSinglePACS_BDCCB />,
 							},
+							{
+								path: "approvedisbursed/:id",
+								element: <AcceptDisburseFormPACS_BDCCB />,
+							},
+							
 						],
 					},
 					{

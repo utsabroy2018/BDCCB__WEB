@@ -153,13 +153,13 @@ function DisbursedLoanApproveSinglePACS_BDCCB() {
 				<main className="px-4 h-auto my-16 mx-32">
 					{/* <Radiobtn data={options} val={"U"} onChangeVal={onChange1} /> */}
 
-					<Radiobtn
+					{/* <Radiobtn
 						data={options}
 						val={loanType}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
-					/>
+					/> */}
 
 					{loanType === "U" ? (
 						<>
@@ -182,8 +182,6 @@ function DisbursedLoanApproveSinglePACS_BDCCB() {
 								title="Approve Disburse"
 								setSearch={(data) => setSearch(data)}
 								loanType={loanType}
-								// fetchLoanApplications={fetchLoanApplications}
-								// fetchLoanApplicationsDate={{ fromDate, toDate }}
 							/>
 						</>
 					) : null}

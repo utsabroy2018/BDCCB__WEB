@@ -2575,7 +2575,7 @@ const items_bdccb_PACS = [
 				{
 					key: "sub4-2",
 					icon: <CheckCircleOutlined />,
-					label: "Approve Transaction",
+					label: "Accept Transaction",
 					// hidden: data?.approve_transaction == "Y" ? false : true,
 					children: [
 						{
@@ -2584,12 +2584,12 @@ const items_bdccb_PACS = [
 							label: <Link to={"/homepacs/approvedisbursed"}>Disburse</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
-						// {
-						// 	key: "sub4-2-2",
-						// 	icon: <CheckCircleOutlined />,
-						// 	label: <Link to={"/homebm/approveloan"}>Recovery</Link>,
-						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
-						// },
+						{
+							key: "sub4-2-2",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={""}>Recovery</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
 					],
 				},
 			],

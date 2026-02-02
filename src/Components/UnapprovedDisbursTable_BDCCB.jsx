@@ -92,11 +92,11 @@ function UnapprovedDisbursTable_BDCCB({
 	const [RejectcachedPaymentId, setRejectCachedPaymentId] = useState(() => [])
 	const [checkBeforeApproveData, setCheckBeforeApproveData] = useState(() => [])
 
-	useEffect(() => {
-		if (loanAppData.length > 0) {
-			setLoanAppData(loanAppData)
-		}
-	}, [loanAppData])
+	// useEffect(() => {
+	// 	if (loanAppData.length > 0) {
+	// 		setLoanAppData(loanAppData)
+	// 	}
+	// }, [loanAppData])
 
 	// useEffect(() => {
 	// 	console.log(getloanAppData, 'ffffffffffffffffff');
@@ -107,6 +107,19 @@ function UnapprovedDisbursTable_BDCCB({
 	// 	// 	toast.current.show({ severity: 'success', summary: `${summary}`, life: 3000 });
 	// 	// }
 	// }, [expandedRows]);
+
+	useEffect(()=>{
+		// setAmountTd_(loanAppData.reduce((sum, r) => sum + parseFloat(r.disb_amt || 0), 0).toFixed(2));
+
+		if (loanAppData && loanAppData.length > 0) {
+		const total = loanAppData.reduce(
+		(sum, row) => sum + Number(row.disb_amt || 0),
+		0
+		);
+		setAmountTd_(total.toFixed(2));
+		}
+		
+	}, [loanAppData])
 
 	const getClientIP = async () => {
 	const res = await fetch("https://api.ipify.org?format=json")
@@ -128,23 +141,11 @@ function UnapprovedDisbursTable_BDCCB({
 		// if (e.value) {
 		if (rows.length > 0) {
 
-			setTotalEMI(rows.reduce((sum, r) => sum + parseFloat(r.tot_emi || 0), 0).toFixed(2));
-			setAmountTd_(rows.reduce((sum, r) => sum + parseFloat(r.amt || 0), 0).toFixed(2));
-			setOutstanding(rows.reduce((sum, r) => sum + parseFloat(r.outstanding || 0), 0).toFixed(2));
+			// setTotalEMI(rows.reduce((sum, r) => sum + parseFloat(r.tot_emi || 0), 0).toFixed(2));
+			// setAmountTd_(rows.reduce((sum, r) => sum + parseFloat(r.disb_amt || 0), 0).toFixed(2));
+			// setOutstanding(rows.reduce((sum, r) => sum + parseFloat(r.outstanding || 0), 0).toFixed(2));
 
 			
-			// const group_Data = rows.map((item) => {
-			// 	// console.log(item, 'dddddddddddddddddddddddd');
-			// 	return {
-			// 		payment_date: item?.transaction_date,
-			// 		payment_id: item?.payment_id,
-			// 		loan_id: item?.loan_id,
-			// 		outstanding: item?.outstanding,
-			// 		group_code: item?.group_code,
-			// 		branch_code: item?.branch_code,
-			// 	}
-			// })
-
 			const ip = await getClientIP()
 
 			const dat = rows.map((item) => {
@@ -179,9 +180,9 @@ function UnapprovedDisbursTable_BDCCB({
 			// console.log(dat[0], "You selected  rows", cachedPaymentId, ">>>", rows)
 		} else {
 			setShowApprov(false)
-			setTotalEMI(0)
-			setAmountTd_(0)
-			setOutstanding(0)
+			// setTotalEMI(0)
+			// setAmountTd_(0)
+			// setOutstanding(0)
 			console.log("No rows selected")
 		}
 	}
@@ -285,13 +286,13 @@ function UnapprovedDisbursTable_BDCCB({
 					onRefresh();
 					setSelectedProducts(null)
 					// setTotalEMI(0)
-					// setAmountTd_(0)
+					setAmountTd_(0)
 					// setOutstanding(0)
 					setLoading(false)
 
 				}
 				
-				Message(res?.data?.suc == 1 ? 'success' : 'error',res?.data?.suc == 1 ? 'Approve successfully' : 'We are unable to process your request!!')
+				// Message(res?.data?.suc == 1 ? 'success' : 'error',res?.data?.suc == 1 ? 'Approve successfully' : 'We are unable to process your request!!')
 				
 			})
 			.catch((err) => {
@@ -374,7 +375,7 @@ function UnapprovedDisbursTable_BDCCB({
 				<Toast ref={toast} />
 
 				
-					{/* {JSON.stringify(loanAppData, 2)} */}
+					{JSON.stringify(loanAppData, 2)}
 				<DataTable
 					value={loanAppData?.map((item, i) => [{ ...item, id: i }]).flat()}
 					selectionMode="checkbox"
@@ -427,15 +428,15 @@ function UnapprovedDisbursTable_BDCCB({
 						// }
 					></Column>
 					{/* <Column field="payment_id" header="Payment ID"></Column> */}
-					<Column
+					{/* <Column
 						field="branch_shg_id"
 						header="PACS ID"
 						// body={(rowData) =>
 						// 	`${rowData?.group_name} - ${rowData?.loan_id} (${rowData?.client_name})`
 						// }
-					></Column>
+					></Column> */}
 
-					<Column
+					{/* <Column
 						field="period"
 						header="Period"
 						// body={(rowData) => `${rowData?.amt} - (${rowData?.tr_mode})`}
@@ -444,18 +445,18 @@ function UnapprovedDisbursTable_BDCCB({
 						// 		{AmountTd_}
 						// 	</span>
 						// }
-					></Column>
-					<Column
+					></Column> */}
+					{/* <Column
 						field="pay_mode"
 						header="Pay Mode"
-					></Column>
+					></Column> */}
 
-					<Column
+					{/* <Column
 						field="curr_roi"
 						header="Current Rate Of Intarest"
 						body={(rowData) => `${rowData?.curr_roi} (%)`}
 						// footer={<span style={{ fontWeight: "bold" }}>{TotalEMI}</span>}
-					></Column>
+					></Column> */}
 						<Column
 						field="disb_dt"
 						header="Disburse Date"
@@ -468,19 +469,41 @@ function UnapprovedDisbursTable_BDCCB({
 					<Column
 						field="disb_amt"
 						header="Disburse Amount"
+						footer={
+							<span style={{ fontWeight: "bold", color: "#0694A2" }}>
+								{AmountTd_}
+							</span>
+						}
 					></Column>
 
 					<Column
-						field="curr_prn"
-						header="Current Principle"
+						// field="curr_prn"
+						header="Action"
+						body={(rowData) => (
+						<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+						<button
+						type="button"
+						onClick={() => {
+						console.log("ROW DATA:", rowData);
+						navigate(
+						`/homepacs/approvedisbursed/${rowData?.loan_id}`,
+						{ state: rowData }
+						);
+						}}
+						style={{ background: "transparent", border: "none", cursor: "pointer" }}
+						>
+						<EditOutlined className="text-md text-slate-800" />
+						</button>
+						</div>
+						)}
 					></Column>
 				
 					{/* <Column field="created_by" header="Collected By"></Column> */}
-					<Column
+					{/* <Column
 						field="curr_intt"
 						header="Current Intarest"
 						
-					></Column>
+					></Column> */}
 				</DataTable>
 				{/* <>{JSON.stringify(cachedPaymentId, null, 2)}</> */}
 

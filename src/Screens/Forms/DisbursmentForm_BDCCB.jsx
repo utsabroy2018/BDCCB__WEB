@@ -142,9 +142,10 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 		period: "",
 		curr_roi: "",
+		over_roi: "",
 		disb_dt: "",
 		disb_amt: "",
-		pay_mode: "",
+		// pay_mode: "",
 	}
 	const [formValues, setValues] = useState(initialValues)
 
@@ -156,9 +157,10 @@ function DisbursmentForm_BDCCB({ flag }) {
 		branch_shg_id: Yup.string().required("Select PACS or SHG is required"),
 		period: Yup.string().required("Period is required"),
 		curr_roi: Yup.mixed().required("Current Rate Of Intarest is required"),
+		over_roi: Yup.mixed().required("Overdue Rate Of Intarest is required"),
 		disb_dt: Yup.mixed().required("Disbursement Date is required"),
 		disb_amt: Yup.mixed().required("Disbursement Amount is required"),
-		pay_mode: Yup.mixed().required("Pay Mode is required"),
+		// pay_mode: Yup.mixed().required("Pay Mode is required"),
 	})
 
 
@@ -277,9 +279,10 @@ useEffect(()=>{
 				branch_shg_id: formData?.branch_shg_id, ///////////////
 				period: formData?.period,
 				curr_roi: formData?.curr_roi,
+				penal_roi: formData?.over_roi,
 				disb_dt: formData?.disb_dt,
 				disb_amt: formData?.disb_amt,
-				pay_mode: formData?.pay_mode,
+				// pay_mode: formData?.pay_mode,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 				}
@@ -315,7 +318,13 @@ useEffect(()=>{
 
 
 	const search_PACS_SHG = async (loan_toDroupDown, searchTxt)=>{
-	console.log(searchTxt, 'Call API For Pacs or SHG', loan_toDroupDown); // API Call
+
+		if(searchTxt.length < 3){
+			Message("error", "Minimum type 3 character")
+			return;
+		}
+
+		console.log(searchTxt, 'Calllllllllllllllllllll', loan_toDroupDown); // API Call
 
 	setPACS_SHGList([])
 	setLoading(true)
@@ -340,10 +349,10 @@ useEffect(()=>{
 		
 	if(res?.data?.success){
 	if(loan_toDroupDown == "P"){
-		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
-			code: item?.branch_id,
-			name: item?.branch_name,
-			})))
+	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+		code: item?.branch_id,
+		name: item?.branch_name,
+		})))
 	}
 
 	if(loan_toDroupDown == "S"){
@@ -373,6 +382,97 @@ useEffect(()=>{
 
 	}
 
+	useEffect(() => {
+  const currRoi = Number(formik.values.curr_roi);
+
+  if (!isNaN(currRoi) && currRoi !== "") {
+	console.log(formik.values.curr_roi, 'ccccccccccc');
+	if(formik.values.curr_roi > 0){
+    formik.setFieldValue("over_roi", currRoi + 2);
+	}
+  }
+}, [formik.values.curr_roi]);
+
+// const setSearch = (key)=>{
+// 	console.log(key, 'jjjjjjjjjjjjjjj');
+	
+// }
+
+const handleSearchChange = async (value) => {
+//   const value = e.target.value;
+  console.log(value, 'jjjjjjjjjjjjjjj', formik.values.loan_to);
+
+  // Update formik field
+  formik.handleChange(value);
+
+  // Trigger search logic
+//   setSearch(value);       // or call API / filter list
+
+
+
+
+	if(value.length < 3){
+		Message("error", "Minimum type 3 character")
+		return;
+	}
+
+	console.log(value, 'Calllllllllllllllllllll', formik.values.loan_to); // API Call
+
+	setPACS_SHGList([])
+	setLoading(true)
+	const creds = {
+	loan_to : formik.values.loan_to,
+    branch_code : userDetails[0]?.brn_code,
+    branch_shg_id : value,
+	tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
+	}
+
+	const tokenValue = await getLocalStoreTokenDts(navigate);
+
+	await axios.post(`${url_bdccb}/loan/fetch_pacs_shg_details`, creds, {
+	headers: {
+	Authorization: `${tokenValue?.token}`, // example header
+	"Content-Type": "application/json", // optional
+	},
+	})
+	.then((res) => {
+
+	if(res?.data?.success){
+	if(formik.values.loan_to == "P"){
+	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+	code: item?.branch_id,
+	name: item?.branch_name,
+	})))
+	}
+
+	if(formik.values.loan_to == "S"){
+	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+	code: item?.group_code,
+	name: item?.group_name,
+	})))
+	}
+
+	if(res?.data?.data.length > 0){
+		Message("success", res?.data?.msg)
+	} else {
+		Message("error", res?.data?.msg)
+	}
+	
+
+	} else {
+	navigate(routePaths.LANDING)
+	localStorage.clear()
+	}
+	})
+	.catch((err) => {
+	Message("error", "Some error occurred while fetching group form")
+	})
+
+	setLoading(false)
+};
+
+
+
 
 	return (
 		<>
@@ -392,7 +492,7 @@ useEffect(()=>{
 				
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-3"}>
+						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
 
 							
 							{/* <div>
@@ -416,7 +516,7 @@ useEffect(()=>{
 								{/* {JSON.stringify(sahayikaList, null, 2)} */}
 								<TDInputTemplateBr
 									placeholder="Loan Account No."
-									type="number"
+									type="text"
 									label="Loan Account No."
 									name="loan_ac_no"
 									formControlName={formik.values.loan_ac_no}
@@ -437,11 +537,11 @@ useEffect(()=>{
 
 							
 
-							</div>
+							{/* </div>
 							</div>
 
 							<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
+						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}> */}
 
 							<div>
 								{/* {loan_toDroupDown} */}
@@ -485,25 +585,54 @@ useEffect(()=>{
 								
 							</div>
 
-							<div>
-								{/* {JSON.stringify(formik.values.loan_to, null, 2)} */}
-								<TDInputTemplateBr
-									placeholder="Search Here.."
-									type="text"
-									label={formik.values.loan_to === 'P' ? 'Search By PACS *' : formik.values.loan_to === 'S' ? 'Search By SHG *' : 'Search *'}
-									name="branch_shg_SearchField"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.branch_shg_SearchField}
-									mode={1}
-								/>
-								{/* {formik.errors.branch_shg_id && formik.touched.branch_shg_id ? (
-									<VError title={formik.errors.branch_shg_id} />
-								) : null} */}
 							</div>
+							</div>
+
+							<div className="flex justify-start gap-5">
+						<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
+
 							<div>
-								{/* {JSON.stringify(PACS_SHGList, null, 2)} */}
-								{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
+								<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
+				 dark:text-gray-100"> {formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'} </label>
+								<Select
+									showSearch
+									placeholder="Choose Sector"
+									value={formik.values.branch_shg_id || undefined}
+									style={{ width: "100%" }}
+									optionFilterProp="children"
+									name="branch_shg_id"
+									// 🔍 typing search
+									onSearch={(value) => {
+									handleSearchChange(value);   // your search function
+									}}
+									disabled={formik.values.loan_to.length > 0 ? false : true}
+									// ✅ selecting option
+									onChange={(value) => {formik.setFieldValue("branch_shg_id", value)}}
+
+									onBlur={formik.handleBlur}
+									filterOption={(input, option) =>
+									option?.children?.toLowerCase().includes(input.toLowerCase())
+									}
+									>
+									<Select.Option value="" disabled>Choose Sector</Select.Option>
+
+									{PACS_SHGList?.map((data) => (
+									<Select.Option key={data.code} value={data.code}>
+									{data.name}
+									</Select.Option>
+									))}
+									</Select>
+
+								
+									{formik.errors.branch_shg_id && formik.touched.branch_shg_id ? (
+										<VError title={formik.errors.branch_shg_id} />
+									) : null}
+
+
+								
+								
+							</div>
+							{/* <div>
 
 							<button type="button" onClick={()=>{
 								search_PACS_SHG(formik.values.loan_to, formik.values.branch_shg_SearchField)
@@ -513,24 +642,11 @@ useEffect(()=>{
 							>
 								Search
 							</button>
-							</div>
+							</div> */}
 
-							<div>
-								<TDInputTemplateBr
-									placeholder="Select ..."
-									type="text"
-									label={formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'}
-									name="branch_shg_id"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.branch_shg_id}
-									data={PACS_SHGList}
-									mode={2}
-								/>
-								{formik.errors.branch_shg_id && formik.touched.branch_shg_id ? (
-									<VError title={formik.errors.branch_shg_id} />
-								) : null}
-							</div>
+							{/* <div>
+								
+							</div> */}
 
 
 						</div>
@@ -541,14 +657,14 @@ useEffect(()=>{
 							<div>
 								<TDInputTemplateBr
 									placeholder="Period"
-									type="text"
-									label="Period"
+									type="number"
+									label="Period (In Month)"
 									name="period"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}
 									formControlName={formik.values.period}
 									data={period_data}
-									mode={2}
+									mode={1}
 								/>
 								{formik.errors.period && formik.touched.period ? (
 									<VError title={formik.errors.period} />
@@ -558,9 +674,9 @@ useEffect(()=>{
 
 							<div>
 							<TDInputTemplateBr
-							placeholder="Type Current Rate Of Intarest"
+							placeholder="Type Current ROI"
 							type="number"
-							label="Current Rate Of Intarest %"
+							label="Current ROI"
 							name="curr_roi"
 							formControlName={formik.values.curr_roi}
 							handleChange={formik.handleChange}
@@ -569,6 +685,22 @@ useEffect(()=>{
 							/>
 							{formik.errors.curr_roi && formik.touched.curr_roi ? (
 									<VError title={formik.errors.curr_roi} />
+								) : null}
+							</div>
+
+							<div>
+							<TDInputTemplateBr
+							placeholder="Ovd ROI"
+							type="number"
+							label="Ovd ROI"
+							name="over_roi"
+							formControlName={formik.values.over_roi}
+							handleChange={formik.handleChange}
+							handleBlur={formik.handleBlur}
+							mode={1}
+							/>
+							{formik.errors.over_roi && formik.touched.over_roi ? (
+									<VError title={formik.errors.over_roi} />
 								) : null}
 							</div>
 
@@ -607,17 +739,13 @@ useEffect(()=>{
 								) : null}
 					</div>
 
-							<div>
-								{/* {JSON.stringify(masterData, null, 2)}  */}
+							{/* <div>
 						<TDInputTemplateBr
 						placeholder="Select Pay Mode..."
 						type="text"
 						label="Pay Mode"
 						name="pay_mode"
-						// formControlName={masterData.pay_mode}
-						// handleChange={handleChangeMaster}
 						formControlName={formik.values.pay_mode}
-						// handleChange={formik.handleChange}
 						handleChange={formik.handleChange}
 						handleBlur={formik.handleBlur}
 						data={pay_mode}
@@ -626,7 +754,7 @@ useEffect(()=>{
 						{formik.errors.pay_mode && formik.touched.pay_mode ? (
 									<VError title={formik.errors.pay_mode} />
 								) : null}
-					</div>
+					</div> */}
 
 					
 

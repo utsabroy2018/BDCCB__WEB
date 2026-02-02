@@ -10,15 +10,21 @@ import FormHeader from "../../Components/FormHeader"
 import { useLocation } from "react-router"
 import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
+import MemberGroupExtendedForm from "../Forms/MemberGroupExtendedForm.jsx__BDCCB"
+import SahayikaExtendedForm from "../Forms/SahayikaExtendedForm"
+import AcceptDisburseInfo from "../Forms/AcceptDisburseInfo"
 
-function EditGroupFormBM() {
+function AcceptDisburseFormPACS_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
 	const  loanAppData  = location.state || {}
 	const navigate = useNavigate()
 
-
+	useEffect(()=>{
+		console.log(loanAppData, 'ddddddddddddddddddd');
+		
+	}, [])
 
 	return (
 		<>
@@ -28,7 +34,7 @@ function EditGroupFormBM() {
 				<div className=" p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
 						<FormHeader
-							text={`${params?.id == 0 ? "Add Group" : "Edit/Preview Group"}`}
+							text={`Accept Transaction`}
 							mode={2}
 						/>
 					</div>
@@ -40,7 +46,7 @@ function EditGroupFormBM() {
 					>
 						<div className="card bg-white border-2 p-5 mx-16 shadow-lg rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 							{/* {JSON.stringify(loanAppData, null, 2)} ccccccccccc */}
-							<GroupExtendedForm groupDataArr={loanAppData} />
+							<AcceptDisburseInfo groupDataArr={loanAppData} />
 						</div>
 					</Spin>
 				</div>
@@ -51,4 +57,4 @@ function EditGroupFormBM() {
 	)
 }
 
-export default EditGroupFormBM
+export default AcceptDisburseFormPACS_BDCCB
