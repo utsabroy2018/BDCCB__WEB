@@ -5,7 +5,7 @@ import { url } from "../../Address/BaseUrl";
 import { Message } from "../../Components/Message";
 import { Spin } from "antd";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
-import EmployeeMasterTable from "../../Components/Master/EmployeeMasterTable";
+import EmployeeMasterTable from "../../Components/Master/EmployeeMasterTable.jsx__BDCCB";
 import MemberTransferTable from "../../Components/Master/MemberTransferTable";
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts";
 import { useNavigate } from "react-router"

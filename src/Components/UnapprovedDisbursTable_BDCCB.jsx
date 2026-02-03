@@ -187,79 +187,15 @@ function UnapprovedDisbursTable_BDCCB({
 		}
 	}
 
-	const checkingCreditAmt = async () => {
-		const creds = {
-			checklist: checkBeforeApproveData?.map((item) => ({
-				payment_id: item?.payment_id,
-				payment_date: item?.payment_date,
-			})),
-		}
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		await axios.post(`${url}/checking_credit_amt`, creds, {
-		headers: {
-		Authorization: `${tokenValue?.token}`, // example header
-		"Content-Type": "application/json", // optional
-		},
-		}).then((res) => {
-
-		if(res?.data?.suc === 0){
-		Message('error', res?.data?.msg)
-		navigate(routePaths.LANDING)
-		localStorage.clear()
-		} else {
-		setVisible(true)
-		}
 
 
-			})
-		}
-
-		const checkingBeforeApprove = async () => {
-			alert('ffffffffffffff')
-			setLoading(true)
-			const creds = {
-				flag: "M",
-				chkdt: checkBeforeApproveData,
-			}
-
-			// console.log(checkBeforeApproveData, "check before approve dat gggg");
-			const tokenValue = await getLocalStoreTokenDts(navigate);
-
-			await axios
-				.post(`${url}/checking_before_approve`, creds, {
-					headers: {
-						Authorization: `${tokenValue?.token}`, // example header
-						"Content-Type": "application/json", // optional
-					},
-				})
-				.then(async (res) => {
-
-					if (res?.data?.suc === 0) {
-						Message('error', res?.data?.msg)
-						navigate(routePaths.LANDING)
-						localStorage.clear()
-					} else {
-						await checkingCreditAmt()
-					}
-					// if (res?.data?.suc === 0) {
-					// 	Message("error", res?.data?.msg)
-					// } else if (res?.data?.suc === 1) {
-					// 	// setVisible(true)
-					// 	await checkingCreditAmt()
-					// }
-				})
-				.catch((err) => {
-					Message("error", "Some error occurred while fetching loans!")
-				})
-			setLoading(false)
-		}
+	
 
 
 
 	const approveDisbursement = async (cachedPaymentId) => {
 		
-		console.log(cachedPaymentId, 'cachedPaymentIdcachedPaymentIdcachedPaymentId');
+		// console.log(cachedPaymentId, 'cachedPaymentIdcachedPaymentIdcachedPaymentId');
 		setLoading(true)
 		// const creds = {
 		// 	approved_by: userDetails?.emp_id,
@@ -276,12 +212,7 @@ function UnapprovedDisbursTable_BDCCB({
 			})
 			.then((res) => {
 
-				if(res?.data?.suc === 0){
-				// Message('error', res?.data?.msg)
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-
-				} else {
+				if(res?.data?.success){
 
 					onRefresh();
 					setSelectedProducts(null)
@@ -290,7 +221,11 @@ function UnapprovedDisbursTable_BDCCB({
 					// setOutstanding(0)
 					setLoading(false)
 
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
 				}
+
 				
 				// Message(res?.data?.suc == 1 ? 'success' : 'error',res?.data?.suc == 1 ? 'Approve successfully' : 'We are unable to process your request!!')
 				
@@ -357,7 +292,7 @@ function UnapprovedDisbursTable_BDCCB({
 										animate={{ opacity: 1, width: "92%" }}
 										transition={{ delay: 1.1, type: "just" }}
 										className={`bg-white border rounded-lg border-slate-700 text-gray-800 block w-full h-12 pl-10 dark:bg-gray-800 md:ml-4 duration-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-lg focus:border-blue-600`}
-										placeholder="Search"
+										placeholder="Search By Loan Account No."
 										required=""
 										onChange={(text) => setSearch(text.target.value)}
 									/>
@@ -375,13 +310,13 @@ function UnapprovedDisbursTable_BDCCB({
 				<Toast ref={toast} />
 
 				
-					{JSON.stringify(loanAppData, 2)}
+					{/* {JSON.stringify(loanAppData, 2)} */}
 				<DataTable
 					value={loanAppData?.map((item, i) => [{ ...item, id: i }]).flat()}
 					selectionMode="checkbox"
 					
 					selection={selectedProducts}
-					onSelectionChange={(e) => handleSelectionChange(e)}
+					// onSelectionChange={(e) => handleSelectionChange(e)}
 					 scrollable scrollHeight="400px"
 					
 					tableStyle={{ minWidth: "50rem" }}
@@ -394,15 +329,16 @@ function UnapprovedDisbursTable_BDCCB({
 							<span style={{ fontWeight: "bold" }}>{rowData?.id + 1}</span>
 						)}
 					></Column>
-					<Column
+					{/* <Column
 						// selectionMode="single"
 						selectionMode="multiple"
 						headerStyle={{ width: "3rem" }}
-					></Column>
+					></Column> */}
 
 					<Column
 						field="trans_id"
 						header="Transaction ID"
+						footer={<span style={{ fontWeight: "bold" }}>Total</span>}
 					></Column>
 
 					<Column
@@ -427,36 +363,6 @@ function UnapprovedDisbursTable_BDCCB({
 						// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
 						// }
 					></Column>
-					{/* <Column field="payment_id" header="Payment ID"></Column> */}
-					{/* <Column
-						field="branch_shg_id"
-						header="PACS ID"
-						// body={(rowData) =>
-						// 	`${rowData?.group_name} - ${rowData?.loan_id} (${rowData?.client_name})`
-						// }
-					></Column> */}
-
-					{/* <Column
-						field="period"
-						header="Period"
-						// body={(rowData) => `${rowData?.amt} - (${rowData?.tr_mode})`}
-						// footer={
-						// 	<span style={{ fontWeight: "bold", color: "#0694A2" }}>
-						// 		{AmountTd_}
-						// 	</span>
-						// }
-					></Column> */}
-					{/* <Column
-						field="pay_mode"
-						header="Pay Mode"
-					></Column> */}
-
-					{/* <Column
-						field="curr_roi"
-						header="Current Rate Of Intarest"
-						body={(rowData) => `${rowData?.curr_roi} (%)`}
-						// footer={<span style={{ fontWeight: "bold" }}>{TotalEMI}</span>}
-					></Column> */}
 						<Column
 						field="disb_dt"
 						header="Disburse Date"
@@ -498,12 +404,6 @@ function UnapprovedDisbursTable_BDCCB({
 						)}
 					></Column>
 				
-					{/* <Column field="created_by" header="Collected By"></Column> */}
-					{/* <Column
-						field="curr_intt"
-						header="Current Intarest"
-						
-					></Column> */}
 				</DataTable>
 				{/* <>{JSON.stringify(cachedPaymentId, null, 2)}</> */}
 

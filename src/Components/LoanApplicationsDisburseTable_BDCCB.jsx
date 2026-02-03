@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { routePaths } from "../Assets/Data/Routes"
 import { Link } from "react-router-dom"
 import Tooltip from "@mui/material/Tooltip"
@@ -14,6 +14,8 @@ import {
 import { useNavigate } from "react-router-dom"
 import { Tag } from "antd"
 import { Message } from "./Message"
+import Column from "antd/es/table/Column"
+import { DataTable } from "primereact/datatable"
 
 function LoanApplicationsDisburseTable_BDCCB({
 	loanAppData,
@@ -29,21 +31,25 @@ function LoanApplicationsDisburseTable_BDCCB({
 
 	const [first, setFirst] = useState(0)
 	const [rows, setRows] = useState(10)
+	const [AmountTd_, setAmountTd_] = useState(0)
 
 	const onPageChange = (event) => {
 		setFirst(event.first)
 		setRows(event.rows)
 	}
 
-	// const goTo = (item) => {
-	// 	navigate(`${routePaths.EDIT_APPLICATION}`, {
-	// 		state: { loanAppData: item },
-	// 	})
-	// }
+	useEffect(()=>{
+		// setAmountTd_(loanAppData.reduce((sum, r) => sum + parseFloat(r.disb_amt || 0), 0).toFixed(2));
 
-	// useEffect(() => {
-	// 	goTo()
-	// })
+		if (loanAppData && loanAppData.length > 0) {
+		const total = loanAppData.reduce(
+		(sum, row) => sum + Number(row.disb_amt || 0),
+		0
+		);
+		setAmountTd_(total.toFixed(2));
+		}
+		
+	}, [loanAppData])
 
 	return (
 		<>
@@ -67,6 +73,7 @@ function LoanApplicationsDisburseTable_BDCCB({
 							>
 								{title}
 							</motion.h2>
+							
 
 							<label htmlFor="simple-search" className="sr-only">
 								Search
@@ -96,7 +103,7 @@ function LoanApplicationsDisburseTable_BDCCB({
 										transition={{ delay: 1.1, type: "just" }}
 										className={`bg-white border rounded-lg  border-slate-700 bg-slate-300"
 										 text-gray-800 block w-full h-12 pl-10 dark:bg-gray-800 md:ml-4 duration-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-lg `}
-										placeholder="Search"
+										placeholder="Search By Loan Account No."
 										required=""
 										onChange={(text) => setSearch(text.target.value)}
 									/>
@@ -111,130 +118,105 @@ function LoanApplicationsDisburseTable_BDCCB({
 				animate={{ opacity: 1 }}
 				transition={{ delay: 0.5, type: "spring", stiffness: 30 }}
 			>
-				<table className="w-full text-sm text-left rtl:text-right shadow-lg text-green-900dark:text-gray-400">
-					<thead
-						className={`text-md text-gray-700 capitalize bg-slate-300
-						 dark:bg-gray-700 dark:text-gray-400`}
-					>
-						<tr>
-							{/* <th scope="col" className="p-4">
-								#
-							</th> */}
-						
-							<th scope="col" className="p-4">
-								Group Code
-							</th>
-							<th scope="col" className="p-4">
-								Group Name
-							</th>
-							<th scope="col" className="p-4">
-								Group Type
-							</th>
-							{/* <th scope="col" className="p-4">
-								Status
-							</th> */}
-							{/* <th scope="col" className="p-4">
-								Branch
-							</th>
-							<th scope="col" className="p-4">
-								Loan Type
-							</th> */}
-							{/* <th scope="col" className="p-4">
-								Created By
-							</th> */}
-							<th scope="col" className="p-4">
-								Action
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{(loanAppData && loanAppData.length > 0) ? 
-							loanAppData?.slice(first, rows + first).map((item, i) => (
-								<tr
-									className={
-										"bg-white border-b-pink-200 border-2 dark:bg-gray-800 dark:border-gray-700"
-									}
-									key={i}
+
+				{JSON.stringify(loanAppData, 2)} 
+				
+
+				<DataTable
+									value={loanAppData?.map((item, i) => [{ ...item, id: i }]).flat()}
+									selectionMode="checkbox"
+									
+									// selection={selectedProducts}
+									// onSelectionChange={(e) => handleSelectionChange(e)}
+									 scrollable scrollHeight="400px"
+									
+									tableStyle={{ minWidth: "50rem" }}
+									dataKey="id"
+									tableClassName="w-full text-sm text-left rtl:text-right shadow-lg text-green-900dark:text-gray-400 table_Custome table_Custome_1st" // Apply row classes
 								>
-									{/* <th
-										scope="row"
-										className="px-3 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-									>
-										{item.sl_no}
-									</th> */}
-									
-									<td className="px-6 py-3">{item.group_code}</td>
-									<td className="px-6 py-3">{item.group_name}</td>
-									<td className="px-6 py-3">{item.group_type=='J'?'JLG':'SHG'}</td>
-									
-									
-									<td className="px-6 py-3">
-										{flag === "MIS" ? (
-											<button
-												// to={routePaths.BM_EDIT_GRT + item?.form_no}
-												onClick={() => {
-													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homemis/editgrtform/${item?.group_code}`, {
-														state: item,
-													})
-												}}
-												disabled
-											>
-												<EditOutlined
-													className={`text-md  text-slate-800
-												`}
-												/>
-											</button>
-										) : flag === "BM" ? (
-											// </Link>
-											<button
-												// to={routePaths.BM_EDIT_GRT + item?.form_no}
-												onClick={() => {
-												if(item.loan_exist==0){
-													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homebm/disburseloan/0`, {
-														state: [item, approvalStat],
-													})
-												}
-												else{
-													Message("error", item.loan_exist_msg)
-												}
-												}}
-											>
-												<EditOutlined
-													className={`text-md  text-slate-800
-													}`}
-												/>
-											</button>
-										) : (
-											// </Link>
-											<button
-												// to={routePaths.BM_EDIT_GRT + item?.form_no}
-												onClick={() => {
-													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homeco/disburseloan/0`, {
-														state: item,
-													})
-												}}
-											>
-												<EditOutlined
-													className={`text-md  text-slate-800
-													}`}
-												/>
-											</button>
+									<Column
+										header="Sl No."
+										body={(rowData) => (
+											<span style={{ fontWeight: "bold" }}>{rowData?.id + 1}</span>
 										)}
-									</td>
-								</tr>
-							)) : <tr className={
-										"bg-white border-b-pink-200 border-2 dark:bg-gray-800 dark:border-gray-700"
-									}>
-										<td colSpan={4} className="text-center p-5">
-												<span className="text-lg">No Data Available</span>
-										</td>
-							</tr>
-						}
-					</tbody>
-				</table>
+									></Column>
+									{/* <Column
+										// selectionMode="single"
+										selectionMode="multiple"
+										headerStyle={{ width: "3rem" }}
+									></Column> */}
+				
+									<Column
+										field="trans_id"
+										header="Transaction ID"
+										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
+									></Column>
+				
+									<Column
+										field="trans_dt"
+										header="Transaction Date"
+										body={(rowData) =>
+											new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
+										}
+										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
+									></Column>
+				
+									<Column
+										field="loan_id"
+										header="Loan Id"
+									></Column>
+				
+									
+									<Column
+										field="loan_acc_no"
+										header="Loan Account No. "
+										// body={(rowData) =>
+										// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
+										// }
+									></Column>
+										<Column
+										field="disb_dt"
+										header="Disburse Date"
+										body={(rowData) =>
+											new Date(rowData?.disb_dt).toLocaleDateString("en-GB")
+										}
+										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
+									></Column>
+				
+									<Column
+										field="disb_amt"
+										header="Disburse Amount"
+										footer={
+											<span style={{ fontWeight: "bold", color: "#0694A2" }}>
+												{AmountTd_}
+											</span>
+										}
+									></Column>
+				
+									<Column
+										// field="curr_prn"
+										header="Action"
+										body={(rowData) => (
+										<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+										<button
+										type="button"
+										onClick={() => {
+										console.log("ROW DATA:", rowData);
+										navigate(
+										`/homepacs/approvedisbursed/${rowData?.loan_id}`,
+										{ state: rowData }
+										);
+										}}
+										style={{ background: "transparent", border: "none", cursor: "pointer" }}
+										>
+										<EditOutlined className="text-md text-slate-800" />
+										</button>
+										</div>
+										)}
+									></Column>
+								
+								</DataTable>
+								
 				<Paginator
 					first={first}
 					rows={rows}

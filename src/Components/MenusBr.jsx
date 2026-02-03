@@ -2570,7 +2570,7 @@ const items_bdccb_PACS = [
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homepacs/disburseloan/0"}>Disburse Loan</Link>,
+					label: <Link to={"/homepacs/disburseloan"}>Disburse Loan</Link>,
 				},
 				{
 					key: "sub4-2",
@@ -2603,7 +2603,10 @@ const items_bdccb_PACS = [
 	return (
 		
 		<div className="bg-slate-600 flex justify-between align-middle gap-4 rounded-full">
-			<img src={IMG} className="w-12 h-12 p-2 -mr-6" alt="Flowbite Logo" />
+			{/* w-12 h-12 p-2 -mr-6 rounded-lg overflow-hidden */}
+			{/* <img src={IMG} className="w-12 h-12 p-2 -mr-6 rounded-lg overflow-hidden" alt="Flowbite Logo" /> */}
+			<img src={IMG} className="w-12 h-12 -mr-6" alt="Flowbite Logo" style={{display: 'flex', 
+			borderRadius: '60%', overflow: 'hidden'}} />
 			
 
 			{/* <Menu
@@ -2623,7 +2626,7 @@ const items_bdccb_PACS = [
 			<Menu
 			onClick={onClick}
 			selectedKeys={[current]}
-			items={userDetails[0]?.user_type == 'Super Admin' ? items_bdccb : userDetails[0]?.user_type == 'PACS' ? items_bdccb_PACS : items_bdccb}
+			items={userDetails[0]?.user_type == 'H' ? items_bdccb : userDetails[0]?.user_type == 'P' ? items_bdccb_PACS : items_bdccb}
 			// disabled={getMenuShow === "yes" ? true : false}
 
 			mode="horizontal"

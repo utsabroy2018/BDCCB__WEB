@@ -1326,8 +1326,8 @@ function Sidebar({ mode = 0 }) {
 					<div className="italic ml-10">
 						⇨{" "}
 						
-							{`${userDetails[0]?.user_type} - ${userDetails[0]?.emp_name}`}
-						{/* ({userDetails[0]?.branch_name}) */}
+							{`${userDetails[0]?.user_type == 'H'? 'Head Office' : userDetails[0]?.user_type == 'B'? 'Branch' : userDetails[0]?.user_type == 'P'? 'PACS' : userDetails[0]?.user_type == 'S'? 'SHG' : ''} - ${userDetails[0]?.emp_name} `}
+						 ({userDetails[0]?.branch_name})
 					</div>
 
 					{/* <div style={{alignItems:'center', display:'flex'}} className="mr-10">

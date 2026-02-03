@@ -131,6 +131,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const [visible, setVisible] = useState(() => false)
 	const [pendingValues, setPendingValues] = useState(null);
 	const [PACS_SHGList, setPACS_SHGList] = useState([]);
+	const [remainDisburseAmt, setRemainDisburseAmt] = useState(null);
 
 	const initialValues = {
 		// loan_id: "",
@@ -159,8 +160,30 @@ function DisbursmentForm_BDCCB({ flag }) {
 		curr_roi: Yup.mixed().required("Current Rate Of Intarest is required"),
 		over_roi: Yup.mixed().required("Overdue Rate Of Intarest is required"),
 		disb_dt: Yup.mixed().required("Disbursement Date is required"),
-		disb_amt: Yup.mixed().required("Disbursement Amount is required"),
-		// pay_mode: Yup.mixed().required("Pay Mode is required"),
+		// disb_amt: Yup.mixed().required("Disbursement Amount is required"),
+		// disb_amt: Yup.number()
+		// .typeError("Disbursement Amount must be a number")
+		// .required("Disbursement Amount is required")
+		// .max(remainDisburseAmt, `Disbursement Amount cannot be more than ${remainDisburseAmt}`)
+		// .positive("Disbursement Amount must be greater than 0"),
+		disb_amt: Yup.number()
+		.typeError("Disbursement Amount must be a number")
+		.required("Disbursement Amount is required")
+		.positive("Disbursement Amount must be greater than 0")
+		.test(
+			"max-disb-amt-for-P",
+			`Disbursement Amount cannot be more than ${remainDisburseAmt}`,
+			function (value) {
+			if (!value) return true;
+
+			// apply condition ONLY for P
+			if (userDetails?.[0]?.user_type === "P") {
+				return value <= remainDisburseAmt;
+			}
+
+			return true; // no limit for other user types
+			}
+		)
 	})
 
 
@@ -393,30 +416,14 @@ useEffect(()=>{
   }
 }, [formik.values.curr_roi]);
 
-// const setSearch = (key)=>{
-// 	console.log(key, 'jjjjjjjjjjjjjjj');
-	
-// }
+
 
 const handleSearchChange = async (value) => {
-//   const value = e.target.value;
-  console.log(value, 'jjjjjjjjjjjjjjj', formik.values.loan_to);
-
-  // Update formik field
-  formik.handleChange(value);
-
-  // Trigger search logic
-//   setSearch(value);       // or call API / filter list
-
-
-
-
 	if(value.length < 3){
 		Message("error", "Minimum type 3 character")
 		return;
 	}
 
-	console.log(value, 'Calllllllllllllllllllll', formik.values.loan_to); // API Call
 
 	setPACS_SHGList([])
 	setLoading(true)
@@ -471,8 +478,55 @@ const handleSearchChange = async (value) => {
 	setLoading(false)
 };
 
+useEffect(() => {
+	if(userDetails[0]?.user_type == 'P'){
+		remainingDisburseAmt()
+	}
+	
+}, [formik.values.loan_to])
+
+const remainingDisburseAmt = async ()=>{
 
 
+	setLoading(true)
+	const creds = {
+	// pacs_shg_id : formik.values.loan_to,
+    // loan_to : userDetails[0]?.brn_code,
+    // branch_shg_id : value,
+	// tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
+
+	pacs_shg_id : userDetails[0]?.brn_code,
+    loan_to : userDetails[0]?.user_type,
+	// loan_to : formik.values.loan_to,
+	}
+
+	const tokenValue = await getLocalStoreTokenDts(navigate);
+
+	await axios.post(`${url_bdccb}/loan/fetch_max_balance`, creds, {
+	headers: {
+	Authorization: `${tokenValue?.token}`, // example header
+	"Content-Type": "application/json", // optional
+	},
+	})
+	.then((res) => {
+
+	if(res?.data?.success){
+	setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
+	console.log(res?.data?.data[0]?.max_balance, 'searchAmtsearchAmtsearchAmtsearchAmt');
+
+	} else {
+	// navigate(routePaths.LANDING)
+	// localStorage.clear()
+	}
+	})
+	.catch((err) => {
+	Message("error", "Some error occurred while fetching group form")
+	})
+
+	setLoading(false)
+	
+
+}
 
 	return (
 		<>
@@ -493,24 +547,6 @@ const handleSearchChange = async (value) => {
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
-
-							
-							{/* <div>
-								<TDInputTemplateBr
-									placeholder="Loan ID"
-									type="text"
-									label="Loan ID"
-									name="loan_id"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.loan_id}
-									mode={1}
-								/>
-								{formik.errors.loan_id && formik.touched.loan_id ? (
-									<VError title={formik.errors.loan_id} />
-								) : null}
-							</div> */}
-
 
 							<div>
 								{/* {JSON.stringify(sahayikaList, null, 2)} */}
@@ -533,15 +569,7 @@ const handleSearchChange = async (value) => {
 								) : null}
 							</div>
 
-							
 
-							
-
-							{/* </div>
-							</div>
-
-							<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}> */}
 
 							<div>
 								{/* {loan_toDroupDown} */}
@@ -585,6 +613,20 @@ const handleSearchChange = async (value) => {
 								
 							</div>
 
+							<div className="pt-6">
+							{userDetails[0]?.user_type == 'P'&& (
+								<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
+							<span className="text-sm font-medium">
+								Balance:</span>
+							<span className="text-base font-semibold">₹{remainDisburseAmt?.toLocaleString("en-IN")}
+							</span>
+							</div>
+							)}
+							
+
+
+							</div>
+
 							</div>
 							</div>
 
@@ -593,10 +635,13 @@ const handleSearchChange = async (value) => {
 
 							<div>
 								<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
-				 dark:text-gray-100"> {formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'} </label>
+				 dark:text-gray-100"> 
+				 {formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'} 
+				 {/* Select PACS/SHG * */}
+				 </label>
 								<Select
 									showSearch
-									placeholder="Choose Sector"
+									placeholder={formik.values.loan_to === 'P' ? 'Choose PACS ' : formik.values.loan_to === 'S' ? 'Choose SHG ' : 'Choose '}
 									value={formik.values.branch_shg_id || undefined}
 									style={{ width: "100%" }}
 									optionFilterProp="children"
@@ -710,7 +755,7 @@ const handleSearchChange = async (value) => {
 						<TDInputTemplateBr
 						// placeholder="Select Disbursement Date..."
 						type="date"
-						label="Select Disbursement Date"
+						label="Disbursement Date"
 						name="disb_dt"
 						formControlName={formik.values.disb_dt}
 						handleChange={formik.handleChange} 
@@ -730,10 +775,23 @@ const handleSearchChange = async (value) => {
 						label="Disbursement Amount"
 						name="disb_amt"
 						formControlName={formik.values.disb_amt}
+						// handleChange={(e) => {
+						// formik.handleChange(e);                 // keep Formik in sync
+						// remainingDisburseAmt(e.target.value);   // trigger on typing
+						// }}
+
+						// handleChange={(e) => {
+						// 	const value = Number(e.target.value);
+
+						// 	if (value <= remainDisburseAmt || e.target.value === "") {
+						// 	formik.handleChange(e);
+						// 	}
+						// }}
 						handleChange={formik.handleChange}
 						handleBlur={formik.handleBlur}
 						mode={1}
 						/>
+
 						{formik.errors.disb_amt && formik.touched.disb_amt ? (
 									<VError title={formik.errors.disb_amt} />
 								) : null}

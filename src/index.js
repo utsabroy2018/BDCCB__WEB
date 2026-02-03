@@ -11,30 +11,32 @@ import RejectDisbursement from "./Screens/BMHome/Loans/RejectDisbursement"
 import SearchMemberBM from "./Screens/BMHome/SearchMemberBM"
 
 // const LoanTransactionsMain = lazy(() => import("./Screens/Reports/LoanTransactions/LoanTransactionsMain.jsx__BDCCB"));
-const PreviousLoanTransaction = lazy(()=> import('./Screens/Reports/PreviousLoanTransactions/PreviousLoanTransactions'));
-const TestPage = lazy(() => import("./Screens/Reports/LoanTransactions/testPage"));
-const LoanStatementMain =  lazy(() => import("./Screens/Reports/LoanStatements/LoanStatementMain"));
-const DemandReportsMain = lazy(() => import("./Screens/Reports/DemandReports/DemandReportsMain"));
-const DemandVsCollectionMain = lazy(() => import("./Screens/Reports/DemandVsCollectionReport/DemandVsCollectionMain"));
-const AdvanceCollectionReportMain = lazy(() => import("./Screens/Reports/AdvanceCollectionReport/AdvanceCollectionReportMain"));
-const GroupClose =  lazy(() => import("./Screens/Reports/GroupClose/GroupClose"));
-const OutstaningReportMain =  lazy(() => import("./Screens/Reports/OutstandingReports/OutstaningReportMain"));
-const OverdueReport = lazy(() => import("./Screens/Reports/OverdueReport/OverdueReport"));
-const GroupReport = lazy(() => import("./Screens/Reports/GroupReport/GroupReport"));
-const PortfolioReport =  lazy(() => import("./Screens/Reports/PortfolioReport/PortfolioReport"));
-const FundwiseMain = lazy(() => import("./Screens/Reports/SummaryReports/FundwiseReport/FundwiseMain"));
-const SchemewiseMain = lazy(() => import("./Screens/Reports/SummaryReports/SchemewiseReport/SchemewiseMain"));
-const Notfound = lazy(() => import("./Screens/Notfound/Notfound"));
-const SignInPage = lazy(() => import("./Screens/Login/SignInPage"));
-const Landing = lazy(() => import("./Screens/Landing/Landing"));
-const LandingOutlet = lazy(() => import("./Screens/Landing/LandingOutlet"));
-// const DisbursedLoanApproveSingleBM =  lazy(() => import("./Screens/BMHome/DisbursedLoanApproveSingleBM"));
-const ApproveMemberTransfer = lazy(() => import("./Screens/BMHome/ApproveMemberTransfer"));
-const AttendanceBM = lazy(() => import("./Screens/BMHome/AttendanceBM"));
+// const PreviousLoanTransaction = lazy(()=> import('./Screens/Reports/PreviousLoanTransactions/PreviousLoanTransactions.jsx__BDCCB'));
+// const TestPage = lazy(() => import("./Screens/Reports/LoanTransactions/testPage.jsx__BDCCB"));
+// const LoanStatementMain =  lazy(() => import("./Screens/Reports/LoanStatements/LoanStatementMain.jsx__BDCCB"));
+// const DemandReportsMain = lazy(() => import("./Screens/Reports/DemandReports/DemandReportsMain.jsx__BDCCB"));
+// const DemandVsCollectionMain = lazy(() => import("./Screens/Reports/DemandVsCollectionReport/DemandVsCollectionMain.jsx__BDCCB"));
+// const AdvanceCollectionReportMain = lazy(() => import("./Screens/Reports/AdvanceCollectionReport/AdvanceCollectionReportMain.jsx__BDCCB"));
+// const GroupClose =  lazy(() => import("./Screens/Reports/GroupClose/GroupClose.jsx__BDCCB"));
+// const OutstaningReportMain =  lazy(() => import("./Screens/Reports/OutstandingReports/OutstaningReportMain.jsx__BDCCB"));
+// const OverdueReport = lazy(() => import("./Screens/Reports/OverdueReport/OverdueReport.jsx__BDCCB"));
+// const GroupReport = lazy(() => import("./Screens/Reports/GroupReport/GroupReport.jsx__BDCCB"));
+// const PortfolioReport =  lazy(() => import("./Screens/Reports/PortfolioReport/PortfolioReport.jsx__BDCCB"));
+// const FundwiseMain = lazy(() => import("./Screens/Reports/SummaryReports/FundwiseReport/FundwiseMain.jsx__BDCCB"));
+// const SchemewiseMain = lazy(() => import("./Screens/Reports/SummaryReports/SchemewiseReport/SchemewiseMain.jsx__BDCCB"));
+
+// const Landing = lazy(() => import("./Screens/Landing/Landing.jsx__BDCCB"));
+
+// const DisbursedLoanApproveSingleBM =  lazy(() => import("./Screens/BMHome/DisbursedLoanApproveSingleBM.jsx__BDCCB"));
+// const ApproveMemberTransfer = lazy(() => import("./Screens/BMHome/ApproveMemberTransfer.jsx__BDCCB"));
+// const AttendanceBM = lazy(() => import("./Screens/BMHome/AttendanceBM.jsx__BDCCB"));
 
 
 ////////////////////////////////////////////// BDCCB Start //////////////////////////////////////////////
 
+const LandingOutlet = lazy(() => import("./Screens/Landing/LandingOutlet"));
+const Notfound = lazy(() => import("./Screens/Notfound/Notfound"));
+const SignInPage = lazy(() => import("./Screens/Login/SignInPage"));
 
 //////////////// BDCCB ADMIN Start ////////////////
 const HomeAdmin = lazy(() => import("./Screens/Admin/HomeAdmin"));
@@ -102,7 +104,7 @@ const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/Acce
 
 
 
-const MasterEmployees = lazy(() => import("./Screens/Admin/Master/Employees/MasterEmployees"));
+const MasterEmployees = lazy(() => import("./Screens/Admin/Master/Employees/MasterEmployees.jsx__BDCCB"));
 const EditMasterEmployee = lazy(() => import("./Screens/Admin/Master/Employees/EditMasterEmployee"));
 
 
@@ -176,9 +178,7 @@ const EditGRTFormMis = lazy(() =>
 // const HomeScreenBM = lazy(() => import("./Screens/BMHome/HomeScreenBM.jsx__BDCCB"))
 // const EditGRTFormBM = lazy(() => import("./Screens/BMHome/EditGRTFormBM.jsx__BDCCB"))
 
-const DashboardMis = lazy(() =>
-	import("./Screens/MISAssistantHome/DashboardMis")
-)
+const DashboardMis = lazy(() =>	import("./Screens/MISAssistantHome/DashboardMis"))
 const SearchGRTFormMis = lazy(() =>
 	import("./Screens/MISAssistantHome/SearchGRTFormMis")
 )
@@ -261,10 +261,10 @@ const router = createBrowserRouter([
 						path: "ssvws_fin",
 						element: <></>,
 					},
-					{
-						path: "signup",
-						element: <SignUp />,
-					},
+					// {
+					// 	path: "signup",
+					// 	element: <SignUp />,
+					// },
 					{
 						path: "forgotpassword",
 						element: <ForgotPassMis />,
@@ -552,20 +552,20 @@ const router = createBrowserRouter([
 								path: "masterbanks",
 								element: <MasterBanks />,
 							},
-							{
-								path:"masterschemes",
-								element: <SchemeLayout />,
-								children: [
-									{
-										path: "",
-										element: <SchemeListPage />,
-									},
-									{
-										path: ":scheme_id",
-										element: <SchemeAddOrUpdatePage />,
-									}
-								]
-							},
+							// {
+							// 	path:"masterschemes",
+							// 	element: <SchemeLayout />,
+							// 	children: [
+							// 		{
+							// 			path: "",
+							// 			element: <SchemeListPage />,
+							// 		},
+							// 		{
+							// 			path: ":scheme_id",
+							// 			element: <SchemeAddOrUpdatePage />,
+							// 		}
+							// 	]
+							// },
 							// {
 							// 	path:'masterfunds',
 							// 	element: <FundsListPage />,
