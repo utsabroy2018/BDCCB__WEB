@@ -54,7 +54,7 @@ function DisbursedLoanApproveSinglePACS_BDCCB() {
 		setCopyDisburseData([])
 
 		const creds = {
-			branch_id : userDetails[0]?.brn_code,
+			branch_id : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : userDetails[0]?.user_type == 'S' ? userDetails[0]?.emp_id : "",
 			tenant_id : userDetails[0]?.tenant_id,
 			loan_to : userDetails[0]?.user_type == 'P' ? "P" : userDetails[0]?.user_type == 'S' ? "S" : "",
 			approval_status: loanType

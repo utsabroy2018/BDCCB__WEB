@@ -186,9 +186,6 @@ function DisbursmentForm_BDCCB({ flag }) {
 		)
 	})
 
-
-
-
 	const formatDateToYYYYMMDD_CurrentDT = (date) => {
 	const d = new Date(date);
 	d.setHours(0, 0, 0, 0);
@@ -221,7 +218,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 	
 
 	const formik = useFormik({
-		initialValues: +params.id > 0 ? formValues : initialValues,
+		initialValues: + params.id > 0 ? formValues : initialValues,
 		onSubmit,
 		validationSchema,
 		validateOnChange: true,
@@ -238,46 +235,72 @@ function DisbursmentForm_BDCCB({ flag }) {
 	return data.ip
 	}
 
-useEffect(()=>{
-	console.log(flag, 'flagflagflagflagflagflag');
-	
-}, [])
+
+
+
+	useEffect(() => {
+		if(params.id > 0){
+		
+		handleSearchChange(loanAppData?.loan_to_name)
+		fetchDisburseDetails()
+		console.log(loanAppData?.loan_to_name, 'loan_to_name', userDetails[0]?.user_type);
+		
+		}
+	}, [])
+
+	const fetchDisburseDetails = async () => {
+		setValues({
+		loan_ac_no: loanAppData?.loan_acc_no,
+		loan_to: loanAppData?.loan_to,
+		branch_shg_id: loanAppData?.loan_to_name,
+		// branch_shg_id: loanAppData?.branch_shg_id, 
+		branch_shg_SearchField: '',
+		period: loanAppData?.period,
+		curr_roi: loanAppData?.curr_roi,
+		over_roi: loanAppData?.over_roi,
+		disb_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.disb_dt)),
+		disb_amt: loanAppData?.disb_amt,
+
+		})
+	}
+
 
 
 	const editGroup = async (formData) => {
-		return;
+				// return;
 				setLoading(true)
 			
 				const ip = await getClientIP()
 			
 				const creds = {
-				// group_code: groupDataArr?.group_code,
-				// branch_code: userDetails[0]?.brn_code,
-				// group_name: formData?.loan_id,
-				// // gp_leader_id: 2, ///////////////
-				// phone1: formData?.branch_shg_id,
-				// loan_ac_no: formData?.loan_ac_no, ///////////////
-				// curr_roi: formData?.curr_roi,
+				loan_id : loanAppData?.loan_id,
+    			tran_id : loanAppData?.trans_id,
+				tenant_id: userDetails[0]?.tenant_id,
+				branch_id: userDetails[0]?.brn_code,
+				loan_acc_no: formData?.loan_ac_no,
+				loan_to: formData?.loan_to,
+				// branch_shg_id: formData?.branch_shg_id, ///////////////
+				branch_shg_id: loanAppData?.branch_shg_id,
+				period: formData?.period,
+				curr_roi: formData?.curr_roi,
+				penal_roi: formData?.over_roi,
+				disb_dt: formData?.disb_dt,
+				disb_amt: formData?.disb_amt,
 				// pay_mode: formData?.pay_mode,
-				// disb_dt: formData?.disb_dt,
-				// disb_amt: formData?.disb_amt,
-				// gp_id: formData?.gp_id,
-				// village_id: formData?.village_id,
-				// pin_no: formData?.loan_to,
-				// sb_ac_no: formData?.period,
-				// created_by: userDetails[0]?.emp_id,
-				// ip_address: ip,
+				created_by: userDetails[0]?.emp_id,
+				ip_address: ip,
 				}
 
-
-				console.log(formData, 'credscredscredscreds', userDetails[0]);
 				
-			
+				console.log(formData, 'formDataformDataformDataformData', creds, '>>>', userDetails[0]);
+
+				// return;
+
 				await saveMasterData({
-				endpoint: "group/save_group",
+				endpoint: "loan/save_disbursement",
 				creds,
 				navigate,
-				successMsg: "Group details saved.",
+				successMsg: "Loan Disburse edited saved.",
 				onSuccess: () => navigate(-1),
 			
 				// 🔥 fully dynamic failure handling
@@ -329,227 +352,166 @@ useEffect(()=>{
 				}
 
 	useEffect(()=>{
-
-		console.log(userDetails[0], 'userDetailsuserDetailsuserDetails');
-		
+	if(params.id < 1){
 	formik.setFieldValue("branch_shg_SearchField", "");
 	formik.setFieldValue("branch_shg_id", "");
 	setPACS_SHGList([])
-	
+	}
 	}, [formik.values.loan_to])
 
 
 
-	const search_PACS_SHG = async (loan_toDroupDown, searchTxt)=>{
 
-		if(searchTxt.length < 3){
+
+	useEffect(() => {
+	const currRoi = Number(formik.values.curr_roi);
+
+	if (!isNaN(currRoi) && currRoi !== "") {
+	console.log(formik.values.curr_roi, 'ccccccccccc');
+	if(formik.values.curr_roi > 0){
+	formik.setFieldValue("over_roi", currRoi + 2);
+	}
+	}
+	}, [formik.values.curr_roi]);
+
+
+
+	const handleSearchChange = async (value) => {
+		if(value.length < 3){
 			Message("error", "Minimum type 3 character")
 			return;
 		}
 
-		console.log(searchTxt, 'Calllllllllllllllllllll', loan_toDroupDown); // API Call
 
-	setPACS_SHGList([])
-	setLoading(true)
-	const creds = {
-	loan_to : loan_toDroupDown,
-    branch_code : userDetails[0]?.brn_code,
-    branch_shg_id : searchTxt,
-	tenant_id: loan_toDroupDown == 'P' ? userDetails[0]?.tenant_id : 0,
-	}
+		setPACS_SHGList([])
+		setLoading(true)
+		const creds = {
+		loan_to : formik.values.loan_to,
+		branch_code : userDetails[0]?.brn_code,
+		branch_shg_id : value,
+		tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
+		}
 
-	const tokenValue = await getLocalStoreTokenDts(navigate);
+		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-	await axios.post(`${url_bdccb}/loan/fetch_pacs_shg_details`, creds, {
-	headers: {
-	Authorization: `${tokenValue?.token}`, // example header
-	"Content-Type": "application/json", // optional
-	},
-	})
-	.then((res) => {
+		await axios.post(`${url_bdccb}/loan/fetch_pacs_shg_details`, creds, {
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		},
+		})
+		.then((res) => {
 
-		console.log(res?.data, 'mmmmmmmmmmmmmmmmmmmmmmmmmmm');
-		
-	if(res?.data?.success){
-	if(loan_toDroupDown == "P"){
-	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+		if(res?.data?.success){
+			// console.log(res?.data?.data, 'mmmmmmmmmmmmmmmmmmm'); 
+			
+		if(formik.values.loan_to == "P" || loanAppData?.loan_to == "P"){
+		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
 		code: item?.branch_id,
 		name: item?.branch_name,
 		})))
-	}
+		}
 
-	if(loan_toDroupDown == "S"){
+		if(formik.values.loan_to == "S" || loanAppData?.loan_to == "S"){
 		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
-			code: item?.group_code,
-			name: item?.group_name,
-			})))
-	}
+		code: item?.group_code,
+		name: item?.group_name,
+		})))
+		}
 
-	if(res?.data?.data.length > 0){
-		Message("success", res?.data?.msg)
-	} else {
-		Message("error", res?.data?.msg)
-	}
-	
+		// if(res?.data?.data.length > 0){
+		// 	Message("success", res?.data?.msg)
+		// } else {
+		// 	Message("error", res?.data?.msg)
+		// }
+		
 
-	} else {
-	navigate(routePaths.LANDING)
-	localStorage.clear()
-	}
-	})
-	.catch((err) => {
-	Message("error", "Some error occurred while fetching group form")
-	})
+		} else {
+		navigate(routePaths.LANDING)
+		localStorage.clear()
+		}
+		})
+		.catch((err) => {
+		Message("error", "Some error occurred while fetching group form")
+		})
 
-	setLoading(false)
-
-	}
+		setLoading(false)
+	};
 
 	useEffect(() => {
-  const currRoi = Number(formik.values.curr_roi);
+		if(userDetails[0]?.user_type == 'P'){
+			remainingDisburseAmt()
+		}
+		
+	}, [formik.values.loan_to])
 
-  if (!isNaN(currRoi) && currRoi !== "") {
-	console.log(formik.values.curr_roi, 'ccccccccccc');
-	if(formik.values.curr_roi > 0){
-    formik.setFieldValue("over_roi", currRoi + 2);
+	const remainingDisburseAmt = async ()=>{
+
+
+		setLoading(true)
+		const creds = {
+		// pacs_shg_id : formik.values.loan_to,
+		// loan_to : userDetails[0]?.brn_code,
+		// branch_shg_id : value,
+		// tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
+
+		pacs_shg_id : userDetails[0]?.brn_code,
+		loan_to : userDetails[0]?.user_type,
+		// loan_to : formik.values.loan_to,
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/loan/fetch_max_balance`, creds, {
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		},
+		})
+		.then((res) => {
+
+		if(res?.data?.success){
+		setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
+		console.log(res?.data?.data[0]?.max_balance, 'searchAmtsearchAmtsearchAmtsearchAmt');
+
+		} else {
+		// navigate(routePaths.LANDING)
+		// localStorage.clear()
+		}
+		})
+		.catch((err) => {
+		Message("error", "Some error occurred while fetching group form")
+		})
+
+		setLoading(false)
+		
+
 	}
-  }
-}, [formik.values.curr_roi]);
-
-
-
-const handleSearchChange = async (value) => {
-	if(value.length < 3){
-		Message("error", "Minimum type 3 character")
-		return;
-	}
-
-
-	setPACS_SHGList([])
-	setLoading(true)
-	const creds = {
-	loan_to : formik.values.loan_to,
-    branch_code : userDetails[0]?.brn_code,
-    branch_shg_id : value,
-	tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
-	}
-
-	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	await axios.post(`${url_bdccb}/loan/fetch_pacs_shg_details`, creds, {
-	headers: {
-	Authorization: `${tokenValue?.token}`, // example header
-	"Content-Type": "application/json", // optional
-	},
-	})
-	.then((res) => {
-
-	if(res?.data?.success){
-	if(formik.values.loan_to == "P"){
-	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
-	code: item?.branch_id,
-	name: item?.branch_name,
-	})))
-	}
-
-	if(formik.values.loan_to == "S"){
-	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
-	code: item?.group_code,
-	name: item?.group_name,
-	})))
-	}
-
-	if(res?.data?.data.length > 0){
-		Message("success", res?.data?.msg)
-	} else {
-		Message("error", res?.data?.msg)
-	}
-	
-
-	} else {
-	navigate(routePaths.LANDING)
-	localStorage.clear()
-	}
-	})
-	.catch((err) => {
-	Message("error", "Some error occurred while fetching group form")
-	})
-
-	setLoading(false)
-};
-
-useEffect(() => {
-	if(userDetails[0]?.user_type == 'P'){
-		remainingDisburseAmt()
-	}
-	
-}, [formik.values.loan_to])
-
-const remainingDisburseAmt = async ()=>{
-
-
-	setLoading(true)
-	const creds = {
-	// pacs_shg_id : formik.values.loan_to,
-    // loan_to : userDetails[0]?.brn_code,
-    // branch_shg_id : value,
-	// tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
-
-	pacs_shg_id : userDetails[0]?.brn_code,
-    loan_to : userDetails[0]?.user_type,
-	// loan_to : formik.values.loan_to,
-	}
-
-	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	await axios.post(`${url_bdccb}/loan/fetch_max_balance`, creds, {
-	headers: {
-	Authorization: `${tokenValue?.token}`, // example header
-	"Content-Type": "application/json", // optional
-	},
-	})
-	.then((res) => {
-
-	if(res?.data?.success){
-	setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
-	console.log(res?.data?.data[0]?.max_balance, 'searchAmtsearchAmtsearchAmtsearchAmt');
-
-	} else {
-	// navigate(routePaths.LANDING)
-	// localStorage.clear()
-	}
-	})
-	.catch((err) => {
-	Message("error", "Some error occurred while fetching group form")
-	})
-
-	setLoading(false)
-	
-
-}
 
 	return (
 		<>
-		{/* {
-			isOverdue === 'Y' && <AlertComp 
-			
-			msg={<p className="text-2xl font-normal"><span className="text-lg ">Loan Overdue Amount is </span>{formatINR(overDueAmt)}</p>} />
-		} */}
+		<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
+			<div className="p-5 w-4/5 min-h-screen rounded-3xl">
+			<div className="w-auto mx-14 my-4">
+			<FormHeader text={`${params?.id == 0 ? "Loan Disburse Form" : loanAppData?.approval_status == 'A' ? "View Loan Disburse Form" : "Edit/Preview Loan Disburse Form"}`} mode={2} />
+			</div>
+
 			<Spin
 				indicator={<LoadingOutlined spin />}
 				size="large"
 				className="text-blue-800 dark:text-gray-400"
 				spinning={loading}
 			>	
-				{/* {(userDetails.id == 4 || userDetails.id == 3 || userDetails.id == 2 || userDetails.id == 13) && 
-				<Button htmlType="button" type="primary" icon={<Map />} onClick={() => showModal()} className="my-3">View Distance</Button>} */}
-				
+				{/* {JSON.stringify(loanAppData?.approval_status, 2)}  */}
+				<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
 
+					
+
 							<div>
-								{/* {JSON.stringify(sahayikaList, null, 2)} */}
+								
 								<TDInputTemplateBr
 									placeholder="Loan Account No."
 									type="text"
@@ -559,8 +521,7 @@ const remainingDisburseAmt = async ()=>{
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}
 									mode={1}
-									// data={sahayikaList}
-									// setSahayikaList
+									disabled={params.id > 0 ? true : false}
 								/>
 								
 
@@ -572,8 +533,9 @@ const remainingDisburseAmt = async ()=>{
 
 
 							<div>
+								{/* params.id < 1 */}
 								{/* {loan_toDroupDown} */}
-								{flag == 'BM' ? (
+								{userDetails[0]?.user_type == 'H' && userDetails[0]?.user_type == 'B' ? (
 									<>
 									<TDInputTemplateBr
 									placeholder="Select One"
@@ -586,6 +548,7 @@ const remainingDisburseAmt = async ()=>{
 									formControlName={formik.values.loan_to}
 									data={loan_to}
 									mode={2}
+									disabled={params.id > 0 ? true : false}
 								/>
 								{formik.errors.loan_to && formik.touched.loan_to ? (
 									<VError title={formik.errors.loan_to} />
@@ -604,6 +567,7 @@ const remainingDisburseAmt = async ()=>{
 									formControlName={formik.values.loan_to}
 									data={loan_to_For_Pacs}
 									mode={2}
+									disabled={params.id > 0 ? true : false}
 								/>
 								{formik.errors.loan_to && formik.touched.loan_to ? (
 									<VError title={formik.errors.loan_to} />
@@ -613,19 +577,21 @@ const remainingDisburseAmt = async ()=>{
 								
 							</div>
 
+							{loanAppData?.approval_status != 'A' && (
+							<>
 							<div className="pt-6">
 							{userDetails[0]?.user_type == 'P'&& (
-								<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
+							<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
 							<span className="text-sm font-medium">
-								Balance:</span>
+							Balance:</span>
 							<span className="text-base font-semibold">₹{remainDisburseAmt?.toLocaleString("en-IN")}
 							</span>
 							</div>
 							)}
-							
-
-
 							</div>
+							</>
+							)}
+
 
 							</div>
 							</div>
@@ -634,6 +600,7 @@ const remainingDisburseAmt = async ()=>{
 						<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
 
 							<div>
+								
 								<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
 				 dark:text-gray-100"> 
 				 {formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'} 
@@ -642,7 +609,7 @@ const remainingDisburseAmt = async ()=>{
 								<Select
 									showSearch
 									placeholder={formik.values.loan_to === 'P' ? 'Choose PACS ' : formik.values.loan_to === 'S' ? 'Choose SHG ' : 'Choose '}
-									value={formik.values.branch_shg_id || undefined}
+									value={formik.values.branch_shg_id}
 									style={{ width: "100%" }}
 									optionFilterProp="children"
 									name="branch_shg_id"
@@ -650,7 +617,8 @@ const remainingDisburseAmt = async ()=>{
 									onSearch={(value) => {
 									handleSearchChange(value);   // your search function
 									}}
-									disabled={formik.values.loan_to.length > 0 ? false : true}
+									// disabled={formik.values.loan_to.length > 0 ? false :  true}
+									disabled={params.id > 0 ? true : formik.values.loan_to.length < 1 ? true : false}
 									// ✅ selecting option
 									onChange={(value) => {formik.setFieldValue("branch_shg_id", value)}}
 
@@ -658,6 +626,7 @@ const remainingDisburseAmt = async ()=>{
 									filterOption={(input, option) =>
 									option?.children?.toLowerCase().includes(input.toLowerCase())
 									}
+									
 									>
 									<Select.Option value="" disabled>Choose Sector</Select.Option>
 
@@ -677,21 +646,7 @@ const remainingDisburseAmt = async ()=>{
 								
 								
 							</div>
-							{/* <div>
 
-							<button type="button" onClick={()=>{
-								search_PACS_SHG(formik.values.loan_to, formik.values.branch_shg_SearchField)
-							}}
-							disabled={formik.values.branch_shg_SearchField.length > 0 ? false : true}
-								className="inline-flex items-center px-5 py-2.5 mt-4 ml-2 sm:mt-6 text-sm font-medium text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900"
-							>
-								Search
-							</button>
-							</div> */}
-
-							{/* <div>
-								
-							</div> */}
 
 
 						</div>
@@ -710,6 +665,7 @@ const remainingDisburseAmt = async ()=>{
 									formControlName={formik.values.period}
 									data={period_data}
 									mode={1}
+									disabled={loanAppData?.approval_status == 'A' ? true : false}
 								/>
 								{formik.errors.period && formik.touched.period ? (
 									<VError title={formik.errors.period} />
@@ -727,6 +683,7 @@ const remainingDisburseAmt = async ()=>{
 							handleChange={formik.handleChange}
 							handleBlur={formik.handleBlur}
 							mode={1}
+							disabled={loanAppData?.approval_status == 'A' ? true : false}
 							/>
 							{formik.errors.curr_roi && formik.touched.curr_roi ? (
 									<VError title={formik.errors.curr_roi} />
@@ -743,6 +700,7 @@ const remainingDisburseAmt = async ()=>{
 							handleChange={formik.handleChange}
 							handleBlur={formik.handleBlur}
 							mode={1}
+							disabled={loanAppData?.approval_status == 'A' ? true : false}
 							/>
 							{formik.errors.over_roi && formik.touched.over_roi ? (
 									<VError title={formik.errors.over_roi} />
@@ -762,6 +720,7 @@ const remainingDisburseAmt = async ()=>{
 						handleBlur={formik.handleBlur}
 						min={formatDateToYYYYMMDD_CurrentDT(new Date())}
 						mode={1}
+						disabled={loanAppData?.approval_status == 'A' ? true : false}
 						/>
 						{formik.errors.disb_dt && formik.touched.disb_dt ? (
 									<VError title={formik.errors.disb_dt} />
@@ -775,21 +734,10 @@ const remainingDisburseAmt = async ()=>{
 						label="Disbursement Amount"
 						name="disb_amt"
 						formControlName={formik.values.disb_amt}
-						// handleChange={(e) => {
-						// formik.handleChange(e);                 // keep Formik in sync
-						// remainingDisburseAmt(e.target.value);   // trigger on typing
-						// }}
-
-						// handleChange={(e) => {
-						// 	const value = Number(e.target.value);
-
-						// 	if (value <= remainDisburseAmt || e.target.value === "") {
-						// 	formik.handleChange(e);
-						// 	}
-						// }}
 						handleChange={formik.handleChange}
 						handleBlur={formik.handleBlur}
 						mode={1}
+						disabled={loanAppData?.approval_status == 'A' ? true : false}
 						/>
 
 						{formik.errors.disb_amt && formik.touched.disb_amt ? (
@@ -825,10 +773,16 @@ const remainingDisburseAmt = async ()=>{
 
 
 					{/* {userDetails?.id != 3 &&  */}
-					<BtnComp mode="A" onReset={formik.resetForm} param={params?.id} />
+					{loanAppData?.approval_status != 'A' &&(
+						<BtnComp mode="A" onReset={formik.resetForm} param={params?.id} />
+					)}
+					
 					{/* } */}
 				</form>
+				</div>
 			</Spin>
+			</div>
+			</section>
 
 			<DialogBox
 				flag={4}

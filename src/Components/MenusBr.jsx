@@ -2409,7 +2409,7 @@ const items_bdccb = [
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homebm/disburseloan/0"}>Disburse Loan</Link>,
+					label: <Link to={"/homebm/disburseloan"}>Disburse Loan</Link>,
 				}
 			],
 		},
@@ -2626,7 +2626,7 @@ const items_bdccb_PACS = [
 			<Menu
 			onClick={onClick}
 			selectedKeys={[current]}
-			items={userDetails[0]?.user_type == 'H' ? items_bdccb : userDetails[0]?.user_type == 'P' ? items_bdccb_PACS : items_bdccb}
+			items={userDetails[0]?.user_type == 'B' ? items_bdccb : userDetails[0]?.user_type == 'P' ? items_bdccb_PACS : userDetails[0]?.user_type == 'S' ? items_bdccb_PACS : items_bdccb}
 			// disabled={getMenuShow === "yes" ? true : false}
 
 			mode="horizontal"
