@@ -184,7 +184,18 @@ function DisbursmentForm_BDCCB({ flag }) {
 			return true; // no limit for other user types
 			}
 		)
-	})
+		})
+
+	// const formatDateToYYYYMMDD_CurrentDT = (date) => {
+	// const d = new Date(date);
+	// d.setHours(0, 0, 0, 0);
+
+	// const year = d.getFullYear();
+	// const month = String(d.getMonth() + 1).padStart(2, "0");
+	// const day = String(d.getDate()).padStart(2, "0");
+
+	// return `${year}-${month}-${day}`;
+	// };
 
 	const formatDateToYYYYMMDD_CurrentDT = (date) => {
 	const d = new Date(date);
@@ -367,7 +378,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const currRoi = Number(formik.values.curr_roi);
 
 	if (!isNaN(currRoi) && currRoi !== "") {
-	console.log(formik.values.curr_roi, 'ccccccccccc');
+	// console.log(formik.values.curr_roi, 'ccccccccccc');
 	if(formik.values.curr_roi > 0){
 	formik.setFieldValue("over_roi", currRoi + 2);
 	}
@@ -450,11 +461,6 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 		setLoading(true)
 		const creds = {
-		// pacs_shg_id : formik.values.loan_to,
-		// loan_to : userDetails[0]?.brn_code,
-		// branch_shg_id : value,
-		// tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
-
 		pacs_shg_id : userDetails[0]?.brn_code,
 		loan_to : userDetails[0]?.user_type,
 		// loan_to : formik.values.loan_to,
@@ -511,7 +517,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 					
 
 							<div>
-								
+								{/* {JSON.stringify(userDetails[0], null, 2)} */}
 								<TDInputTemplateBr
 									placeholder="Loan Account No."
 									type="text"
@@ -535,7 +541,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 							<div>
 								{/* params.id < 1 */}
 								{/* {loan_toDroupDown} */}
-								{userDetails[0]?.user_type == 'H' && userDetails[0]?.user_type == 'B' ? (
+								{userDetails[0]?.user_type == 'H' || userDetails[0]?.user_type == 'B' ? (
 									<>
 									<TDInputTemplateBr
 									placeholder="Select One"
@@ -628,7 +634,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 									}
 									
 									>
-									<Select.Option value="" disabled>Choose Sector</Select.Option>
+									<Select.Option value="" disabled>{formik.values.loan_to === 'P' ? 'Choose PACS ' : formik.values.loan_to === 'S' ? 'Choose SHG ' : 'Choose '}</Select.Option>
 
 									{PACS_SHGList?.map((data) => (
 									<Select.Option key={data.code} value={data.code}>
@@ -718,7 +724,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 						formControlName={formik.values.disb_dt}
 						handleChange={formik.handleChange} 
 						handleBlur={formik.handleBlur}
-						min={formatDateToYYYYMMDD_CurrentDT(new Date())}
+						max={formatDateToYYYYMMDD_CurrentDT(new Date())}
 						mode={1}
 						disabled={loanAppData?.approval_status == 'A' ? true : false}
 						/>

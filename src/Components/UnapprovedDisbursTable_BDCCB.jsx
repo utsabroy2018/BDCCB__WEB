@@ -398,7 +398,7 @@ function UnapprovedDisbursTable_BDCCB({
 						}}
 						style={{ background: "transparent", border: "none", cursor: "pointer" }}
 						>
-						<EditOutlined className="text-md text-slate-800" />
+						<CheckCircleOutlined className="text-md text-slate-800" />
 						</button>
 						</div>
 						)}
@@ -407,7 +407,7 @@ function UnapprovedDisbursTable_BDCCB({
 				</DataTable>
 				{/* <>{JSON.stringify(cachedPaymentId, null, 2)}</> */}
 
-				<div className="grid-cols-2 h-3 gap-5 mt-3 items-center text-left">
+				{/* <div className="grid-cols-2 h-3 gap-5 mt-3 items-center text-left">
 					{(ShowApprov && userDetails?.id != 3) && (
 						<>
 							<motion.section
@@ -427,7 +427,7 @@ function UnapprovedDisbursTable_BDCCB({
 							</motion.section>
 						</>
 					)}
-				</div>
+				</div> */}
 			</motion.section>
 
 			<DialogBox
