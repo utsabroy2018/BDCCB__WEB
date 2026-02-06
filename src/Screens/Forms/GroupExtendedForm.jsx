@@ -134,7 +134,15 @@ const containerStyle = {
 		block_id: "",
 		gp_id: "",
 		village_id: "",
-		branch_code: ""
+		branch_code: "",
+		members: [
+				{
+				member_name: "",
+				member_address: "",
+				aadhar_no: "",
+				is_leader: false,
+				},
+			],
 	}
 	const [formValues, setValues] = useState(initialValues)
 
@@ -149,6 +157,20 @@ const containerStyle = {
 		block_id: Yup.mixed().required("Block is required"),
 		gp_id: Yup.mixed().required("GP Name is required"),
 		village_id: Yup.mixed().required("Village Name is required"),
+
+		// 🔥 MEMBER VALIDATION
+		members: Yup.array().of(
+		Yup.object({
+		member_name: Yup.string().required("Member name required"),
+		member_address: Yup.string().required("Address required"),
+		aadhar_no: Yup.string()
+		.length(12, "Aadhaar must be 12 digits")
+		.required("Aadhaar required"),
+		is_leader: Yup.boolean(),
+		})
+		)
+		.min(1, "At least one member required"),
+
 	})
 
 
@@ -730,6 +752,24 @@ const handleFormikMasterChange = async (e) => {
   }
 };
 
+const handleGroupLeaderChange = (index) => {
+  const updated = formik.values.members.map((m, i) => ({
+    ...m,
+    is_group_leader: i === index,
+  }));
+  formik.setFieldValue("members", updated);
+};
+
+const handleAssistantChange = (index) => {
+  const updated = formik.values.members.map((m, i) => ({
+    ...m,
+    is_assistant_member: i === index,
+  }));
+  formik.setFieldValue("members", updated);
+};
+
+
+
 	return (
 		<>
 		{/* {
@@ -1030,6 +1070,154 @@ const handleFormikMasterChange = async (e) => {
 
 						</div>
 					</div>
+
+					{/* ================= ADD MEMBER SECTION ================= */}
+<div className="sm:col-span-3 mt-6">
+  <Tag color="#2563eb" className="text-white mb-3 font-bold">
+    Add Group Members
+  </Tag>
+
+  {formik.values.members.map((member, index) => {
+    const isRowFilled =
+      member.member_name &&
+      member.member_address &&
+      member.aadhar_no;
+
+    return (
+      <div
+        key={index}
+        className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50"
+      >
+        {/* Leader */}
+        {/* <div className="col-span-2 flex flex-col gap-1 items-start">
+  <label className="flex items-center gap-2 text-xs">
+    <input
+      type="checkbox"
+      name={`members[${index}].is_leader`}
+      checked={member.is_leader}
+      onChange={formik.handleChange}
+    />
+    Group Leader
+  </label>
+
+  <label className="flex items-center gap-2 text-xs">
+    <input
+      type="checkbox"
+      name={`members[${index}].is_assistant`}
+      checked={member.is_assistant}
+      onChange={formik.handleChange}
+    />
+    Assistant Member
+  </label>
+</div> */}
+
+{/* Designation */}
+<div className="col-span-1 flex flex-col gap-1">
+  {/* Group Leader */}
+  <label className="flex items-center gap-1 text-xs">
+    <input
+      type="checkbox"
+      checked={member.is_group_leader}
+      onChange={() => handleGroupLeaderChange(index)}
+    />
+    Group Leader
+  </label>
+
+  {/* Assistant Member */}
+  <label className="flex items-center gap-1 text-xs">
+    <input
+      type="checkbox"
+      checked={member.is_assistant_member}
+      onChange={() => handleAssistantChange(index)}
+    />
+    Assistant
+  </label>
+</div>
+
+
+        {/* Name */}
+        <div className="col-span-3">
+          <TDInputTemplateBr
+            placeholder="Member Name"
+            type="text"
+            name={`members[${index}].member_name`}
+            formControlName={member.member_name}
+            handleChange={formik.handleChange}
+            mode={1}
+          />
+        </div>
+
+        {/* Address */}
+        <div className="col-span-4">
+          <TDInputTemplateBr
+            placeholder="Address"
+            type="text"
+            name={`members[${index}].member_address`}
+            formControlName={member.member_address}
+            handleChange={formik.handleChange}
+            mode={1}
+          />
+        </div>
+
+        {/* Aadhaar */}
+        <div className="col-span-3">
+          <TDInputTemplateBr
+            placeholder="Aadhaar No"
+            type="number"
+            name={`members[${index}].aadhar_no`}
+            formControlName={member.aadhar_no}
+            handleChange={formik.handleChange}
+            mode={1}
+          />
+        </div>
+
+        {/* Remove */}
+        <div className="col-span-1 text-center">
+          {formik.values.members.length > 1 && (
+            <button
+              type="button"
+              onClick={() => {
+                const updated = [...formik.values.members];
+                updated.splice(index, 1);
+                formik.setFieldValue("members", updated);
+              }}
+              className="text-red-600 font-bold"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Add Button */}
+        {index === formik.values.members.length - 1 && (
+          <div className="col-span-12 text-right">
+            <Button
+              type="primary"
+              disabled={!isRowFilled}
+              onClick={() =>
+                formik.setFieldValue("members", [
+                  ...formik.values.members,
+                  {
+                    member_name: "",
+                    member_address: "",
+                    aadhar_no: "",
+                    is_leader: false,
+                  },
+                ])
+              }
+            >
+              + Add Member
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  })}
+</div>
+{/* ===================================================== */}
+
+
+					
 
 					{/* {params.id > 0 && (
 							<Divider
