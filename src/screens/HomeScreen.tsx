@@ -856,14 +856,16 @@ const HomeScreen = () => {
                         }}
                         >
                         <ListCard
-                            title={`Loan Balance`}
+                            title={`Loan Member Details`}
                             // subtitle={`${noOfGrtForms || 0} Forms`}
-                            subtitle={`Rs. ${remainDisburseAmt}/-`}
+                            subtitle={`Balance Rs.${remainDisburseAmt}/-`}
                             position={0}
+                            // icon='chevron-right'
                             icon='format-list-numbered'
                             iconViewColor={MD2Colors.green500}
                             iconViewBorderColor={MD2Colors.green200}
                         />
+                        
                         </TouchableOpacity>
                         {/* <ListCard
                             title={`Total Cash Recovery`}

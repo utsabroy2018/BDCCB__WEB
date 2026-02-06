@@ -2,12 +2,16 @@ import { BASE_URL, BASE_URL_BDCCB } from "./config"
 
 export const ADDRESSES = {
 
+    //////////////// BDCCB Start ////////////////
+
     LOGIN: `${BASE_URL_BDCCB}/login`,
     FETCH_DISBURS_DTLS: `${BASE_URL_BDCCB}/loan/fetch_disburse_dtls`,
     SAVE_LOAN_VOUCHER: `${BASE_URL_BDCCB}/account/save_loan_voucher`,
     FETCH_MAX_BALANCE: `${BASE_URL_BDCCB}/loan/fetch_max_balance`,
     SAVE_SHG_MEMBER_DISBURS: `${BASE_URL_BDCCB}/loan/save_shg_member_disbursement`,
     FETCH_MEMBER_LOAN_DETAILS: `${BASE_URL_BDCCB}/dashboard/fetch_member_loan_dtls`,
+    
+    //////////////// BDCCB End ////////////////
 
 
     FETCH_APP_VERSION: `${BASE_URL}/fetch_app_version`,

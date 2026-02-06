@@ -23,7 +23,7 @@ import { AppStore } from '../../context/AppContext'
 import { disableCondition } from '../../utils/disableCondition'
 import { KeyboardAvoidingView } from "react-native";
 
-const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
+const DISBMemberDetailsForm = ({ fetchedData, branchCode}) => {
     const theme = usePaperColorScheme()
     const navigation = useNavigation()
     const isFocused = useIsFocused()
@@ -37,6 +37,7 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     const [openDate, setOpenDate] = useState(() => false)
     const { handlePrint } = useEscPosPrint()
     const [remainDisburseAmt, setRemainDisburseAmt] = useState('');
+    const [memberList, setMemberList] = useState([]);
 
     const [members, setMembers] = useState([
     {
@@ -57,6 +58,7 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
         curr_roi: "",
         penal_roi: "",
         disb_dt: new Date(),
+        grand_total: "",
     })
     
 
@@ -116,101 +118,54 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     };
 
     useEffect(() => {
-        // requestPermissions()
-    }, [])
+        fetchMemberDetails()
+    }, [isFocused])
 
     	
 
-       const getClientIP = async () => {
-		const res = await fetch("https://api.ipify.org?format=json")
-		const data = await res.json()
-		return data.ip
-	}
+    const getClientIP = async () => {
+    const res = await fetch("https://api.ipify.org?format=json")
+    const data = await res.json()
+    return data.ip
+    }
 
-    const newDisbursement = async () => {
-    // if (hasBeforeUpnapproveTransDate) {
-    //     ToastAndroid.show(`There are unapproved ${errMsg} before this date. Please check and try again.`, ToastAndroid.SHORT)
-    //     return;
-    // }
+    const fetchMemberDetails = async () => {
+
     setLoading(true)
-
-    const ip = await getClientIP()
-
-    const formattedDate = new Date(formData.disb_dt).toISOString().split("T")[0];
 
     const creds = {
     group_code: loginStore?.emp_id,
     tenant_id: loginStore?.tenant_id,
     branch_id: loginStore?.brn_code,
-    period: formData?.period,
-    curr_roi: formData?.curr_roi,
-    penal_roi: formData?.penal_roi,
-    // disb_dt: new Date(formData.disb_dt).toLocaleDateString("en-GB"),
-    disb_dt: formattedDate,
-    members: members,
-    created_by: loginStore?.emp_id,
-    ip_address: ip,
     }
-    // members
+    console.log('start',  creds, "////////////////////////////////")
 
 //     {
-//   "group_code": "emp_id",
-//   "tenant_id": ,
-//   "branch_id": ,
-//   "period": ,
-//   "curr_roi": ,
-//   "penal_roi": ,
-//   "disb_dt": "",
-//   "created_by": "",
-//   "ip_address": "",
-//   "members": [
-//     {
-//       "member_name": "",
-//       "gp_leader_flag": "Y/N",
-//       "disb_amt": 
-//     },
-//     {
-//       "member_name": "",
-//       "gp_leader_flag": "",
-//       "disb_amt": 
-//     }
-//   ]
+//     "branch_id" : "",
+//     "tenant_id" : "",
+//     "group_code" : "emp_id"
 // }
-    
 
-
-
-    // console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP')
-    // return
-
-    await axios.post(ADDRESSES.SAVE_SHG_MEMBER_DISBURS, creds, {
+    await axios.post(ADDRESSES.FETCH_MEMBER_LOAN_DETAILS, creds, {
     headers: {
     Authorization: loginStore?.token, // example header
     "Content-Type": "application/json", // optional
     }
     }
     ).then(async res => {
-    console.log('start',  creds, "RESSSSSsssssssssssssssssssssssssss", res?.data)
+    console.log('start',  res?.data?.data, "Testttttttttttttttttttttttttttttttttttttttttt")
     if(res?.data?.success){
-    Alert.alert("Alert", res?.data?.msg, [
-    { text: "Back", onPress: () => navigation.goBack() }
-    ], {
-    cancelable: false
-    })
-    return
+      setFormData({
+            period: res?.data?.data?.period?.toString() || "",
+            curr_roi: res?.data?.data?.curr_roi?.toString() || "",
+            penal_roi: res?.data?.data?.penal_roi?.toString() || "",
+            disb_dt: res?.data?.data?.disb_dt ? new Date(res?.data?.data?.disb_dt) : new Date(),
+            grand_total: res?.data?.data?.grand_total?.toString() || "",
+      })
+      setMemberList(res?.data?.data?.members || [])
+    
     }
-    ToastAndroid.show("Disbursment Done.", ToastAndroid.SHORT)
-    // await handlePrint(res?.data?.msg)
-
-    navigation.dispatch(
-    CommonActions.navigate({
-    name: navigationRoutes.homeScreen,
-    params: {
-    resultData: res?.data?.msg,
-    not_inserted_row: res?.data?.not_inserted_row,
-    },
-    }),
-    )
+    
 
     }).catch(err => {
     ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
@@ -355,8 +310,8 @@ useEffect(() => {
         <SafeAreaView>
             <KeyboardAvoidingView
             style={{ flex: 1 }}
-            // behavior={Platform.OS === "ios" ? "padding" : "height"}
-            // keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
             >
             <ScrollView 
             keyboardShouldPersistTaps="handled"
@@ -384,7 +339,7 @@ useEffect(() => {
                   
 
 
-                    {/* <InputPaper 
+                    <InputPaper 
                     label="Disburse Date *" keyboardType="default" 
                     leftIcon='calendar'
                     value={new Date(formData.disb_dt).toLocaleDateString("en-GB")} 
@@ -392,20 +347,10 @@ useEffect(() => {
                     disabled
                     customStyle={{
                     backgroundColor: theme.colors.background,
-                    }} /> */}
+                    }} />
                     
 
-                    <ButtonPaper
-                        textColor={theme.colors.primary}
-                        onPress={() => setOpenDate(true)}
-                        mode="elevated"
-                        icon="calendar"
-                        // disabled={disableCondition(approvalStatus, branchCode)}
-                        >
-                        {/* CHOOSE DOB: {formData.dob?.toLocaleDateString("en-GB")} */}
-                        {/* Choose Disbursment Date {isToday(formData.disb_dt) ? "*" : formData.disb_dt?.toLocaleDateString("en-GB")} */}
-                        Choose Disbursment Date {formData.disb_dt?.toLocaleDateString("en-GB")}
-                    </ButtonPaper>
+                    
 
                     <DatePicker
                     modal
@@ -473,7 +418,7 @@ useEffect(() => {
 
 
 
-  <View>
+  {/* <View>
   {loginStore?.user_type === "S" && (
     <View
       style={{
@@ -510,7 +455,7 @@ useEffect(() => {
       </Text>
     </View>
   )}
-</View>
+</View> */}
 
 
 <View style={{ padding: 5 }}>
@@ -528,9 +473,9 @@ useEffect(() => {
   </Text>
 
   {/* Rows */}
-  {members.map((item, index) => (
+  {memberList.map((item) => (
   <View
-    key={item.id}
+    key={item.loan_id}
     style={{
       flexDirection: "row",
       alignItems: "center",
@@ -539,95 +484,42 @@ useEffect(() => {
   >
     {/* Radio Button */}
     <RadioButton
-      value={item.id.toString()}
-    //   status={item.gp_leader_flag ? "checked" : "unchecked"}
+      value={String(item.loan_id)}
       status={item.gp_leader_flag === "Y" ? "checked" : "unchecked"}
-      onPress={() => selectMember(item.id)}
+      disabled
     />
 
-    {/* Member Name (BIG) */}
+    {/* Member Name */}
     <InputPaper
-      label="Member"
-      value={item.member_name}
-      onChangeText={(txt) => {
-        const arr = [...members];
-        arr[index].member_name = String(txt);
-        setMembers(arr);
-      }}
-      customStyle={{
-        backgroundColor: theme.colors.background,
-        marginRight: 6,
-        flex: 2.5,
-        fontSize: 13,
-      }}
-    />
+        label="Member"
+        disabled
+        value={item.member_name}
+        customStyle={{
+          backgroundColor: theme.colors.background,
+          marginRight: 6,
+          flex: 2.5,
+          fontSize: 13,
+        }} onChangeText={function (msg: string | number): void {
+          throw new Error('Function not implemented.')
+        } }    />
 
-    {/* disb_amt */}
+    {/* Amount */}
     <InputPaper
-      label="Amount"
-      keyboardType="numeric"
-      value={item.disb_amt}
-      onChangeText={(txt) => {
-        const arr = [...members];
-        arr[index].disb_amt = String(txt);
-        setMembers(arr);
-      }}
-      customStyle={{
-        backgroundColor: theme.colors.background,
-        flex: 1.5,
-        fontSize: 13,
-      }}
-    />
-
-    {/* Remove Row */}
-    {members.length > 1 && (
-      <IconButton
-        icon="delete-outline"
-        size={20}
-        onPress={() => removeRow(item.id)}
-        iconColor={theme.colors.error}
-      />
-    )}
+        label="Amount"
+        disabled
+        value={String(item.disb_amt)}
+        customStyle={{
+          backgroundColor: theme.colors.background,
+          flex: 1.5,
+          fontSize: 13,
+        }} onChangeText={function (msg: string | number): void {
+          throw new Error('Function not implemented.')
+        } }    />
   </View>
 ))}
 
 
-  {/* Add Button BELOW */}
-
   
-
-{/* <TouchableOpacity
-  disabled={!canAddMember()}
-  onPress={addRow}
-  style={{
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 8,
-    opacity: canAddMember() ? 1 : 0.4, // 👈 visual feedback
-  }}
->
-  <IconButton
-    icon="plus"
-    size={22}
-    disabled={!canAddMember()}
-  />
-
-  <Text
-    style={{
-      fontSize: 14,
-      color: theme.colors.primary,
-      marginLeft: -6,
-    }}
-  >
-    Add Member
-  </Text>
-  
-</TouchableOpacity> */}
-{/* <View>
-    <Text>{JSON.stringify(Number(totalDisbAmt) > Number(remainDisburseAmt), null, 2)} </Text>
-    <Text>{JSON.stringify(!canAddMember(), null, 2)} </Text>
-</View> */}
 <View
   style={{
     flexDirection: "row",
@@ -636,43 +528,15 @@ useEffect(() => {
     marginTop: 8,
   }}
 >
-  {/* Add Member Button */}
-  <TouchableOpacity
-    // disabled={Number(totalDisbAmt) > Number(remainDisburseAmt)}
-    disabled={!canAddMember()}
-    onPress={addRow}
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      // opacity: Number(totalDisbAmt) < Number(remainDisburseAmt) ? 1 : 0.4,
-      opacity: canAddMember() ? 1 : 0.4,
-    }}
-  >
-    <IconButton
-      icon="plus"
-      size={22}
-      // disabled={Number(totalDisbAmt) > Number(remainDisburseAmt)}
-      disabled={!canAddMember()}
-    />
 
-    <Text
-      style={{
-        fontSize: 14,
-        color: theme.colors.primary,
-        marginLeft: -6,
-      }}
-    >
-      Add Member
-    </Text>
-  </TouchableOpacity>
 
   {/* Total Amount */}
-  <View style={{ alignItems: "flex-end" }}>
-    <Text style={{ fontSize: 12, color: theme.colors.error }}>
-      Total Amount
+  <View style={{flex: 1}}>
+    <Text style={{ fontSize: 16, color: theme.colors.green, fontWeight: "700", textAlign: "center" }}>
+      Total Amount ₹ {formData?.grand_total}
     </Text>
 
-    <Text
+    {/* <Text
       style={{
         fontSize: 14,
         fontWeight: "600",
@@ -682,8 +546,8 @@ useEffect(() => {
             : theme.colors.primary,
       }}
     >
-      ₹ {totalDisbAmt.toLocaleString()}
-    </Text>
+      ₹ {formData?.grand_total}
+    </Text> */}
   </View>
 </View>
 
@@ -697,7 +561,7 @@ useEffect(() => {
                     
 
 
-                    <ButtonPaper icon="cash-register" mode="contained" onPress={() => {
+                    {/* <ButtonPaper icon="cash-register" mode="contained" onPress={() => {
                             Alert.alert(`Submit Disbursment?`, `Are you sure, you want to submit?`, [{
                                 onPress: () => null,
                                 text: "No"
@@ -711,7 +575,7 @@ useEffect(() => {
                         >
                             
                             {!loading ? "Submit Disbursment" : "DON'T CLOSE THIS PAGE..."}
-                        </ButtonPaper>
+                        </ButtonPaper> */}
 
                     
 
@@ -725,6 +589,6 @@ useEffect(() => {
     )
 }
 
-export default DISBBasicDetailsForm
+export default DISBMemberDetailsForm
 
 const styles = StyleSheet.create({})

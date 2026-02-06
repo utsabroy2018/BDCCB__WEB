@@ -16,8 +16,7 @@ const DISBMemberScreen = () => {
     const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "")
 
     return (
-        <SafeAreaView
-        >
+        <SafeAreaView>
             <ScrollView keyboardShouldPersistTaps="handled" style={{
                 backgroundColor: theme.colors.background
         }}
