@@ -28,7 +28,6 @@ import {
 	InfoCircleFilled,
 	CheckCircleOutlined,
 	EditOutlined,
-	CheckCircleFilled,
 } from "@ant-design/icons"
 import FormHeader from "../../Components/FormHeader"
 import { routePaths } from "../../Assets/Data/Routes"
@@ -100,7 +99,7 @@ const pay_mode = [
 	]
 
 
-function DisbursmentForm_BDCCB({ flag }) {
+function AccountHolderForm_BDCCB({ flag }) {
 
 
 	const params = useParams()
@@ -135,56 +134,25 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const [remainDisburseAmt, setRemainDisburseAmt] = useState(null);
 
 	const initialValues = {
-		// loan_id: "",
-		loan_ac_no: "",
+		branch_name: "",
+		acc_open_date: "",
 		loan_to: "",
-		branch_shg_id: "",
-
-		branch_shg_SearchField: "", /// Not
-
-		period: "",
-		curr_roi: "",
-		over_roi: "",
-		disb_dt: "",
-		disb_amt: "",
-		// pay_mode: "",
+		acc_no: "", /// Not
+		tran_type: "",
+		depo_amt: "",
 	}
 	const [formValues, setValues] = useState(initialValues)
 
 	
 	const validationSchema = Yup.object({
 		// loan_id: Yup.string().required("Loan ID is required"),
-		loan_ac_no: Yup.string().required("Loan Account No. is required"),
+		branch_name: Yup.string().required("Branch Name is required"),
+		acc_open_date: Yup.string().required("Account Open Date is required"),
 		loan_to: Yup.string().required("Loan To is required"),
-		branch_shg_id: Yup.string().required("Select PACS or SHG is required"),
-		period: Yup.string().required("Period is required"),
-		curr_roi: Yup.mixed().required("Current Rate Of Intarest is required"),
-		over_roi: Yup.mixed().required("Overdue Rate Of Intarest is required"),
-		disb_dt: Yup.mixed().required("Disbursement Date is required"),
-		disb_amt: Yup.number()
-		.typeError("Disbursement Amount must be a number")
-		.required("Disbursement Amount is required")
-		.positive("Disbursement Amount must be greater than 0"),
-		approved_by: '',
-		approved_dt: '',
-		// disb_amt: Yup.number()
-		// .typeError("Disbursement Amount must be a number")
-		// .required("Disbursement Amount is required")
-		// .positive("Disbursement Amount must be greater than 0")
-		// .test(
-		// 	"max-disb-amt-for-P",
-		// 	`Disbursement Amount cannot be more than ${remainDisburseAmt}`,
-		// 	function (value) {
-		// 	if (!value) return true;
-
-		// 	// apply condition ONLY for P
-		// 	if (userDetails?.[0]?.user_type === "P") {
-		// 		return value <= remainDisburseAmt;
-		// 	}
-
-		// 	return true; // no limit for other user types
-		// 	}
-		// )
+		acc_no: Yup.string().required("Account No. is required"),
+		tran_type: Yup.string().required("Transaction Type is required"),
+		depo_amt: Yup.mixed().required("Deposit Amount is required"),
+		
 		})
 
 	// const formatDateToYYYYMMDD_CurrentDT = (date) => {
@@ -272,8 +240,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		over_roi: loanAppData?.over_roi,
 		disb_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.disb_dt)),
 		disb_amt: loanAppData?.disb_amt,
-		approved_by: loanAppData?.approved_by,
-		approved_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.approved_dt)),
+
 		})
 	}
 
@@ -453,7 +420,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 	useEffect(() => {
 		if(userDetails[0]?.user_type == 'P'){
-			// remainingDisburseAmt()
+			remainingDisburseAmt()
 		}
 		
 	}, [formik.values.loan_to])
@@ -511,312 +478,134 @@ function DisbursmentForm_BDCCB({ flag }) {
 				spinning={loading}
 			>	
 				{/* {JSON.stringify(loanAppData?.approval_status, 2)}  */}
-				{/* {JSON.stringify(loanAppData, null, 2)} */}
 				<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-					<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} /> Disbursement Accepted </div>
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-4"}>
-							
+						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
+
 					
 
 							<div>
-								
+								{/* {JSON.stringify(userDetails[0], null, 2)} */}
 								<TDInputTemplateBr
-									placeholder="Loan Account No."
+									placeholder="Branch Name"
 									type="text"
-									label="Loan Account No."
-									name="loan_ac_no"
-									formControlName={formik.values.loan_ac_no}
+									label="Branch Name"
+									name="branch_name"
+									formControlName={formik.values.branch_name}
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}
 									mode={1}
-									disabled={params.id > 0 ? true : false}
+									// disabled={params.id > 0 ? true : false}
 								/>
 								
-
-								{formik.errors.loan_ac_no && formik.touched.loan_ac_no ? (
-									<VError title={formik.errors.loan_ac_no} />
-								) : null}
-							</div>
-
-
-
-							<div>
-								{/* params.id < 1 */}
-								{/* {loan_toDroupDown} */}
-								{userDetails[0]?.user_type == 'H' || userDetails[0]?.user_type == 'B' ? (
-									<>
-									<TDInputTemplateBr
-									placeholder="Select One"
-									type="text"
-									label="Loan To *"
-									name="loan_to"
-									handleChange={formik.handleChange}
-									// handleChange={handleFormikMasterChange} 
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.loan_to}
-									data={loan_to}
-									mode={2}
-									disabled={params.id > 0 ? true : false}
-								/>
-								{formik.errors.loan_to && formik.touched.loan_to ? (
-									<VError title={formik.errors.loan_to} />
-								) : null}
-									</>
-								) : (
-									<>
-									<TDInputTemplateBr
-									placeholder="Select One"
-									type="text"
-									label="Loan To *"
-									name="loan_to"
-									handleChange={formik.handleChange}
-									// handleChange={handleFormikMasterChange} 
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.loan_to}
-									data={loan_to_For_Pacs}
-									mode={2}
-									disabled={params.id > 0 ? true : false}
-								/>
-								{formik.errors.loan_to && formik.touched.loan_to ? (
-									<VError title={formik.errors.loan_to} />
-								) : null}
-									</>
-								)}
-								
-							</div>
-							
-							{loanAppData?.approval_status == 'A' && (
-								<>
-								<div>
-								
-								<TDInputTemplateBr
-									placeholder="Approved By"
-									type="text"
-									label="Approved By"
-									name="approved_by"
-									formControlName={formik.values.approved_by}
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									mode={1}
-									disabled={params.id > 0 ? true : false}
-								/>
-
-							</div>
-
-							<div>
-								
-								<TDInputTemplateBr
-									placeholder="Approved Date"
-									type="text"
-									label="Approved Date"
-									name="approved_dt"
-									formControlName={formik.values.approved_dt}
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									mode={1}
-									disabled={params.id > 0 ? true : false}
-								/>
-
-							</div>
-							</>
-
-							)}
-							
-
-							{/* {loanAppData?.approval_status != 'A' && (
-							<>
-							<div className="pt-6">
-							{userDetails[0]?.user_type == 'P'&& (
-							<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
-							<span className="text-sm font-medium">
-							Balance:</span>
-							<span className="text-base font-semibold">₹{remainDisburseAmt?.toLocaleString("en-IN")}
-							</span>
-							</div>
-							)}
-							</div>
-							</>
-							)} */}
-
-
-							</div>
-							</div>
-
-							<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
-
-							<div>
-								
-								<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
-				 dark:text-gray-100"> 
-				 {formik.values.loan_to === 'P' ? 'Select PACS *' : formik.values.loan_to === 'S' ? 'Select SHG *' : 'Select *'} 
-				 {/* Select PACS/SHG * */}
-				 </label>
-								<Select
-									showSearch
-									placeholder={formik.values.loan_to === 'P' ? 'Choose PACS ' : formik.values.loan_to === 'S' ? 'Choose SHG ' : 'Choose '}
-									value={formik.values.branch_shg_id}
-									style={{ width: "100%" }}
-									optionFilterProp="children"
-									name="branch_shg_id"
-									// 🔍 typing search
-									onSearch={(value) => {
-									handleSearchChange(value);   // your search function
-									}}
-									// disabled={formik.values.loan_to.length > 0 ? false :  true}
-									disabled={params.id > 0 ? true : formik.values.loan_to.length < 1 ? true : false}
-									// ✅ selecting option
-									onChange={(value) => {formik.setFieldValue("branch_shg_id", value)}}
-
-									onBlur={formik.handleBlur}
-									filterOption={(input, option) =>
-									option?.children?.toLowerCase().includes(input.toLowerCase())
-									}
-									
-									>
-									<Select.Option value="" disabled>{formik.values.loan_to === 'P' ? 'Choose PACS ' : formik.values.loan_to === 'S' ? 'Choose SHG ' : 'Choose '}</Select.Option>
-
-									{PACS_SHGList?.map((data) => (
-									<Select.Option key={data.code} value={data.code}>
-									{data.name}
-									</Select.Option>
-									))}
-									</Select>
-
-								
-									{formik.errors.branch_shg_id && formik.touched.branch_shg_id ? (
-										<VError title={formik.errors.branch_shg_id} />
-									) : null}
-
-
-								
-								
-							</div>
-
-
-
-						</div>
-						</div>
-							
-						<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-3"}>
-							<div>
-								<TDInputTemplateBr
-									placeholder="Period"
-									type="number"
-									label="Period (In Month)"
-									name="period"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.period}
-									data={period_data}
-									mode={1}
-									disabled={loanAppData?.approval_status == 'A' ? true : false}
-								/>
-								{formik.errors.period && formik.touched.period ? (
-									<VError title={formik.errors.period} />
-								) : null}
-							</div>
-
-
-							<div>
-							<TDInputTemplateBr
-							placeholder="Type Current ROI"
-							type="number"
-							label="Current ROI"
-							name="curr_roi"
-							formControlName={formik.values.curr_roi}
-							handleChange={formik.handleChange}
-							handleBlur={formik.handleBlur}
-							mode={1}
-							disabled={loanAppData?.approval_status == 'A' ? true : false}
-							/>
-							{formik.errors.curr_roi && formik.touched.curr_roi ? (
-									<VError title={formik.errors.curr_roi} />
+								{formik.errors.branch_name && formik.touched.branch_name ? (
+									<VError title={formik.errors.branch_name} />
 								) : null}
 							</div>
 
 							<div>
 							<TDInputTemplateBr
-							placeholder="Ovd ROI"
-							type="number"
-							label="Ovd ROI"
-							name="over_roi"
-							formControlName={formik.values.over_roi}
-							handleChange={formik.handleChange}
+							// placeholder="Select Disbursement Date..."
+							type="date"
+							label="Account Open Date"
+							name="acc_open_date"
+							formControlName={formik.values.acc_open_date}
+							handleChange={formik.handleChange} 
 							handleBlur={formik.handleBlur}
+							max={formatDateToYYYYMMDD_CurrentDT(new Date())}
 							mode={1}
-							disabled={loanAppData?.approval_status == 'A' ? true : false}
+							// disabled={loanAppData?.approval_status == 'A' ? true : false}
 							/>
-							{formik.errors.over_roi && formik.touched.over_roi ? (
-									<VError title={formik.errors.over_roi} />
-								) : null}
-							</div>
-
-							
+							{formik.errors.acc_open_date && formik.touched.acc_open_date ? (
+							<VError title={formik.errors.acc_open_date} />
+							) : null}
+						</div>
 
 						<div>
 						<TDInputTemplateBr
-						// placeholder="Select Disbursement Date..."
-						type="date"
-						label="Disbursement Date"
-						name="disb_dt"
-						formControlName={formik.values.disb_dt}
-						handleChange={formik.handleChange} 
-						handleBlur={formik.handleBlur}
-						max={formatDateToYYYYMMDD_CurrentDT(new Date())}
-						mode={1}
-						disabled={loanAppData?.approval_status == 'A' ? true : false}
-						/>
-						{formik.errors.disb_dt && formik.touched.disb_dt ? (
-									<VError title={formik.errors.disb_dt} />
-								) : null}
-					</div>
-
-					<div>
-						<TDInputTemplateBr
-						placeholder="Disbursement Amount..."
-						type="number"
-						label="Disbursement Amount"
-						name="disb_amt"
-						formControlName={formik.values.disb_amt}
-						handleChange={formik.handleChange}
-						handleBlur={formik.handleBlur}
-						mode={1}
-						disabled={loanAppData?.approval_status == 'A' ? true : false}
-						/>
-
-						{formik.errors.disb_amt && formik.touched.disb_amt ? (
-									<VError title={formik.errors.disb_amt} />
-								) : null}
-					</div>
-
-							{/* <div>
-						<TDInputTemplateBr
-						placeholder="Select Pay Mode..."
+						placeholder="Select One"
 						type="text"
-						label="Pay Mode"
-						name="pay_mode"
-						formControlName={formik.values.pay_mode}
+						label="Loan To *"
+						name="loan_to"
 						handleChange={formik.handleChange}
+						// handleChange={handleFormikMasterChange} 
 						handleBlur={formik.handleBlur}
-						data={pay_mode}
+						formControlName={formik.values.loan_to}
+						data={loan_to}
 						mode={2}
-						/>
-						{formik.errors.pay_mode && formik.touched.pay_mode ? (
-									<VError title={formik.errors.pay_mode} />
-								) : null}
-					</div> */}
-
-					
-
-					
-					{/* {JSON.stringify(villName, null, 2)} */}
-
+						disabled={params.id > 0 ? true : false}
+					/>
+					{formik.errors.loan_to && formik.touched.loan_to ? (
+						<VError title={formik.errors.loan_to} />
+					) : null}
 						</div>
-					</div>
+
+						<div>
+								<TDInputTemplateBr
+									placeholder="Account No."
+									type="number"
+									label="Account No."
+									name="acc_no"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.acc_no}
+									// data={period_data}
+									mode={1}
+									// disabled={loanAppData?.approval_status == 'A' ? true : false}
+								/>
+								{formik.errors.acc_no && formik.touched.acc_no ? (
+									<VError title={formik.errors.acc_no} />
+								) : null}
+							</div>
+
+							<div>
+								<TDInputTemplateBr
+									placeholder="Transaction Type"
+									type="text"
+									label="Transaction Type"
+									name="tran_type"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.tran_type || "Deposit"}
+									// data={period_data}
+									mode={1}
+									disabled
+								/>
+								{formik.errors.tran_type && formik.touched.tran_type ? (
+									<VError title={formik.errors.tran_type} />
+								) : null}
+							</div>
+
+							<div>
+								<TDInputTemplateBr
+									placeholder="Deposit Amount"
+									type="number"
+									label="Deposit Amount"
+									name="depo_amt"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.depo_amt}
+									// data={period_data}
+									mode={1}
+									// disabled={loanAppData?.approval_status == 'A' ? true : false}
+								/>
+								{formik.errors.depo_amt && formik.touched.depo_amt ? (
+									<VError title={formik.errors.depo_amt} />
+								) : null}
+							</div>
+
+
+
+							
+
+
+							</div>
+							</div>
+
+							
+							
+						
 
 
 
@@ -837,30 +626,22 @@ function DisbursmentForm_BDCCB({ flag }) {
 				onPress={() => setVisible(!visible)}
 				visible={visible}
 				 onPressYes={() => {
-	if (pendingValues) {
+		if (pendingValues) {
 		if(params?.id > 0) {
 			editGroup(pendingValues);
 		} else {
 			saveGroupData(pendingValues) 
 		}
-		
 	  
-	 // 🔥 pass values here
-	}
-	setVisible(false);
-  }}
+	 	// 🔥 pass values here
+		}
+		setVisible(false);
+		}}
 				onPressNo={() => setVisible(!visible)}
-			/>
+		/>
 
-			
-
-			
-
-			
-
-			
 		</>
 	)
 }
 
-export default DisbursmentForm_BDCCB
+export default AccountHolderForm_BDCCB

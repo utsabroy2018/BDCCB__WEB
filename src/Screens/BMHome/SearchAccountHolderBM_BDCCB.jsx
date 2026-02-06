@@ -14,19 +14,20 @@ import { routePaths } from "../../Assets/Data/Routes"
 import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
 import LoanApplicationsDisburseTable_BDCCB from "../../Components/LoanApplicationsDisburseTable_BDCCB"
 import { motion } from "framer-motion"
+import AccountHolderTable_BDCCB from "../../Components/AccountHolderTable_BDCCB"
 
 const options_Disburs = [
 	{
-		label: "Acceptance Pending",
+		label: "Pending Disbursement",
 		value: "U",
 	},
 	{
-		label: "Accepted",
+		label: "Approved Disbursement",
 		value: "A",
 	}
 ]
 
-function SearchMemberForDisburseBM_BDCCB() {
+function SearchAccountHolderBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -143,7 +144,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 												<button
 												className="bg-slate-100 p-3 h-11 rounded-full float-right text-center ml-3"
 												onClick={() => {
-													navigate(`/homebm/disburseloan/0`)
+													navigate(`/homebm/createaccount/0`)
 												}}
 											>
 												<PlusOutlined className="text-xl" />
@@ -186,7 +187,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 													transition={{ delay: 1, type: "just" }}
 													className="text-xl w-48 capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{"Disburse Loan"}
+													{"Account Holder"}
 												</motion.h2>
 											{/* </div> */}
 										</div>
@@ -221,10 +222,10 @@ function SearchMemberForDisburseBM_BDCCB() {
 						// setSearch={(data) => setSearch(data)}
 					/> */}
 
-					<LoanApplicationsDisburseTable_BDCCB
+					<AccountHolderTable_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}
-					title="Disburse Loan"
+					title="Account Holder"
 					showSearch={true}
 					disbursementStatus={disbursementStatus}
 					setSearch={(data) => setSearch(data)}
@@ -241,4 +242,4 @@ function SearchMemberForDisburseBM_BDCCB() {
 	)
 }
 
-export default SearchMemberForDisburseBM_BDCCB
+export default SearchAccountHolderBM_BDCCB

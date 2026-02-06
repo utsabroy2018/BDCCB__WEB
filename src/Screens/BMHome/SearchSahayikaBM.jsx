@@ -49,6 +49,7 @@ function SearchSahayikaBM() {
 					console.log(res?.data?.msg, 'fetchSahayikaList', res?.data?.data);
 					if(res?.data?.success){
 					setGroups(res?.data?.data)
+					setCopyLoanApplications(res?.data?.data)
 					} else {
 					Message('error', res?.data?.msg)
 					navigate(routePaths.LANDING)
@@ -65,11 +66,25 @@ function SearchSahayikaBM() {
 
 
 	useEffect(()=>{
-		console.log(userDetails[0]?.tenant_id, 'fetchSahayikaList');
-		
-		// fetchSearchedGroups()
 		fetchSahayikaList()
 	}, [])
+
+	const setSearch = (word) => {
+		console.log(word, "wordwordwordword", copyLoanApplications)
+		setGroups(
+			copyLoanApplications?.filter(
+				(e) =>
+					e?.sahayika_name
+						?.toString()
+						?.toLowerCase()
+						.includes(word?.toLowerCase()) ||
+					e?.sahayika_name
+						?.toString()
+						?.toLowerCase()
+						?.includes(word?.toLowerCase())
+			)
+		)
+	}
 
 	return (
 		<div>
@@ -124,11 +139,13 @@ function SearchSahayikaBM() {
 							</button>
 						</div>
 					</div> */}
+					{/* {JSON.stringify(groups, 2)} */}
 					<SahayikaTableViewBr
 						flag="BM"
 						loanAppData={groups}
+						setSearch={(data) => setSearch(data)}
 						title="Sahayika"
-						showSearch={false}
+						showSearch={true}
 					/>
 					
 				</main>

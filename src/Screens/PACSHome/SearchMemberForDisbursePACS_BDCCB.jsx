@@ -17,11 +17,11 @@ import { motion } from "framer-motion"
 
 const options_Disburs = [
 	{
-		label: "Pending Disbursement",
+		label: "Acceptance Pending",
 		value: "U",
 	},
 	{
-		label: "Approved Disbursement",
+		label: "Accepted",
 		value: "A",
 	}
 ]

@@ -148,3 +148,6 @@ table.table_Custome_2nd thead tr th:first-child{width: auto;}
 }
 
 .radioBtn .ant-radio-group{margin-top: -8px; margin-left: -10px;}
+
+.accept_dis{background: #6cbb3f; color: #fff; 
+  margin-top: 0; padding: 3px 10px; border-radius: 5px; display: inline-block; margin-bottom: 20px; font-size: 14px;}

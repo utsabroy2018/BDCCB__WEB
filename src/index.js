@@ -80,7 +80,7 @@ const SearchSahayikaBM = lazy(() => import("./Screens/BMHome/SearchSahayikaBM"))
 const EditSahayikaFormBM = lazy(() => import("./Screens/BMHome/EditSahayikaFormBM"))
 
 const EditDisburseFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditDisburseFormBM_BDCCB"))
-const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB"))
+const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB.jsx"))
 
 //////////////// BDCCB BM End ////////////////
 
@@ -97,7 +97,12 @@ const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/Acce
 
 //////////////// BDCCB PACS End ////////////////
 
+//////////////// BDCCB Account Open Start ////////////////
 
+const EditAccountHolderFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditAccountHolderFormBM_BDCCB"))
+const SearchAccountHolderBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchAccountHolderBM_BDCCB.jsx"))
+
+//////////////// BDCCB Account Open End ////////////////
 
 
 ////////////////////////////////////////////// BDCCB End //////////////////////////////////////////////
@@ -355,6 +360,16 @@ const router = createBrowserRouter([
 								path: "disburseloan/:id",
 								element: <EditDisburseFormBM_BDCCB />,
 							},
+
+							{
+								path: "createaccount",
+								element: <SearchAccountHolderBM_BDCCB />,
+							},
+							{
+								path: "createaccount/:id",
+								element: <EditAccountHolderFormBM_BDCCB />,
+							},
+
 							// {
 							// 	path: "transfermember",
 							// 	element: <MemberTransfer />,
