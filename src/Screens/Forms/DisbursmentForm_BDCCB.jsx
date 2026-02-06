@@ -513,7 +513,8 @@ function DisbursmentForm_BDCCB({ flag }) {
 				{/* {JSON.stringify(loanAppData?.approval_status, 2)}  */}
 				{/* {JSON.stringify(loanAppData, null, 2)} */}
 				<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-					<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} /> Disbursement Accepted </div>
+					{loanAppData?.approval_status == 'A' && (<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} /> 
+					Disbursement Accepted </div>)}
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-4"}>
