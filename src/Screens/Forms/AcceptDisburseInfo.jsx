@@ -27,6 +27,8 @@ import {
 	LoadingOutlined,
 	InfoCircleFilled,
 	CheckCircleOutlined,
+	UsergroupAddOutlined,
+	UserOutlined,
 } from "@ant-design/icons"
 import FormHeader from "../../Components/FormHeader"
 import { routePaths } from "../../Assets/Data/Routes"
@@ -64,6 +66,7 @@ function AcceptDisburseInfo({ groupDataArr }) {
 	const loanAppData = location.state || {}
 	const navigate = useNavigate()
 	const userDetails = JSON.parse(localStorage.getItem("user_details"))
+	const [groupMemberTotal, setGroupMemberTotal] = useState();
 
 	// const  loanAppData  = location.state || {}
 
@@ -119,6 +122,49 @@ function AcceptDisburseInfo({ groupDataArr }) {
 				setLoading(false)
 				}
 
+
+		useEffect(() => {
+		fetchTotalGroupMember()
+		}, [])
+	
+		const fetchTotalGroupMember = async ()=>{
+	
+	
+			setLoading(true)
+			const creds = {
+			branch_code : userDetails[0]?.brn_code,
+			tenant_id : userDetails[0]?.tenant_id,
+			}
+	
+			const tokenValue = await getLocalStoreTokenDts(navigate);
+	
+			await axios.post(`${url_bdccb}/loan/fetch_tot_grp_memb`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+	
+			if(res?.data?.success){
+			setGroupMemberTotal(res?.data?.data)
+			console.log(res?.data?.data, 'searchAmtsearchAmtsearchAmtsearchAmt');
+	
+			} else {
+			// navigate(routePaths.LANDING)
+			// localStorage.clear()
+			}
+			})
+			.catch((err) => {
+			Message("error", "Some error occurred while fetching group form")
+			})
+	
+			setLoading(false)
+			
+	
+		}
+	
+
 	return (
 		<>
 			{/* {
@@ -171,7 +217,7 @@ function AcceptDisburseInfo({ groupDataArr }) {
 							/>
 						</div>
 
-						<div>
+						{/* <div>
 
 							<TDInputTemplateBr
 								type="text"
@@ -180,7 +226,7 @@ function AcceptDisburseInfo({ groupDataArr }) {
 								mode={1}
 								disabled={true}
 							/>
-						</div>
+						</div> */}
 
 						<div>
 
@@ -274,6 +320,17 @@ function AcceptDisburseInfo({ groupDataArr }) {
 								disabled={true}
 							/>
 						</div> */}
+
+						<div className="pt-6">
+						{/* {userDetails[0]?.user_type == 'P'&& ( */}
+						<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
+						<span className="text-sm font-medium" style={{fontSize: 12}}>
+						<UsergroupAddOutlined />Total Group:</span> <span className="text-base font-semibold" style={{fontSize: 12}}>{groupMemberTotal?.tot_grp}</span>
+						<span className="text-sm font-medium" style={{fontSize: 12}}>
+						<UserOutlined />  Member:</span> <span className="text-base font-semibold" style={{fontSize: 12}}>{groupMemberTotal?.tot_memb}</span>
+						</div>
+						{/* )} */}
+						</div>
 
 
 					</div>

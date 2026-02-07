@@ -137,10 +137,12 @@ const containerStyle = {
 		branch_code: "",
 		members: [
 				{
+				member_id : 0,
 				member_name: "",
-				member_address: "",
+				address: "",
 				aadhar_no: "",
-				is_leader: false,
+				gp_leader_flag: "N",
+    			asst_gp_leader_flag: "N",
 				},
 			],
 	}
@@ -159,17 +161,92 @@ const containerStyle = {
 		village_id: Yup.mixed().required("Village Name is required"),
 
 		// 🔥 MEMBER VALIDATION
-		members: Yup.array().of(
-		Yup.object({
-		member_name: Yup.string().required("Member name required"),
-		member_address: Yup.string().required("Address required"),
-		aadhar_no: Yup.string()
-		.length(12, "Aadhaar must be 12 digits")
-		.required("Aadhaar required"),
-		is_leader: Yup.boolean(),
-		})
-		)
-		.min(1, "At least one member required"),
+		// members: Yup.array().of(
+		// Yup.object({
+		// member_name: Yup.string().required("Member name required"),
+		// address: Yup.string().required("Address required"),
+		// aadhar_no: Yup.string()
+		// .length(12, "Aadhaar must be 12 digits")
+		// .required("Aadhaar required"),
+		// is_leader: Yup.boolean(),
+		// })
+		// )
+		// .min(1, "At least one member required"),
+		// 🔥 MEMBER VALIDATION
+// members: Yup.array()
+//   .of(
+//     Yup.object({
+//       member_name: Yup.string().required("Member name required"),
+
+//       address: Yup.string().required("Address required"),
+
+//       aadhar_no: Yup.string()
+//         .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
+//         .required("Aadhaar required"),
+
+//       gp_leader_flag: Yup.boolean(),
+//       asst_gp_leader_flag: Yup.boolean(),
+//     })
+//   )
+//   .min(1, "At least one member required")
+
+//   // 🔐 ROLE VALIDATION
+//   .test(
+//     "leader-assistant-rule",
+//     "Only one Group Leader and one Assistant Member allowed",
+//     (members = []) => {
+//       const leaderCount = members.filter(
+//         (m) => m.gp_leader_flag
+//       ).length;
+
+//       const assistantCount = members.filter(
+//         (m) => m.asst_gp_leader_flag
+//       ).length;
+
+//       return leaderCount <= 1 && assistantCount <= 1;
+//     }
+//   )
+
+members: Yup.array()
+  .of(
+    Yup.object({
+      member_name: Yup.string().required("Member name required"),
+
+      address: Yup.string().required("Address required"),
+
+      aadhar_no: Yup.string()
+        .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
+        .required("Aadhaar required"),
+
+      gp_leader_flag: Yup.string()
+        .oneOf(["Y", "N"])
+        .required(),
+
+      asst_gp_leader_flag: Yup.string()
+        .oneOf(["Y", "N"])
+        .required(),
+    })
+  )
+  .min(1, "At least one member required")
+
+  // 🔐 ROLE VALIDATION
+  .test(
+    "leader-assistant-rule",
+    "Only one Group Leader and one Assistant Member allowed",
+    (members = []) => {
+      const leaderCount = members.filter(
+        (m) => m.gp_leader_flag === "Y"
+      ).length;
+
+      const assistantCount = members.filter(
+        (m) => m.asst_gp_leader_flag === "Y"
+      ).length;
+
+      return leaderCount <= 1 && assistantCount <= 1;
+    }
+  )
+
+
 
 	})
 
@@ -238,8 +315,8 @@ const containerStyle = {
 				
 				
 				if(res?.data?.success){
-					console.log(res, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
-				
+					console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
+
 
 				setValues({
 
@@ -259,6 +336,7 @@ const containerStyle = {
 					gp_id: res?.data?.data[0]?.gp_id,
 					village_id: res?.data?.data[0]?.village_id,
 					branch_code: res?.data?.data[0]?.branch_code,
+					members: res?.data?.data[0]?.memb_dt
 
 				})
 
@@ -293,6 +371,7 @@ const containerStyle = {
 			
 				const creds = {
 				group_code: groupDataArr?.group_code,
+				tenant_id: userDetails[0]?.tenant_id,
 				// branch_code: masterData?.branch_code,
 				branch_code: userDetails[0]?.brn_code,
 				group_name: formData?.g_group_name,
@@ -308,12 +387,13 @@ const containerStyle = {
 				village_id: formData?.village_id,
 				pin_no: formData?.g_pin,
 				sb_ac_no: formData?.g_acc1,
+				members: formData?.members,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 				}
 
 
-				console.log(formData, 'credscredscredscreds', userDetails[0]);
+				console.log(creds, 'credscredscredscreds', userDetails[0]);
 				
 			
 				await saveMasterData({
@@ -339,6 +419,8 @@ const containerStyle = {
 				const creds = {
 				// group_code: groupDataArr?.group_code,
 				// branch_code: masterData?.branch_code,
+				group_code: 0,
+				tenant_id: userDetails[0]?.tenant_id,
 				branch_code: userDetails[0]?.brn_code,
 				group_name: formData?.g_group_name,
 				phone1: formData?.g_phone1,
@@ -352,12 +434,15 @@ const containerStyle = {
 				village_id: formData?.village_id,
 				pin_no: formData?.g_pin,
 				sb_ac_no: formData?.g_acc1,
+				members: formData?.members,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 				}
 
 
 				console.log(creds, 'credscredscredscreds', formData);
+
+				// return;
 				
 			
 				await saveMasterData({
@@ -752,21 +837,44 @@ const handleFormikMasterChange = async (e) => {
   }
 };
 
+// const handleGroupLeaderChange = (index) => {
+//   const updated = formik.values.members.map((m, i) => ({
+//     ...m,
+//     gp_leader_flag: i === index,
+//   }));
+//   formik.setFieldValue("members", updated);
+// };
 const handleGroupLeaderChange = (index) => {
   const updated = formik.values.members.map((m, i) => ({
     ...m,
-    is_group_leader: i === index,
+    gp_leader_flag: i === index ? "Y" : "N",
+    asst_gp_leader_flag: i === index ? "N" : m.asst_gp_leader_flag,
   }));
+
   formik.setFieldValue("members", updated);
 };
+
+
+
+// const handleAssistantChange = (index) => {
+//   const updated = formik.values.members.map((m, i) => ({
+//     ...m,
+//     asst_gp_leader_flag: i === index,
+//   }));
+//   formik.setFieldValue("members", updated);
+// };
 
 const handleAssistantChange = (index) => {
   const updated = formik.values.members.map((m, i) => ({
     ...m,
-    is_assistant_member: i === index,
+    asst_gp_leader_flag: i === index ? "Y" : "N",
+    gp_leader_flag: i === index ? "N" : m.gp_leader_flag,
   }));
+
   formik.setFieldValue("members", updated);
 };
+
+
 
 
 
@@ -1080,13 +1188,13 @@ const handleAssistantChange = (index) => {
   {formik.values.members.map((member, index) => {
     const isRowFilled =
       member.member_name &&
-      member.member_address &&
+      member.address &&
       member.aadhar_no;
 
     return (
       <div
         key={index}
-        className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50"
+        className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{position:'relative'}}
       >
         {/* Leader */}
         {/* <div className="col-span-2 flex flex-col gap-1 items-start">
@@ -1112,25 +1220,27 @@ const handleAssistantChange = (index) => {
 </div> */}
 
 {/* Designation */}
-<div className="col-span-1 flex flex-col gap-1">
+<div className="col-span-12 flex flex-col gap-1" style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'start'}}>
   {/* Group Leader */}
-  <label className="flex items-center gap-1 text-xs">
+  <label className="flex items-center gap-1 text-xs" style={{fontSize:11}}>
     <input
       type="checkbox"
-      checked={member.is_group_leader}
+    //   checked={member.gp_leader_flag}
+	checked={member.gp_leader_flag === "Y"}
       onChange={() => handleGroupLeaderChange(index)}
     />
     Group Leader
   </label>
 
   {/* Assistant Member */}
-  <label className="flex items-center gap-1 text-xs">
+  <label className="flex items-center gap-1 text-xs" style={{fontSize:11}}>
     <input
       type="checkbox"
-      checked={member.is_assistant_member}
+    //   checked={member.asst_gp_leader_flag}
+	checked={member.asst_gp_leader_flag === "Y"}
       onChange={() => handleAssistantChange(index)}
     />
-    Assistant
+    Assistant Leader
   </label>
 </div>
 
@@ -1152,15 +1262,15 @@ const handleAssistantChange = (index) => {
           <TDInputTemplateBr
             placeholder="Address"
             type="text"
-            name={`members[${index}].member_address`}
-            formControlName={member.member_address}
+            name={`members[${index}].address`}
+            formControlName={member.address}
             handleChange={formik.handleChange}
             mode={1}
           />
         </div>
 
         {/* Aadhaar */}
-        <div className="col-span-3">
+        <div className="col-span-5">
           <TDInputTemplateBr
             placeholder="Aadhaar No"
             type="number"
@@ -1172,7 +1282,7 @@ const handleAssistantChange = (index) => {
         </div>
 
         {/* Remove */}
-        <div className="col-span-1 text-center">
+        <div className="col-span-1 text-center" style={{position:'absolute', right:10}}>
           {formik.values.members.length > 1 && (
             <button
               type="button"
@@ -1181,7 +1291,16 @@ const handleAssistantChange = (index) => {
                 updated.splice(index, 1);
                 formik.setFieldValue("members", updated);
               }}
-              className="text-red-600 font-bold"
+              className="text-red-600 font-bold" style={{
+  background: "rgb(218 65 103 / var(--tw-bg-opacity))",
+  padding: "0 7px",
+  height: "25px",
+  color: "#fff",
+  lineHeight: "25px",
+  borderRadius: "5px",
+  marginTop: "13px",
+  fontSize: "13px",
+}}
             >
               ✕
             </button>
@@ -1198,10 +1317,12 @@ const handleAssistantChange = (index) => {
                 formik.setFieldValue("members", [
                   ...formik.values.members,
                   {
+					member_id : 0,
                     member_name: "",
-                    member_address: "",
+                    address: "",
                     aadhar_no: "",
-                    is_leader: false,
+                    gp_leader_flag: "N",
+        			asst_gp_leader_flag: "N",
                   },
                 ])
               }
@@ -1227,7 +1348,7 @@ const handleAssistantChange = (index) => {
 								}}
 							/>
 						)} */}
-					{params?.id > 0 && (
+					{params?.id == 'u' && (
 						<>
 							{/* {JSON.stringify(groupData, null, 2)} */}
 							<div className="sm:col-span-2 mt-5">
@@ -1251,9 +1372,7 @@ const handleAssistantChange = (index) => {
 													<th scope="col" className="px-6 py-3">
 														Group Leader
 													</th>
-													{/* <th scope="col" className="px-6 py-3">
-														
-													</th> */}
+													
 													<th scope="col" className="px-6 py-3">
 														Action
 													</th>

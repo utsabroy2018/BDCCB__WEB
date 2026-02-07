@@ -2409,7 +2409,7 @@ const items_bdccb = [
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homebm/disburseloan"}>Disburse Loan</Link>,
+					label: <Link to={"/homebm/disburseloan"}>Loan Disburse Branch to PACS</Link>,
 				}
 			],
 		},
