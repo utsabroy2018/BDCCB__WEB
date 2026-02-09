@@ -127,7 +127,7 @@ const containerStyle = {
 		g_pin: "",
 		g_phone1: "",
 		g_bank_branch: "",
-		g_acc1: "",
+		// g_acc1: "",
 		dist_id: "",
 		ps_id: "",
 		po_id: "",
@@ -214,9 +214,10 @@ members: Yup.array()
 
       address: Yup.string().required("Address required"),
 
-      aadhar_no: Yup.string()
-        .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
-        .required("Aadhaar required"),
+    //   aadhar_no: Yup.string()
+    //     .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
+    //     .required("Aadhaar required"),
+	aadhar_no: Yup.string(),
 
       gp_leader_flag: Yup.string()
         .oneOf(["Y", "N"])
@@ -226,8 +227,7 @@ members: Yup.array()
         .oneOf(["Y", "N"])
         .required(),
     })
-  )
-  .min(1, "At least one member required")
+  ).min(1, "At least one member required")
 
   // 🔐 ROLE VALIDATION
   .test(
@@ -328,7 +328,7 @@ members: Yup.array()
 					g_pin: res?.data?.data[0]?.pin_no,
 					g_phone1: res?.data?.data[0]?.phone1,
 					g_bank_branch: res?.data?.data[0]?.branch_name,
-					g_acc1: res?.data?.data[0]?.sb_ac_no,
+					// g_acc1: res?.data?.data[0]?.sb_ac_no,
 					dist_id: res?.data?.data[0]?.dist_id,
 					ps_id: res?.data?.data[0]?.ps_id,
 					po_id: res?.data?.data[0]?.po_id,
@@ -386,7 +386,7 @@ members: Yup.array()
 				gp_id: formData?.gp_id,
 				village_id: formData?.village_id,
 				pin_no: formData?.g_pin,
-				sb_ac_no: formData?.g_acc1,
+				// sb_ac_no: formData?.g_acc1,
 				members: formData?.members,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
@@ -433,7 +433,7 @@ members: Yup.array()
 				gp_id: formData?.gp_id,
 				village_id: formData?.village_id,
 				pin_no: formData?.g_pin,
-				sb_ac_no: formData?.g_acc1,
+				// sb_ac_no: formData?.g_acc1,
 				members: formData?.members,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
@@ -1032,7 +1032,7 @@ const handleAssistantChange = (index) => {
 
 							
 
-							<div>
+							{/* <div>
 								<TDInputTemplateBr
 									placeholder="SB Account"
 									type="text"
@@ -1046,7 +1046,7 @@ const handleAssistantChange = (index) => {
 								{formik.errors.g_acc1 && formik.touched.g_acc1 ? (
 									<VError title={formik.errors.g_acc1} />
 								) : null}
-							</div>
+							</div> */}
 
 
 							<div>
@@ -1181,9 +1181,12 @@ const handleAssistantChange = (index) => {
 
 					{/* ================= ADD MEMBER SECTION ================= */}
 <div className="sm:col-span-3 mt-6">
-  <Tag color="#2563eb" className="text-white mb-3 font-bold">
-    Add Group Members
-  </Tag>
+	{formik.values.members.length > 0 &&(
+		<Tag color="#2563eb" className="text-white mb-3 font-bold">
+			Add Group Members
+		</Tag>
+	)}
+  
 
   {formik.values.members.map((member, index) => {
     const isRowFilled =
@@ -1279,6 +1282,7 @@ const handleAssistantChange = (index) => {
             handleChange={formik.handleChange}
             mode={1}
           />
+		  
         </div>
 
         {/* Remove */}

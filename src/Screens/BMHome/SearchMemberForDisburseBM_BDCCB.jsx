@@ -14,6 +14,7 @@ import { routePaths } from "../../Assets/Data/Routes"
 import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
 import LoanApplicationsDisburseTable_BDCCB from "../../Components/LoanApplicationsDisburseTable_BDCCB"
 import { motion } from "framer-motion"
+import LoanBrnPacsDisburseTable_BDCCB from "../../Components/LoanBrnPacsDisburseTable_BDCCB"
 
 const options_Disburs = [
 	{
@@ -184,9 +185,9 @@ function SearchMemberForDisburseBM_BDCCB() {
 													initial={{ opacity: 0, y: -50 }}
 													animate={{ opacity: 1, y: 0 }}
 													transition={{ delay: 1, type: "just" }}
-													className="text-xl w-48 capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
+													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{"Disburse Loan"}
+													{"Loan Disburse Branch to PACS"}
 												</motion.h2>
 											{/* </div> */}
 										</div>
@@ -221,7 +222,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 						// setSearch={(data) => setSearch(data)}
 					/> */}
 
-					<LoanApplicationsDisburseTable_BDCCB
+					<LoanBrnPacsDisburseTable_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}
 					title="Disburse Loan"

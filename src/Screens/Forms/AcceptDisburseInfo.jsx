@@ -98,6 +98,8 @@ function AcceptDisburseInfo({ groupDataArr }) {
 				dr_amt: loanAppData?.disb_amt,
 				cr_amt: loanAppData?.disb_amt,
 				loan_id: loanAppData?.loan_id,
+				// tot_grp: loanAppData?.tot_grp,
+				// tot_memb: loanAppData?.tot_memb,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 			}
@@ -123,9 +125,9 @@ function AcceptDisburseInfo({ groupDataArr }) {
 				}
 
 
-		useEffect(() => {
-		fetchTotalGroupMember()
-		}, [])
+		// useEffect(() => {
+		// fetchTotalGroupMember()
+		// }, [])
 	
 		const fetchTotalGroupMember = async ()=>{
 	
@@ -311,6 +313,28 @@ function AcceptDisburseInfo({ groupDataArr }) {
 							/>
 						</div>
 
+						<div>
+
+							<TDInputTemplateBr
+								type="text"
+								label="Total Group"
+								formControlName={loanAppData?.tot_grp} // Default to SHG
+								mode={1}
+								disabled={true}
+							/>
+						</div>
+
+						<div>
+
+							<TDInputTemplateBr
+								type="text"
+								label="Total Member"
+								formControlName={loanAppData?.tot_memb} // Default to SHG
+								mode={1}
+								disabled={true}
+							/>
+						</div>
+
 						{/* <div>
 							<TDInputTemplateBr
 								type="text"
@@ -321,16 +345,16 @@ function AcceptDisburseInfo({ groupDataArr }) {
 							/>
 						</div> */}
 
-						<div className="pt-6">
-						{/* {userDetails[0]?.user_type == 'P'&& ( */}
+						{/* <div className="pt-6">
+						
 						<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
 						<span className="text-sm font-medium" style={{fontSize: 12}}>
 						<UsergroupAddOutlined />Total Group:</span> <span className="text-base font-semibold" style={{fontSize: 12}}>{groupMemberTotal?.tot_grp}</span>
 						<span className="text-sm font-medium" style={{fontSize: 12}}>
 						<UserOutlined />  Member:</span> <span className="text-base font-semibold" style={{fontSize: 12}}>{groupMemberTotal?.tot_memb}</span>
 						</div>
-						{/* )} */}
-						</div>
+					
+						</div> */}
 
 
 					</div>

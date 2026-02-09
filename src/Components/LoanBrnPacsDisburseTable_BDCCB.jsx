@@ -19,7 +19,7 @@ import { Message } from "./Message"
 import Column from "antd/es/table/Column"
 import { DataTable } from "primereact/datatable"
 
-function LoanApplicationsDisburseTable_BDCCB({
+function LoanBrnPacsDisburseTable_BDCCB({
 	loanAppData,
 	setSearch,
 	title,
@@ -150,7 +150,7 @@ function LoanApplicationsDisburseTable_BDCCB({
 										onClick={() => {
 										console.log("ROW DATA:", rowData);
 										navigate(
-										`/homepacs/disburseloan/${rowData?.loan_id}`,
+										`/homebm/disburseloan/${rowData?.loan_id}`,
 										{ state: rowData }
 										);
 										}}
@@ -185,4 +185,4 @@ function LoanApplicationsDisburseTable_BDCCB({
 	)
 }
 
-export default LoanApplicationsDisburseTable_BDCCB
+export default LoanBrnPacsDisburseTable_BDCCB

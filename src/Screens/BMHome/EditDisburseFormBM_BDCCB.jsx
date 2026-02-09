@@ -11,6 +11,7 @@ import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
 import DisbursmentForm from "../Forms/DisbursmentForm"
 import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
+import BrnPacsDisbursmentForm_BDCCB from "../Forms/BrnPacsDisbursmentForm_BDCCB"
 
 function EditDisburseFormBM_BDCCB() {
 	const params = useParams()
@@ -36,7 +37,7 @@ function EditDisburseFormBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium"> */}
-							<DisbursmentForm_BDCCB flag="BM"/>
+							<BrnPacsDisbursmentForm_BDCCB flag="BM"/>
 						{/* </div>
 					</Spin>
 				</div>
