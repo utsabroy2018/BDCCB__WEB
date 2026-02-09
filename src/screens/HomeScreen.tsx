@@ -96,12 +96,15 @@ const HomeScreen = () => {
         const ip = await getClientIP()
 
         const creds = {
-            pacs_shg_id : loginStore?.emp_id,
+            // pacs_shg_id : loginStore?.emp_id,
+            // loan_to : loginStore?.user_type,
+            tenant_id: loginStore?.tenant_id,
+            branch_shg_id : loginStore?.emp_id,
             loan_to : loginStore?.user_type,
 			}
         // return
         
-        await axios.post(ADDRESSES.FETCH_MAX_BALANCE, creds, {
+        await axios.post(ADDRESSES.FETCH_MEMBERS_DETAILS, creds, {
             headers: {
                 Authorization: loginStore?.token, // example header
                 "Content-Type": "application/json", // optional
@@ -110,9 +113,9 @@ const HomeScreen = () => {
         ).then(async res => {
             // console.log("RESSSSS", res?.data)
             if(res?.data?.success){
-            console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.data)
+            console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data)
               if(res?.data?.data.length > 0){
-                setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
+                setRemainDisburseAmt(res?.data?.loan_amount)
               } else {
                 setRemainDisburseAmt("0")
               }

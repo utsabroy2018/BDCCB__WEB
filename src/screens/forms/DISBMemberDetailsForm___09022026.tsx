@@ -41,23 +41,12 @@ const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
   const [memberList, setMemberList] = useState([]);
   const [members, setMembers] = useState([
     {
-      // id: 1,
-      // member_name: "",
-      // disb_amt: "",
-      // gp_leader_flag: 'Y',
-      // approve_member: "N",
-
       id: 1,
-      member_id: "",
       member_name: "",
       disb_amt: "",
-      approve_member: "N", // ⭐ NEW
-      loan_id: "",
-
+      gp_leader_flag: 'Y',
     },
   ]);
-
-
   const [recoveryFlag, setRecoveryFlag] = useState<"Y" | "N">("Y");
 
   const canEdit = recoveryFlag === "Y";
@@ -145,39 +134,12 @@ const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
 
   const newDisbursement = async () => {
 
-
-    const selected = members.filter(m => m.approve_member === "Y");
-
-    if (selected.length === 0) {
-      Alert.alert("Validation", "Please select at least one member");
-      setLoading(false);
-      return;
-    }
-
-    const invalidAmount = selected.find(
-      m => !m.disb_amt || Number(m.disb_amt) <= 0
-    );
-
-    if (invalidAmount) {
-      Alert.alert("Validation", "Enter valid amount for selected members");
-      setLoading(false);
-      return;
-    }
-
-    const payload_member = selected.map(m => ({
-    member_id: m.member_id,
-    loan_id: m.loan_id,
-    member_name: m.member_name,
-    disb_amt: Number(m.disb_amt),
-    approve_member: m.approve_member,
-    }));
-
     setLoading(true)
 
     const ip = await getClientIP()
 
     const formattedDate = new Date(formData.disb_dt).toISOString().split("T")[0];
-    
+    console.log('start', formattedDate, "RESSSSSsssssssssssssssssssssssssss")
 
     const creds = {
       group_code: loginStore?.emp_id,
@@ -188,15 +150,10 @@ const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
       penal_roi: formData?.penal_roi,
       // disb_dt: new Date(formData.disb_dt).toLocaleDateString("en-GB"),
       disb_dt: formattedDate,
-      members: payload_member,
+      members: members,
       created_by: loginStore?.emp_id,
       ip_address: ip,
     }
-
-    console.log('start', creds, "RESSSSSsssssssssssssssssssssssssss", payload_member, 'endddddddddd')
-
-    // return
-    
 
     await axios.post(ADDRESSES.SAVE_SHG_MEMBER_DISBURS, creds, {
       headers: {
@@ -257,7 +214,7 @@ const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
       }
     }
     ).then(async res => {
-      // 
+      // console.log('start', res?.data?.data, "Testttttttttttttttttttttttttttttttttttttttttt")
       if (res?.data?.success) {
         setFormData({
           period: res?.data?.data?.period?.toString() || "",
@@ -272,27 +229,14 @@ const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
         setRecoveryFlag(res?.data?.data?.recovery_flag);   // ⭐ important
 
         // Map API members to UI members
-        // const mappedMembers = (res?.data?.data?.members || []).map((m: any, index: number) => ({
-        //   id: index + 1,
-        //   member_name: m.member_name,
-        //   disb_amt: String(m.disb_amt),
-        //   gp_leader_flag: m.gp_leader_flag,
-        //   loan_id: m.loan_id,
-        //   member_id: m.member_id,
-        // }));
-
-        console.log('start', res?.data?.data?.members, "Testttttttttttttttttttttttttttttttttttttttttt")
-
         const mappedMembers = (res?.data?.data?.members || []).map((m: any, index: number) => ({
           id: index + 1,
-          member_id: m.member_id,
           member_name: m.member_name,
-          disb_amt: String(m.disb_amt || ""),
-          approve_member: m.approve_member ?? "N", // ⭐ NEW
-          // approve_member: "Y",
+          disb_amt: String(m.disb_amt),
+          gp_leader_flag: m.gp_leader_flag,
           loan_id: m.loan_id,
+          member_id: m.member_id,
         }));
-
 
         setMembers(mappedMembers);
 
@@ -304,58 +248,6 @@ const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
     })
     setLoading(false)
   }
-
-
-//   const toggleMember = (id: number) => {
-//   if (!canEdit) return;
-
-//   setMembers(prev =>
-//     prev.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             approve_member: item.approve_member === "Y" ? "N" : "Y",
-//             disb_amt:
-//               item.approve_member === "Y" ? "" : item.disb_amt,
-//           }
-//         : item
-//     )
-//   );
-// };
-
-// const toggleMember = (id: number) => {
-//   if (!canEdit) return;
-
-//   setMembers(prev =>
-//     prev.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             approve_member: item.approve_member === "Y" ? "N" : "Y",
-//             disb_amt:
-//               item.approve_member === "Y" ? "" : item.disb_amt, // clear on uncheck
-//           }
-//         : item
-//     )
-//   );
-// };
-
-const toggleMember = (id: number) => {
-  setMembers(prev =>
-    prev.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            approve_member: item.approve_member === "Y" ? "N" : "Y",
-            disb_amt:
-              item.approve_member === "Y" ? "" : item.disb_amt,
-          }
-        : item
-    )
-  );
-};
-
-
 
 
   useEffect(() => {
@@ -374,19 +266,16 @@ const toggleMember = (id: number) => {
     const ip = await getClientIP()
 
     const creds = {
-      // pacs_shg_id: loginStore?.emp_id,
-      // loan_to: loginStore?.user_type,
-      tenant_id: loginStore?.tenant_id,
-      branch_shg_id : loginStore?.emp_id,
-      loan_to : loginStore?.user_type,
+      pacs_shg_id: loginStore?.emp_id,
+      loan_to: loginStore?.user_type,
     }
 
 
 
-    // console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP', loginStore)
+    console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP', loginStore)
     // return
 
-    await axios.post(ADDRESSES.FETCH_MEMBERS_DETAILS, creds, {
+    await axios.post(ADDRESSES.FETCH_MAX_BALANCE, creds, {
       headers: {
         Authorization: loginStore?.token, // example header
         "Content-Type": "application/json", // optional
@@ -397,10 +286,9 @@ const toggleMember = (id: number) => {
       if (res?.data?.success) {
         console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.data)
         if (res?.data?.data.length > 0) {
-          // setRemainDisburseAmt(res?.data?.loan_amount)
-          
+          setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
         } else {
-          // setRemainDisburseAmt("0")
+          setRemainDisburseAmt("0")
         }
 
       }
@@ -438,18 +326,18 @@ const toggleMember = (id: number) => {
 
 
 
-  // const addRow = () => {
-  //   setMembers(prev => [
-  //     ...prev,
-  //     {
-  //       id: prev.length + 1,
-  //       member_name: "",
-  //       disb_amt: "",
-  //       //   gp_leader_flag: false,
-  //       gp_leader_flag: "N",
-  //     },
-  //   ]);
-  // };
+  const addRow = () => {
+    setMembers(prev => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        member_name: "",
+        disb_amt: "",
+        //   gp_leader_flag: false,
+        gp_leader_flag: "N",
+      },
+    ]);
+  };
 
 
   const selectMember = (id: any) => {
@@ -604,7 +492,7 @@ const toggleMember = (id: number) => {
                 backgroundColor: theme.colors.background,
               }} />
 
-            {/* <View>
+            <View>
               {loginStore?.user_type === "S" && (
                 <View
                   style={{
@@ -641,100 +529,191 @@ const toggleMember = (id: number) => {
                   </Text>
                 </View>
               )}
-            </View> */}
+            </View>
 
             {/* <View>
-    <Text>{JSON.stringify(members, null, 2)} </Text>
+    <Text>{JSON.stringify(canEdit, null, 2)} </Text>
 </View> */}
             <View style={{ padding: 5 }}>
 
-  {/* Title */}
-  <Text
-    style={{
-      fontSize: 16,
-      fontWeight: "700",
-      marginBottom: 10,
-      color: theme.colors.primary,
-    }}
-  >
-    Member List
-  </Text>
+              {/* Title */}
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  marginBottom: 10,
+                  color: theme.colors.primary,
+                }}
+              >
+                Group Leader
+              </Text>
 
- {members.map(item => (
-  <View
-    key={item.id}
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 8,
-    }}
-  >
-    {/* Checkbox */}
-    <Checkbox
-      status={item.approve_member === "Y" ? "checked" : "unchecked"}
-      onPress={() => toggleMember(item.id)}
-      disabled
-    />
+              {/* Rows */}
+              {members.map((item, index) => (
+                <View
+                  key={item.id}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  {/* // Radio Button  */}
+                  {/* <RadioButton
+                    value={item.id.toString()}
+                    status={item.gp_leader_flag === "Y" ? "checked" : "unchecked"}
+                    onPress={() => selectMember(item.id)}
+                  /> */}
+                  <RadioButton
+                    value={item.id.toString()}
+                    status={item.gp_leader_flag === "Y" ? "checked" : "unchecked"}
+                    onPress={() => canEdit && selectMember(item.id)}
+                    disabled={!canEdit}
+                  />
 
-    {/* Member Name */}
-    <InputPaper
-      label="Member"
-      value={item.member_name}
-      onChangeText={(txt: any) => handleFormChange("member_name", txt)} 
-      disabled
-      customStyle={{
-        backgroundColor: theme.colors.background,
-        marginRight: 6,
-        flex: 2.5,
-        fontSize: 13,
-      }}
-    />
+                  {/* // Member Name (BIG) */}
+                  {/* <InputPaper
+                    label="Member"
+                    value={item.member_name}
+                    onChangeText={(txt) => {
+                      const arr = [...members];
+                      arr[index].member_name = String(txt);
+                      setMembers(arr);
+                    }}
+                    customStyle={{
+                      backgroundColor: theme.colors.background,
+                      marginRight: 6,
+                      flex: 2.5,
+                      fontSize: 13,
+                    }}
+                  /> */}
 
-    {/* Amount */}
-    <InputPaper
-      label="Amount"
-      keyboardType="numeric"
-      // onChangeText={(txt: any) => handleFormChange("member_name", txt)} 
-      // disabled
-      value={item.disb_amt}
-      onChangeText={(txt: string) => {
-        setMembers(prev =>
-          prev.map(m =>
-            m.id === item.id
-              ? { ...m, disb_amt: txt }
-              : m
-          )
-        );
-      }}
-      customStyle={{
-        backgroundColor: theme.colors.background,
-        flex: 1.2,
-        fontSize: 13,
-      }}
-    />
-  </View>
-))}
+                  <InputPaper
+                    label="Member"
+                    value={item.member_name}
+                    disabled={!canEdit}
+                    onChangeText={(txt) => {
+                      if (!canEdit) return;
+                      const arr = [...members];
+                      arr[index].member_name = String(txt);
+                      setMembers(arr);
+                    }}
+                    customStyle={{
+                      backgroundColor: theme.colors.background,
+                      marginRight: 6,
+                      flex: 2.5,
+                      fontSize: 13,
+                    }}
+                  />
 
-  {/* Total Amount */}
-  <View style={{ alignItems: "flex-end", marginTop: 6 }}>
-    <Text style={{ fontSize: 12, color: theme.colors.error }}>
-      Total Amount
-    </Text>
+                  {/* // disb_amt */}
+                  {/* <InputPaper
+                    label="Amount"
+                    keyboardType="numeric"
+                    value={item.disb_amt}
+                    onChangeText={(txt) => {
+                      const arr = [...members];
+                      arr[index].disb_amt = String(txt);
+                      setMembers(arr);
+                    }}
+                    customStyle={{
+                      backgroundColor: theme.colors.background,
+                      flex: 1.5,
+                      fontSize: 13,
+                    }}
+                  /> */}
 
-    <Text
-      style={{
-        fontSize: 14,
-        fontWeight: "600",
-        color:
-          theme.colors.primary,
-      }}
-    >
-      ₹ {totalDisbAmt.toLocaleString("en-IN")}
-    </Text>
-  </View>
+                  <InputPaper
+                    label="Amount"
+                    keyboardType="numeric"
+                    value={item.disb_amt}
+                    disabled={!canEdit}
+                    onChangeText={(txt) => {
+                      if (!canEdit) return;
+                      const arr = [...members];
+                      arr[index].disb_amt = String(txt);
+                      setMembers(arr);
+                    }}
+                    customStyle={{
+                      backgroundColor: theme.colors.background,
+                      flex: 1.5,
+                      fontSize: 13,
+                    }}
+                  />
 
-</View>
+                  {/* // Remove Row */}
+                  {canEdit && members.length > 1 && (
+                    <IconButton
+                      icon="delete-outline"
+                      size={20}
+                      onPress={() => removeRow(item.id)}
+                      iconColor={theme.colors.error}
+                    />
+                  )}
+                </View>
+              ))}
 
+
+              {/* Add Button BELOW */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginTop: 8,
+                }}
+              >
+                {/* Add Member Button */}
+                <TouchableOpacity
+                  // disabled={!canAddMember()}
+                  disabled={!canEdit || !canAddMember()}
+                  onPress={addRow}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    opacity: canAddMember() ? 1 : 0.4,
+                  }}
+                >
+                  <IconButton
+                    icon="plus"
+                    size={22}
+                    disabled={!canAddMember()}
+                  />
+
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: theme.colors.primary,
+                      marginLeft: -6,
+                    }}
+                  >
+                    Add Member
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Total Amount */}
+                <View style={{ alignItems: "flex-end" }}>
+                  <Text style={{ fontSize: 12, color: theme.colors.error }}>
+                    Total Amount
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "600",
+                      color:
+                        totalDisbAmt > Number(remainDisburseAmt)
+                          ? theme.colors.error
+                          : theme.colors.primary,
+                    }}
+                  >
+                    ₹ {totalDisbAmt.toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+
+
+            </View>
 
             <View style={{
             flexDirection: "row",
@@ -743,14 +722,14 @@ const toggleMember = (id: number) => {
             marginBottom: 45
             }}>
 
-            {/* {canEdit &&( */}
+            {canEdit &&(
             <ButtonPaper mode="text"
             textColor={theme.colors.error} onPress={handleResetForm} icon="backup-restore">
             <Text variant='labelMedium' style={{
             color: theme.colors.error
             }}>RESET FORM</Text>
             </ButtonPaper>
-            {/* )} */}
+            )}
 
 
             <ButtonPaper icon="cash-register" mode="contained" onPress={() => {
@@ -763,7 +742,7 @@ const toggleMember = (id: number) => {
               }])
 
             }} loading={loading}
-              disabled={formData?.period === "" || formData?.curr_roi === "" || formData?.penal_roi === "" || loading}
+              disabled={formData?.period === "" || formData?.curr_roi === "" || formData?.penal_roi === "" || members.length < 2 || !canAddMember() || !canEdit || loading}
             >
  
               {!loading ? "Submit Disb." : "Please wait..."}

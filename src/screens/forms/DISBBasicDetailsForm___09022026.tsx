@@ -36,19 +36,16 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     const [openDate2, setOpenDate2] = useState(() => false)
     const [openDate, setOpenDate] = useState(() => false)
     const { handlePrint } = useEscPosPrint()
-    // const [remainDisburseAmt, setRemainDisburseAmt] = useState('');
+    const [remainDisburseAmt, setRemainDisburseAmt] = useState('');
 
-    // const [members, setMembers] = useState([
-    // {
-    //     id: 1,
-    //     member_name: "",
-    //     disb_amt: "",
-    //     gp_leader_flag: 'Y',
-    // },
-    // ]);
-
-    const [members_1stLoad, setMembers_1stLoad] = useState([]);
-    const [members, setMembers] = useState([]);
+    const [members, setMembers] = useState([
+    {
+        id: 1,
+        member_name: "",
+        disb_amt: "",
+        gp_leader_flag: 'Y',
+    },
+    ]);
 
 
 
@@ -61,41 +58,6 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
         penal_roi: "",
         disb_dt: new Date(),
     })
-
-    const apiMembers = [
-  { member_id: "M001", member_name: "Ram Kumar" },
-  { member_id: "M002", member_name: "Rahim Ali" },
-  { member_id: "M003", member_name: "Raj Sekhar" },
-  ];
-
-
-    // useEffect(() => {
-    //   const formatted = members_1stLoad.map((item, index) => ({
-    //     id: index + 1,
-    //     member_id: item.member_id,
-    //     member_name: item.member_name,
-    //     disb_amt: "",
-    //     approve_member: "N", // checkbox
-    //   }));
-
-    //   setMembers(formatted);
-    // }, []);
-
-    const toggleMember = (id: number) => {
-  setMembers(prev =>
-    prev.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            approve_member: item.approve_member === "Y" ? "N" : "Y",
-            disb_amt:
-              item.approve_member === "Y" ? "" : item.disb_amt,
-          }
-        : item
-    )
-  );
-};
-
     
 
    
@@ -170,38 +132,7 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     //     ToastAndroid.show(`There are unapproved ${errMsg} before this date. Please check and try again.`, ToastAndroid.SHORT)
     //     return;
     // }
-
-    const selected = members.filter(m => m.approve_member === "Y");
-
-  if (selected.length === 0) {
-    Alert.alert("Validation", "Please select at least one member");
-    return;
-  }
-
-  const invalidAmount = selected.find(
-    m => !m.disb_amt || Number(m.disb_amt) <= 0
-  );
-
-  if (invalidAmount) {
-    Alert.alert(
-      "Validation",
-      "Please enter a valid amount for selected member(s)"
-    );
-    return;
-  }
-
-  const payload_member = selected.map(m => ({
-    member_id: m.member_id,
-    loan_id: 0,
-    member_name: m.member_name,
-    disb_amt: Number(m.disb_amt),
-    approve_member: m.approve_member,
-  }));
-
-  console.log("Submit Payload:", payload_member, 'llllllll', selected);
-
-
-  setLoading(true)
+    setLoading(true)
 
     const ip = await getClientIP()
 
@@ -216,14 +147,11 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     penal_roi: formData?.penal_roi,
     // disb_dt: new Date(formData.disb_dt).toLocaleDateString("en-GB"),
     disb_dt: formattedDate,
-    members: payload_member,
+    members: members,
     created_by: loginStore?.emp_id,
     ip_address: ip,
     }
     
-    console.log('start',  creds, "RESSSSSsssssssssssssssssssssssssss")
-
-    // return;
 
     await axios.post(ADDRESSES.SAVE_SHG_MEMBER_DISBURS, creds, {
     headers: {
@@ -232,7 +160,7 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     }
     }
     ).then(async res => {
-    
+    console.log('start',  creds, "RESSSSSsssssssssssssssssssssssssss", res?.data)
     if(res?.data?.success){
     Alert.alert("Alert", res?.data?.msg, [
     { text: "Back", onPress: () => navigation.goBack() }
@@ -261,11 +189,13 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
     }
 
     useEffect(() => {
+      console.log(loginStore?.user_type, 'ggggggggggggggggg');
+      
 		if(loginStore?.user_type == 'S'){
 			remainingDisburseAmt()
 		}
 		
-	}, [])
+	}, [remainDisburseAmt])
 
        const remainingDisburseAmt = async () => {
         // if (hasBeforeUpnapproveTransDate) {
@@ -277,17 +207,16 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
         const ip = await getClientIP()
 
         const creds = {
-            tenant_id: loginStore?.tenant_id,
-            branch_shg_id : loginStore?.emp_id,
+            pacs_shg_id : loginStore?.emp_id,
             loan_to : loginStore?.user_type,
 			}
 
 
       
-        // console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP', loginStore)
+        console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP', loginStore)
         // return
         
-        await axios.post(ADDRESSES.FETCH_MEMBERS_DETAILS, creds, {
+        await axios.post(ADDRESSES.FETCH_MAX_BALANCE, creds, {
             headers: {
                 Authorization: loginStore?.token, // example header
                 "Content-Type": "application/json", // optional
@@ -295,23 +224,13 @@ const DISBBasicDetailsForm = ({ fetchedData, branchCode}) => {
         }
         
         ).then(async res => {
-            // console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res)
+            console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res)
             if(res?.data?.success){
-            console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.loan_amount, 'enddddddddddddd')
+            console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.data)
               if(res?.data?.data.length > 0){
-                // setRemainDisburseAmt(res?.data?.loan_amount)
-                // setMembers_1stLoad(res?.data?.data)
-                const formatted = res?.data?.data?.map((item:any, index:any) => ({
-                id: index + 1,
-                member_id: item.member_id,
-                member_name: item.member_name,
-                disb_amt: "",
-                approve_member: "N", // checkbox
-              }));
-
-              setMembers(formatted);
+                setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
               } else {
-                // setRemainDisburseAmt("0")
+                setRemainDisburseAmt("0")
               }
                 
             }
@@ -337,9 +256,9 @@ const removeRow = (id) => {
 const canAddMember = () => {
 // return Number(totalDisbAmt) <= Number(remainDisburseAmt);
 // if(Number(totalDisbAmt) >= Number(remainDisburseAmt)){
-  //   if (Number(totalDisbAmt) > Number(remainDisburseAmt)) {
-  //   return false;
-  // }
+    if (Number(totalDisbAmt) > Number(remainDisburseAmt)) {
+    return false;
+  }
 
     if (members.length === 0) return true;
 
@@ -400,48 +319,9 @@ useEffect(() => {
 
 
 
-// const apiMembers = [
-//   { member_id: "M001", member_name: "Ram Kumar" },
-//   { member_id: "M002", member_name: "Rahim Ali" },
-//   { member_id: "M003", member_name: "Raj Sekhar" },
-// ];
-
-// const [members_, setMembers_] = useState([]);
-
-// useEffect(() => {
-//   const formatted = apiMembers.map(item => ({
-//     ...item,
-//     checked: false, // 👈 checkbox state
-//   }));
-//   setMembers_(formatted);
-// }, []);
-
-// const toggleMember = (member_id:any) => {
-//   // console.log(member_id, 'member_idmember_idmember_idmember_idmember_id');
-  
-//   const updated = members_.map(item =>
-//     item.member_id === member_id
-//       ? { ...item, checked: !item.checked }
-//       : item
-//   );
-//   setMembers_(updated);
+// const canAddMember = () => {
+//   return totalDisbAmt <= remainDisburseAmt;
 // };
-
-// const toggleMember = (id: number) => {
-//   setMembers(prev =>
-//     prev.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             gp_leader_flag: item.gp_leader_flag === "Y" ? "N" : "Y",
-//             disb_amt:
-//               item.gp_leader_flag === "Y" ? "" : item.disb_amt, // optional
-//           }
-//         : item
-//     )
-//   );
-// };
-
 
 
     return (
@@ -566,7 +446,7 @@ useEffect(() => {
 
 
 
-  {/* <View>
+  <View>
   {loginStore?.user_type === "S" && (
     <View
       style={{
@@ -603,9 +483,7 @@ useEffect(() => {
       </Text>
     </View>
   )}
-</View> */}
-
-
+</View>
 
 
 <View style={{ padding: 5 }}>
@@ -619,9 +497,11 @@ useEffect(() => {
       color: theme.colors.primary,
     }}
   >
-    Member List
+    Group Leader
   </Text>
-{members.map(item => (
+
+  {/* Rows */}
+  {members.map((item, index) => (
   <View
     key={item.id}
     style={{
@@ -630,18 +510,23 @@ useEffect(() => {
       marginBottom: 8,
     }}
   >
-    {/* Checkbox */}
-    <Checkbox
-      status={item.approve_member === "Y" ? "checked" : "unchecked"}
-      onPress={() => toggleMember(item.id)}
+    {/* Radio Button */}
+    <RadioButton
+      value={item.id.toString()}
+    //   status={item.gp_leader_flag ? "checked" : "unchecked"}
+      status={item.gp_leader_flag === "Y" ? "checked" : "unchecked"}
+      onPress={() => selectMember(item.id)}
     />
 
-    {/* Member Name */}
+    {/* Member Name (BIG) */}
     <InputPaper
       label="Member"
       value={item.member_name}
-      onChangeText={(txt: any) => handleFormChange("member_name", txt)} 
-      disabled
+      onChangeText={(txt) => {
+        const arr = [...members];
+        arr[index].member_name = String(txt);
+        setMembers(arr);
+      }}
       customStyle={{
         backgroundColor: theme.colors.background,
         marginRight: 6,
@@ -650,38 +535,111 @@ useEffect(() => {
       }}
     />
 
-    {/* Amount */}
+    {/* disb_amt */}
     <InputPaper
       label="Amount"
       keyboardType="numeric"
-      // onChangeText={(txt: any) => handleFormChange("member_name", txt)} 
-      // disabled
       value={item.disb_amt}
       onChangeText={(txt) => {
-        setMembers(prev =>
-          prev.map(m =>
-            m.id === item.id
-              ? { ...m, disb_amt: txt }
-              : m
-          )
-        );
+        const arr = [...members];
+        arr[index].disb_amt = String(txt);
+        setMembers(arr);
       }}
       customStyle={{
         backgroundColor: theme.colors.background,
-        flex: 1.2,
+        flex: 1.5,
         fontSize: 13,
       }}
     />
+
+    {/* Remove Row */}
+    {members.length > 1 && (
+      <IconButton
+        icon="delete-outline"
+        size={20}
+        onPress={() => removeRow(item.id)}
+        iconColor={theme.colors.error}
+      />
+    )}
   </View>
 ))}
 
-{/* Total Amount */}
 
+  {/* Add Button BELOW */}
+
+  
+
+{/* <TouchableOpacity
+  disabled={!canAddMember()}
+  onPress={addRow}
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    opacity: canAddMember() ? 1 : 0.4, // 👈 visual feedback
+  }}
+>
+  <IconButton
+    icon="plus"
+    size={22}
+    disabled={!canAddMember()}
+  />
+
+  <Text
+    style={{
+      fontSize: 14,
+      color: theme.colors.primary,
+      marginLeft: -6,
+    }}
+  >
+    Add Member
+  </Text>
+  
+</TouchableOpacity> */}
 {/* <View>
-    <Text>{JSON.stringify(totalDisbAmt, null, 2)} </Text>
-     <Text>{JSON.stringify(remainDisburseAmt, null, 2)} </Text>
-     <Text>{JSON.stringify(Number(totalDisbAmt) > Number(remainDisburseAmt), null, 2)} </Text>
+    <Text>{JSON.stringify(Number(totalDisbAmt) > Number(remainDisburseAmt), null, 2)} </Text>
+    <Text>{JSON.stringify(!canAddMember(), null, 2)} </Text>
 </View> */}
+<View
+  style={{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 8,
+  }}
+>
+  {/* Add Member Button */}
+  <TouchableOpacity
+    // disabled={Number(totalDisbAmt) > Number(remainDisburseAmt)}
+    disabled={!canAddMember()}
+    onPress={addRow}
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      // opacity: Number(totalDisbAmt) < Number(remainDisburseAmt) ? 1 : 0.4,
+      opacity: canAddMember() ? 1 : 0.4,
+    }}
+  >
+    <IconButton
+      icon="plus"
+      size={22}
+      // disabled={Number(totalDisbAmt) > Number(remainDisburseAmt)}
+      disabled={!canAddMember()}
+    />
+
+    <Text
+      style={{
+        fontSize: 14,
+        color: theme.colors.primary,
+        marginLeft: -6,
+      }}
+    >
+      Add Member
+    </Text>
+  </TouchableOpacity>
+
+  {/* Total Amount */}
   <View style={{ alignItems: "flex-end" }}>
     <Text style={{ fontSize: 12, color: theme.colors.error }}>
       Total Amount
@@ -692,12 +650,16 @@ useEffect(() => {
         fontSize: 14,
         fontWeight: "600",
         color:
-          theme.colors.primary,
+          totalDisbAmt > Number(remainDisburseAmt)
+            ? theme.colors.error
+            : theme.colors.primary,
       }}
     >
       ₹ {totalDisbAmt.toLocaleString()}
     </Text>
   </View>
+</View>
+
 
 </View>
 
@@ -718,7 +680,7 @@ useEffect(() => {
                             }])
 
                         }} loading={loading} 
-                        disabled={formData?.period === "" || formData?.curr_roi === "" || formData?.penal_roi === "" || loading}
+                        disabled={formData?.period === "" || formData?.curr_roi === "" || formData?.penal_roi === "" || members.length < 2 || !canAddMember() || loading}
                         >
                             
                             {!loading ? "Submit Disbursment" : "DON'T CLOSE THIS PAGE..."}
