@@ -52,7 +52,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 		setLoading(true)
 		const creds = {
 			branch_id: userDetails[0]?.brn_code,
-			approval_status: disbursementStatus
+			approval_status: disbursementStatus,
+			loan_to : "S"
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 		await axios
@@ -64,7 +65,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 				},
 			})
 			.then((res) => {
-
+				console.log(res?.data?.data, 'dataaaaaaaaaaa', creds);
 				if(res?.data?.success){
 					console.log(res?.data?.data, 'dataaaaaaaaaaa', creds);
 					
@@ -187,7 +188,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 													transition={{ delay: 1, type: "just" }}
 													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{"Loan Disburse Branch to PACS"}
+													{`Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG`}
 												</motion.h2>
 											{/* </div> */}
 										</div>
@@ -221,7 +222,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 						showSearch={false}
 						// setSearch={(data) => setSearch(data)}
 					/> */}
-
+					{/* {JSON.stringify(loanApplications, 2)} */}
 					<LoanBrnPacsDisburseTable_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}

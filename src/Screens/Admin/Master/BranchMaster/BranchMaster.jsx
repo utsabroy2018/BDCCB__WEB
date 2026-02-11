@@ -13,6 +13,7 @@ import { useNavigate } from "react-router"
 import PoliceStationTable from "../../../../Components/Master/PoliceStationTable"
 import TDInputTemplateBr from "../../../../Components/TDInputTemplateBr"
 import BranchTable from "../../../../Components/Master/BranchTable"
+import Radiobtn from "../../../../Components/Radiobtn"
 // import BranchTable from "../../../../Components/Master/PoliceStationTable"
 // const options = [
 // 	{
@@ -33,6 +34,17 @@ import BranchTable from "../../../../Components/Master/BranchTable"
 // 	},
 // ]
 
+const branchTypeOption = [
+	{
+		label: "Pacs",
+		value: "P",
+	},
+	{
+		label: "Branch",
+		value: "B",
+	},
+]
+
 function BranchMaster() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
@@ -40,6 +52,9 @@ function BranchMaster() {
 	const [copyLoanApplications, setCopyLoanApplications] = useState(() => [])
 
 	const [approvalStatus, setApprovalStatus] = useState("U")
+
+	// const [radioBranchTyp, setRadioBranchTyp] = useState(params?.id > 0 ? masterDetails?.branch_type : "P")
+	const [radioBranchTyp, setRadioBranchTyp] = useState("P")
 	
 	const navigate = useNavigate()
 
@@ -78,17 +93,6 @@ function BranchMaster() {
 			},
 			})
 			.then((res) => {
-
-			// if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			// } else {
-			// setLoanApplications(res?.data?.msg)
-			// setCopyLoanApplications(res?.data?.msg)
-			// }
-			console.log(res, 'xxxxxxxxxxxxxxxxxxx');
-	
 			if(res?.data?.success){
 			setLoanApplications(res?.data?.data)
 			setCopyLoanApplications(res?.data?.data)
@@ -106,30 +110,26 @@ function BranchMaster() {
 		setLoading(false)
 	}
 
-	// useEffect(() => {
-	// 	// console.log(userDetails[0], 'userDtlsuserDtlsuserDtlsuserDtls');
-		
-	// 	fetchLoanApplications("U")
-	// }, [])
-
 
 	const setSearch = (word) => {
 		const searchText = word?.toLowerCase() || ""
+
 		setLoanApplications(
-			copyLoanApplications?.filter((e) =>
-				e?.ps_name?.toString()?.toLowerCase().includes(word?.toLowerCase())
+			copyLoanApplications?.filter(
+				(e) =>
+					e?.branch_name
+						?.toString()
+						?.toLowerCase()
+						.includes(word?.toLowerCase())
+					// 	 ||
+					// e?.loan_acc_no
+					// 	?.toString()
+					// 	?.toLowerCase()
+					// 	?.includes(word?.toLowerCase())
 			)
 		)
 	}
 
-	// const onChange = (e) => {
-	// 	console.log("radio1 checked", e)
-	// 	setApprovalStatus(e)
-	// }
-
-	// useEffect(() => {
-	// 	fetchLoanApplications(approvalStatus)
-	// }, [approvalStatus])
 
 	useEffect(() => {
 		console.log(userDetails[0]?.tenant_id, 'userDetailsuserDetailsuserDetails', userDetails[0]);
@@ -139,19 +139,28 @@ function BranchMaster() {
 
 	const handleChangeMaster = (e) => {
 	const { name, value } = e.target
-	// console.log(e.target, 'userDetailsuserDetailsuserDetails', name, value);
 	if (value > 0) {
 	fetchLoanApplications(value)
 	} else {
 	setLoanApplications([])
 	setCopyLoanApplications([])
 	}
-	
-	//   setMasterData((prev) => ({
-	//     ...prev,
-	//     [name]: value,
-	//   }))
 	}
+
+	const onChange2 = (e) => {
+	console.log("radio1 checked", e)
+	setRadioBranchTyp(e)
+	}
+
+	useEffect(() => {
+	if (radioBranchTyp) {
+		const filteredData = copyLoanApplications.filter(
+			(item) => item.branch_type === radioBranchTyp
+		)
+		setLoanApplications(filteredData)
+	}
+}, [radioBranchTyp, copyLoanApplications])
+
 
 	return (
 		<div>
@@ -187,8 +196,20 @@ function BranchMaster() {
 						/>
 					</div>
 
-					</div>
+					
+					<div>
+						<Radiobtn
+						data={branchTypeOption}
+						val={radioBranchTyp}
+						onChangeVal={(value) => {
+						onChange2(value)
+						}}
+						/>
+						</div>
+					
 
+					</div>
+					{/* {JSON.stringify(loanApplications[0], null, 2)} */}
 					<BranchTable
 						// flag="BM"
 						flag=""

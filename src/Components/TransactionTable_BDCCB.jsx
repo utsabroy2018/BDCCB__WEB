@@ -19,7 +19,7 @@ import { Message } from "./Message"
 import Column from "antd/es/table/Column"
 import { DataTable } from "primereact/datatable"
 
-function AccountHolderTable_BDCCB({
+function TransactionTable_BDCCB({
 	loanAppData,
 	setSearch,
 	title,
@@ -45,7 +45,7 @@ function AccountHolderTable_BDCCB({
 
 		if (loanAppData && loanAppData.length > 0) {
 		const total = loanAppData.reduce(
-		(sum, row) => sum + Number(row.disb_amt || 0),
+		(sum, row) => sum + Number(row.balance || 0),
 		0
 		);
 		setAmountTd_(total.toFixed(2));
@@ -90,55 +90,30 @@ function AccountHolderTable_BDCCB({
 									></Column> */}
 				
 									<Column
-										field="trans_id"
-										header="Transaction ID"
+										field="group_name"
+										header="Group Name"
 										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
 									></Column>
 				
 									<Column
-										field="trans_dt"
-										header="Transaction Date"
-										body={(rowData) =>
-											new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
-										}
+										field="shg_id"
+										header="Group ID"
+										// body={(rowData) =>
+										// 	new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
+										// }
 										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
 									></Column>
 				
 									<Column
-										field="loan_id"
-										header="Loan Id"
+										field="balance"
+										header="Balance"
+										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_}</span>}
 									></Column>
 				
 									
-									<Column
-										field="loan_acc_no"
-										header="Loan Account No. "
-										// body={(rowData) =>
-										// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
-										// }
-									></Column>
-										<Column
-										field="disb_dt"
-										header="Disburse Date"
-										body={(rowData) =>
-											new Date(rowData?.disb_dt).toLocaleDateString("en-GB")
-										}
-										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
-									></Column>
-				
-									<Column
-										field="disb_amt"
-										header="Disburse Amount"
-										footer={
-											<span style={{ fontWeight: "bold", color: "#0694A2" }}>
-												{AmountTd_}
-											</span>
-										}
-									></Column>
-				
-									{/* {disbursementStatus === "U" && ( */}
+									
 
-										<Column
+										{/* <Column
 										// field="curr_prn"
 										header="Action"
 										body={(rowData) => (
@@ -149,7 +124,7 @@ function AccountHolderTable_BDCCB({
 										onClick={() => {
 										console.log("ROW DATA:", rowData);
 										navigate(
-										`/homebm/createaccount/${rowData?.loan_id}`,
+										`/homebm/transaction/${rowData?.loan_id}`,
 										{ state: rowData }
 										);
 										}}
@@ -165,7 +140,7 @@ function AccountHolderTable_BDCCB({
 										</button>
 										</div>
 										)}
-									></Column>
+									></Column> */}
 
 									{/* )} */}
 									
@@ -184,4 +159,4 @@ function AccountHolderTable_BDCCB({
 	)
 }
 
-export default AccountHolderTable_BDCCB
+export default TransactionTable_BDCCB

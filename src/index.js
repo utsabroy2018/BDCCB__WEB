@@ -97,12 +97,12 @@ const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/Acce
 
 //////////////// BDCCB PACS End ////////////////
 
-//////////////// BDCCB Account Open Start ////////////////
+//////////////// BDCCB Transaction Open Start ////////////////
 
-const EditAccountHolderFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditAccountHolderFormBM_BDCCB"))
-const SearchAccountHolderBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchAccountHolderBM_BDCCB.jsx"))
+const EditTransactionFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditTransactionFormBM_BDCCB.jsx"))
+const SearchTransactionBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchTransactionBM_BDCCB.jsx"))
 
-//////////////// BDCCB Account Open End ////////////////
+//////////////// BDCCB Transaction Open End ////////////////
 
 
 ////////////////////////////////////////////// BDCCB End //////////////////////////////////////////////
@@ -266,10 +266,10 @@ const router = createBrowserRouter([
 						path: "ssvws_fin",
 						element: <></>,
 					},
-					// {
-					// 	path: "signup",
-					// 	element: <SignUp />,
-					// },
+					{
+						path: "signup",
+						element: <SignUp />,
+					},
 					{
 						path: "forgotpassword",
 						element: <ForgotPassMis />,
@@ -362,12 +362,12 @@ const router = createBrowserRouter([
 							},
 
 							{
-								path: "createaccount",
-								element: <SearchAccountHolderBM_BDCCB />,
+								path: "transaction",
+								element: <SearchTransactionBM_BDCCB />,
 							},
 							{
-								path: "createaccount/:id",
-								element: <EditAccountHolderFormBM_BDCCB />,
+								path: "transaction/:id",
+								element: <EditTransactionFormBM_BDCCB />,
 							},
 
 							// {

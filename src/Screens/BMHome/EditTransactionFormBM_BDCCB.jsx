@@ -11,9 +11,10 @@ import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
 import DisbursmentForm from "../Forms/DisbursmentForm"
 import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
-import AccountHolderForm_BDCCB from "../Forms/AccountHolderForm_BDCCB"
+import AccountHolderForm_BDCCB from "../Forms/TransactionForm_BDCCB"
+import TransactionForm_BDCCB from "../Forms/TransactionForm_BDCCB"
 
-function EditAccountHolderFormBM_BDCCB() {
+function EditTransactionFormBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -37,7 +38,7 @@ function EditAccountHolderFormBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium"> */}
-							<AccountHolderForm_BDCCB flag="BM"/>
+							<TransactionForm_BDCCB flag="BM"/>
 						{/* </div>
 					</Spin>
 				</div>
@@ -48,4 +49,4 @@ function EditAccountHolderFormBM_BDCCB() {
 	)
 }
 
-export default EditAccountHolderFormBM_BDCCB
+export default EditTransactionFormBM_BDCCB

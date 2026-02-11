@@ -51,7 +51,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 		setLoading(true)
 		const creds = {
 			branch_id: userDetails[0]?.brn_code,
-			approval_status: disbursementStatus
+			approval_status: disbursementStatus,
+			loan_to : "P"
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 		await axios
@@ -184,9 +185,9 @@ function SearchMemberForDisburseBM_BDCCB() {
 													initial={{ opacity: 0, y: -50 }}
 													animate={{ opacity: 1, y: 0 }}
 													transition={{ delay: 1, type: "just" }}
-													className="text-xl w-48 capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
+													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{"Disburse Loan"}
+													{"Loan Disburse Branch to PACS"}
 												</motion.h2>
 											{/* </div> */}
 										</div>
@@ -221,7 +222,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 
 
 					{/* <DisbursmentForm_BDCCB /> */}
-					
+					{/* {JSON.stringify(loanApplications, 2)} */}
 					<LoanApplicationsDisburseTable_BDCCB
 						flag="BM"
 						loanAppData={loanApplications}

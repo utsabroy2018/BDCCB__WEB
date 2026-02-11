@@ -2331,42 +2331,42 @@ const items_bdccb = [
 			label: <Link to={"/homebm/"}>Dashboard</Link>,
 		},
 		{
-			key: "sub5",
+			key: "sub2",
 			icon: <DatabaseOutlined />,
 			label: "Master",
 			children: [
 				{
-					key: "sub5-1",
+					key: "sub2-1",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/masterdistricts"}>District</Link>,
 				},
 				{
-					key: "sub5-2",
+					key: "sub2-2",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/masterblocks"}>Blocks</Link>,
 				},
 				{
-					key: "sub5-3",
+					key: "sub2-3",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/postMaster"}>Post Office Master</Link>,
 				},
 				{
-					key: "sub5-4",
+					key: "sub2-4",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/policeStationMaster"}>Police Station Master</Link>,
 				},
 				{
-					key: "sub5-5",
+					key: "sub2-5",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/gplistMaster"}>GP List Master</Link>,
 				},
 				{
-					key: "sub5-6",
+					key: "sub2-6",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/villageMaster"}>Village Master</Link>,
 				},
 				{
-					key: "sub5-7",
+					key: "sub2-7",
 					icon: <DatabaseOutlined />,
 					label: <Link to={"/homeadmin/branchMaster"}>Branch Master</Link>,
 				},
@@ -2409,134 +2409,29 @@ const items_bdccb = [
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homebm/disburseloan"}>Loan Disburse Branch to PACS</Link>,
+					label: <Link to={"/homepacs/disburseloan"}>Loan Disburse Branch to PACS</Link>,
+				},
+				{
+					key: "sub4-2",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homebm/disburseloan"}>Loan Disburse Branch to SHG</Link>,
 				}
 			],
 		},
-		// {
-		// 	key: "sub4",
-		// 	icon: <ThunderboltOutlined />,
-		// 	label: "Account",
-		// 	children: [
-		// 		{
-		// 			key: "sub4-2",
-		// 			icon: <ThunderboltOutlined />,
-		// 			label: <Link to={"/homebm/createaccount"}>New Account</Link>,
-		// 		}
-		// 	],
-		// },
+
+		{
+			key: "sub5",
+			icon: <ThunderboltOutlined />,
+			label: "Account",
+			children: [
+				{
+					key: "sub5-1",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homebm/transaction"}>Transaction</Link>,
+				}
+			],
+		},
 		
-		// {
-		// 	key: "sub_att",
-		// 	icon: <ImportOutlined />,
-		// 	label: "Attendance",
-		// 	children: [
-		// 		{
-		// 			key: "sub4-1",
-		// 			icon: <UserAddOutlined />,
-		// 			label: (
-		// 				<Link to={"/homeadmin/attendancedashboard"}>
-		// 					Attendance Dashboard
-		// 				</Link>
-		// 			),
-		// 		},
-		// 	],
-		// },
-		// {
-		// 	key: "sub7",
-		// 	icon: <ImportOutlined />,
-		// 	label: "User Management",
-		// 	children: [
-		// 		{
-		// 			key: "sub7-1",
-		// 			icon: <UserAddOutlined />,
-		// 			label: <Link to={"/homeadmin/createuser/0"}>Create User</Link>,
-		// 		},
-		// 		{
-		// 			key: "sub7-2",
-		// 			icon: <SettingOutlined />,
-		// 			label: <Link to={"/homeadmin/manageuser/"}>Manage User</Link>,
-		// 		},
-		// 		{
-		// 			key: "sub7-3",
-		// 			icon: <FastForwardOutlined />,
-		// 			label: <Link to={"/homeadmin/transferuser/0"}>Transfer User</Link>,
-		// 		},
-		// 	],
-		// },
-		// {
-		// 	label: "Reports",
-		// 	key: "sub6",
-		// 	icon: <BarsOutlined />,
-		// 	children: [
-		// 		// {
-		// 		//  key: "sub6-1",
-		// 		//  icon: <BarChartOutlined />,
-		// 		//  label: (
-		// 		//    <Link to={"/homebm/memberwiserecoveryreport"}>
-		// 		//      Memberwise Recovery
-		// 		//    </Link>
-		// 		//  ),
-		// 		// },
-		// 		// {
-		// 		//  key: "sub6-2",
-		// 		//  icon: <BarChartOutlined />,
-		// 		//  label: (
-		// 		//    <Link to={"/homebm/groupwiserecoveryreport"}>
-		// 		//      Groupwise Recovery
-		// 		//    </Link>
-		// 		//  ),
-		// 		// },
-		// 		// {
-		// 		//  key: "sub6-3",
-		// 		//  icon: <BarChartOutlined />,
-		// 		//  label: <Link to={"/homebm/demandreport"}>Demand</Link>,
-		// 		// },
-		// 		{
-		// 			key: "sub6-4",
-		// 			icon: <BarChartOutlined />,
-		// 			label: <Link to={"/homeadmin/loanstatements"}>Loan Statements</Link>,
-		// 		},
-		// 		{
-		// 			key: "sub6-5",
-		// 			icon: <BarChartOutlined />,
-		// 			label: <Link to={"/homeadmin/loantxns"}>Loan Transactions</Link>,
-		// 		},
-		// 		{
-		// 			key: "sub6-6",
-		// 			icon: <BarChartOutlined />,
-		// 			label: <Link to={"/homeadmin/demandreport"}>Demand Report</Link>,
-		// 		},
-		// 		{
-		// 			key: "sub6-7",
-		// 			icon: <BarChartOutlined />,
-		// 			label: (
-		// 				<Link to={"/homeadmin/outstasndingreport"}>Outstanding Report</Link>
-		// 			),
-		// 		},
-		// 		{
-		// 			key: "sub6-8",
-		// 			icon: <BarChartOutlined />,
-		// 			label: <Link to={"/homeadmin/fundwisesummary"}>Fundwise Report</Link>,
-		// 		},
-		// 		{
-		// 			key: "sub6-9",
-		// 			icon: <BarChartOutlined />,
-		// 			label: (
-		// 				<Link to={"/homeadmin/schemewisesummary"}>Schemewise Report</Link>
-		// 			),
-		// 		},
-		// 		{
-		// 			key: "sub6-10",
-		// 			icon: <BarChartOutlined />,
-		// 			label: (
-		// 				<Link to={"/homeadmin/demandvscollectionreport"}>
-		// 					Demand vs. Collection
-		// 				</Link>
-		// 			),
-		// 		},
-		// 	],
-		// },
 	]
 
 const items_bdccb_PACS = [
@@ -2582,7 +2477,7 @@ const items_bdccb_PACS = [
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homepacs/disburseloan"}>Disburse Loan</Link>,
+					label: <Link to={"/homebm/disburseloan"}>Loan Disburse PACS to SHG</Link>,
 				},
 				{
 					key: "sub4-2",

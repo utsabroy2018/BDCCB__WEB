@@ -14,20 +14,21 @@ import { routePaths } from "../../Assets/Data/Routes"
 import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
 import LoanApplicationsDisburseTable_BDCCB from "../../Components/LoanApplicationsDisburseTable_BDCCB"
 import { motion } from "framer-motion"
-import AccountHolderTable_BDCCB from "../../Components/AccountHolderTable_BDCCB"
+import AccountHolderTable_BDCCB from "../../Components/TransactionTable_BDCCB"
+import TransactionTable_BDCCB from "../../Components/TransactionTable_BDCCB"
 
-const options_Disburs = [
-	{
-		label: "Pending Disbursement",
-		value: "U",
-	},
-	{
-		label: "Approved Disbursement",
-		value: "A",
-	}
-]
+// const options_Disburs = [
+// 	{
+// 		label: "Pending Disbursement",
+// 		value: "U",
+// 	},
+// 	{
+// 		label: "Approved Disbursement",
+// 		value: "A",
+// 	}
+// ]
 
-function SearchAccountHolderBM_BDCCB() {
+function SearchTransactionBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -38,30 +39,38 @@ function SearchAccountHolderBM_BDCCB() {
 	const [disbursementStatus, setDisbursementStatus] = useState("U")
 	const navigate = useNavigate()
 
-	const onChange = (e) => {
-		console.log("radio1 checked", e)
-		setDisbursementStatus(e)
-	}
+	// const onChange = (e) => {
+	// 	console.log("radio1 checked", e)
+	// 	setDisbursementStatus(e)
+	// }
 
 	useEffect(() => {
 		fetchApproveUapprove()
-	}, [disbursementStatus])
+	}, [])
 
 
 	const fetchApproveUapprove = async () => {
 		setLoading(true)
 		const creds = {
 			branch_id: userDetails[0]?.brn_code,
-			approval_status: disbursementStatus
+			tenant_id: userDetails[0]?.tenant_id
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 		await axios
 			// .post(`${url}/admin/fetch_loan_application_dtls`, creds)
-			.post(`${url_bdccb}/loan/show_loan_status`, creds, {
-				headers: {
-					Authorization: `${tokenValue?.token}`, // example header
-					"Content-Type": "application/json", // optional
-				},
+			// .post(`${url_bdccb}/depsav/deposit_list`, {
+			// 	params: {branch_id: userDetails[0]?.brn_code, tenant_id: userDetails[0]?.tenant_id},
+			// 	headers: {
+			// 		Authorization: `${tokenValue?.token}`, // example header
+			// 		"Content-Type": "application/json", // optional
+			// 	},
+			// })
+			await axios.get(`${url_bdccb}/depsav/deposit_list`, {
+			params: {branch_id: userDetails[0]?.brn_code, tenant_id: userDetails[0]?.tenant_id},
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			}
 			})
 			.then((res) => {
 
@@ -90,11 +99,11 @@ function SearchAccountHolderBM_BDCCB() {
 		setLoanApplications(
 			copyLoanApplications?.filter(
 				(e) =>
-					e?.loan_acc_no
+					e?.group_name
 						?.toString()
 						?.toLowerCase()
 						.includes(word?.toLowerCase()) ||
-					e?.loan_acc_no
+					e?.shg_id
 						?.toString()
 						?.toLowerCase()
 						?.includes(word?.toLowerCase())
@@ -115,13 +124,13 @@ function SearchAccountHolderBM_BDCCB() {
 			>
 				<main className="px-4 h-auto my-10 mx-32">
 
-					<Radiobtn
+					{/* <Radiobtn
 						data={options_Disburs}
 						val={disbursementStatus}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
-					/>
+					/> */}
 
 					<motion.section
 									initial={{ opacity: 0 }}
@@ -144,10 +153,11 @@ function SearchAccountHolderBM_BDCCB() {
 												<button
 												className="bg-slate-100 p-3 h-11 rounded-full float-right text-center ml-3"
 												onClick={() => {
-													navigate(`/homebm/createaccount/0`)
+													navigate(`/homebm/transaction/0`)
 												}}
 											>
 												<PlusOutlined className="text-xl" />
+												{/* Deposit/Withdrawal */}
 											</button>
 												{/* {showSearch && ( */}
 													<div className="relative w-full">
@@ -174,7 +184,7 @@ function SearchAccountHolderBM_BDCCB() {
 															transition={{ delay: 1.1, type: "just" }}
 															className={`bg-white border rounded-lg  border-slate-700 bg-slate-300"
 															 text-gray-800 block w-full h-12 pl-10 dark:bg-gray-800 md:ml-4 duration-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-lg `}
-															placeholder="Search By Loan Account No."
+															placeholder="Search By Group Name or Group ID."
 															required=""
 															onChange={(text) => setSearch(text.target.value)}
 														/>
@@ -185,44 +195,18 @@ function SearchAccountHolderBM_BDCCB() {
 													initial={{ opacity: 0, y: -50 }}
 													animate={{ opacity: 1, y: 0 }}
 													transition={{ delay: 1, type: "just" }}
-													className="text-xl w-48 capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
+													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{"Account Holder"}
+													{"Deposit / Withdrawal  Transaction"}
 												</motion.h2>
 											{/* </div> */}
 										</div>
 									</div>
 								</motion.section>
 					
-{/* <div className="mt-20">
-    <label for="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-    <div className="relative mt-10">
-        <div className="absolute inset-y-0  start-0 flex items-center ps-3 pointer-events-none">
-            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-            </svg>
-        </div>
-							<input type="search" id="default-search" className="block mt-10 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"placeholder="Search by Group No./Group Name"
-							
-							onChange={(e) => setSearchKeywords(e.target.value)}
-							
-							/>
-		<button type="submit" className="text-white absolute end-2.5 disabled:bg-[#ee7c98] bottom-2.5 bg-[#DA4167] hover:bg-[#DA4167] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={fetchSearchedApplication}
-							disabled={!searchKeywords}>Search</button>
 
-    </div>
-	</div> */}
-	{/* <DisbursmentForm_BDCCB /> */}
 
-					{/* <LoanApplicationsDisburseTable_BDCCB
-						flag="BM"
-						loanAppData={loanApplications}
-						title="Disburse Loan"
-						showSearch={false}
-						// setSearch={(data) => setSearch(data)}
-					/> */}
-
-					<AccountHolderTable_BDCCB
+					<TransactionTable_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}
 					title="Account Holder"
@@ -242,4 +226,4 @@ function SearchAccountHolderBM_BDCCB() {
 	)
 }
 
-export default SearchAccountHolderBM_BDCCB
+export default SearchTransactionBM_BDCCB

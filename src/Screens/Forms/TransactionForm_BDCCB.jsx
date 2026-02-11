@@ -54,52 +54,33 @@ import { saveMasterData } from "../../services/masterService"
 // import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 
 
-const loan_to = [
+const trans_type = [
 		{
-		code: "P",
-		name: "PACS",
+		code: "D",
+		name: "Deposit",
 		},
 		{
-		code: "S",
-		name: "SHG",
+		code: "W",
+		name: "Withdrawal",
 		}
 ]
 
-const loan_to_For_Pacs = [
+
+const trans_type_ = [
 		{
-		code: "S",
-		name: "SHG",
+		code: "D",
+		name: "Deposit__",
+		},
+		{
+		code: "W",
+		name: "Withdrawal__",
 		}
 ]
 
-const period_data = [
-		{
-		code: "12",
-		name: "12",
-		},
-		{
-		code: "6",
-		name: "6",
-		},
-		{
-		code: "3",
-		name: "3",
-		},
-	]
-
-const pay_mode = [
-		{
-		code: "Monthly",
-		name: "Monthly",
-		},
-		{
-		code: "Weekly",
-		name: "Weekly",
-		}
-	]
 
 
-function AccountHolderForm_BDCCB({ flag }) {
+
+function TransactionForm_BDCCB({ flag }) {
 
 
 	const params = useParams()
@@ -132,39 +113,57 @@ function AccountHolderForm_BDCCB({ flag }) {
 	const [pendingValues, setPendingValues] = useState(null);
 	const [PACS_SHGList, setPACS_SHGList] = useState([]);
 	const [remainDisburseAmt, setRemainDisburseAmt] = useState(null);
+	const [SBAccountList, setSBAccountList] = useState([]);
 
 	const initialValues = {
-		branch_name: "",
+		// branch_name: "",
 		acc_open_date: "",
-		loan_to: "",
-		acc_no: "", /// Not
-		tran_type: "",
-		depo_amt: "",
+		// loan_to: "",
+		// acc_no: "", /// Not
+		group_name: "",
+		// depo_amt: "",
+		transaction_type: "",
+		sb_accounts: []   // 👈 add this
 	}
 	const [formValues, setValues] = useState(initialValues)
 
 	
+	// const validationSchema = Yup.object({
+	// acc_open_date: Yup.string().required("Account Open Date is required"),
+	// group_name: Yup.mixed().required("Group is required"),
+	// transaction_type: Yup.mixed().required("Transaction Type is required"),
+	// })
+
 	const validationSchema = Yup.object({
-		// loan_id: Yup.string().required("Loan ID is required"),
-		branch_name: Yup.string().required("Branch Name is required"),
-		acc_open_date: Yup.string().required("Account Open Date is required"),
-		loan_to: Yup.string().required("Loan To is required"),
-		acc_no: Yup.string().required("Account No. is required"),
-		tran_type: Yup.string().required("Transaction Type is required"),
-		depo_amt: Yup.mixed().required("Deposit Amount is required"),
-		
+	acc_open_date: Yup.string().required("Account Open Date is required"),
+	group_name: Yup.mixed().required("Group is required"),
+	transaction_type: Yup.mixed().required("Transaction Type is required"),
+
+	sb_accounts: Yup.array().of(
+		Yup.object().shape({
+		amount: Yup.number()
+			.typeError("Amount must be a number")
+			.required("Amount is required")
+			.positive("Amount must be greater than 0")
+			.when("$transaction_type", (transaction_type, schema) => {
+			if (transaction_type === "W") {
+				return schema.test(
+				"balance-check",
+				"Amount cannot exceed balance",
+				function (value) {
+					const { balance } = this.parent
+					if (!value) return true
+					return value <= balance
+				}
+				)
+			}
+			return schema
+			})
 		})
+	)
+	})
 
-	// const formatDateToYYYYMMDD_CurrentDT = (date) => {
-	// const d = new Date(date);
-	// d.setHours(0, 0, 0, 0);
 
-	// const year = d.getFullYear();
-	// const month = String(d.getMonth() + 1).padStart(2, "0");
-	// const day = String(d.getDate()).padStart(2, "0");
-
-	// return `${year}-${month}-${day}`;
-	// };
 
 	const formatDateToYYYYMMDD_CurrentDT = (date) => {
 	const d = new Date(date);
@@ -186,13 +185,7 @@ function AccountHolderForm_BDCCB({ flag }) {
 	};
 	
 	const onSubmit = async (values) => {
-		
-		// setVisible(true)
-		// if (params?.id > 0) {
-		// 	editGroup(values)
-		// }
 		handleOpenConfirm(values)
-			
 	}
 
 	
@@ -220,20 +213,17 @@ function AccountHolderForm_BDCCB({ flag }) {
 
 	useEffect(() => {
 		if(params.id > 0){
-		
-		handleSearchChange(loanAppData?.loan_to_name)
-		fetchDisburseDetails()
-		console.log(loanAppData?.loan_to_name, 'loan_to_name', userDetails[0]?.user_type);
-		
+		// handleSearchChange(loanAppData?.loan_to_name)
+		// fetchDisburseDetails()
 		}
 	}, [])
 
 	const fetchDisburseDetails = async () => {
 		setValues({
-		loan_ac_no: loanAppData?.loan_acc_no,
-		loan_to: loanAppData?.loan_to,
-		branch_shg_id: loanAppData?.loan_to_name,
-		// branch_shg_id: loanAppData?.branch_shg_id, 
+		// loan_ac_no: loanAppData?.loan_acc_no,
+		// loan_to: loanAppData?.loan_to,
+		group_name: loanAppData?.loan_to_name,
+		// group_name: loanAppData?.group_name, 
 		branch_shg_SearchField: '',
 		period: loanAppData?.period,
 		curr_roi: loanAppData?.curr_roi,
@@ -247,7 +237,9 @@ function AccountHolderForm_BDCCB({ flag }) {
 
 
 	const editGroup = async (formData) => {
-				// return;
+			console.log(formData, 'editGroup');
+			
+				return;
 				setLoading(true)
 			
 				const ip = await getClientIP()
@@ -257,16 +249,8 @@ function AccountHolderForm_BDCCB({ flag }) {
     			tran_id : loanAppData?.trans_id,
 				tenant_id: userDetails[0]?.tenant_id,
 				branch_id: userDetails[0]?.brn_code,
-				loan_acc_no: formData?.loan_ac_no,
+				// loan_acc_no: formData?.loan_ac_no,
 				loan_to: formData?.loan_to,
-				// branch_shg_id: formData?.branch_shg_id, ///////////////
-				branch_shg_id: loanAppData?.branch_shg_id,
-				period: formData?.period,
-				curr_roi: formData?.curr_roi,
-				penal_roi: formData?.over_roi,
-				disb_dt: formData?.disb_dt,
-				disb_amt: formData?.disb_amt,
-				// pay_mode: formData?.pay_mode,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 				}
@@ -292,32 +276,41 @@ function AccountHolderForm_BDCCB({ flag }) {
 				}
 
 	const saveGroupData = async (formData) => {
-				
-				setLoading(true)
 			
-				const ip = await getClientIP()
+			setLoading(true)
+			
+			const ip = await getClientIP()
+
+			const formattedRows = formData?.sb_accounts?.map(row => ({
+			trans_no: 0,
+			sb_id: row.sb_id,
+			tenant_id: userDetails[0]?.tenant_id,
+			branch_id: userDetails[0]?.brn_code,
+			acc_no: row.acc_no,
+			dep_with_flag: formData?.transaction_type,
+			amt: row?.amount,
+			remarks: '',
+			trans_date: formData?.acc_open_date,
+			created_by: userDetails[0]?.emp_id,
+			ip_address: ip,
+			}))
+
+			console.log(formData, 'saveGroupData', formattedRows);
+
+
+
+			// return;
+				
 			
 				const creds = {
-				tenant_id: userDetails[0]?.tenant_id,
-				branch_id: userDetails[0]?.brn_code,
-				loan_acc_no: formData?.loan_ac_no,
-				loan_to: formData?.loan_to,
-				branch_shg_id: formData?.branch_shg_id, ///////////////
-				period: formData?.period,
-				curr_roi: formData?.curr_roi,
-				penal_roi: formData?.over_roi,
-				disb_dt: formData?.disb_dt,
-				disb_amt: formData?.disb_amt,
-				// pay_mode: formData?.pay_mode,
-				created_by: userDetails[0]?.emp_id,
-				ip_address: ip,
+				rows: formattedRows
 				}
 
 				
-				console.log(formData, 'formDataformDataformDataformData', creds, userDetails[0]);
+				console.log(formData, 'formDataformDataformDataformData', creds);
 
 				await saveMasterData({
-				endpoint: "loan/save_disbursement",
+				endpoint: "depsav/save_dept_trans",
 				creds,
 				navigate,
 				successMsg: "Loan Disburse details saved.",
@@ -331,34 +324,10 @@ function AccountHolderForm_BDCCB({ flag }) {
 				setLoading(false)
 				}
 
-	useEffect(()=>{
-	if(params.id < 1){
-	formik.setFieldValue("branch_shg_SearchField", "");
-	formik.setFieldValue("branch_shg_id", "");
-	setPACS_SHGList([])
-	}
-	}, [formik.values.loan_to])
-
-
-
-
-
-	useEffect(() => {
-	const currRoi = Number(formik.values.curr_roi);
-
-	if (!isNaN(currRoi) && currRoi !== "") {
-	// console.log(formik.values.curr_roi, 'ccccccccccc');
-	if(formik.values.curr_roi > 0){
-	formik.setFieldValue("over_roi", currRoi + 2);
-	}
-	}
-	}, [formik.values.curr_roi]);
-
-
 
 	const handleSearchChange = async (value) => {
 		if(value.length < 3){
-			Message("error", "Minimum type 3 character")
+			// Message("error", "Minimum type 3 character")
 			return;
 		}
 
@@ -366,10 +335,11 @@ function AccountHolderForm_BDCCB({ flag }) {
 		setPACS_SHGList([])
 		setLoading(true)
 		const creds = {
-		loan_to : formik.values.loan_to,
+		// loan_to : formik.values.loan_to,
+		loan_to : userDetails[0]?.user_type == 'B' ? 'S' : '',
 		branch_code : userDetails[0]?.brn_code,
 		branch_shg_id : value,
-		tenant_id: formik.values.loan_to == 'P' ? userDetails[0]?.tenant_id : 0,
+		tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -385,14 +355,9 @@ function AccountHolderForm_BDCCB({ flag }) {
 		if(res?.data?.success){
 			// console.log(res?.data?.data, 'mmmmmmmmmmmmmmmmmmm'); 
 			
-		if(formik.values.loan_to == "P" || loanAppData?.loan_to == "P"){
-		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
-		code: item?.branch_id,
-		name: item?.branch_name,
-		})))
-		}
-
-		if(formik.values.loan_to == "S" || loanAppData?.loan_to == "S"){
+		// console.log(res?.data?.data, 'ddddddddddddddddddddddd');
+	
+		if(userDetails[0]?.user_type == 'B'){
 		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
 		code: item?.group_code,
 		name: item?.group_name,
@@ -418,26 +383,19 @@ function AccountHolderForm_BDCCB({ flag }) {
 		setLoading(false)
 	};
 
-	useEffect(() => {
-		if(userDetails[0]?.user_type == 'P'){
-			remainingDisburseAmt()
-		}
-		
-	}, [formik.values.loan_to])
 
-	const remainingDisburseAmt = async ()=>{
-
+	const fetchSBAccList = async (value) => {
+		console.log(value, 'ddddddddddddddddddddddd');
 
 		setLoading(true)
+
 		const creds = {
-		pacs_shg_id : userDetails[0]?.brn_code,
-		loan_to : userDetails[0]?.user_type,
-		// loan_to : formik.values.loan_to,
+		shg_id : value,
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/loan/fetch_max_balance`, creds, {
+		await axios.post(`${url_bdccb}/depsav/get_meb_acc_dtls`, creds, {
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
@@ -446,12 +404,32 @@ function AccountHolderForm_BDCCB({ flag }) {
 		.then((res) => {
 
 		if(res?.data?.success){
-		setRemainDisburseAmt(res?.data?.data[0]?.max_balance)
-		console.log(res?.data?.data[0]?.max_balance, 'searchAmtsearchAmtsearchAmtsearchAmt');
+		console.log(res?.data?.data, 'ddddddddddddddddddddddd');
+
+		const formattedList = res?.data?.data?.map(item => ({
+			sb_id: item.sb_id,
+			acc_no: item.acc_no,
+			member_name: item.member_name,
+			balance: parseFloat(item.balance),
+			amount: ""   // 👈 user will enter this
+		}))
+
+		setSBAccountList(formattedList)
+
+		formik.setFieldValue("sb_accounts", formattedList) // 👈 important
+
+		// setSBAccountList(res?.data?.data)
+	
+		// if(userDetails[0]?.user_type == 'B'){
+		// setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+		// code: item?.group_code,
+		// name: item?.group_name,
+		// })))
+		// }
 
 		} else {
-		// navigate(routePaths.LANDING)
-		// localStorage.clear()
+		navigate(routePaths.LANDING)
+		localStorage.clear()
 		}
 		})
 		.catch((err) => {
@@ -459,16 +437,28 @@ function AccountHolderForm_BDCCB({ flag }) {
 		})
 
 		setLoading(false)
-		
+	};
 
-	}
+useEffect(() => {
+  if (!formik.values.sb_accounts?.length) return;
+
+  const resetAccounts = formik.values.sb_accounts.map((item) => ({
+    ...item,
+    amount: ""   // reset amount
+  }));
+
+  formik.setFieldValue("sb_accounts", resetAccounts);
+
+}, [formik.values.transaction_type]);
+
+
 
 	return (
 		<>
 		<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
 			<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 			<div className="w-auto mx-14 my-4">
-			<FormHeader text={`${params?.id == 0 ? "Loan Disburse Form" : loanAppData?.approval_status == 'A' ? "View Loan Disburse Form" : "Edit/Preview Loan Disburse Form"}`} mode={2} />
+			<FormHeader text={`${params?.id == 0 ? "Deposit / Withdrawal  Transaction" : loanAppData?.approval_status == 'A' ? "View Deposit / Withdrawal  Transaction" : "Edit/Preview Deposit / Withdrawal  Transaction"}`} mode={2} />
 			</div>
 
 			<Spin
@@ -477,38 +467,21 @@ function AccountHolderForm_BDCCB({ flag }) {
 				className="text-blue-800 dark:text-gray-400"
 				spinning={loading}
 			>	
-				{/* {JSON.stringify(loanAppData?.approval_status, 2)}  */}
+				{/* {JSON.stringify(SBAccountList, 2)}  */}
 				<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
 
-					
+					{/* {JSON.stringify(userDetails[0], null, 2)} */}
 
-							<div>
-								{/* {JSON.stringify(userDetails[0], null, 2)} */}
-								<TDInputTemplateBr
-									placeholder="Branch Name"
-									type="text"
-									label="Branch Name"
-									name="branch_name"
-									formControlName={formik.values.branch_name}
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									mode={1}
-									// disabled={params.id > 0 ? true : false}
-								/>
-								
-								{formik.errors.branch_name && formik.touched.branch_name ? (
-									<VError title={formik.errors.branch_name} />
-								) : null}
-							</div>
+							
 
 							<div>
 							<TDInputTemplateBr
 							// placeholder="Select Disbursement Date..."
 							type="date"
-							label="Account Open Date"
+							label="Transaction Date"
 							name="acc_open_date"
 							formControlName={formik.values.acc_open_date}
 							handleChange={formik.handleChange} 
@@ -522,86 +495,162 @@ function AccountHolderForm_BDCCB({ flag }) {
 							) : null}
 						</div>
 
-						<div>
-						<TDInputTemplateBr
-						placeholder="Select One"
-						type="text"
-						label="Loan To *"
-						name="loan_to"
-						handleChange={formik.handleChange}
-						// handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						formControlName={formik.values.loan_to}
-						data={loan_to}
-						mode={2}
-						disabled={params.id > 0 ? true : false}
-					/>
-					{formik.errors.loan_to && formik.touched.loan_to ? (
-						<VError title={formik.errors.loan_to} />
-					) : null}
-						</div>
+							<div>
+								<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
+				 dark:text-gray-100"> 
+				 Select Group
+				 {/* Select PACS/SHG * */}
+				 </label>
+								<Select
+									showSearch
+									placeholder={userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' === 'S' ? 'Choose SHG ' : 'Choose '}
+									value={formik.values.group_name}
+									style={{ width: "100%" }}
+									optionFilterProp="children"
+									name="group_name"
+									// 🔍 typing search
+									onSearch={(value) => {
+									handleSearchChange(value);   // your search function
+									// userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+									}}
+									onChange={(value) => {
 
-						<div>
-								<TDInputTemplateBr
-									placeholder="Account No."
-									type="number"
-									label="Account No."
-									name="acc_no"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.acc_no}
-									// data={period_data}
-									mode={1}
-									// disabled={loanAppData?.approval_status == 'A' ? true : false}
-								/>
-								{formik.errors.acc_no && formik.touched.acc_no ? (
-									<VError title={formik.errors.acc_no} />
-								) : null}
+										formik.setFieldValue("group_name", value)
+										fetchSBAccList(value)
+									}}
+									onBlur={formik.handleBlur}
+									filterOption={(input, option) =>
+									option?.children?.toLowerCase().includes(input.toLowerCase())
+									}
+									
+									>
+									<Select.Option value="" disabled>{userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' ? 'Choose SHG ' : 'Choose '}</Select.Option>
+
+									{PACS_SHGList?.map((data) => (
+									<Select.Option key={data.code} value={data.code}>
+									{data.name}
+									</Select.Option>
+									))}
+									</Select>
+
+								
+									{formik.errors.group_name && formik.touched.group_name ? (
+										<VError title={formik.errors.group_name} />
+									) : null}
+
 							</div>
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="Transaction Type"
-									type="text"
-									label="Transaction Type"
-									name="tran_type"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.tran_type || "Deposit"}
-									// data={period_data}
-									mode={1}
-									disabled
-								/>
-								{formik.errors.tran_type && formik.touched.tran_type ? (
-									<VError title={formik.errors.tran_type} />
-								) : null}
+								placeholder="Transaction Type"
+								type="text"
+								label="Transaction Type *"
+								name="transaction_type"
+								handleChange={formik.handleChange}
+								// handleChange={handleFormikMasterChange} 
+								handleBlur={formik.handleBlur}
+								formControlName={formik.values.transaction_type}
+								data={trans_type}
+								mode={2}
+								// disabled={params.id > 0 ? true : false}
+							/>
+							{formik.errors.transaction_type && formik.touched.transaction_type ? (
+								<VError title={formik.errors.transaction_type} />
+							) : null}
 							</div>
-
-							<div>
-								<TDInputTemplateBr
-									placeholder="Deposit Amount"
-									type="number"
-									label="Deposit Amount"
-									name="depo_amt"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.depo_amt}
-									// data={period_data}
-									mode={1}
-									// disabled={loanAppData?.approval_status == 'A' ? true : false}
-								/>
-								{formik.errors.depo_amt && formik.touched.depo_amt ? (
-									<VError title={formik.errors.depo_amt} />
-								) : null}
-							</div>
-
-
-
-							
-
 
 							</div>
 							</div>
+
+		<div className="sm:col-span-3 mt-6">
+		
+		
+	
+
+		{formik.values.sb_accounts?.length > 0 && (
+		<div className="mt-6">
+		<Tag color="#2563eb" className="text-white mb-3 font-bold">
+		SB Account Holder
+		</Tag>
+
+		{formik.values.sb_accounts.map((item, index) => (
+		<div key={item.sb_id} className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50 relative">
+
+		{/* 1️⃣ Account No + Member Name */}
+		<div className="col-span-3">
+			<TDInputTemplateBr
+				placeholder="Account Number"
+				label="Account Number"
+				type="text"
+				formControlName={item.acc_no}
+				disabled
+				mode={1}
+			/>
+		</div>
+
+		<div className="col-span-4">
+			<TDInputTemplateBr
+				placeholder="Member Name"
+				label="Member Name"
+				type="text"
+				formControlName={item.member_name}
+				disabled
+				mode={1}
+			/>
+		</div>
+		{/* <div className="font-medium">
+		{item.acc_no} - {item.member_name}
+		</div> */}
+
+		{/* 2️⃣ Amount Input */}
+		<div className="col-span-3">
+			<TDInputTemplateBr
+			placeholder="Enter Amount"
+			label="Amount"
+			type="number"
+			name={`sb_accounts[${index}].amount`}
+			formControlName={item.amount}
+			handleChange={(e) => {
+			const value = e.target.value;
+
+			// Optional validation
+			if(formik.values.transaction_type == 'W'){
+			if (parseFloat(value) > item.balance) {
+			  Message("error", "Amount cannot exceed balance");
+			  return;
+			}
+			}
+
+			formik.setFieldValue(
+			`sb_accounts[${index}].amount`,
+			value
+			);
+			}}
+			mode={1}
+			/>
+
+		</div>
+
+		{/* 3️⃣ Balance */}
+		<div className="col-span-2">
+			<TDInputTemplateBr
+			placeholder="Balance"
+			label="Balance"
+			type="text"
+			formControlName={item.balance}
+			disabled
+			mode={1}
+			/>
+		{/* Balance: ₹ {item.balance} */}
+		</div>
+
+		</div>
+		))}
+		</div>
+		)}
+
+		</div>
+
 
 							
 							
@@ -644,4 +693,4 @@ function AccountHolderForm_BDCCB({ flag }) {
 	)
 }
 
-export default AccountHolderForm_BDCCB
+export default TransactionForm_BDCCB

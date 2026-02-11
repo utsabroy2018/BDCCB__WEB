@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import * as Yup from "yup"
 import { Link } from "react-router-dom"
 import { useFormik } from "formik"
@@ -11,7 +11,7 @@ import TDInputTemplate from "../../Components/TDInputTemplate"
 import axios from "axios"
 import { Spin } from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
-import { url } from "../../Address/BaseUrl"
+import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
 import { motion } from "framer-motion"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
@@ -21,10 +21,12 @@ function SignUp() {
 	const navigate = useNavigate()
 	const [loading, setLoading] = useState(false)
 	// const [loginUserDetails, setLoginUserDetails] = useState(() => "")
+	const [branch, setBranch] = useState(() => [])
 
 	const initialValues = {
 		user_id: "",
-		emp_name: "",
+		user_name: "",
+		desig_name: "",
 		password: "",
 		cnf_password: "",
 	}
@@ -122,6 +124,47 @@ localStorage.clear()
 		validateOnMount: true,
 	})
 
+	useEffect(()=>{
+		fetchBranch()
+	}, [])
+
+	const fetchBranch = async () => {
+			setLoading(true)
+				const tokenValue = await getLocalStoreTokenDts(navigate);
+			
+				await axios
+					.get(`${url_bdccb}/master/branch_list`, {
+						params: {
+						dist_id: 0, tenant_id: 1 ,branch_id: 0
+						},
+				headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+				},
+				})
+				.then((res) => {
+	
+				console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
+		
+				if(res?.data?.success){
+				setBranch(res?.data?.data?.map((item, i) => ({
+				code: item?.branch_id,
+				name: item?.branch_name,
+				})))
+				} else {
+				Message('error', res?.data?.msg)
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+	
+				})
+				.catch((err) => {
+					Message("error", "Some error occurred while fetching data!")
+					console.log("ERRR", err)
+				})
+			setLoading(false)
+		}
+
 	return (
 		<div className="bg-blue-800 p-20 flex justify-center min-h-screen min-w-screen">
 			<div className="bg-white p-44 rounded-3xl flex flex-col gap-8 justify-center items-center">
@@ -143,15 +186,66 @@ localStorage.clear()
 					onSubmit={formik.handleSubmit}
 					className="flex flex-col justify-center items-center gap-5"
 				>
-					<div
-						style={{
-							width: 280,
-						}}
-					>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+													
+					<TDInputTemplateBr
+					placeholder="Select Branch..."
+					type="text"
+					label="Branch"
+					name="branch_id"
+					formControlName={formik.values.branch_id}
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					data={branch}
+					mode={2}
+					/>
+					{formik.errors.branch_id && formik.touched.branch_id ? (
+					<VError title={formik.errors.branch_id} />
+					) : null}
+					</div>
+
+					<div>
 						<TDInputTemplateBr
-							placeholder="Type employee id..."
+							placeholder="Type user name..."
 							type="text"
-							label="Employee ID"
+							label="User Name"
+							name="user_name"
+							formControlName={formik.values.user_name}
+							handleChange={formik.handleChange}
+							handleBlur={formik.handleBlur}
+							mode={1}
+							// disabled
+						/>
+						{formik.errors.user_name && formik.touched.user_name ? (
+							<VError title={formik.errors.user_name} />
+						) : null}
+					</div>
+					
+
+					<div>
+						<TDInputTemplateBr
+							placeholder="Type designation..."
+							type="text"
+							label="Designation"
+							name="desig_name"
+							formControlName={formik.values.desig_name}
+							handleChange={formik.handleChange}
+							handleBlur={formik.handleBlur}
+							mode={1}
+							// disabled
+						/>
+						{formik.errors.desig_name && formik.touched.desig_name ? (
+							<VError title={formik.errors.desig_name} />
+						) : null}
+					</div>
+
+					<div>
+						<TDInputTemplateBr
+							placeholder="Type user id..."
+							type="text"
+							label="User ID"
 							name="user_id"
 							formControlName={formik.values.user_id}
 							handleChange={formik.handleChange}
@@ -162,31 +256,10 @@ localStorage.clear()
 							<VError title={formik.errors.user_id} />
 						) : null}
 					</div>
-					<div
-						style={{
-							width: 280,
-						}}
-					>
-						<TDInputTemplateBr
-							placeholder="Type employee name..."
-							type="text"
-							label="Employee Name"
-							name="emp_name"
-							formControlName={formik.values.emp_name}
-							handleChange={formik.handleChange}
-							handleBlur={formik.handleBlur}
-							mode={1}
-							disabled
-						/>
-						{formik.errors.emp_name && formik.touched.emp_name ? (
-							<VError title={formik.errors.emp_name} />
-						) : null}
-					</div>
-					<div
-						style={{
-							width: 280,
-						}}
-					>
+
+					
+					
+					<div>
 						<TDInputTemplateBr
 							placeholder="*****"
 							type="password"
@@ -201,11 +274,7 @@ localStorage.clear()
 							<VError title={formik.errors.password} />
 						) : null}
 					</div>
-					<div
-						style={{
-							width: 280,
-						}}
-					>
+					<div>
 						<TDInputTemplateBr
 							placeholder="*****"
 							type="password"
@@ -220,6 +289,9 @@ localStorage.clear()
 							<VError title={formik.errors.cnf_password} />
 						) : null}
 					</div>
+
+					</div>
+					
 					<Spin
 						indicator={<LoadingOutlined spin />}
 						size={5}

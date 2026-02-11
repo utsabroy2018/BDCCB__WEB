@@ -131,9 +131,9 @@ function BranchTable({
 							<th scope="col" className="p-4">
 								Contact Person
 							</th>
-							<th scope="col" className="p-4">
+							{/* <th scope="col" className="p-4">
 								Branch Type
-							</th>
+							</th> */}
 							<th scope="col" className="p-4">
 								Branch Address
 							</th>
@@ -186,9 +186,9 @@ function BranchTable({
 									<td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.branch_address}
 									</td>
-									<td className="px-6 py-3 text-slate-800 font-bold">
+									{/* <td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.branch_city}
-									</td>
+									</td> */}
 									<td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.pin_no}
 									</td>

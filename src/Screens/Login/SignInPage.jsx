@@ -464,7 +464,7 @@ const SignInPage = () => {
 						</div>
 						</div>
 
-
+		<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<Spin indicator={<LoadingOutlined spin />} spinning={loading}>
 							<button
 								type="submit"
@@ -478,7 +478,22 @@ const SignInPage = () => {
 							>
 								Sign In
 							</button>
-						</Spin>
+							</Spin>
+							<button
+							type="submit"
+							// disabled={!formik.isValid || loading}
+							className="w-full px-6 py-3 bg-blue-800 text-white rounded-lg
+							hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2
+							focus:ring-blue-500 focus:ring-offset-2 cursor-pointer
+							disabled:opacity-50 disabled:cursor-not-allowed
+							disabled:hover:bg-pink-600 disabled:transition-none
+							"
+							onClick={() => navigate("/signup")}
+							>
+								Sign Up
+							</button>
+							</div>
+						
 					</form>
 				</div>
 

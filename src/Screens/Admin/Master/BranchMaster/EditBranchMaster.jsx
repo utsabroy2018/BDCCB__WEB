@@ -17,12 +17,16 @@ import BranchForm from "../../../Forms/Master/BranchForm"
 // import BranchForm from "../../../Forms/Master/PoliceStationForm"
 // import PostMasterForm from "../../../Forms/Master/PostMasterForm"
 
+
+
 function EditBranchMaster() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
 	const { loanAppData } = location.state || {}
 	const navigate = useNavigate()
+
+
 
 	return (
 		<>
@@ -47,6 +51,9 @@ function EditBranchMaster() {
 						spinning={loading}
 					>
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16  rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
+
+							
+
 							<BranchForm />
 						</div>
 					</Spin>

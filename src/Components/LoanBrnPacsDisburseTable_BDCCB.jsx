@@ -33,7 +33,8 @@ function LoanBrnPacsDisburseTable_BDCCB({
 
 	const [first, setFirst] = useState(0)
 	const [rows, setRows] = useState(10)
-	const [AmountTd_, setAmountTd_] = useState(0)
+	const [AmountTd_dis, setAmountTd_dis] = useState(0)
+	const [AmountTd_dis_Prn, setAmountTd_Prn] = useState(0)
 
 	const onPageChange = (event) => {
 		setFirst(event.first)
@@ -42,14 +43,22 @@ function LoanBrnPacsDisburseTable_BDCCB({
 
 	useEffect(()=>{
 		// setAmountTd_(loanAppData.reduce((sum, r) => sum + parseFloat(r.disb_amt || 0), 0).toFixed(2));
-		setAmountTd_(0)
+		setAmountTd_dis(0)
 
 		if (loanAppData && loanAppData.length > 0) {
 		const total = loanAppData.reduce(
 		(sum, row) => sum + Number(row.disb_amt || 0),
 		0
 		);
-		setAmountTd_(total.toFixed(2));
+
+		const total_prn = loanAppData.reduce(
+		(sum, row) => sum + Number(row.curr_prn || 0),
+		0
+		);
+
+		
+		setAmountTd_dis(total.toFixed(2));
+		setAmountTd_Prn(total_prn.toFixed(2));
 		}
 		
 	}, [loanAppData])
@@ -66,18 +75,18 @@ function LoanBrnPacsDisburseTable_BDCCB({
 				{/* {JSON.stringify(loanAppData, 2)}  */}
 				
 
-				<DataTable
+									<DataTable
 									value={loanAppData?.map((item, i) => [{ ...item, id: i }]).flat()}
 									selectionMode="checkbox"
-									
+
 									// selection={selectedProducts}
 									// onSelectionChange={(e) => handleSelectionChange(e)}
-									 scrollable scrollHeight="400px"
-									
+									scrollable scrollHeight="400px"
+
 									tableStyle={{ minWidth: "50rem" }}
 									dataKey="id"
 									tableClassName="w-full text-sm text-left rtl:text-right shadow-lg text-green-900dark:text-gray-400 table_Custome table_Custome_1st" // Apply row classes
-								>
+									>
 									<Column
 										header="Sl No."
 										body={(rowData) => (
@@ -100,34 +109,40 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										field="trans_dt"
 										header="Transaction Date"
 										body={(rowData) =>
-											new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
-										}
-										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
-									></Column>
-				
-									<Column
-										field="loan_id"
-										header="Loan Id"
-									></Column>
-				
-									
-									<Column
-										field="loan_acc_no"
-										header="Loan Account No. "
-										// body={(rowData) =>
-										// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
-										// }
-									></Column>
-										<Column
-										field="disb_dt"
-										header="Disburse Date"
-										body={(rowData) =>
 											new Date(rowData?.disb_dt).toLocaleDateString("en-GB")
 										}
 										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
 									></Column>
 				
 									<Column
+										field="loan_acc_no"
+										header="Loan Account No."
+									></Column>
+				
+									<Column
+										field="loan_to_name"
+										header="Group Name "
+										// body={(rowData) =>
+										// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
+										// }
+									></Column>
+									<Column
+										field="disb_dt"
+										header="Disburse Date"
+									></Column>
+									<Column
+										field="disb_amt"
+										header="Disburse Amount"
+										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_dis}</span>}
+									></Column>
+									<Column
+										field="curr_prn"
+										header="Current Princepal"
+										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_dis_Prn}</span>}
+									></Column>
+
+				
+										{/* <Column
 										field="disb_amt"
 										header="Disburse Amount"
 										footer={
@@ -135,9 +150,8 @@ function LoanBrnPacsDisburseTable_BDCCB({
 												{AmountTd_}
 											</span>
 										}
-									></Column>
+									></Column> */}
 				
-									{/* {disbursementStatus === "U" && ( */}
 
 										<Column
 										// field="curr_prn"

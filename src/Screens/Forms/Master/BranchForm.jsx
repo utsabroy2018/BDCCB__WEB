@@ -23,8 +23,8 @@ const branchTypeOption = [
 		value: "P",
 	},
 	{
-		label: "Own",
-		value: "O",
+		label: "Branch",
+		value: "B",
 	},
 ]
 
@@ -58,7 +58,7 @@ function BranchForm() {
 		branch_name: "",
 		contact_person: "",
 		branch_address: "",
-		branch_city: "",
+		// branch_city: "",
 		pin_no: "",
 		branch_phone: "",
 		branch_type: ""
@@ -109,7 +109,7 @@ function BranchForm() {
 			branch_name: masterDetails?.branch_name || "",
 			contact_person: masterDetails?.contact_person || "",
 			branch_address: masterDetails?.branch_address || "",
-			branch_city: masterDetails?.branch_city || "",
+			// branch_city: masterDetails?.branch_city || "",
 			pin_no: masterDetails?.pin_no || "",
 			branch_phone: masterDetails?.branch_phone || "",
 			branch_type: masterDetails?.branch_type || "",
@@ -227,7 +227,7 @@ function BranchForm() {
 				branch_name: masterData?.branch_name,
 				contact_person: masterData?.contact_person,
 				branch_address: masterData?.branch_address,
-				branch_city: masterData?.branch_city,
+				// branch_city: masterData?.branch_city,
 				pin_no: masterData?.pin_no,
 				branch_phone: masterData?.branch_phone,
 				branch_status: masterDetails?.branch_status,
@@ -277,7 +277,7 @@ function BranchForm() {
 			branch_name: "",
 			contact_person: "",
 			branch_address: "",
-			branch_city: "",
+			// branch_city: "",
 			pin_no: "",
 			branch_phone: "",
 			branch_type: "",
@@ -306,7 +306,7 @@ function BranchForm() {
 									/>
 									</div>
 							</div>
-							<div className="grid gap-4 sm:grid-cols-8 sm:gap-6">
+							<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
 
 								<div>
 									{/* {masterData.ps_name} */}
@@ -349,18 +349,10 @@ function BranchForm() {
 									/>
 								</div>
 
-								<div>
-									{/* {masterData.ps_name} */}
-									<TDInputTemplateBr
-										placeholder="Branch City Name..."
-										type="text"
-										label="Branch City Name"
-										name="branch_city"
-										formControlName={masterData.branch_city}
-										handleChange={handleChangeMaster}
-										mode={1}
-									/>
-								</div>
+								
+							</div>
+
+							<div className="grid gap-4 sm:grid-cols-3 sm:gap-6 mt-5">
 
 								<div>
 									{/* {masterData.ps_name} */}
@@ -401,6 +393,12 @@ function BranchForm() {
 										mode={2}
 									/>
 								</div>
+								
+							</div>
+
+							<div className="grid gap-4 sm:grid-cols-3 sm:gap-6 mt-5">
+
+								
 								<div>
 									<TDInputTemplateBr
 										placeholder="Select Block..."

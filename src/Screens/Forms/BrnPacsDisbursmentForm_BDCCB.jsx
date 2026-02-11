@@ -138,13 +138,14 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 	const [PACS_SHGList, setPACS_SHGList] = useState([]);
 	const [remainDisburseAmt, setRemainDisburseAmt] = useState(null);
 	const [groupMemberTotal, setGroupMemberTotal] = useState();
+	// const [groupMemberTotal, setTotalMember] = useState();
 
 	const [rows, setRows] = useState([
 		{
 			acc_no: "",
 			branch_shg_id: "",
-			no_of_group: "",
-			no_of_member: "",
+			total_member: "",
+			loany_member: "",
 			amount: "",
 		},
 	]);
@@ -152,27 +153,16 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 	const initialValues = {
-		// loan_id: "",
-		// loan_ac_no: "",
-		loan_to: "",
-		// branch_shg_id: "",
-
-		branch_shg_SearchField: "", /// Not
-
 		period: "",
 		curr_roi: "",
 		over_roi: "",
 		disb_dt: "",
-		disb_amt: "",
-		// group_total: "",
-		// member_total: "",
-		// pay_mode: "",
 		rows: [
 			{
 				acc_no: "",
 				branch_shg_id: "",
-				no_of_group: "",
-				no_of_member: "",
+				total_member: "",
+				loany_member: "",
 				amount: "",
 			},
 		],
@@ -181,23 +171,12 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 	const validationSchema = Yup.object({
-		// loan_id: Yup.string().required("Loan ID is required"),
-		// loan_ac_no: Yup.string().required("Loan Account No. is required"),
-		// loan_to: Yup.string().required("Loan To is required"),
-		loan_to: Yup.string(),
-		// branch_shg_id: Yup.string().required("Select PACS or SHG is required"),
 		period: Yup.string().required("Period is required"),
 		curr_roi: Yup.mixed().required("Current Rate Of Intarest is required"),
 		over_roi: Yup.mixed().required("Overdue Rate Of Intarest is required"),
 		disb_dt: Yup.mixed().required("Disbursement Date is required"),
-		disb_amt: Yup.number()
-			.typeError("Disbursement Amount must be a number")
-			.required("Disbursement Amount is required")
-			.positive("Disbursement Amount must be greater than 0"),
 		approved_by: '',
 		approved_dt: '',
-		// group_total: Yup.mixed().required("Group Total Of Intarest is required"),
-		// member_total: Yup.mixed().required("Member Total Of Intarest is required"),
 		rows: Yup.array()
     .of(
       Yup.object({
@@ -207,15 +186,23 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
         branch_shg_id: Yup.string()
           .required("PACS / SHG is required"),
 
-        no_of_group: Yup.number()
+        total_member: Yup.number()
           .typeError("No. of Group must be a number")
           .required("No. of Group is required")
           .min(1, "Must be at least 1"),
 
-        no_of_member: Yup.number()
-          .typeError("No. of Member must be a number")
-          .required("No. of Member is required")
-          .min(1, "Must be at least 1"),
+        loany_member: Yup.number()
+        .typeError("Loanee Member must be a number")
+        .required("Loanee Member is required")
+        .min(1, "Must be at least 1")
+        .test(
+          "not-greater-than-total",
+          "Loanee Member cannot be greater than Total Member",
+          function (value) {
+            const { total_member } = this.parent;
+            return Number(value) <= Number(total_member);
+          }
+        ),
 
         amount: Yup.number()
           .typeError("Amount must be a number")
@@ -283,85 +270,72 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 	useEffect(() => {
 		if (params.id > 0) {
-			// handleSearchChange(loanAppData?.loan_to_name)
 			fetchDisburseDetails()
 		}
 	}, [])
 
-	const fetchDisburseDetails = async () => {
-		setValues({
-			// loan_ac_no: loanAppData?.loan_acc_no,
-			loan_to: loanAppData?.loan_to,
-			// branch_shg_id: loanAppData?.loan_to_name,
-			// branch_shg_id: loanAppData?.branch_shg_id, 
-			branch_shg_SearchField: '',
-			period: loanAppData?.period,
-			curr_roi: loanAppData?.curr_roi,
-			over_roi: loanAppData?.over_roi,
-			disb_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.disb_dt)),
-			disb_amt: loanAppData?.disb_amt,
-			approved_by: loanAppData?.approved_by,
-			approved_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.approved_dt)),
-			// group_total: loanAppData?.tot_grp,
-			// member_total: loanAppData?.tot_memb,
-		})
+	useEffect(() => {
+	if (Number(params?.id) > 0) {
+		formik.values.rows.forEach((row, index) => {
+		if (row.branch_shg_id) {
+			fetchGroupData(row.branch_shg_id, index);
+		}
+		});
 	}
+	}, [formik.values.rows]);
+
+	
+
+	const fetchDisburseDetails = async () => {
+
+		const formattedRows = [
+			{
+			acc_no: loanAppData?.loan_acc_no || "",
+			branch_shg_id: loanAppData?.branch_shg_id || "",
+			loany_member: loanAppData?.tot_memb || "",
+			amount: loanAppData?.disb_amt || "",
+			loan_id: loanAppData?.loan_id,
+			tran_id: userDetails[0]?.tenant_id,
+			}
+		];
+
+		setValues({
+			period: loanAppData?.period || "",
+			curr_roi: loanAppData?.curr_roi || "",
+			over_roi: loanAppData?.penal_roi || "",
+			disb_dt: loanAppData?.disb_dt
+			? formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.disb_dt))
+			: "",
+			rows: formattedRows,
+		});
+
+		setPACS_SHGList([
+			{
+			code: loanAppData?.branch_shg_id,
+			name: loanAppData?.loan_to_name, // <-- this is important
+			},
+		]);
+
+		};
+
+
 
 
 
 	const editGroup = async (formData) => {
-		// return;
-		setLoading(true)
 
-		const ip = await getClientIP()
+		// console.log(rows, 'formDataformDataformDataformData', formData);
 
-		const creds = {
-			loan_id: loanAppData?.loan_id,
-			tran_id: loanAppData?.trans_id,
-			tenant_id: userDetails[0]?.tenant_id,
-			branch_id: userDetails[0]?.brn_code,
-			// loan_acc_no: formData?.loan_ac_no,
-			// loan_to: formData?.loan_to,
-			loan_to: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-			// branch_shg_id: formData?.branch_shg_id, ///////////////
-			branch_shg_id: loanAppData?.branch_shg_id,
-			period: formData?.period,
-			curr_roi: formData?.curr_roi,
-			penal_roi: formData?.over_roi,
-			disb_dt: formData?.disb_dt,
-			disb_amt: formData?.disb_amt,
-			// tot_grp: formData?.group_total,
-			// tot_memb: formData?.member_total,
-			// pay_mode: formData?.pay_mode,
-			created_by: userDetails[0]?.emp_id,
-			ip_address: ip,
-		}
+		// return
 
-
-		console.log(formData, 'formDataformDataformDataformData', loanAppData);
-
-		// return;
-
-		await saveMasterData({
-			endpoint: "loan/save_disbursement",
-			creds,
-			navigate,
-			successMsg: "Loan Disburse edited saved.",
-			onSuccess: () => navigate(-1),
-
-			// 🔥 fully dynamic failure handling
-			failureRedirect: routePaths.LANDING,
-			clearStorage: true,
-		})
-
-		setLoading(false)
-	}
-
-	const saveGroupData = async (formData) => {
-
-		console.log(rows, 'rowsrowsrowsrowsrows', formData);
-		return
-
+		const formattedRows = formData?.rows?.map(row => ({
+		loan_acc_no: row.acc_no,
+		branch_shg_id: row.branch_shg_id,
+		tot_memb: row.loany_member,   // or total_member if required
+		disb_amt: Number(row.amount),
+		loan_id: row?.loan_id,
+		tran_id: row?.tran_id,
+		}))
 
 		setLoading(true)
 
@@ -370,27 +344,23 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
-			// loan_acc_no: formData?.loan_ac_no,
-			// loan_to: formData?.loan_to,
-			loan_to: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-			branch_shg_id: formData?.branch_shg_id, ///////////////
+			loan_to: 'S',
 			period: formData?.period,
 			curr_roi: formData?.curr_roi,
 			penal_roi: formData?.over_roi,
 			disb_dt: formData?.disb_dt,
-			disb_amt: formData?.disb_amt,
-			// tot_grp: formData?.group_total,
-			// tot_memb: formData?.member_total,
-			// pay_mode: formData?.pay_mode,
+			loanee_dtls: formattedRows,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
 		}
 
 
-		console.log(formData, 'formDataformDataformDataformData', creds, userDetails[0]);
+
+		console.log(formData, 'formDataformDataformDataformData', creds);
+		// return
 
 		await saveMasterData({
-			endpoint: "loan/save_disbursement",
+			endpoint: "loan/save_disburse_brn_pacs_shg",
 			creds,
 			navigate,
 			successMsg: "Loan Disburse details saved.",
@@ -404,13 +374,63 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		setLoading(false)
 	}
 
-	useEffect(() => {
-		if (params.id < 1) {
-			formik.setFieldValue("branch_shg_SearchField", "");
-			formik.setFieldValue("branch_shg_id", "");
-			setPACS_SHGList([])
+	const saveGroupData = async (formData) => {
+
+		console.log(rows, 'rowsrowsrowsrowsrows', formData);
+		// return
+
+		const formattedRows = formData?.rows?.map(row => ({
+		loan_acc_no: row.acc_no,
+		branch_shg_id: row.branch_shg_id,
+		tot_memb: row.loany_member,   // or total_member if required
+		disb_amt: Number(row.amount),
+		loan_id: "0",
+		tran_id: "0",
+		}))
+
+		setLoading(true)
+
+		const ip = await getClientIP()
+
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+			branch_id: userDetails[0]?.brn_code,
+			loan_to: 'S',
+			period: formData?.period,
+			curr_roi: formData?.curr_roi,
+			penal_roi: formData?.over_roi,
+			disb_dt: formData?.disb_dt,
+			loanee_dtls: formattedRows,
+			created_by: userDetails[0]?.emp_id,
+			ip_address: ip,
 		}
-	}, [formik.values.loan_to])
+
+
+
+		// console.log(formData, 'formDataformDataformDataformData', creds, userDetails[0]);
+
+		await saveMasterData({
+			endpoint: "loan/save_disburse_brn_pacs_shg",
+			creds,
+			navigate,
+			successMsg: "Loan Disburse details saved.",
+			onSuccess: () => navigate(-1),
+
+			// 🔥 fully dynamic failure handling
+			failureRedirect: routePaths.LANDING,
+			clearStorage: true,
+		})
+
+		setLoading(false)
+	}
+
+	// useEffect(() => {
+	// 	if (params.id < 1) {
+	// 		formik.setFieldValue("branch_shg_SearchField", "");
+	// 		formik.setFieldValue("branch_shg_id", "");
+	// 		setPACS_SHGList([])
+	// 	}
+	// }, [formik.values.loan_to])
 
 
 
@@ -430,22 +450,23 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 	const handleSearchChange = async (value) => {
 		if (value.length < 3) {
-			Message("error", "Minimum type 3 character")
+			// Message("error", "Minimum type 3 character")
 			return;
 		}
-
-
-
-
 
 		setPACS_SHGList([])
 		setLoading(true)
 		const creds = {
 			// loan_to : formik.values.loan_to,
+			// loan_to: userDetails[0]?.user_type == 'B' ? 'S' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+			// branch_code: userDetails[0]?.user_type == 'B' ? 0 : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : '',
+			// branch_shg_id: value,
+			// tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
+
 			loan_to: userDetails[0]?.user_type == 'B' ? 'S' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-			branch_code: userDetails[0]?.user_type == 'B' ? 0 : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : '',
-			branch_shg_id: value,
-			tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
+			branch_code: userDetails[0]?.brn_code,
+			branch_shg_id : value,
+			tenant_id: 0,
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -463,20 +484,22 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 				if (res?.data?.success) {
 					// console.log(res?.data?.data, 'mmmmmmmmmmmmmmmmmmm'); 
 
-					if (userDetails[0]?.user_type == 'B') {
-						setPACS_SHGList(res?.data?.data?.map((item, i) => ({
-							code: item?.branch_id,
-							name: item?.branch_name,
-						})))
-					}
+					// if (userDetails[0]?.user_type == 'B') {
+					// 	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+					// 		code: item?.branch_id,
+					// 		name: item?.branch_name,
+					// 	})))
+					// }
 
 					// if(formik.values.loan_to == "S" || loanAppData?.loan_to == "S"){
-					if (userDetails[0]?.user_type == 'P') {
+					// console.log(res?.data?.data, 'valueeeeeeeeeeeeeeeeeeeeeeee');
+					
+					// if (userDetails[0]?.user_type == 'B') {
 						setPACS_SHGList(res?.data?.data?.map((item, i) => ({
 							code: item?.group_code,
 							name: item?.group_name,
 						})))
-					}
+					// }
 
 					// if(res?.data?.data.length > 0){
 					// 	Message("success", res?.data?.msg)
@@ -497,30 +520,49 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		setLoading(false)
 	};
 
+	const fetchGroupData = async (value, rowIndex) => {
+		console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
 
-	const addNewRow = () => {
-		setRows([
-			...rows,
-			{
-				acc_no: "",
-				branch_shg_id: "",
-				no_of_group: "",
-				no_of_member: "",
-				amount: "",
+		setLoading(true)
+		const creds = {
+			group_code: value,
+			tenant_id: userDetails[0]?.tenant_id,
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/loan/fetch_tot_memb`, creds, {
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
 			},
-		]);
+		})
+			.then((res) => {
+
+				if (res?.data?.success) {
+					console.log(res?.data?.data, 'valueeeeeeeeeeeeeeeeeeeeeeee', res.data.data.tot_memb);
+					const totMemb = Number(res.data.data[0].tot_memb);
+
+					// 🔥 SET VALUE INTO THAT ROW
+					formik.setFieldValue(
+						`rows[${rowIndex}].total_member`,
+						totMemb
+					);
+					
+				} else {
+					navigate(routePaths.LANDING)
+					localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+
+		setLoading(false)
 	};
 
-	const updateRow = (index, key, value) => {
-		const updated = [...rows];
-		updated[index][key] = value;
-		setRows(updated);
-	};
 
-	const totalAmount = rows.reduce(
-		(sum, r) => sum + Number(r.amount || 0),
-		0
-	);
+	
 
 
 
@@ -529,7 +571,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text={`${params?.id == 0 ? "Loan Disburse Form" : loanAppData?.approval_status == 'A' ? "View Loan Disburse Form" : "Edit/Preview Loan Disburse Form"}`} mode={2} />
+						<FormHeader text={`${params?.id == 0 ? `Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG` : loanAppData?.approval_status == 'A' ? `View Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'Pacs' : ''} to SHG Form` : `Edit/Preview Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'Pacs' : ''} to SHG Form`}`} mode={2} />
 					</div>
 
 					<Spin
@@ -594,6 +636,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 								<div className="flex justify-start gap-5">
 									<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-3"}>
 										<div>
+											{/* {JSON.stringify(formik.values.period, 2)} */}
 											<TDInputTemplateBr
 												placeholder="Period"
 												type="number"
@@ -666,7 +709,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 											) : null}
 										</div>
 
-										<div>
+										{/* <div>
 											<TDInputTemplateBr
 												placeholder="Disbursement Amount..."
 												type="number"
@@ -682,7 +725,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 											{formik.errors.disb_amt && formik.touched.disb_amt ? (
 												<VError title={formik.errors.disb_amt} />
 											) : null}
-										</div>
+										</div> */}
 
 									</div>
 								</div>
@@ -700,8 +743,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 										const isRowFilled =
 											row.acc_no &&
 											row.branch_shg_id &&
-											row.no_of_group &&
-											row.no_of_member &&
+											row.total_member &&
+											row.loany_member &&
 											row.amount;
 
 										return (
@@ -755,10 +798,16 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 														// ✅ selecting option (ROW SAFE)
 														onChange={(value) => {
-															formik.setFieldValue(
-																`rows[${index}].branch_shg_id`,
-																value
-															);
+															// console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
+															// fetchGroupData(value)
+															// formik.setFieldValue(
+															// 	`rows[${index}].branch_shg_id`,
+															// 	value
+															// );
+															formik.setFieldValue(`rows[${index}].branch_shg_id`, value);
+
+															// 🔥 fetch and auto-fill total member
+															fetchGroupData(value, index);
 														}}
 
 														onBlur={() =>
@@ -789,6 +838,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 														))}
 													</Select>
 
+													
+
 													{formik.touched.rows?.[index]?.branch_shg_id &&
 													formik.errors.rows?.[index]?.branch_shg_id && (
 													<VError title={formik.errors.rows[index].branch_shg_id} />
@@ -800,17 +851,18 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												{/* No of Group */}
 												<div className="col-span-2">
 													<TDInputTemplateBr
-														placeholder="No. of Group"
-														label="No. of Group"
+														placeholder="Total Member"
+														label="Total Member"
 														type="number"
-														name={`rows[${index}].no_of_group`}
-														formControlName={row.no_of_group}
+														name={`rows[${index}].total_member`}
+														formControlName={row.total_member}
 														handleChange={formik.handleChange}
 														mode={1}
+														disabled
 													/>
-													{formik.touched.rows?.[index]?.no_of_group &&
-													formik.errors.rows?.[index]?.no_of_group && (
-													<VError title={formik.errors.rows[index].no_of_group} />
+													{formik.touched.rows?.[index]?.total_member &&
+													formik.errors.rows?.[index]?.total_member && (
+													<VError title={formik.errors.rows[index].total_member} />
 													)}
 
 
@@ -819,17 +871,18 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												{/* No of Member */}
 												<div className="col-span-2">
 													<TDInputTemplateBr
-														placeholder="No. of Member"
-														label="No. of Member"
+														placeholder="Loanee Member"
+														label="Loanee Member"
 														type="number"
-														name={`rows[${index}].no_of_member`}
-														formControlName={row.no_of_member}
+														name={`rows[${index}].loany_member`}
+														formControlName={row.loany_member}
 														handleChange={formik.handleChange}
 														mode={1}
+														max={row.total_member}
 													/>
-													{formik.touched.rows?.[index]?.no_of_member &&
-													formik.errors.rows?.[index]?.no_of_member && (
-													<VError title={formik.errors.rows[index].no_of_member} />
+													{formik.touched.rows?.[index]?.loany_member &&
+													formik.errors.rows?.[index]?.loany_member && (
+													<VError title={formik.errors.rows[index].loany_member} />
 													)}
 
 												</div>
@@ -881,9 +934,12 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 														</button>
 													)}
 												</div>
-
+													
+													{/* {JSON.stringify(params, 2)} */}
 												{/* Add Button (only last row) */}
-												{index === formik.values.rows.length - 1 && (
+												
+												{index === formik.values.rows.length - 1 &&
+  												Number(params?.id) <= 0 && (
 													<div className="col-span-12 text-right mt-2">
 														<Button
 															type="primary"
@@ -895,8 +951,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 																	{
 																		acc_no: "",
 																		branch_shg_id: "",
-																		no_of_group: "",
-																		no_of_member: "",
+																		total_member: "",
+																		loany_member: "",
 																		amount: "",
 																	},
 																])
