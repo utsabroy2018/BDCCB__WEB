@@ -38,4 +38,5 @@ export const routePaths = {
 	CO_EDIT_GROUP: "/homeco/editgroupform/",
 
 	ADMIN_HOME: "/homeadmin/",
+	MANAGE_USER: "/homebm/manageuser/",
 }

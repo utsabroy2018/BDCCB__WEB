@@ -369,6 +369,14 @@ const router = createBrowserRouter([
 								path: "transaction/:id",
 								element: <EditTransactionFormBM_BDCCB />,
 							},
+							{
+								path: "manageuser/:id",
+								element: <CreateUser />,
+							},
+							{
+								path: "manageuser",
+								element: <ManageUser />,
+							},
 
 							// {
 							// 	path: "transfermember",

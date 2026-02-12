@@ -2440,6 +2440,33 @@ const items_bdccb_PACS = [
 			icon: <LineChartOutlined />,
 			label: <Link to={"/homebm/"}>Dashboard</Link>,
 		},
+
+		{
+			key: "sub5",
+			icon: <ImportOutlined />,
+			label: "User Management",
+			// hidden: data?.user_management == "Y" ? false : true,
+			children: [
+				// {
+				// 	key: "sub7-1",
+				// 	icon: <UserAddOutlined />,
+				// 	label: <Link to={"/homeadmin/createuser/0"}>Create User</Link>,
+				// 	// hidden: data?.create_user == "Y" ? false : true,
+				// },
+				{
+					key: "sub5-1",
+					icon: <SettingOutlined />,
+					label: <Link to={"/homebm/manageuser/"}>Manage User</Link>,
+					// hidden: data?.manage_user == "Y" ? false : true,
+				},
+				// {
+				// 	key: "sub7-3",
+				// 	icon: <FastForwardOutlined />,
+				// 	label: <Link to={"/homeadmin/transferuser/0"}>Transfer User</Link>,
+				// 	// hidden: data?.transfer_user == "Y" ? false : true,
+				// },
+			],
+		},
 		
 		{
 			key: "sub3",

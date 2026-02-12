@@ -56,7 +56,7 @@ function SearchTransactionBM_BDCCB() {
 			tenant_id: userDetails[0]?.tenant_id
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
-		await axios
+		// await axios
 			// .post(`${url}/admin/fetch_loan_application_dtls`, creds)
 			// .post(`${url_bdccb}/depsav/deposit_list`, {
 			// 	params: {branch_id: userDetails[0]?.brn_code, tenant_id: userDetails[0]?.tenant_id},

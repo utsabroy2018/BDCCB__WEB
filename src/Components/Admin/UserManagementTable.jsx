@@ -12,6 +12,7 @@ import {
 	FileTextOutlined,
 	SyncOutlined,
 	PlusCircleOutlined,
+	EyeOutlined,
 } from "@ant-design/icons"
 import { useNavigate } from "react-router-dom"
 import { Tag } from "antd"
@@ -129,17 +130,17 @@ function UserManagementTable({
 								#
 							</th> */}
 							<th scope="col" className="p-4">
-								Employee ID
+								User ID
 							</th>
 							<th scope="col" className="p-4">
-								Employee Name
+								User Name
 							</th>
-							<th scope="col" className="p-4">
+							{/* <th scope="col" className="p-4">
 								Branch ID
 							</th>
 							<th scope="col" className="p-4">
 								Branch Name
-							</th>
+							</th> */}
 							<th scope="col" className="p-4">
 								Status
 							</th>
@@ -164,46 +165,46 @@ function UserManagementTable({
 										{item.sl_no}
 									</th> */}
 									<td className="px-6 py-3 text-slate-800 font-bold">
-										{item?.emp_id}
+										{item?.user_id}
 									</td>
 									<td className="px-6 py-3  text-slate-700">
-										{item?.emp_name}
+										{item?.user_name}
 									</td>
-									<td className="px-6 py-3 text-slate-700">{item?.brn_code}</td>
+									{/* <td className="px-6 py-3 text-slate-700">{item?.brn_code}</td>
 									<td className="px-6 py-3 text-slate-700">
 										{item?.branch_name}
-									</td>
+									</td> */}
 									<td
 										className={`px-6 py-3 ${
-											item?.user_status === "A"
+											item?.active_flag === "Y"
 												? "text-green-500"
 												: "text-red-500"
 										}`}
 									>
-										{item?.user_status === "A" ? "Active" : "Inactive"}
+										{item?.active_flag === "Y" ? "Approved" : item?.active_flag === "N" ? "Unapproved" : "Block"}
 									</td>
 
 									<td className="px-6 py-3 text-slate-700">
-										{flag === "ADMIN" && (
-											// </Link>
+										{/* {flag === "ADMIN" && ( */}
+											{/* // </Link> */}
 											<button
 												// to={routePaths.BM_EDIT_GRT + item?.form_no}
 												onClick={() => {
-													console.log("LLSKSIODFUISFH", item)
+													// console.log("LLSKSIODFUISFH", item)
 													navigate(
-														`/homeadmin/createuser/${item?.emp_id || 0}`,
+														`/homebm/manageuser/${item?.user_id || 0}`,
 														{
 															state: item,
 														}
 													)
 												}}
 											>
-												<EditOutlined
+												<EyeOutlined
 													className={`text-md  text-[#DA4167]
 													`}
 												/>
 											</button>
-										)}
+										{/* )} */}
 									</td>
 								</tr>
 							)) : <tr 

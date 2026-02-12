@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import Sidebar from "../../../Components/Sidebar"
 import axios from "axios"
-import { url } from "../../../Address/BaseUrl"
+import { url, url_bdccb } from "../../../Address/BaseUrl"
 import { Message } from "../../../Components/Message"
 import { Spin } from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
@@ -10,25 +10,22 @@ import UserManagementTable from "../../../Components/Admin/UserManagementTable"
 import { useNavigate } from "react-router"
 import { getLocalStoreTokenDts } from "../../../Components/getLocalforageTokenDts"
 import { routePaths } from "../../../Assets/Data/Routes"
+import Radiobtn from "../../../Components/Radiobtn"
 
-// const options = [
-// 	{
-// 		label: "Pending",
-// 		value: "U",
-// 	},
-// 	{
-// 		label: "Sent to MIS",
-// 		value: "S",
-// 	},
-// 	{
-// 		label: "Approved",
-// 		value: "A",
-// 	},
-// 	{
-// 		label: "MIS Rejected",
-// 		value: "R",
-// 	},
-// ]
+const options = [
+	{
+		label: "Approved",
+		value: "Y",
+	},
+	{
+		label: "Unapproved",
+		value: "N",
+	},
+	{
+		label: "Block",
+		value: "B",
+	}
+]
 
 function ManageUser() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
@@ -36,21 +33,21 @@ function ManageUser() {
 	const [masterData, setMasterData] = useState(() => [])
 	const [copyLoanApplications, setCopyLoanApplications] = useState(() => [])
 
-	const [approvalStatus, setApprovalStatus] = useState("U")
+	const [approvalStatus, setApprovalStatus] = useState("Y")
 	// const [value2, setValue2] = useState("S")
 	const navigate = useNavigate()
 
 	const fetchLoanApplications = async () => {
 		setLoading(true)
 		const tokenValue = await getLocalStoreTokenDts(navigate);
-		// const creds = {
-		// 	prov_grp_code: 0,
-		// 	user_type: userDetails?.id,
-		// 	branch_code: userDetails?.brn_code,
-		// }
 
-		await axios
-			.post(`${url}/fetch_user_details`, {}, {
+		await axios.get(`${url_bdccb}/user/user_list`, {
+		params: {
+			tenant_id: userDetails[0]?.tenant_id, 
+			branch_id: userDetails[0]?.user_type == 'S' ? 0 : userDetails[0]?.brn_code, 
+			user_type: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+			user_status: approvalStatus
+		},
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
@@ -58,28 +55,19 @@ function ManageUser() {
 		})
 			.then((res) => {
 				console.log(res, 'resresresresres');
-				
-				if(res?.data?.suc === 0){
 
+				if(res?.data?.success){
+				
+
+				setMasterData(res?.data?.data)
+				setCopyLoanApplications(res?.data?.data)
+				} else {
+				Message('error', res?.data?.msg)
 				navigate(routePaths.LANDING)
 				localStorage.clear()
-				// Message('error', res?.data?.msg)
-
-				} else {
-
-				setMasterData(res?.data?.msg)
-				setCopyLoanApplications(res?.data?.msg)
 
 				}
 
-				// if (res?.data?.suc === 1) {
-				// 	setMasterData(res?.data?.msg)
-				// 	setCopyLoanApplications(res?.data?.msg)
-
-				// 	console.log("PPPPPPPPPPPPPPPPPPPP", res?.data)
-				// } else {
-				// 	Message("error", "No users found.")
-				// }
 			})
 			.catch((err) => {
 				Message("error", "Some error occurred while fetching users!")
@@ -88,24 +76,31 @@ function ManageUser() {
 		setLoading(false)
 	}
 
-	useEffect(() => {
-		fetchLoanApplications()
-	}, [])
+	const onChange = (e) => {
+
+	setApprovalStatus(e)
+
+	}
+
+	// useEffect(() => {
+	// 	fetchLoanApplications()
+	// }, [])
 
 	const setSearch = (word) => {
 		setMasterData(
 			copyLoanApplications?.filter(
 				(e) =>
-					e?.emp_id
+					e?.user_name
 						?.toString()
 						?.toLowerCase()
 						.includes(word?.toLowerCase()) ||
-					e?.emp_name
+					e?.user_name
 						?.toString()
 						?.toLowerCase()
 						?.includes(word?.toLowerCase()) ||
-					e?.brn_code?.toString()?.toLowerCase()?.includes(word?.toLowerCase()) ||
-					e?.branch_name?.toString()?.toLowerCase()?.includes(word?.toLowerCase())
+					e?.user_id?.toString()?.toLowerCase()?.includes(word?.toLowerCase())
+					//  ||
+					// e?.branch_name?.toString()?.toLowerCase()?.includes(word?.toLowerCase())
 			)
 		)
 	}
@@ -131,13 +126,14 @@ function ManageUser() {
 				<main className="px-4 h-auto my-20 mx-32">
 					{/* <Radiobtn data={options} val={"U"} onChangeVal={onChange1} /> */}
 
-					{/* <Radiobtn
+					<Radiobtn
 						data={options}
 						val={approvalStatus}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
-					/> */}
+					/>
+					{/* {JSON.stringify(masterData, 2)} */}
 					<UserManagementTable
 						flag="ADMIN"
 						loanAppData={masterData}

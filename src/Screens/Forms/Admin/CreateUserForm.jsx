@@ -5,7 +5,7 @@ import BtnComp from "../../../Components/BtnComp"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { Message } from "../../../Components/Message"
-import { url } from "../../../Address/BaseUrl"
+import { url, url_bdccb } from "../../../Address/BaseUrl"
 import { Badge, Spin, Card, Popconfirm } from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
 import { useLocation } from "react-router"
@@ -14,6 +14,26 @@ import DialogBox from "../../../Components/DialogBox"
 import { MultiSelect } from "primereact/multiselect"
 import { getLocalStoreTokenDts } from "../../../Components/getLocalforageTokenDts"
 import { routePaths } from "../../../Assets/Data/Routes"
+import { useFormik } from "formik"
+import * as Yup from "yup"
+import Radiobtn from "../../../Components/Radiobtn"
+
+
+const user_status = [
+		{
+		label: "Approve",
+		value: "Y",
+		},
+		{
+		label: "Unapprove",
+		value: "N",
+		},
+		{
+		label: "Block",
+		value: "B",
+		}
+]
+
 function CreateUserForm() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
@@ -21,45 +41,88 @@ function CreateUserForm() {
 	const [designations, setDesignations] = useState(() => [])
 	const [designation, setDesignation] = useState(() => [])
 	const location = useLocation()
-	const userMasterDetails = location.state || {}
+	const userState = location.state || {}
 
 	const navigate = useNavigate()
 	const userDetails = JSON.parse(localStorage.getItem("user_details"))
 
 	const [visible, setVisible] = useState(() => false)
+	const [radioBtnStatus, setRadioBtnStatus] = useState("Y")
 
-	useEffect(()=>{
-		console.log(userMasterDetails, ': DHURR')
-	},[userMasterDetails])
-
-	// const formattedDob = formatDateToYYYYMMDD(memberDetails?.dob)
 	const [selectedBranches, setSelectedBranches] = useState([])
-	const cities = [
-		{ name: "New York", code: "NY" },
-		{ name: "Rome", code: "RM" },
-		{ name: "London", code: "LDN" },
-		{ name: "Istanbul", code: "IST" },
-		{ name: "Paris", code: "PRS" },
-	]
-	console.log(params, "params")
-	console.log(location, "location")
-	// console.log(memberDetails, "memberDetails")
+	const [masterData, setMasterData] = useState(() => [])
+	const [pendingValues, setPendingValues] = useState(null);
+
 
 	const [userTypes, setUserTypes] = useState(() => [])
 	const [masterUserData, setMasterUserData] = useState({
-		emp_id: "", // onBlur search to fetch
-		emp_name: "",
-		branch: "", // dropdown - prefetched id
-		designation: "", // dropdown - prefetched id
-		user_type: "", // dropdown - CO, BM, MIS Asst., Admin
-		active_flag: "",
-		remarks: "",
 		finance_module: "N",
 	})
+	
+	const initialValues = {
+	user_name: "",
+	user_id: "",
+	designation: "",
+	finance_module: "",
+	user_type: ""
+	}
+	const [formValues, setValues] = useState(initialValues)
+
+	const validationSchema = Yup.object({
+	user_name: Yup.string(),
+	user_id: Yup.string(),
+	designation: Yup.string(),
+	finance_module: Yup.string(),
+	user_type: Yup.string(),
+	})
+
+	// const handleOpenConfirm = (values) => {
+	// setPendingValues(values);   // store formik values
+	// setVisible(true);           // open dialog
+	// };
+
+	const handleOpenConfirm = (values) => {
+	setPendingValues(values);
+	setVisible(true);
+	};
+
+	// const onSubmit = (e) => {
+	// 	e.preventDefault()
+	// 	setVisible(true)
+	// 	console.log(e, 'fffffffffffffffffffffffff');
+	// 	handleOpenConfirm(e)
+		
+	// }
+
+	const onSubmit = (values) => {
+	console.log("Formik Values:", values);
+	handleOpenConfirm(values);
+	};
+
+	const formik = useFormik({
+	initialValues: + params.id > 0 ? formValues : initialValues,
+	onSubmit,
+	validationSchema,
+	validateOnChange: true,
+	validateOnBlur: true,
+	enableReinitialize: true,
+	validateOnMount: true,
+	})
+
+		const onChange = (e) => {
+		console.log("radio1 checked", e)
+		setRadioBtnStatus(e)
+		// formik.setFieldValue("departmentStatus", e)
+  		// formik.setFieldValue("shg_group", "") 
+	}
 
 	const handleChangeForm = (e) => {
 		const { name, type, checked, value } = e.target
 		if (type === "checkbox" && name === "finance_module") {
+			if(radioBtnStatus == 'N' || radioBtnStatus == 'B'){
+				return setMasterUserData({finance_module: "N"})
+			}
+
 			setMasterUserData((prev) => ({
 				...prev,
 				finance_module: checked ? "Y" : "N",
@@ -72,565 +135,192 @@ function CreateUserForm() {
 		}
 	}
 
-	const handleFetchBranches = async () => {
-		setLoading(true)
-		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.get(`${url}/fetch_all_branch_dt`, {
-		headers: {
-		Authorization: `${tokenValue?.token}`, // example header
-		"Content-Type": "application/json", // optional
-		},
-		})
-			.then((res) => {
-
-			console.log(res?.data, 'gggggggggggggggggg', 'ttttttt');
-			
-			if(res?.data?.suc === 0){
-
-			navigate(routePaths.LANDING)
-			localStorage.clear()
-
-			// Message('error', res?.data?.msg)
-
-			} else {
-			// console.log("QQQQQQQQQQQQQQQQ", res?.data)
-			const dt = 	res?.data?.msg.map((item) => {
-			return { code: item.branch_code, name: item.branch_name }
-			})
-			setBranches(dt)
-			if(+params?.id > 0 && userMasterDetails?.brn_code){
-			if(userMasterDetails.user_type == 2){
-			try{
-			const pre_selectedbranc = dt?.find((item) => item.code == userMasterDetails?.brn_code);
-			// console.log(pre_selectedbranc)
-			if(pre_selectedbranc){
-			setSelectedBranches([pre_selectedbranc]);
-			}
-			}
-			catch(err){
-			console.log("Error in setting branches", err);
-			setSelectedBranches([]);
-			}
-			}
-			else{
-			setSelectedBranches([]);
-			}
-			}
-			}
-
-			})
-			.catch((err) => {
-				console.log("?????????????????????", err)
-			})
-
-		setLoading(false)
-	}
-	useEffect(() => {
-		const fetchApi = async () => {
-		
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		axios.get(`${url}/admin/fetch_branches`, {
-				headers: {
-				Authorization: `${tokenValue?.token}`, // example header
-				"Content-Type": "application/json", // optional
-				},
-				})
-
-			// .get(`${url}/admin/fetch_branches`, {}, {
-			// headers: {
-			// Authorization: `${tokenValue?.token}`, // example header
-			// "Content-Type": "application/json", // optional
-			// },
-			// })
-			
-			.then((res) => {
-
-				console.log(res?.data, 'gggggggggggggggggg');
-				
-				if(res?.data?.suc === 0){
-
-					Message('error', res?.data?.msg)
-					navigate(routePaths.LANDING)
-					localStorage.clear()
-					
-
-					} else {
-				setBranches(
-					res?.data?.msg.map((item) => {
-						return {
-							code: item.branch_code,
-							name: item.branch_name,
-						}
-					})
-				)
-			}
-			})
-			.catch((err) => {
-				console.log("Some error")
-			})
-
-		if (params.id > 0) {
-			axios
-				.post(`${url}/fetch_assign_branch`, {
-					emp_id: userMasterDetails.emp_id,
-				}, {
-				headers: {
-				Authorization: `${tokenValue?.token}`, // example header
-				"Content-Type": "application/json", // optional
-				},
-				})
-				.then((res) => {
-					// console.log(res)
-					
-
-					if(res?.data?.suc === 0){
-
-					navigate(routePaths.LANDING)
-					localStorage.clear()
-					Message('error', res?.data?.msg)
-
-					} else {
-
-					if (res?.data?.msg?.length) {
-						setSelectedBranches(res?.data?.msg)
-					}
-
-					}
-				})
-		}
-		};
-
-		fetchApi();
-	}, [])
-	const handleFetchUserTypes = async () => {
-
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		await axios
-			.get(`${url}/get_user_type`, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
-			})
-			.then((res) => {
-				
-				if(res?.data?.suc === 0){
-
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-				Message('error', res?.data?.msg)
-
-				} else {
-
-				setUserTypes(res?.data?.msg)
-
-				}
-			})
-			.catch((err) => {
-				// console.log("Errrr", err)
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-			})
-	}
 
 	useEffect(() => {
-		handleFetchBranches()
-		handleFetchUserTypes()
-	}, [])
-
-	// const fetchParticularEmployeeDetails = async () => {
-	// 	const creds = {
-	// 		branch_code: userMasterDetails?.branch_id,
-	// 		emp_id: params?.id,
-	// 	}
-	// 	await axios
-	// 		.post(`${url}/fetch_emp`, creds)
-	// 		.then((res) => {
-	// 			console.log("+-----------------+", res?.data)
-	// 			// setMasterEmployeeData()
-
-	// 			setMasterUserData({
-	// 				emp_id: res?.data?.msg[0]?.active_flag || "", // onBlur search to fetch
-	// 				emp_name: res?.data?.msg[0]?.emp_name || "",
-	// 				branch: res?.data?.msg[0]?.branch || "", // dropdown - prefetched id
-	// 				user_type: res?.data?.msg[0]?.user_type || "", // dropdown - CO, BM, MIS Asst., Admin
-	// 			})
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log("=======", err)
-	// 		})
-	// }
-
-	// useEffect(() => {
-	// 	if (params?.id > 0) {
-	// 		fetchParticularEmployeeDetails()
-	// 	}
-	// }, [])
-
-	useEffect(() => {
-		console.log(+params?.id > 0, "params?.id > 0");
-		if (+params?.id > 0) {
-			// console.log("userMasterDetails", userMasterDetails);
-			setMasterUserData({
-				finance_module: userMasterDetails?.finance_toggle || "N",
-				emp_id: userMasterDetails?.emp_id || "",
-				emp_name: userMasterDetails?.emp_name || "",
-				branch: userMasterDetails?.brn_code || "",
-				designation: userMasterDetails?.desig_code || "",
-				user_type: userMasterDetails?.user_type || "",
-				active_flag: userMasterDetails?.user_status || "A",
-				remarks: userMasterDetails?.deactive_remarks || "",
-			});
-			// setTimeout(() => {
-			// 	findEmployeeById();
-			// }, 500);
-			
-
-		}
-	}, [userMasterDetails])
-
-	const findEmployeeById = async () => {
-		console.log('asdasd')
-
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		if (!masterUserData.emp_id) return
-		setLoading(true)
-		const creds = {
-			emp_id: masterUserData.emp_id,
-		}
-
-		console.log("FIND ===", creds)
-		await axios
-			.post(`${url}/fetch_empl_dtls`, creds, {
-		headers: {
-		Authorization: `${tokenValue?.token}`, // example header
-		"Content-Type": "application/json", // optional
-		},
-		})
-			.then((res) => {
-
-			if(res?.data?.suc === 0){
-
-			navigate(routePaths.LANDING)
-			localStorage.clear()
-			// Message('error', res?.data?.msg)
-
-			} else {
-
-			if (res?.data?.msg?.length === 0) {
-					Message("warning", "No employee found!")
-					setMasterUserData((prev) => ({
-						...prev,
-						emp_id: "",
-						emp_name: "",
-						designation: "",
-						branch: "", // dropdown - prefetched id
-						user_type: "", // dropdown - CO, BM, MIS Asst., Admin
-						finance_module: "",
-					}))
-					return
-				}
-
-				if ("user_type" in res?.data?.msg[0]) {
-					Message(
-						"warning",
-						res?.data?.details +
-							" Name: " +
-							res?.data?.msg[0]?.emp_name 
-							// +
-							// " Branch: " +
-							// // res?.data?.msg[0]?.branch_id
-							// res?.data?.msg[0]?.brn_code
-					)
-					onReset()
-					return
-				}
-
-				setMasterUserData((prev) => ({
-					...prev,
-					emp_name: res?.data?.msg[0]?.emp_name,
-					branch: res?.data?.msg[0]?.branch_id,
-					designation: res?.data?.msg[0]?.designation,
-				}));
-				
-				populateDataInBranchesSelectDropdown(masterUserData.user_type, res?.data?.msg[0]?.branch_id);
-
-			}
-
-				
-
-				// setSelectedBranches(prev => [...prev,{ code: res?.data?.msg[0]?.branch_id, name: res?.data?.msg[0]?.branch_name }]);
-				// 
-			})
-			.catch((err) => {
-				Message("error", "Some error while fetching user details.")
-				console.log("Errr", err)
-			})
-		setLoading(false)
+		// fetchUserDetails()
+	// 	const [masterUserData, setMasterUserData] = useState({
+	// 	finance_module: "N",
+	// })
+	if(radioBtnStatus == 'N' || radioBtnStatus == 'B'){
+		setMasterUserData({finance_module: "N"})
 	}
-
-	const handleSaveForm = async () => {
-		console.log("masterUserData", masterUserData);
-		setLoading(true)
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-		
-		if (
-			((masterUserData.user_type == 3 ||
-				masterUserData.user_type == 2 ||
-				masterUserData.user_type == 10 ||
-				masterUserData.user_type == 11) &&
-				selectedBranches) ||
-			(masterUserData.user_type != 3 &&
-				masterUserData.user_type != 2 &&
-				masterUserData.user_type != 10 &&
-				masterUserData.user_type != 11)
-		) {
-			const credsForSave = {
-				finance_toggle: masterUserData.finance_module || "N",
-				emp_id: masterUserData.emp_id || "",
-				brn_code: masterUserData.branch || 0,
-				user_type: masterUserData.user_type || "Y",
-				designation: masterUserData.designation || "Y",
-				created_by: userDetails?.emp_id || "",
-				modified_by: userDetails?.emp_id || "",
-				assigndtls:(masterUserData.user_type == 3 ||
-				masterUserData.user_type == 2 ||
-				masterUserData.user_type == 10 ||
-				masterUserData.user_type == 11) ?
-					selectedBranches?.map((item) => {
-						return { branch_assign_id: item.code }
-					}) || [] : [],
-			}
-			// console.log("credsForSave", credsForSave)
-			await axios
-				.post(`${url}/save_user_dt`, credsForSave, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
-			})
-				.then((res) => {
-
-				if(res?.data?.suc === 0){
-
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-				// Message('error', res?.data?.msg)
-
-				} else {
-
-				console.log("User details saved.", res?.data)
-				Message("success", "User details saved.")
-
-				}
-
-					
-					// navigate(-1)
-				})
-				.catch((err) => {
-					Message("error", "Some error occurred.")
-					console.log("ERR", err)
-				})
-			setLoading(false)
-		} else {
-			setLoading(false)
-			Message("warning", "Please assign branche(s) before saving!")
-		}
-	}
-
-	const handleUpdateForm = async () => {
-		setLoading(true)
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		// console.log(masterUserData)
-
-		if (
-			((masterUserData.user_type == 3 ||
-				masterUserData.user_type == 2 ||
-				masterUserData.user_type == 10 ||
-				masterUserData.user_type == 11) &&
-				selectedBranches) ||
-			(masterUserData.user_type != 3 &&
-				masterUserData.user_type != 2 &&
-				masterUserData.user_type != 10 &&
-				masterUserData.user_type != 11)
-		) {
-			const creds = {
-				finance_toggle: masterUserData.finance_module || "N",
-				emp_id: masterUserData.emp_id || "",
-				branch_code: masterUserData.branch || 0,
-				user_type: masterUserData.user_type || "Y",
-				user_status: masterUserData.active_flag || "A",
-				user_status: masterUserData.active_flag || "A",
-				designation: masterUserData.designation || "",
-				modified_by: userDetails?.emp_id || "",
-				created_by: userDetails?.emp_id || "",
-				remarks: masterUserData.remarks || "",
-				deactivated_by: userDetails?.emp_id || "",
-				assigndtls:(masterUserData.user_type == 3 ||
-				masterUserData.user_type == 2 ||
-				masterUserData.user_type == 10 ||
-				masterUserData.user_type == 11) ?
-					selectedBranches?.map((item) => {
-						return { branch_assign_id: item.code }
-					}) || [] : [],
-			}
-			console.log("creds", creds)
-			await axios
-				.post(`${url}/edit_user_dt`, creds, {
-				headers: {
-				Authorization: `${tokenValue?.token}`, // example header
-				"Content-Type": "application/json", // optional
-				},
-				})
-
-				.then((res) => {
-
-				if(res?.data?.suc === 0){
-
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-				// Message('error', res?.data?.msg)
-
-				} else {
-
-				console.log("User details updated.", res?.data)
-				Message("success", "User details updated.")
-				navigate(-1)
-
-				}
-
-					
-				})
-				.catch((err) => {
-					Message("error", "Some error occurred.")
-					console.log("ERR", err)
-				})
-			setLoading(false)
-		} else {
-			setLoading(false)
-			Message("warning", "Please assign branche(s) before saving!")
-		}
-	}
-
-	const onSubmit = (e) => {
-		e.preventDefault()
-		setVisible(true)
-	}
-	useEffect(() => {
-
-		const fetchToken = async () => {
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		axios.get(url + "/get_designation", {
-		headers: {
-		Authorization: `${tokenValue?.token}`, // example header
-		"Content-Type": "application/json", // optional
-		},
-		}).then((res) => {
-
-		if(res?.data?.suc === 0){
-
-		navigate(routePaths.LANDING)
-		localStorage.clear()
-		Message('error', res?.data?.msg)
-
-		} else {
-			// console.log("Designation", res.data.msg)
-			setDesignations(res.data.msg)
-		}
-		})
-	}
-
-	fetchToken()
+	}, [radioBtnStatus])
 
 
-	}, [])
 
 	const onReset = () => {
-		setMasterUserData({
-			emp_id: "", // onBlur search to fetch
-			emp_name: "",
-			designation: "",
-			branch: "", // dropdown - prefetched id
-			user_type: "", // dropdown - CO, BM, MIS Asst., Admin
-			finance_module: "N",
-		})
+		fetchUserDetails()
 	}
 
-	const confirm = async (itemToDelete) => {
+	// const confirm = async (itemToDelete) => {
+	// 	setLoading(true)
+
+	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
+
+	// 	const creds = {
+	// 		user_name: masterUserData.user_name || "",
+	// 		branch_code: masterUserData.branch || 0,
+	// 		modified_by: userDetails?.user_name || "",
+	// 	}
+	// 	axios
+	// 		.post(`${url}/reset_password`, creds, {
+	// 		headers: {
+	// 		Authorization: `${tokenValue?.token}`, // example header
+	// 		"Content-Type": "application/json", // optional
+	// 		},
+	// 		})
+	// 		.then((res) => {
+
+	// 		if(res?.data?.suc === 0){
+
+	// 		navigate(routePaths.LANDING)
+	// 		localStorage.clear()
+	// 		// Message('error', res?.data?.msg)
+
+	// 		} else {
+
+	// 		Message("success", "Password reset done.")
+	// 		navigate(-1)
+
+	// 		}
+				
+	// 		})
+	// 		.catch((err) => {
+	// 			Message("error", "Some error occurred")
+	// 		})
+	// 	setLoading(false)
+	// }
+
+	// const cancel = (e) => {
+	// 	console.log(e)
+	// 	// message.error('Click on No');
+	// }
+
+	const getClientIP = async () => {
+	const res = await fetch("https://api.ipify.org?format=json")
+	const data = await res.json()
+	return data.ip
+	}
+
+	const handleUpdateForm = async (values) =>{
 		setLoading(true)
 
-		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		const ip = await getClientIP()
+
 
 		const creds = {
-			emp_id: masterUserData.emp_id || "",
-			branch_code: masterUserData.branch || 0,
-			modified_by: userDetails?.emp_id || "",
+			add_edit_flag: 1,
+			user_id: values?.user_id,
+			pwd: '',
+			default_pass: masterUserData.finance_module,
+			tenant_id: 1,
+			branch_id: userDetails[0].brn_code,
+			user_type: values?.user_type,
+			active_flag: radioBtnStatus,
+			user_name: values?.user_name,
+			phone_mobile: 0,
+			shg_id: '', 
+			designation: values?.designation,
+			created_by: values?.user_name,
+			ip_address: ip,
 		}
-		axios
-			.post(`${url}/reset_password`, creds, {
+		console.log(creds, 'ggggggggggggggg', masterUserData.finance_module, 'gg', radioBtnStatus);
+		// return
+
+		await axios
+			.post(`${url_bdccb}/user/save_user`, creds, {
 			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
+			Authorization: ``, // example header
 			"Content-Type": "application/json", // optional
-			},
-			})
-			.then((res) => {
-
-			if(res?.data?.suc === 0){
-
-			navigate(routePaths.LANDING)
-			localStorage.clear()
-			// Message('error', res?.data?.msg)
-
-			} else {
-
-			Message("success", "Password reset done.")
-			navigate(-1)
-
 			}
+		})
+			.then((res) => {
+				console.log(res?.data, 'sssssssssssssssssssss', creds);
 				
+				if(res?.data?.success){
+				navigate(routePaths.MANAGE_USER)
+				formik.resetForm()
+				// setUserIDAvailableMsg('')
+				// setUserIDAvailable(null)
+				} else {
+				Message('error', res?.data?.msg)
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
+				}
+
 			})
 			.catch((err) => {
-				Message("error", "Some error occurred")
+				Message("error", "Some error on server while logging in...")
+			})
+
+		setLoading(false)
+		
+	}
+
+	const handleSaveForm = async () =>{
+		console.log('handleSaveForm');
+		
+	}
+
+
+	useEffect(() => {
+		fetchUserDetails()
+	}, [])
+
+	const fetchUserDetails = async () => {
+		setLoading(true)
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/user/user_list`, {
+		params: {
+			tenant_id: userDetails[0]?.tenant_id, 
+			branch_id: userDetails[0]?.user_type == 'S' ? 0 : userDetails[0]?.brn_code, 
+			user_type: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+			user_status: userState?.active_flag,
+			user_id: params?.id
+		},
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		}
+		})
+			.then((res) => {
+				console.log(res?.data?.data, 'resresresresres', res?.data?.data[0]?.active_flag);
+
+				if(res?.data?.success){
+				
+
+				setMasterData(res?.data?.data)
+
+				setValues({
+				user_name: res?.data?.data[0]?.user_name,
+				user_id: res?.data?.data[0]?.user_id,
+				designation: res?.data?.data[0]?.designation,
+				user_type: res?.data?.data[0]?.user_type,
+				})
+				setRadioBtnStatus(res?.data?.data[0]?.active_flag)
+
+				
+
+				// setCopyLoanApplications(res?.data?.data)
+				} else {
+				Message('error', res?.data?.msg)
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+
+				}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching users!")
+				console.log("ERRR", err)
 			})
 		setLoading(false)
 	}
 
-	const cancel = (e) => {
-		console.log(e)
-		// message.error('Click on No');
-	}
 
-	const populateDataInBranchesSelectDropdown = (userType,pre_selected_branch_code) => {
-		try{
-			if(userType == 2){
-				try{
-					
-					const pre_selectedbranc = branches?.find((item) => item.code == pre_selected_branch_code);
-					console.log(pre_selectedbranc)
-					if(pre_selectedbranc){
-						setSelectedBranches([pre_selectedbranc]);
-					}
-				}
-				catch(err){
-					console.log("Error in setting branches", err);
-					setSelectedBranches([]);
-				}
-			}
-			else{
-				setSelectedBranches([]);
-			}
-		}
-		catch(err){
-			console.log("Error in populating branches", err);
-			setSelectedBranches([]);
-		}
-	}
 	
 
 	return (
@@ -641,94 +331,71 @@ function CreateUserForm() {
 				className="text-blue-800 dark:text-gray-400"
 				spinning={loading}
 			>
-				<form onSubmit={onSubmit}>
+				<form onSubmit={formik.handleSubmit}>
 					<div>
 						<div>
 							<div className="grid gap-4 sm:grid-cols-6 sm:gap-6">
 								<div className="sm:col-span-2">
+									
 									<TDInputTemplateBr
-										placeholder="Employee ID..."
-										type="text"
-										label="Employee ID"
-										name="emp_id"
-										formControlName={masterUserData.emp_id}
-										handleChange={handleChangeForm}
-										handleBlur={findEmployeeById}
-										mode={1}
-										disabled={+params?.id > 0}
+									placeholder="User Name"
+									type="text"
+									label="User Name"
+									name="user_name"
+									handleChange={formik.handleChange}
+									// handleChange={handleFormikMasterChange} 
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.user_name}
+									mode={1}
+									disabled
 									/>
 								</div>
 								<div className="sm:col-span-2">
 									<TDInputTemplateBr
-										placeholder="Employee Name..."
-										type="text"
-										label="Employee Name"
-										name="emp_name"
-										formControlName={masterUserData.emp_name}
-										handleChange={handleChangeForm}
-										mode={1}
+									placeholder="User ID..."
+									type="text"
+									label="User ID"
+									name="user_id"
+									handleChange={formik.handleChange}
+									// handleChange={handleFormikMasterChange} 
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.user_id}
+									mode={1}
+									disabled
 									/>
 								</div>
+								
 								<div className="sm:col-span-2">
-									<TDInputTemplateBr
-										placeholder="Branch..."
-										type="text"
-										label="Branch"
-										name="branch"
-										formControlName={masterUserData.branch}
-										handleChange={handleChangeForm}
-										mode={2}
-										// data={branches?.map((item, i) => ({
-										// 	code: item?.branch_code,
-										// 	name: item?.branch_name,
-										// }))}
-										data={branches}
-										disabled={true}
-									/>
-								</div>
-								<div className="sm:col-span-3">
 									<TDInputTemplateBr
 										placeholder="Designation"
 										type="text"
 										label="Designation"
 										name="designation"
-										formControlName={masterUserData.designation}
-										handleChange={handleChangeForm}
-										mode={2}
-										data={designations?.map((item, i) => ({
-											code: item?.desig_code,
-											name: item?.desig_type,
-										}))}
-										// disabled={+params?.id > 0}
-									/>
-								</div>
-								<div className={"sm:col-span-3"}>
-									<TDInputTemplateBr
-										placeholder="User Type..."
-										type="text"
-										label="User Type"
-										name="user_type"
-										formControlName={masterUserData.user_type}
-										handleChange={(e)=>{
-											handleChangeForm(e);
-											// If Branch Admin is selected, log the branches
-											populateDataInBranchesSelectDropdown(e.target.value, masterUserData.branch);
-										}}
-										mode={2}
-										// data={[
-										// 	{ code: "1", name: "Credit Officer" },
-										// 	{ code: "2", name: "Branch Manager" },
-										// 	{ code: "3", name: "MIS Assistant" },
-										// 	{ code: "4", name: "Administrator" },
-										// ]}
-										data={userTypes?.map((item, i) => ({
-											code: item?.type_code,
-											name: item?.user_type,
-										}))}
+										formControlName={formik.values.designation}
+										handleChange={formik.handleChange}
+										handleBlur={formik.handleBlur}
+										mode={1}
+										disabled
 									/>
 								</div>
 
-								<div className={"sm:col-span-3"}>
+								<div className="sm:col-span-2">
+									<TDInputTemplateBr
+										placeholder="User Type"
+										type="text"
+										label="User Type"
+										name="user_type"
+										formControlName={formik.values.user_type == 'B'? 'Branch' : formik.values.user_type == 'P'? 'PACS' : formik.values.user_type == 'S'? 'SHG' : ''}
+										handleChange={formik.handleChange}
+										handleBlur={formik.handleBlur}
+										mode={1}
+										disabled
+									/>
+								</div>
+								
+								
+
+								<div className={"sm:col-span-2"}>
 									<label className="inline-flex items-center me-5 cursor-pointer">
 										<input
 											type="checkbox"
@@ -740,65 +407,24 @@ function CreateUserForm() {
 										/>
 										<div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-teal-500 dark:peer-checked:bg-teal-500"></div>
 										<span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-											Assign to Finance Module as well?
+											Default Password?
 										</span>
 									</label>
 								</div>
 
-								{(masterUserData.user_type == 3 ||
-									masterUserData.user_type == 2 ||
-									masterUserData.user_type == 10 ||
-									masterUserData.user_type == 11) && (
-									<div className="sm:col-span-6">
-										<label className="text-gray-800 font-semibold text-sm my-2">
-											Branches
-										</label>
-										<MultiSelect
-											filter	
-											value={selectedBranches}
-											onChange={(e) => setSelectedBranches(e.value)}
-											// options={branches?.filter((i) => i.code != 100)}
-											options={branches}
+								<div className={"sm:col-span-2 radio_btn_user"}>
+									<Radiobtn
+									data={user_status}
+									val={radioBtnStatus}
+									onChangeVal={(value) => {
+									onChange(value)
+									}}
+									/>
+								</div>
 
-											optionLabel="name"
-											placeholder="Select branch(es)"
-											maxSelectedLabels={3}
-											className="w-full md:w-20rem my-1.5"
-										/>
-									</div>
-								)}
-								{+params?.id > 0 && (
-									<>
-										<div className="sm:col-span-3">
-											<TDInputTemplateBr
-												placeholder="Active Flag..."
-												type="text"
-												label="Active Flag"
-												name="active_flag"
-												formControlName={masterUserData.active_flag}
-												handleChange={handleChangeForm}
-												mode={2}
-												data={[
-													{ code: "A", name: "Active" },
-													{ code: "I", name: "Inactive" },
-												]}
-											/>
-										</div>
-										<div className="sm:col-span-6">
-											<TDInputTemplateBr
-												placeholder="Remarks..."
-												type="text"
-												label="Remarks"
-												name="remarks"
-												formControlName={masterUserData.remarks}
-												handleChange={handleChangeForm}
-												mode={3}
-											/>
-										</div>
-									</>
-								)}
+								
 							</div>
-							{+params?.id > 0 && (
+							{/* {+params?.id > 0 && (
 								<div className="float-right pt-4">
 									<Popconfirm
 										title={`Reset Passowrd`}
@@ -818,68 +444,58 @@ function CreateUserForm() {
 										</div>
 									</Popconfirm>
 								</div>
-							)}
+							)} */}
 						</div>
 
 						<div className="mt-10">
-							<BtnComp mode="A" onReset={onReset} />
+							{/* <BtnComp mode="A" onReset={onReset} /> */}
+							<BtnComp mode="A" onReset={onReset} param={params?.id} />
 						</div>
 					</div>
 				</form>
 			</Spin>
 
+
 			<DialogBox
+			flag={4}
+			onPress={() => setVisible(!visible)}
+			visible={visible}
+			onPressYes={() => {
+			if (pendingValues) {
+			if(params?.id > 0) {
+			handleUpdateForm(pendingValues);
+			} else {
+			handleSaveForm(pendingValues) 
+			}
+
+			// 🔥 pass values here
+			}
+			setVisible(false);
+			}}
+			onPressNo={() => setVisible(!visible)}
+			/>
+
+
+			{/* <DialogBox
 				flag={4}
 				onPress={() => setVisible(!visible)}
 				visible={visible}
 				onPressYes={() => {
 					console.log(masterUserData)
-
 					if (+params?.id > 0) {
-						if (masterUserData.active_flag != "A")
-							if (
-								!masterUserData.emp_id ||
-								!masterUserData.emp_name ||
-								!masterUserData.branch ||
-								!masterUserData.active_flag ||
-								!masterUserData.user_type ||
-								!masterUserData.remarks ||
-								!masterUserData.designation
-							) {
-								Message("warning", "Fill the details correctly.")
-								return
-							} else {
-								if (
-									!masterUserData.emp_id ||
-									!masterUserData.emp_name ||
-									!masterUserData.branch ||
-									!masterUserData.active_flag ||
-									!masterUserData.user_type ||
-									!masterUserData.designation
-								) {
-									Message("warning", "Fill the details correctly.")
-									return
-								}
-							}
+						
 						handleUpdateForm()
 					} else {
-						if (
-							!masterUserData.emp_id ||
-							!masterUserData.emp_name ||
-							!masterUserData.branch ||
-							!masterUserData.user_type ||
-							!masterUserData.designation
-						) {
-							Message("warning", "Fill the details correctly.")
-							return
-						}
 						handleSaveForm()
 					}
 					// ;+params?.id > 0 ? handleUpdateForm() : handleSaveForm()
 					setVisible(!visible)
 				}}
 				onPressNo={() => setVisible(!visible)}
-			/>
+			/> */}
+
+
+
 		</>
 	)
 }
