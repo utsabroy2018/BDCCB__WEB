@@ -44,7 +44,7 @@ function ManageUser() {
 		await axios.get(`${url_bdccb}/user/user_list`, {
 		params: {
 			tenant_id: userDetails[0]?.tenant_id, 
-			branch_id: userDetails[0]?.user_type == 'S' ? 0 : userDetails[0]?.brn_code, 
+			branch_id: userDetails[0]?.user_type == 'H' ? 0 : userDetails[0]?.brn_code, 
 			user_type: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
 			user_status: approvalStatus
 		},

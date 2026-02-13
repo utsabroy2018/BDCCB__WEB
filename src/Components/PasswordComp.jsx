@@ -3,7 +3,7 @@ import { routePaths } from "../Assets/Data/Routes"
 import { useNavigate } from "react-router-dom"
 import TDInputTemplateBr from "./TDInputTemplateBr"
 import axios from "axios"
-import { url } from "../Address/BaseUrl"
+import { url, url_bdccb } from "../Address/BaseUrl"
 import { Message } from "./Message"
 import { getLocalStoreTokenDts } from "./getLocalforageTokenDts"
 import CryptoJS from "crypto-js"
@@ -26,7 +26,7 @@ const PasswordComp = ({ mode }) => {
 
 
 		useEffect(() => {
-		console.log(userDetails, 'userDetails');
+		console.log(userDetails[0], 'userDetails');
 		getPublicIP()
 		}, []);
 
@@ -40,33 +40,53 @@ const PasswordComp = ({ mode }) => {
 		}
 		};
 
+	const getClientIP = async () => {
+	const res = await fetch("https://api.ipify.org?format=json")
+	const data = await res.json()
+	return data.ip
+	}
+
 	const handlePasswordUpdate = async () => {
 
 		// const secretKey = "MySuperSecretKey123!"
+		console.log(oldPassword, 'hhhhhhhhh', newPassword);
+		
 
 		// const encryptedOldPwd = CryptoJS.AES.encrypt(oldPassword, secretKey).toString()
 		// const encryptedNewPwd = CryptoJS.AES.encrypt(newPassword, secretKey).toString()
+		const ip = await getClientIP()
 
 		const encryptedOldPwd = encryptText(oldPassword);
 		const encryptedNewPwd = encryptText(newPassword);
 
 		const creds = {
-			emp_id: userDetails?.emp_id,
-			old_pwd: encryptedOldPwd,
-			new_pwd: encryptedNewPwd,
-			modified_by: userDetails?.emp_id,
-			branch_code: userDetails?.brn_code,
-            in_out_flag: "P",
-            flag : "W",
-            myIP: machineIP
+			user_id: userDetails[0]?.emp_id,
+			old_pass: oldPassword,
+			new_pass: newPassword,
+			// old_pass: encryptedOldPwd,
+			// new_pass: encryptedNewPwd,
+			created_by: userDetails[0]?.emp_id,
+			ip_address: ip,
+
+			// branch_code: userDetails?.brn_code,
+            // in_out_flag: "P",
+            // flag : "W",
+            // myIP: machineIP
 		}
+
+		// return;
+
+// 		{
+//     "user_id":"420003",
+//     "old_pass":"pacs123",
+//     "new_pass":"Branch@123"
+// }
 
 		// console.log("credscreds ", creds);
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios
-			.post(`${url}/change_password`, creds, {
+		await axios.post(`${url_bdccb}/user/changepass`, creds, {
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
@@ -74,16 +94,26 @@ const PasswordComp = ({ mode }) => {
 		})
 			.then((res) => {
 
-				if(res?.data?.suc === 0){
+				// if(res?.data?.suc === 0){
 
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-				// Message('error', res?.data?.msg)
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
+				// // Message('error', res?.data?.msg)
 
-				} else {
+				// } else {
+				// Message("success", "Password changed successfully")
+				// console.log("PASSWWWWWWWDDDDDDDDDD", res?.data)
+				// navigate("/")
+				// localStorage.clear()
+				// }
+
+				if(res?.data?.success){
 				Message("success", "Password changed successfully")
-				console.log("PASSWWWWWWWDDDDDDDDDD", res?.data)
+				// console.log("PASSWWWWWWWDDDDDDDDDD", res?.data)
 				navigate("/")
+				localStorage.clear()
+				} else {
+				navigate(routePaths.LANDING)
 				localStorage.clear()
 				}
 
@@ -93,6 +123,12 @@ const PasswordComp = ({ mode }) => {
 				Message("error", "Some error occurred while changing password")
 			})
 	}
+
+
+	const validatePassword = (password) => {
+	const regex = /^(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{6,}$/;
+	return regex.test(password);
+	};
 
 	return (
 		<div className="max-w-sm mx-auto">
@@ -151,7 +187,7 @@ const PasswordComp = ({ mode }) => {
 				</label> */}
 			</div>
 			<div className="flex justify-between">
-				<button
+				{/* <button
 					onClick={() => {
 						if (newPassword !== confirmPassword) {
 							Message("error", "New and Confirm password must be equal")
@@ -163,7 +199,31 @@ const PasswordComp = ({ mode }) => {
       blue-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm w-full sm:w-full px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:bg-blue-400"
 				>
 					Submit
+				</button> */}
+				<button
+				onClick={() => {
+
+					if (newPassword !== confirmPassword) {
+					Message("error", "New and Confirm password must be equal")
+					return
+					}
+
+					if (!validatePassword(newPassword)) {
+					Message(
+						"error",
+						"Password must be at least 6 characters, include 1 uppercase and 1 number"
+					)
+					return
+					}
+
+					handlePasswordUpdate()
+				}}
+				className="text-white bg-blue-900 hover:bg-
+      blue-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm w-full sm:w-full px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:bg-blue-400"
+				>
+				Submit
 				</button>
+
 			</div>
 		</div>
 	)

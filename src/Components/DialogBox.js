@@ -36,7 +36,7 @@ const DialogBox = ({
 				<>
 					{/* <ProfileInfo flag={flag} /> */}
 
-					<UserProfileUpdateForm />
+					<UserProfileUpdateForm onClose={onPress} />
 
 					{/* <Button
 						className="rounded-full bg-blue-800 text-white mt-10 float-right"

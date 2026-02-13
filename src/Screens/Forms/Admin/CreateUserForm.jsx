@@ -37,9 +37,6 @@ const user_status = [
 function CreateUserForm() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
-	const [branches, setBranches] = useState(() => [])
-	const [designations, setDesignations] = useState(() => [])
-	const [designation, setDesignation] = useState(() => [])
 	const location = useLocation()
 	const userState = location.state || {}
 
@@ -48,13 +45,11 @@ function CreateUserForm() {
 
 	const [visible, setVisible] = useState(() => false)
 	const [radioBtnStatus, setRadioBtnStatus] = useState("Y")
+	const [masterData, setMasterData] = useState([])
 
-	const [selectedBranches, setSelectedBranches] = useState([])
-	const [masterData, setMasterData] = useState(() => [])
 	const [pendingValues, setPendingValues] = useState(null);
 
 
-	const [userTypes, setUserTypes] = useState(() => [])
 	const [masterUserData, setMasterUserData] = useState({
 		finance_module: "N",
 	})
@@ -76,23 +71,12 @@ function CreateUserForm() {
 	user_type: Yup.string(),
 	})
 
-	// const handleOpenConfirm = (values) => {
-	// setPendingValues(values);   // store formik values
-	// setVisible(true);           // open dialog
-	// };
 
 	const handleOpenConfirm = (values) => {
 	setPendingValues(values);
 	setVisible(true);
 	};
 
-	// const onSubmit = (e) => {
-	// 	e.preventDefault()
-	// 	setVisible(true)
-	// 	console.log(e, 'fffffffffffffffffffffffff');
-	// 	handleOpenConfirm(e)
-		
-	// }
 
 	const onSubmit = (values) => {
 	console.log("Formik Values:", values);
@@ -100,7 +84,7 @@ function CreateUserForm() {
 	};
 
 	const formik = useFormik({
-	initialValues: + params.id > 0 ? formValues : initialValues,
+	initialValues: + params?.id != 0 ? formValues : initialValues,
 	onSubmit,
 	validationSchema,
 	validateOnChange: true,
@@ -112,8 +96,6 @@ function CreateUserForm() {
 		const onChange = (e) => {
 		console.log("radio1 checked", e)
 		setRadioBtnStatus(e)
-		// formik.setFieldValue("departmentStatus", e)
-  		// formik.setFieldValue("shg_group", "") 
 	}
 
 	const handleChangeForm = (e) => {
@@ -138,10 +120,6 @@ function CreateUserForm() {
 
 
 	useEffect(() => {
-		// fetchUserDetails()
-	// 	const [masterUserData, setMasterUserData] = useState({
-	// 	finance_module: "N",
-	// })
 	if(radioBtnStatus == 'N' || radioBtnStatus == 'B'){
 		setMasterUserData({finance_module: "N"})
 	}
@@ -153,49 +131,6 @@ function CreateUserForm() {
 		fetchUserDetails()
 	}
 
-	// const confirm = async (itemToDelete) => {
-	// 	setLoading(true)
-
-	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	// 	const creds = {
-	// 		user_name: masterUserData.user_name || "",
-	// 		branch_code: masterUserData.branch || 0,
-	// 		modified_by: userDetails?.user_name || "",
-	// 	}
-	// 	axios
-	// 		.post(`${url}/reset_password`, creds, {
-	// 		headers: {
-	// 		Authorization: `${tokenValue?.token}`, // example header
-	// 		"Content-Type": "application/json", // optional
-	// 		},
-	// 		})
-	// 		.then((res) => {
-
-	// 		if(res?.data?.suc === 0){
-
-	// 		navigate(routePaths.LANDING)
-	// 		localStorage.clear()
-	// 		// Message('error', res?.data?.msg)
-
-	// 		} else {
-
-	// 		Message("success", "Password reset done.")
-	// 		navigate(-1)
-
-	// 		}
-				
-	// 		})
-	// 		.catch((err) => {
-	// 			Message("error", "Some error occurred")
-	// 		})
-	// 	setLoading(false)
-	// }
-
-	// const cancel = (e) => {
-	// 	console.log(e)
-	// 	// message.error('Click on No');
-	// }
 
 	const getClientIP = async () => {
 	const res = await fetch("https://api.ipify.org?format=json")
@@ -216,18 +151,19 @@ function CreateUserForm() {
 			pwd: '',
 			default_pass: masterUserData.finance_module,
 			tenant_id: 1,
-			branch_id: userDetails[0].brn_code,
+			branch_id: masterData[0]?.brn_code,
 			user_type: values?.user_type,
 			active_flag: radioBtnStatus,
 			user_name: values?.user_name,
 			phone_mobile: 0,
 			shg_id: '', 
 			designation: values?.designation,
-			created_by: values?.user_name,
+			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
 		}
-		console.log(creds, 'ggggggggggggggg', masterUserData.finance_module, 'gg', radioBtnStatus);
-		// return
+
+		console.log(values, 'sssssssssssssssssssss', creds);
+		// return;
 
 		await axios
 			.post(`${url_bdccb}/user/save_user`, creds, {
@@ -237,7 +173,7 @@ function CreateUserForm() {
 			}
 		})
 			.then((res) => {
-				console.log(res?.data, 'sssssssssssssssssssss', creds);
+				
 				
 				if(res?.data?.success){
 				navigate(routePaths.MANAGE_USER)
@@ -276,7 +212,7 @@ function CreateUserForm() {
 		await axios.get(`${url_bdccb}/user/user_list`, {
 		params: {
 			tenant_id: userDetails[0]?.tenant_id, 
-			branch_id: userDetails[0]?.user_type == 'S' ? 0 : userDetails[0]?.brn_code, 
+			branch_id: userDetails[0]?.user_type == 'H' ? 0 : userDetails[0]?.brn_code, 
 			user_type: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
 			user_status: userState?.active_flag,
 			user_id: params?.id
@@ -332,6 +268,10 @@ function CreateUserForm() {
 				spinning={loading}
 			>
 				<form onSubmit={formik.handleSubmit}>
+					{/* {JSON.stringify(formValues, 2)} */}
+					 {/* {JSON.stringify(masterData, 2)}
+					 {JSON.stringify(masterData[0]?.brn_code, 2)} */}
+					 {/* {JSON.stringify(params?.id == 0, 2)} */}
 					<div>
 						<div>
 							<div className="grid gap-4 sm:grid-cols-6 sm:gap-6">
@@ -462,7 +402,7 @@ function CreateUserForm() {
 			visible={visible}
 			onPressYes={() => {
 			if (pendingValues) {
-			if(params?.id > 0) {
+			if(params?.id != 0) {
 			handleUpdateForm(pendingValues);
 			} else {
 			handleSaveForm(pendingValues) 

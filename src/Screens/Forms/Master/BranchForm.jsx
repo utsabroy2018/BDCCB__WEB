@@ -33,7 +33,8 @@ function BranchForm() {
 
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
-	const masterDetails = location.state || {}
+	const masterDetails = location.state?.state1 || {}
+	const flagRadion = location.state?.state2 || {}
 
 	const navigate = useNavigate()
 	const userDetails = JSON.parse(localStorage.getItem("user_details"))
@@ -48,9 +49,11 @@ function BranchForm() {
 	const [visible, setVisible] = useState(() => false)
 	const [blocks, setBlocks] = useState(() => [])
 	const [radioBranchTyp, setRadioBranchTyp] = useState(params?.id > 0 ? masterDetails?.branch_type : "P")
+	const [branch, setBranch] = useState(() => [])
 
 	// console.log(params, "params")
-	// console.log(location, "location", location.state)
+	// console.log(flagRadion, "location", location.state?.state1)
+	
 
 	const [masterData, setMasterData] = useState({
 		block_id: "",
@@ -61,7 +64,9 @@ function BranchForm() {
 		// branch_city: "",
 		pin_no: "",
 		branch_phone: "",
-		branch_type: ""
+		branch_type: "",
+		// branch_jurisdiction_id: "",
+		branch_jurisdiction_id: 0
 	})
 
 	const handleChangeMaster = (e) => {
@@ -97,12 +102,10 @@ function BranchForm() {
 	}
 
 	useEffect(() => {
-		console.log(masterDetails?.branch_type, 'userDetails');
-		
 		if (params?.id > 0) {
 			fetchBlock(masterDetails?.dist_id)
 		}
-		
+		// return
 		setMasterData({
 			block_id: masterDetails?.block_id || "",
 			dist_id: masterDetails?.dist_id || "",
@@ -113,6 +116,9 @@ function BranchForm() {
 			pin_no: masterDetails?.pin_no || "",
 			branch_phone: masterDetails?.branch_phone || "",
 			branch_type: masterDetails?.branch_type || "",
+			// branch_id: masterDetails?.branch_id || "",
+			branch_jurisdiction_id: masterDetails?.branch_jurisdiction_id || "",
+
 		})
 	}, [])
 
@@ -195,10 +201,8 @@ function BranchForm() {
 	}
 
 	useEffect(() => {
-		// getDistricts()
-		// console.log(userDetails[0], '');
-		
-
+		console.log(flagRadion, 'ffffffffffffffffffff', masterDetails, 'll', location);
+		fetchBranch()
 	}, [])
 
 	const getClientIP = async () => {
@@ -231,16 +235,15 @@ function BranchForm() {
 				pin_no: masterData?.pin_no,
 				branch_phone: masterData?.branch_phone,
 				branch_status: masterDetails?.branch_status,
-
+				branch_jurisdiction_id: radioBranchTyp == 'B' ? 0 : masterData?.branch_jurisdiction_id,
 
 				created_by: userDetails[0]?.emp_id, //userDetails[0]?.emp_id
 				created_at: new Date().toISOString(),
 				created_ip: ip,
 				}
 
-				console.log(creds, 'credscredscredscreds');
+				console.log(creds, 'credscredscredscreds', masterData);
 				
-			
 				await saveMasterData({
 				endpoint: "master/save_branch",
 				creds,
@@ -261,15 +264,6 @@ function BranchForm() {
 		setVisible(true)
 	}
 
-	// const onReset = () => {
-	// 	// params?.id < 1
-	// 	setMasterData({
-	// 		ps_name: "",
-	// 		dist_id: "",
-	// 		pin_code: "",
-	// 	})
-	// }
-
 	const onReset = () => {
 		setMasterData({
 			block_id: "",
@@ -284,6 +278,43 @@ function BranchForm() {
 		})
 	}
 
+	const fetchBranch = async () => {
+		setLoading(true)
+			const tokenValue = await getLocalStoreTokenDts(navigate);
+		// console.log({dist_id: 0, tenant_id: userDetails[0]?.tenant_id , branch_id: 0}, 'userDetailsuserDetailsuserDetails');
+		
+			await axios
+				.get(`${url_bdccb}/master/branch_list`, {
+					params: {
+					dist_id: 0, tenant_id: userDetails[0]?.tenant_id ,branch_id: 0, branch_type: 'B'
+					},
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+
+	
+			if(res?.data?.success){
+			setBranch(res?.data?.data?.map((item, i) => ({
+			code: item?.branch_id,
+			name: item?.branch_name,
+			})))
+			} else {
+			Message('error', res?.data?.msg)
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
+
 	return (
 		<>
 			<Spin
@@ -295,6 +326,7 @@ function BranchForm() {
 				<form onSubmit={onSubmit}>
 					<div>
 						<div>
+							{/* {JSON.stringify(masterDetails, null, 2)} */}
 							<div className="grid gap-4 sm:grid-cols-1 sm:gap-6">
 								<div>
 									<Radiobtn
@@ -306,7 +338,7 @@ function BranchForm() {
 									/>
 									</div>
 							</div>
-							<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
+							<div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
 
 								<div>
 									{/* {masterData.ps_name} */}
@@ -334,7 +366,9 @@ function BranchForm() {
 									/>
 								</div>
 
-									
+								</div>	
+
+								<div className="grid gap-4 sm:grid-cols-1 sm:gap-6 mt-5">
 
 								<div>
 									{/* {masterData.ps_name} */}
@@ -400,6 +434,7 @@ function BranchForm() {
 
 								
 								<div>
+									{/* {JSON.stringify(masterData, null, 2)} */}
 									<TDInputTemplateBr
 										placeholder="Select Block..."
 										type="text"
@@ -411,6 +446,29 @@ function BranchForm() {
 										mode={2}
 									/>
 								</div>
+
+								{radioBranchTyp == 'P' && (
+								<div>
+
+								<TDInputTemplateBr
+								placeholder="Select Branch Jurisdiction ID..."
+								type="text"
+								label="Select Branch Jurisdiction ID"
+								name="branch_jurisdiction_id"
+								formControlName={masterData.branch_jurisdiction_id}
+								handleChange={handleChangeMaster}
+								data={branch}
+								mode={2}
+								/>
+
+								{/* {formik.errors.branch_id && formik.touched.branch_id ? (
+								<VError title={formik.errors.branch_id} />
+								) : null} */}
+
+								</div>
+								)}
+								
+
 							</div>
 						</div>
 

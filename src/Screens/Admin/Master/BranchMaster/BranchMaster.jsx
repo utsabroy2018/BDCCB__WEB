@@ -212,7 +212,7 @@ function BranchMaster() {
 					{/* {JSON.stringify(loanApplications[0], null, 2)} */}
 					<BranchTable
 						// flag="BM"
-						flag=""
+						flagRadion={radioBranchTyp}
 						loanAppData={loanApplications}
 						title="Branch Master"
 						setSearch={(data) => setSearch(data)}

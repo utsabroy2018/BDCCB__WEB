@@ -104,6 +104,8 @@ const SearchTransactionBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchTran
 
 //////////////// BDCCB Transaction Open End ////////////////
 
+const CreateUser = lazy(() => import("./Screens/Admin/UserManagement/CreateUser"));
+const ManageUser = lazy(() => import("./Screens/Admin/UserManagement/ManageUser"));
 
 ////////////////////////////////////////////// BDCCB End //////////////////////////////////////////////
 
@@ -113,8 +115,7 @@ const MasterEmployees = lazy(() => import("./Screens/Admin/Master/Employees/Mast
 const EditMasterEmployee = lazy(() => import("./Screens/Admin/Master/Employees/EditMasterEmployee"));
 
 
-const CreateUser = lazy(() => import("./Screens/Admin/UserManagement/CreateUser"));
-const ManageUser = lazy(() => import("./Screens/Admin/UserManagement/ManageUser"));
+
 const TransferUserManage = lazy(() => import("./Screens/Admin/UserManagement/TransferUserManage"));
 const TransferUser = lazy(() => import("./Screens/Admin/UserManagement/TransferUser"));
 const AuditReport = lazy(()=> import('./Screens/Admin/UserManagement/AuditReport'))

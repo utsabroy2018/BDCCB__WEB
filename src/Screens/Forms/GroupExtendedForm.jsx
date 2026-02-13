@@ -159,6 +159,7 @@ const containerStyle = {
 		block_id: Yup.mixed().required("Block is required"),
 		gp_id: Yup.mixed().required("GP Name is required"),
 		village_id: Yup.mixed().required("Village Name is required"),
+		g_phone1: Yup.mixed().required("Mobile No. is required"),
 
 		// 🔥 MEMBER VALIDATION
 		// members: Yup.array().of(
@@ -1012,9 +1013,9 @@ const handleAssistantChange = (index) => {
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="Mobile No. 1"
+									placeholder="Mobile No."
 									type="number"
-									label="Mobile No. 1"
+									label="Mobile No."
 									name="g_phone1"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}

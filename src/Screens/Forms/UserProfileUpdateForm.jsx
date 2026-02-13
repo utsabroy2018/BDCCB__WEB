@@ -3,21 +3,22 @@ import { routePaths } from "../../Assets/Data/Routes"
 import { useNavigate } from "react-router-dom"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import axios from "axios"
-import { url } from "../../Address/BaseUrl"
+import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 
-const UserProfileUpdateForm = ({ mode }) => {
+const UserProfileUpdateForm = ({ mode, onClose }) => {
 	const navigate = useNavigate()
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [branches, setBranches] = useState(() => [])
 	const [userTypes, setUserTypes] = useState(() => [])
 
 	const [formData, setFormData] = useState({
-		emp_id: "",
-		emp_name: "",
-		branch_code: "",
-		user_type: "",
+		user_id: "",
+		user_name: "",
+		designation: ""
+		// branch_code: "",
+		// user_type: "",
 	})
 
 	const handleFormChange = (field, value) => {
@@ -25,6 +26,12 @@ const UserProfileUpdateForm = ({ mode }) => {
 			...prev,
 			[field]: value,
 		}))
+	}
+
+	const getClientIP = async () => {
+	const res = await fetch("https://api.ipify.org?format=json")
+	const data = await res.json()
+	return data.ip
 	}
 
 	const handleFetchBranches = async () => {
@@ -97,73 +104,78 @@ const UserProfileUpdateForm = ({ mode }) => {
 	}
 
 	useEffect(() => {
-		handleFetchBranches()
-		handleFetchUserTypes()
+		// handleFetchBranches()
+		// handleFetchUserTypes()
+		console.log(userDetails[0], 'gggggggggggggg');
+		
 	}, [])
 
-	// const handleUpdateProfile = async () => {
-	// 	const creds = {
-	// 		emp_name: formData.u_name,
-	// 		branch_id: formData.u_branch_code,
-	// 		// phone_home: formData.u_phone,
-	// 		phone_mobile: formData.u_phone,
-	// 		email: formData.u_email,
-	// 		gender: formData.u_gender,
-	// 		emp_id: userDetails?.emp_id,
-	// 	}
-	// 	await axios
-	// 		.post(`${url}/admin/save_profile_web`, creds)
-	// 		.then((res) => {
-	// 			console.log(res.data)
-	// 			Message("success", "Profile updated successfully!")
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log("Errr occurred!!!", err)
-	// 		})
-	// }
+	const handleUpdateProfile = async () => {
 
-	const fetchProfileDetails = async () => {
-
-		const tokenValue = await getLocalStoreTokenDts(navigate);
+		const ip = await getClientIP()
 
 		const creds = {
-			emp_id: userDetails?.emp_id || "",
-			id: userDetails?.id || "",
+			user_id: formData?.user_id,
+			designation: formData?.designation,
+			created_by: userDetails[0]?.emp_id,
+			ip_address: ip,
 		}
 
+
 		await axios
-			.post(`${url}/user_profile_details`, creds, {
+			.post(`${url_bdccb}/user/profile_update`, creds)
+			.then((res) => {
+				console.log(res.data)
+				Message("success", "Profile updated successfully!")
+				onClose && onClose()
+			})
+			.catch((err) => {
+				console.log("Errr occurred!!!", err)
+			})
+	}
+
+	
+
+	const fetchProfileDetails = async () => {
+		// setLoading(true)
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/user/user_list`, {
+		params: {
+			tenant_id: userDetails[0]?.tenant_id, 
+			branch_id: userDetails[0]?.brn_code, 
+			user_id: userDetails[0]?.emp_id
+		},
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
-		},
+		}
 		})
 			.then((res) => {
 
-			if(res?.data?.suc === 0){
-
-			navigate(routePaths.LANDING)
-			localStorage.clear()
-			// Message('error', res?.data?.msg)
-
-			} else {
-
-			setFormData({
-			emp_id: res?.data?.msg[0]?.emp_id,
-			branch_code: res?.data?.msg.filter(e=>+e.branch_assign_id==+userDetails.brn_code)[0]?.branch_assign_id || +userDetails.brn_code,
-			user_type: res?.data?.msg[0]?.user_type,
-			})
-
-			}
-
-				// console.log(res?.data?.msg.filter(e=>+e.branch_assign_id==+userDetails.brn_code)[0])
-				// setMasterData(res?.data?.msg)
+				if(res?.data?.success){
 				
+				setFormData(
+					{
+					user_id: res?.data?.data[0]?.user_id,
+					user_name: res?.data?.data[0]?.user_name,
+					designation: res?.data?.data[0]?.designation
+					}
+				)
+
+				} else {
+				Message('error', res?.data?.msg)
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+
+				}
+
 			})
 			.catch((err) => {
-				console.log("Errr", err)
-				Message("error", "Some error while fetching profile details...")
+				Message("error", "Some error occurred while fetching users!")
+				console.log("ERRR", err)
 			})
+		// setLoading(false)
 	}
 
 	useState(() => {
@@ -175,42 +187,43 @@ const UserProfileUpdateForm = ({ mode }) => {
 			<div className="grid grid-cols-2 gap-4 justify-between">
 				<div className="sm:col-span-2">
 					<TDInputTemplateBr
-						placeholder="Employee ID..."
+						placeholder="User ID..."
 						type="text"
-						label="Employee ID"
-						name="emp_id"
-						formControlName={formData.emp_id}
-						handleChange={(e) => handleFormChange("emp_id", e.target.value)}
+						label="User ID"
+						name="user_id"
+						formControlName={formData.user_id}
+						handleChange={(e) => handleFormChange("user_id", e.target.value)}
 						mode={1}
 						disabled
 					/>
 				</div>
 				<div className="sm:col-span-2">
 					<TDInputTemplateBr
-						placeholder="Employee Name..."
+						placeholder="User Name..."
 						type="text"
-						label="Employee Name"
-						name="emp_name"
-						formControlName={userDetails?.emp_name}
-						handleChange={(e) => handleFormChange("emp_name", e.target.value)}
+						label="User Name"
+						name="user_name"
+						formControlName={formData.user_name}
+						handleChange={(e) => handleFormChange("user_name", e.target.value)}
 						mode={1}
 						disabled
 					/>
 				</div>
-				<div>
-					{/* <TDInputTemplateBr
-						placeholder="Branch Name"
-						type="text"
-						label="Branch Name"
-						name="u_branch_name"
-						formControlName={formData.u_branch_code || userDetails?.brn_code}
-						handleChange={(e) =>
-							handleFormChange("u_branch_code", e.target.value)
-						}
-						// handleBlur={""}
-						mode={1}
-					/> */}
 
+				<div className="sm:col-span-2">
+					<TDInputTemplateBr
+						placeholder="Designation..."
+						type="text"
+						label="Designation"
+						name="designation"
+						formControlName={formData.designation}
+						handleChange={(e) => handleFormChange("designation", e.target.value)}
+						mode={1}
+						// disabled
+					/>
+				</div>
+				{/* <div>
+					
 					<TDInputTemplateBr
 						placeholder="Branch..."
 						type="text"
@@ -243,40 +256,11 @@ const UserProfileUpdateForm = ({ mode }) => {
 						}))}
 						disabled
 					/>
-				</div>
-				{/* <div className="mb-5">
-					<TDInputTemplateBr
-						placeholder="Email ID"
-						type="email"
-						label="Email ID"
-						name="u_email"
-						formControlName={formData.u_email || userDetails?.email}
-						handleChange={(e) => handleFormChange("u_email", e.target.value)}
-						// handleBlur={""}
-						mode={1}
-					/>
 				</div> */}
-
-				{/* <div className="mb-5">
-					<TDInputTemplateBr
-						placeholder="Select Gender..."
-						type="text"
-						label="Gender"
-						name="u_gender"
-						formControlName={formData.u_gender || userDetails?.gender}
-						handleChange={(e) => handleFormChange("u_gender", e.target.value)}
-						// handleBlur={""}
-						data={[
-							{ code: "M", name: "Male" },
-							{ code: "F", name: "Female" },
-							{ code: "O", name: "Others" },
-						]}
-						mode={2}
-					/>
-				</div> */}
+				
 			</div>
 
-			{/* <div className="flex justify-between">
+			<div className="flex justify-between mt-5">
 				<button
 					onClick={() => handleUpdateProfile()}
 					className="text-white bg-blue-900 hover:bg-
@@ -284,7 +268,7 @@ const UserProfileUpdateForm = ({ mode }) => {
 				>
 					Update
 				</button>
-			</div> */}
+			</div>
 		</div>
 	)
 }

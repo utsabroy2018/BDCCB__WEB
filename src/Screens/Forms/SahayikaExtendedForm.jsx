@@ -493,15 +493,6 @@ const fetchGroupsList = async () => {
 			})
 			.then((res) => {
 
-			// if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			// } else {
-			// setLoanApplications(res?.data?.msg)
-			// setCopyLoanApplications(res?.data?.msg)
-			// }
-			console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
 	
 			if(res?.data?.success){
 			setBranch(res?.data?.data?.map((item, i) => ({

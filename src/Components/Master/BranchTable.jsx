@@ -9,7 +9,7 @@ function BranchTable({
 	loanAppData,
 	setSearch,
 	title,
-	flag,
+	flagRadion,
 	showSearch = true,
 	isForwardLoan = false,
 	isRejected = false,
@@ -216,9 +216,16 @@ function BranchTable({
 													// console.log("LLSKSIODFUISFH", item)
 													navigate(
 														`/homeadmin/branchMaster/${item?.branch_id || 0}`,
+														// {
+														// 	state: item,
+														// 	state2: item,
+														// }
 														{
-															state: item,
-														}
+														state: {
+														state1: item,
+														state2: flagRadion, // 👈 your second value
+														},
+													}
 													)
 												}}
 											>

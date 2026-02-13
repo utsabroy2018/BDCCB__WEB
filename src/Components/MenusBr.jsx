@@ -2331,6 +2331,32 @@ const items_bdccb = [
 			label: <Link to={"/homebm/"}>Dashboard</Link>,
 		},
 		{
+			key: "sub6",
+			icon: <ImportOutlined />,
+			label: "User Management",
+			// hidden: data?.user_management == "Y" ? false : true,
+			children: [
+				// {
+				// 	key: "sub7-1",
+				// 	icon: <UserAddOutlined />,
+				// 	label: <Link to={"/homeadmin/createuser/0"}>Create User</Link>,
+				// 	// hidden: data?.create_user == "Y" ? false : true,
+				// },
+				{
+					key: "sub6-1",
+					icon: <SettingOutlined />,
+					label: <Link to={"/homebm/manageuser/"}>Manage User</Link>,
+					// hidden: data?.manage_user == "Y" ? false : true,
+				},
+				// {
+				// 	key: "sub7-3",
+				// 	icon: <FastForwardOutlined />,
+				// 	label: <Link to={"/homeadmin/transferuser/0"}>Transfer User</Link>,
+				// 	// hidden: data?.transfer_user == "Y" ? false : true,
+				// },
+			],
+		},
+		{
 			key: "sub2",
 			icon: <DatabaseOutlined />,
 			label: "Master",
@@ -2637,14 +2663,14 @@ const items_bdccb_PACS = [
 
 
 			<div className="flex">
-				{/* <Tooltip title="Profile" placement="bottom">
+				<Tooltip title="Profile" placement="bottom">
 					<button
 						onClick={() => setVisibleModal2(!visibleModal2)}
 						className="w-9 h-9 bg-[#DA4167] text-slate-50 flex self-center justify-center items-center rounded-full mr-1"
 					>
 						<UserOutlined className="text-slate-50 text-lg self-center" />
 					</button>
-				</Tooltip> */}
+				</Tooltip>
 				<Tooltip title="Log Out" placement="bottom">
 					<button
 						onClick={() => setVisibleModal(!visibleModal)}

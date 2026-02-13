@@ -457,11 +457,6 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		setPACS_SHGList([])
 		setLoading(true)
 		const creds = {
-			// loan_to : formik.values.loan_to,
-			// loan_to: userDetails[0]?.user_type == 'B' ? 'S' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-			// branch_code: userDetails[0]?.user_type == 'B' ? 0 : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : '',
-			// branch_shg_id: value,
-			// tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
 
 			loan_to: userDetails[0]?.user_type == 'B' ? 'S' : userDetails[0]?.user_type == 'P' ? 'S' : '',
 			branch_code: userDetails[0]?.brn_code,
