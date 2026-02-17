@@ -7,6 +7,7 @@ import { url, url_bdccb } from "../Address/BaseUrl"
 import { Message } from "./Message"
 import { getLocalStoreTokenDts } from "./getLocalforageTokenDts"
 import CryptoJS from "crypto-js"
+import { Visibility, VisibilityOff } from "@mui/icons-material"
 
 
 const PasswordComp = ({ mode }) => {
@@ -17,6 +18,8 @@ const PasswordComp = ({ mode }) => {
 	const [newPassword, setNewPassword] = useState(() => "")
 	const [confirmPassword, setConfirmPassword] = useState(() => "")
 	const [machineIP, setMachineIP] = useState("")
+	const [showPassword, setShowPassword] = useState(false);
+	const [showPassword_2, setShowPassword_2] = useState(false);
 
 	const SECRET_KEY = 'S!YSN@ESR#GAI$CSS%OYF^TVE&KAS&OWL*UNT(ISO)NTS_PSR+IIT=ESL/IKM*IST!EAD@'
 
@@ -47,10 +50,6 @@ const PasswordComp = ({ mode }) => {
 	}
 
 	const handlePasswordUpdate = async () => {
-
-		// const secretKey = "MySuperSecretKey123!"
-		console.log(oldPassword, 'hhhhhhhhh', newPassword);
-		
 
 		// const encryptedOldPwd = CryptoJS.AES.encrypt(oldPassword, secretKey).toString()
 		// const encryptedNewPwd = CryptoJS.AES.encrypt(newPassword, secretKey).toString()
@@ -126,8 +125,10 @@ const PasswordComp = ({ mode }) => {
 
 
 	const validatePassword = (password) => {
-	const regex = /^(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{6,}$/;
-	return regex.test(password);
+	// const regex = /^(?=.*[A-Z])(?=.*[0-9])[A-Za-z0-9]{6,}$/;
+	// return regex.test(password);
+	const regex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
+  	return regex.test(password);
 	};
 
 	return (
@@ -144,10 +145,10 @@ const PasswordComp = ({ mode }) => {
 					mode={1}
 				/>
 			</div>
-			<div className="mb-5">
+			<div className="mb-5 relative">
 				<TDInputTemplateBr
 					placeholder="*****"
-					type="password"
+					type={showPassword ? "text" : "password"}
 					label="New password"
 					name="password"
 					formControlName={newPassword}
@@ -155,11 +156,19 @@ const PasswordComp = ({ mode }) => {
 					// handleBlur={""}
 					mode={1}
 				/>
+				<div className="absolute right-0 pr-3 flex items-center cursor-pointer" onClick={() => setShowPassword((prev) => !prev)} 
+				style={{height:'38px', top:'27px', right:0}}>
+				{showPassword ? (
+				<VisibilityOff className="text-slate-700" />
+				) : (
+				<Visibility className="text-slate-700" />
+				)}
+				</div>
 			</div>
-			<div className="mb-5">
+			<div className="mb-5 relative">
 				<TDInputTemplateBr
 					placeholder="*****"
-					type="password"
+					type={showPassword_2 ? "text" : "password"}
 					label="Confirm password"
 					name="password"
 					formControlName={confirmPassword}
@@ -168,6 +177,15 @@ const PasswordComp = ({ mode }) => {
 					// handleBlur={""}
 					mode={1}
 				/>
+
+				<div className="absolute right-0 pr-3 flex items-center cursor-pointer" onClick={() => setShowPassword_2((prev) => !prev)} 
+				style={{height:'38px', top:'27px', right:0}}>
+				{showPassword_2 ? (
+				<VisibilityOff className="text-slate-700" />
+				) : (
+				<Visibility className="text-slate-700" />
+				)}
+				</div>
 			</div>
 			<div className="flex items-start mb-5">
 				{/* <div className="flex items-center h-5">

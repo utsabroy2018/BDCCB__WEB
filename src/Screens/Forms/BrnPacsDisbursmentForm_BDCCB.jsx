@@ -184,7 +184,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
           .required("Account number is required"),
 
         branch_shg_id: Yup.string()
-          .required("PACS / SHG is required"),
+          .required("SHG is required"),
 
         total_member: Yup.number()
           .typeError("No. of Group must be a number")
@@ -769,14 +769,14 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												<div className="col-span-3">
 													<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
 				 dark:text-gray-100">
-														{userDetails[0]?.user_type == 'B' ? 'Select PACS *' : userDetails[0]?.user_type == 'P' ? 'Select SHG *' : 'Select *'}
+														{userDetails[0]?.user_type == 'B' ? 'Select SHG *' : userDetails[0]?.user_type == 'P' ? 'Select SHG *' : 'Select *'}
 														{/* Select PACS/SHG * */}
 													</label>
 													<Select
 														showSearch
 														placeholder={
 															userDetails[0]?.user_type === "B"
-																? "Choose PACS"
+																? "Choose SHG"
 																: userDetails[0]?.user_type === "P"
 																	? "Choose SHG"
 																	: "Choose"
@@ -820,7 +820,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 													>
 														<Select.Option value="" disabled>
 															{userDetails[0]?.user_type === "B"
-																? "Choose PACS"
+																? "Choose SHG"
 																: userDetails[0]?.user_type === "P"
 																	? "Choose SHG"
 																	: "Choose"}

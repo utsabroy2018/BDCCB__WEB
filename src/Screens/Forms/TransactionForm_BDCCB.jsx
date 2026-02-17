@@ -357,12 +357,12 @@ function TransactionForm_BDCCB({ flag }) {
 			
 		// console.log(res?.data?.data, 'ddddddddddddddddddddddd');
 	
-		if(userDetails[0]?.user_type == 'B'){
+		// if(userDetails[0]?.user_type == 'B'){
 		setPACS_SHGList(res?.data?.data?.map((item, i) => ({
 		code: item?.group_code,
 		name: item?.group_name,
 		})))
-		}
+		// }
 
 		// if(res?.data?.data.length > 0){
 		// 	Message("success", res?.data?.msg)
@@ -503,7 +503,7 @@ useEffect(() => {
 				 </label>
 								<Select
 									showSearch
-									placeholder={userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' === 'S' ? 'Choose SHG ' : 'Choose '}
+									placeholder={userDetails[0]?.user_type == 'B' ? 'Choose Group ' : userDetails[0]?.user_type == 'P' === 'S' ? 'Choose Group ' : 'Choose '}
 									value={formik.values.group_name}
 									style={{ width: "100%" }}
 									optionFilterProp="children"
@@ -524,7 +524,7 @@ useEffect(() => {
 									}
 									
 									>
-									<Select.Option value="" disabled>{userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' ? 'Choose SHG ' : 'Choose '}</Select.Option>
+									<Select.Option value="" disabled>{userDetails[0]?.user_type == 'B' ? 'Choose Group ' : userDetails[0]?.user_type == 'P' ? 'Choose Group ' : 'Choose '}</Select.Option>
 
 									{PACS_SHGList?.map((data) => (
 									<Select.Option key={data.code} value={data.code}>

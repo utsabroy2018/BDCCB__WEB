@@ -22,6 +22,10 @@ function SearchGroupBM() {
 
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
+
+	useEffect(()=>{
+		fetchSearchedGroups()
+	}, [searchKeywords])
 	
 
 	const fetchSearchedGroups = async () => {

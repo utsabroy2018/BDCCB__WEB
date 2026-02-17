@@ -17,6 +17,9 @@ import { motion } from "framer-motion"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import Radiobtn from "../../Components/Radiobtn"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import HomeIcon from '@mui/icons-material/Home';
+import { Height, Visibility, VisibilityOff } from "@mui/icons-material"
 
 
 const department = [
@@ -28,10 +31,10 @@ const department = [
 		label: "PACS",
 		value: "P",
 	},
-	{
-		label: "SHG",
-		value: "S",
-	}
+	// {
+	// 	label: "SHG",
+	// 	value: "S",
+	// }
 ]
 
 function SignUp() {
@@ -43,6 +46,8 @@ function SignUp() {
 	const [uerIDAvailable, setUserIDAvailable] = useState(null)
 	const [uerIDAvailableMsg, setUserIDAvailableMsg] = useState("")
 	const [PACS_SHGList, setPACS_SHGList] = useState([]);
+	const [showPassword, setShowPassword] = useState(false);
+	const [showPassword_2, setShowPassword_2] = useState(false);
 
 	const initialValues = {
 		// departmentStatus: "B",
@@ -255,7 +260,7 @@ function SignUp() {
 
 	useEffect(()=>{
 		fetchBranch()
-	}, [])
+	}, [departmentStatus])
 
 	const fetchBranch = async () => {
 			setLoading(true)
@@ -264,7 +269,7 @@ function SignUp() {
 				await axios
 					.get(`${url_bdccb}/master/branch_list`, {
 						params: {
-						dist_id: 0, tenant_id: 1 ,branch_id: 0
+						dist_id: 0, tenant_id: 1 ,branch_id: 0, branch_type: departmentStatus
 						},
 				headers: {
 				Authorization: `${tokenValue?.token}`, // example header
@@ -347,7 +352,7 @@ function SignUp() {
 	return (
 		<div className="bg-blue-800 p-20 flex justify-center min-h-screen min-w-screen">
 			<div className="bg-white p-20 rounded-3xl flex flex-col gap-8 justify-center items-center">
-				<div className="absolute top-32">
+				<div className="top-32">
 					<motion.img
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
@@ -357,9 +362,24 @@ function SignUp() {
 						alt="Flowbite Logo"
 					/>
 				</div>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{width: 580}}>
+					<nav className="flex items-center justify-left gap-3">
+					<a href={"/"}
+						rel="noreferrer"
+						className="text-gray-600 hover:text-blue-600"
+					>
+						<ArrowBackIcon />
+						{/* <HomeIcon /> */}
+					</a>
+
+					<span className="text-4xl font-thin text-blue-800">
+						Sign Up
+					</span>
+					</nav>
 				
-				<div className="text-4xl text-center font-thin text-blue-800">
+				{/* <div className="text-4xl text-left font-thin text-blue-800">
 					Sign Up
+				</div> */}
 				</div>
 
 				<form
@@ -369,7 +389,7 @@ function SignUp() {
 
 <div className="grid grid-cols-1 md:grid-cols-1 gap-4" style={{width: 580}}>
 
-							<div>
+							<div className="radioBtn_Signup">
 							<Radiobtn
 							data={department}
 							val={departmentStatus}
@@ -540,10 +560,13 @@ function SignUp() {
 
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{width: 580}}>	
 					
-					<div>
+					<div className="relative">
+						
+
 						<TDInputTemplateBr
 							placeholder="*****"
-							type="password"
+							// type="password"
+							type={showPassword ? "text" : "password"}
 							label="New Password"
 							name="password"
 							formControlName={formik.values.password}
@@ -554,11 +577,24 @@ function SignUp() {
 						{formik.errors.password && formik.touched.password ? (
 							<VError title={formik.errors.password} />
 						) : null}
+
+						<div className="absolute right-0 pr-3 flex items-center cursor-pointer" onClick={() => setShowPassword((prev) => !prev)} 
+						style={{height:'38px', top:'27px', right:0}}>
+						{showPassword ? (
+						<VisibilityOff className="text-slate-700" />
+						) : (
+						<Visibility className="text-slate-700" />
+						)}
+						</div>
+
+
+						
 					</div>
-					<div>
+					<div className="relative">
 						<TDInputTemplateBr
 							placeholder="*****"
-							type="password"
+							// type="password"
+							type={showPassword_2 ? "text" : "password"}
 							label="Confirm Password"
 							name="cnf_password"
 							formControlName={formik.values.cnf_password}
@@ -576,6 +612,15 @@ function SignUp() {
 							Passwords match ✓
 						</p>
 						)}
+
+						<div className="absolute right-0 pr-3 flex items-center cursor-pointer" onClick={() => setShowPassword_2((prev) => !prev)} 
+						style={{height:'38px', top:'27px', right:0}}>
+						{showPassword_2 ? (
+						<VisibilityOff className="text-slate-700" />
+						) : (
+						<Visibility className="text-slate-700" />
+						)}
+						</div>
 					</div>
 
 					</div>
@@ -597,11 +642,11 @@ function SignUp() {
 							disabled:opacity-50 disabled:cursor-not-allowed
 							disabled:hover:bg-blue-600 disabled:transition-none"
 							>
-								Registration
+								Submit
 							</button>
 							</Spin>
 
-							<button
+							{/* <button
 								// disabled={!formik.isValid}
 								type="submit"
 								className="w-full px-6 py-3 bg-pink-600 text-white rounded-lg
@@ -611,7 +656,7 @@ function SignUp() {
 								  disabled:hover:bg-pink-600 disabled:transition-none"
 							>
 								Sign In
-							</button>
+							</button> */}
 						</div>
 					
 				</form>

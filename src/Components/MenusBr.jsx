@@ -2448,7 +2448,7 @@ const items_bdccb = [
 		{
 			key: "sub5",
 			icon: <ThunderboltOutlined />,
-			label: "Account",
+			label: "SB Transaction",
 			children: [
 				{
 					key: "sub5-1",
@@ -2499,16 +2499,16 @@ const items_bdccb_PACS = [
 			icon: <DeploymentUnitOutlined />,
 			label: "Groups",
 			children: [
-				{
-					key: "sub3-1",
-					icon: <PlusCircleOutlined />,
-					label: <Link to={"/homebm/editSahayikaFormBM/0"}>Add Sahayika</Link>,
-				},
-				{
-					key: "sub3-2",
-					icon: <FileSearchOutlined />,
-					label: <Link to={"/homebm/searchSahayikaBM/"}>Edit Sahayika</Link>,
-				},
+				// {
+				// 	key: "sub3-1",
+				// 	icon: <PlusCircleOutlined />,
+				// 	label: <Link to={"/homebm/editSahayikaFormBM/0"}>Add Sahayika</Link>,
+				// },
+				// {
+				// 	key: "sub3-2",
+				// 	icon: <FileSearchOutlined />,
+				// 	label: <Link to={"/homebm/searchSahayikaBM/"}>Edit Sahayika</Link>,
+				// },
 				{
 					key: "sub3-3",
 					icon: <PlusCircleOutlined />,
@@ -2552,6 +2552,19 @@ const items_bdccb_PACS = [
 						},
 					],
 				},
+			],
+		},
+
+		{
+			key: "sub6",
+			icon: <ThunderboltOutlined />,
+			label: "SB Transaction",
+			children: [
+				{
+					key: "sub6-1",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homebm/transaction"}>Transaction</Link>,
+				}
 			],
 		},
 		

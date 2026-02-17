@@ -154,3 +154,5 @@ table.table_Custome_2nd thead tr th:first-child{width: auto;}
 
 .pending_dis{background: #be4444; color: #fff; 
   margin-top: 0; padding: 3px 10px; border-radius: 5px; display: inline-block; margin-bottom: 20px; font-size: 14px;}
+
+.radioBtn_Signup .ant-radio-group{margin-top: -8px; margin-left: -10px;}

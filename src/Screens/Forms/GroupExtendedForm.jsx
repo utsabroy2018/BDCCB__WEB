@@ -117,10 +117,11 @@ const containerStyle = {
 
 	const [visible, setVisible] = useState(() => false)
 	const [pendingValues, setPendingValues] = useState(null);
+	const [mobileExists, setMobileExists] = useState();
 
 	const initialValues = {
 		g_group_name: "",
-		g_group_type: "J",
+		// g_group_type: "J",
 		g_address: "",
 		// group_leader_name: "",
 		sahayika_id: "",
@@ -158,7 +159,7 @@ const containerStyle = {
 		po_id: Yup.mixed().required("Post Office is required"),
 		block_id: Yup.mixed().required("Block is required"),
 		gp_id: Yup.mixed().required("GP Name is required"),
-		village_id: Yup.mixed().required("Village Name is required"),
+		village_id: Yup.mixed(),
 		g_phone1: Yup.mixed().required("Mobile No. is required"),
 
 		// 🔥 MEMBER VALIDATION
@@ -385,7 +386,7 @@ members: Yup.array()
 				ps_id: formData?.ps_id,
 				po_id: formData?.po_id,
 				gp_id: formData?.gp_id,
-				village_id: formData?.village_id,
+				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
 				// sb_ac_no: formData?.g_acc1,
 				members: formData?.members,
@@ -432,7 +433,7 @@ members: Yup.array()
 				ps_id: formData?.ps_id,
 				po_id: formData?.po_id,
 				gp_id: formData?.gp_id,
-				village_id: formData?.village_id,
+				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
 				// sb_ac_no: formData?.g_acc1,
 				members: formData?.members,
@@ -838,13 +839,7 @@ const handleFormikMasterChange = async (e) => {
   }
 };
 
-// const handleGroupLeaderChange = (index) => {
-//   const updated = formik.values.members.map((m, i) => ({
-//     ...m,
-//     gp_leader_flag: i === index,
-//   }));
-//   formik.setFieldValue("members", updated);
-// };
+
 const handleGroupLeaderChange = (index) => {
   const updated = formik.values.members.map((m, i) => ({
     ...m,
@@ -857,13 +852,6 @@ const handleGroupLeaderChange = (index) => {
 
 
 
-// const handleAssistantChange = (index) => {
-//   const updated = formik.values.members.map((m, i) => ({
-//     ...m,
-//     asst_gp_leader_flag: i === index,
-//   }));
-//   formik.setFieldValue("members", updated);
-// };
 
 const handleAssistantChange = (index) => {
   const updated = formik.values.members.map((m, i) => ({
@@ -874,6 +862,38 @@ const handleAssistantChange = (index) => {
 
   formik.setFieldValue("members", updated);
 };
+
+const checkMobileExists = async (mobile) => {
+  try {
+    const res = await axios.get(`${url_bdccb}/user/checkuser`, {
+      params: { user_id: mobile },
+    });
+
+	setMobileExists(res.data)
+	
+    return res.data; // true / false
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+
+const handleMobileChange = async (e) => {
+  const value = e.target.value;
+
+  formik.setFieldValue("g_phone1", value);
+
+  if (value.length === 10) {
+    const exists = await checkMobileExists(value);
+
+
+    if (exists?.user_status == 1) {
+      formik.setFieldValue("g_phone1", "");
+    }
+  }
+};
+
 
 
 
@@ -897,7 +917,7 @@ const handleAssistantChange = (index) => {
 				
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-3"}>
+						<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
 
 							
 							<div>
@@ -916,7 +936,7 @@ const handleAssistantChange = (index) => {
 								) : null}
 							</div>
 
-							<div>
+							{/* <div>
 								
 
 								<TDInputTemplateBr
@@ -944,7 +964,7 @@ const handleAssistantChange = (index) => {
 								{formik.errors.g_group_type && formik.touched.g_group_type ? (
 									<VError title={formik.errors.g_group_type} />
 								) : null}
-							</div>
+							</div> */}
 
 							
 							</div>
@@ -1013,15 +1033,23 @@ const handleAssistantChange = (index) => {
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="Mobile No."
+									placeholder="Mobile No. Of Group Leader"
 									type="number"
-									label="Mobile No."
+									label="Mobile No. Of Group Leader"
 									name="g_phone1"
-									handleChange={formik.handleChange}
+									// handleChange={formik.handleChange}
+									handleChange={handleMobileChange} 
 									handleBlur={formik.handleBlur}
 									formControlName={formik.values.g_phone1}
 									mode={1}
 								/>
+								
+								{/* {JSON.stringify(mobileExists, null, 2)} */}
+								{mobileExists?.user_status == 1 ?(
+									<div style={{fontSize:12, color:'red'}}>{mobileExists?.msg}</div>
+								) : (
+									<div style={{fontSize:12, color:'green'}}>{mobileExists?.msg}</div>
+								)}
 								{formik.errors.g_phone1 && formik.touched.g_phone1 ? (
 									<VError title={formik.errors.g_phone1} />
 								) : null}
