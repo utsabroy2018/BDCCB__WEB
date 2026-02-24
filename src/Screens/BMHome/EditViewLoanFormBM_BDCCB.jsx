@@ -9,9 +9,9 @@ import FormHeader from "../../Components/FormHeader"
 import { useLocation } from "react-router"
 import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
-import ViewLoanForm from "../Forms/ViewLoanForm"
+import ViewLoanForm from "../Forms/ViewLoanForm_BDCCB"
 
-function EditViewLoanFormBM() {
+function EditViewLoanFormBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -99,4 +99,4 @@ function EditViewLoanFormBM() {
 	)
 }
 
-export default EditViewLoanFormBM
+export default EditViewLoanFormBM_BDCCB

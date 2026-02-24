@@ -188,7 +188,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 													transition={{ delay: 1, type: "just" }}
 													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{`Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG`}
+													{/* {`Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG`} */}
+													{`Direct Loan`}
 												</motion.h2>
 											{/* </div> */}
 										</div>

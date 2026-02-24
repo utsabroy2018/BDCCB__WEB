@@ -193,7 +193,7 @@ function AcceptDisburseInfo({ groupDataArr }) {
 							<TDInputTemplateBr
 								type="text"
 								label="Transaction ID"
-								formControlName={loanAppData?.trans_id} // Default to SHG
+								formControlName={loanAppData?.tran_id} // Default to SHG
 								mode={1}
 								disabled={true}
 							/>
@@ -218,17 +218,6 @@ function AcceptDisburseInfo({ groupDataArr }) {
 								disabled={true}
 							/>
 						</div>
-
-						{/* <div>
-
-							<TDInputTemplateBr
-								type="text"
-								label="Loan To"
-								formControlName={loanAppData?.loan_to == 'P' ? 'Pacs' : 'SHG'} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div> */}
 
 						<div>
 

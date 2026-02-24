@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from "react"
 import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
-import { url } from "../../Address/BaseUrl"
+import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
 import { Spin, Button } from "antd"
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
-import ViewLoanTableBr from "../../Components/ViewLoanTableBr"
+import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import { routePaths } from "../../Assets/Data/Routes"
 
-function SearchViewLoanBM() {
+const options = [
+	{
+		label: "Unapproved Disbursement",
+		value: "U",
+	},
+	// {
+	// 	label: "Approved Disbursement",
+	// 	value: "A",
+	// }
+]
+
+function SearchViewLoanBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -21,33 +32,38 @@ function SearchViewLoanBM() {
 
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
+	const [loanType, setLoanType] = useState("U")
 	
 
 	const fetchSearchedGroups = async () => {
 		setLoading(true)
 		const creds = {
-			group_name_view: searchKeywords,
-			branch_code: userDetails?.brn_code,
+			branch_id: userDetails[0]?.brn_code ,
+			tenant_id: userDetails[0]?.tenant_id,
+			approval_status: loanType
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url}/admin/search_grp_view`, creds, {
-headers: {
-Authorization: `${tokenValue?.token}`, // example header
-"Content-Type": "application/json", // optional
-},
-})
+			.post(`${url_bdccb}/loan/fetch_disburse_dtls`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
 			.then((res) => {
+				console.log(res?.data, 'dataaaaaaaaaaaaaaa');
 				
-				if(res?.data?.suc === 0){
-Message('error', res?.data?.msg)
-navigate(routePaths.LANDING)
-localStorage.clear()
-} else {
-				setGroups(res?.data?.msg)
-}
+
+				if(res?.data?.success){
+				setGroups(res?.data?.data)
+
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+
 			})
 			.catch((err) => {
 				Message("error", "Some error occurred while searching...")
@@ -55,6 +71,10 @@ localStorage.clear()
 			})
 		setLoading(false)
 	}
+
+	useEffect(()=>{
+	fetchSearchedGroups()
+	}, [])
 
 	return (
 		<div>
@@ -131,7 +151,7 @@ localStorage.clear()
 							</button>
 						</div>
 					</div>
-
+					{/* {JSON.stringify(groups, 2)} */}
 					<ViewLoanTableBr
 						flag="BM"
 						loanAppData={groups}
@@ -150,4 +170,4 @@ localStorage.clear()
 	)
 }
 
-export default SearchViewLoanBM
+export default SearchViewLoanBM_BDCCB

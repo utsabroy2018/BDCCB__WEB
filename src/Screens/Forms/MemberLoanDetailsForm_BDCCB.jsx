@@ -8,9 +8,10 @@ import { useNavigate } from "react-router-dom"
 import * as Yup from "yup"
 import axios from "axios"
 import { Message } from "../../Components/Message"
-import { url } from "../../Address/BaseUrl"
+import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Badge, Spin, Card, Tooltip } from "antd"
 import {
+	CheckCircleOutlined,
 	FileExcelOutlined,
 	LoadingOutlined,
 	PrinterOutlined,
@@ -28,8 +29,9 @@ import { printTableReport } from "../../Utils/printTableReport"
 import moment from "moment"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { routePaths } from "../../Assets/Data/Routes"
+import { saveMasterData } from "../../services/masterService"
 
-function MemberLoanDetailsForm() {
+function MemberLoanDetailsForm_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -69,27 +71,14 @@ function MemberLoanDetailsForm() {
 	console.log("U/A", loanType)
 
 	const [memberLoanDetailsData, setMemberLoanDetailsData] = useState({
-		loanId: "",
-		memberName: "",
-		memberCode: "",
-		groupName: "",
-		purposeId: "",
-		purpose: "",
-		subPurposeId: "",
-		// subPurpose: "",
-		disbursementDate: "",
-		disburseAmount: "",
-		schemeName: "",
-		fundId: "",
-		fundName: "",
-		principalBalance: "",
-		period: "",
-		periodMode: "",
-		principalAmount: "",
-		principalEMI: "",
-		interestAmount: "",
-		interestEMI: "",
-		totalEMI: "",
+		loan_id: "",
+		trans_id: "",
+		trans_dt: "",
+		trans_type: "",
+		dr_amt: "",
+		cr_amt: "",
+		curr_prn: "",
+		approval_status: ""
 	})
 
 	const handleChangeMemberLoanDetails = (e) => {
@@ -130,51 +119,46 @@ function MemberLoanDetailsForm() {
 		setLoading(true)
 		const creds = {
 			loan_id: params?.id,
-			branch_code: userDetails?.brn_code,
+			branch_code: userDetails[0]?.brn_code,
+			tenant_id: userDetails[0]?.tenant_id,
 		}
+
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url}/admin/view_loan_dtls`, creds, {
-headers: {
-Authorization: `${tokenValue?.token}`, // example header
-"Content-Type": "application/json", // optional
-},
-})
+			.post(`${url_bdccb}/loan/fetch_trans_dtls`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
 			.then((res) => {
 				
-				if(res?.data?.suc === 0){
-// Message('error', res?.data?.msg)
-navigate(routePaths.LANDING)
-localStorage.clear()
-} else {
-				setMemberLoanDetailsData({
-					loanId: res?.data?.msg[0]?.loan_id || "",
-					memberName: res?.data?.msg[0]?.client_name || "",
-					memberCode: res?.data?.msg[0]?.member_code || "",
-					groupName: res?.data?.msg[0]?.group_name || "",
-					purposeId: res?.data?.msg[0]?.purpose || "",
-					purpose: res?.data?.msg[0]?.purpose_id || "",
-					subPurposeId: res?.data?.msg[0]?.sub_purpose || "",
-					// subPurpose: res?.data?.msg[0]?.sub_purp_name || "",
-					disbursementDate: res?.data?.msg[0]?.disb_dt || "",
-					disburseAmount: res?.data?.msg[0]?.prn_disb_amt || "",
-					schemeName: res?.data?.msg[0]?.scheme_name || "",
-					fundId: res?.data?.msg[0]?.fund_id || "",
-					fundName: res?.data?.msg[0]?.fund_name || "",
-					principalBalance: res?.data?.msg[0]?.prn_amt || "",
-					period: res?.data?.msg[0]?.period || "",
-					periodMode: res?.data?.msg[0]?.period_mode || "",
-					principalAmount: res?.data?.msg[0]?.prn_disb_amt || "",
-					principalEMI: res?.data?.msg[0]?.prn_emi || "",
-					interestAmount: res?.data?.msg[0]?.intt_amt || "",
-					interestEMI: res?.data?.msg[0]?.intt_emi || "",
-					totalEMI: res?.data?.msg[0]?.tot_emi || "",
-				})
-				setTnxDetails(res?.data?.msg[0]?.trans_dtls || [])
+				// if(res?.data?.suc === 0){
+				// // Message('error', res?.data?.msg)
+				// // navigate(routePaths.LANDING)
+				// // localStorage.clear()
+				// } else {
+				if(res?.data?.success){
+				// console.log(res?.data?.data[0], 'ddddddddddddddddddddd', creds);
+				// setMemberLoanDetailsData({
+				// 	loan_id: res?.data?.data[0]?.loan_id,
+				// 	trans_id: "",
+				// 	trans_dt: "",
+				// 	trans_type: "",
+				// 	dr_amt: "",
+				// 	cr_amt: "",
+				// 	curr_prn: "",
+				// 	approval_status: ""
+				// })
+				setTnxDetails(res?.data?.data || [])
 
-			}
+				} else {
+				// Message('error', res?.data?.msg)
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
 				
 			})
 			.catch((err) => {
@@ -203,9 +187,9 @@ localStorage.clear()
 			.then((res) => {
 				
 				if(res?.data?.suc === 0){
-				Message('error', res?.data?.msg)
-				navigate(routePaths.LANDING)
-				localStorage.clear()
+				// Message('error', res?.data?.msg)
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
 				} else {
 				setPurposeOfLoan(res?.data?.msg)
 				}
@@ -221,23 +205,7 @@ localStorage.clear()
 		getPurposeOfLoan()
 	}, [])
 
-	// const getSubPurposeOfLoan = async (purpId) => {
-	// 	setLoading(true)
-	// 	await axios
-	// 		.get(`${url}/get_sub_purpose?purp_id=${purpId}`)
-	// 		.then((res) => {
-	// 			console.log("------------", res?.data)
-	// 			setSubPurposeOfLoan(res?.data?.msg)
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log("+==========+", err)
-	// 		})
-	// 	setLoading(false)
-	// }
-
-	// useEffect(() => {
-	// 	getSubPurposeOfLoan(memberLoanDetailsData?.purposeId)
-	// }, [memberLoanDetailsData?.purposeId])
+	
 
 	const getFunds = async () => {
 		setLoading(true)
@@ -253,8 +221,8 @@ Authorization: `${tokenValue?.token}`, // example header
 				
 if(res?.data?.suc === 0){
 // Message('error', res?.data?.msg)
-navigate(routePaths.LANDING)
-localStorage.clear()
+// navigate(routePaths.LANDING)
+// localStorage.clear()
 } else {
 				setFunds(res?.data?.msg)
 }
@@ -292,28 +260,7 @@ localStorage.clear()
 			})
 	}
 
-	// const saveTxnDetails = async () => {
-	// 	const creds = {
-	// 		modified_by: userDetails?.emp_id,
-	// 		loan_id: params?.id,
-
-	// 		trans_dt: tnxDetails?.map((item, i) => ({
-	// 			payment_date: formatDateToYYYYMMDD(item?.payment_date),
-	// 			payment_id: item?.payment_id,
-	// 		})),
-	// 	}
-
-	// 	console.log("DSDS", creds)
-	// 	await axios
-	// 		.post(`${url}/admin/change_loan_trans_date`, creds)
-	// 		.then((res) => {
-	// 			console.log("SAVE TXN DTLSSSS", res?.data)
-	// 			Message("success", res?.data?.msg)
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log("ERRR:S:S:S", err)
-	// 		})
-	// }
+	
 
 	// Save the transaction details by calling the API.
 	const saveTxnDetails = async (payment_date, payment_id, tr_type) => {
@@ -371,6 +318,57 @@ localStorage.clear()
 
 	const fileName = `Txn_Details_${new Date().toLocaleString("en-GB")}.xlsx`
 
+
+	const getClientIP = async () => {
+		const res = await fetch("https://api.ipify.org?format=json")
+		const data = await res.json()
+		return data.ip
+	}
+
+		const approveDisbursement = async () => {
+
+			setLoading(true)
+	
+					const ip = await getClientIP()
+	
+					const creds = {
+					tenant_id: userDetails[0]?.tenant_id,
+					branch_id: userDetails[0]?.brn_code,
+					voucher_dt: formatDateToYYYYMMDD(new Date()),
+					voucher_id: 0,
+					trans_id: tnxDetails[0]?.trans_id,
+					voucher_type: "J",
+					acc_code: "23101",
+					trans_type: tnxDetails[0]?.trans_type,
+					dr_amt: tnxDetails[0]?.disb_amt,
+					cr_amt: tnxDetails[0]?.disb_amt,
+					loan_id: tnxDetails[0]?.loan_id,
+					// member_loan_id: tnxDetails[0]?.loan_id,
+					created_by: userDetails[0]?.emp_id,
+					ip_address: ip,
+				}
+	
+	
+					// console.log(creds, 'formDataformDataformDataformData', tnxDetails[0]?.main_trans_id);
+					// return
+	
+					await saveMasterData({
+					endpoint: "account/save_loan_voucher",
+					creds,
+					navigate,
+					successMsg: "Transaction Accepted",
+					onSuccess: () => navigate(-1),
+	
+					// 🔥 fully dynamic failure handling
+					failureRedirect: routePaths.LANDING,
+					clearStorage: true,
+					})
+	
+					console.log(creds, 'formDataformDataformDataformData');
+	
+					setLoading(false)
+					}
+
 	return (
 		<>
 			{/* {disburseOrNot && (
@@ -422,6 +420,10 @@ localStorage.clear()
 								<div
 									className={`relative overflow-x-auto shadow-md sm:rounded-lg`}
 								>
+									{/* {JSON.stringify(tnxDetails, 2)} */}
+										{/* ////
+									{JSON.stringify(dataToExport, 2)} */}
+
 									<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
 										<thead className="text-xs text-slate-50 uppercase bg-slate-700 dark:bg-gray-700 dark:text-gray-400">
 											<tr>
@@ -429,57 +431,40 @@ localStorage.clear()
 													Sl. No.
 												</th>
 												<th scope="col" className="px-6 py-3 font-semibold">
-													Date
+													Loan Id
 												</th>
 												<th scope="col" className="px-6 py-3 font-semibold">
-													Tnx. ID.
+													Transaction ID
 												</th>
 												<th scope="col" className="px-6 py-3 font-semibold">
-													Tnx. Type
+													Transaction Date
 												</th>
 												<th scope="col" className="px-6 py-3 font-semibold">
-													Debit
+													Transaction Type
 												</th>
 												<th scope="col" className="px-6 py-3 font-semibold">
-													Credit
+													Debit Amount 
 												</th>
+												<th scope="col" className="px-6 py-3 font-semibold">
+													Credit Amount 
+												</th>
+												<th scope="col" className="px-6 py-3 font-semibold">
+													Outstanding Amount
+												</th>
+												<th scope="col" className="px-6 py-3 font-semibold">
+													Approval Status
+												</th>
+												
 												{/* <th scope="col" className="px-6 py-3 font-semibold">
-													Balance
-												</th>
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Interest Balance
-												</th> */}
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Outstanding
-												</th>
-
-												{/* <th scope="col" className="px-6 py-3 font-semibold">
-													Chq. ID.
-												</th>
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Chq. Date
-												</th> */}
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Mode
-												</th>
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Particulars
-												</th>
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Status
-												</th>
-												<th scope="col" className="px-6 py-3 font-semibold">
 													Approve Details
-												</th>
-												{/* <th scope="col" className="px-6 py-3 font-semibold">
-													Status
 												</th> */}
-												{/* <th scope="col" className="px-6 py-3 font-semibold">
-													<span className="sr-only">Action</span>
-												</th> */}
+												
 											</tr>
 										</thead>
 										<tbody>
+
+											
+
 											{tnxDetails?.map((item, i) => {
 												totalCredit += item?.credit
 												totalDebit += item?.debit
@@ -501,11 +486,12 @@ localStorage.clear()
 																{i + 1}
 															</td>
 															<td className="px-6 py-4">
+																{item?.loan_id}
 																{/* {new Date(item?.payment_date).toLocaleDateString(
 																"en-GB"
 															) || ""} */}
 
-																<div>
+																{/* <div>
 																	<TDInputTemplateBr
 																		placeholder="Payment Date..."
 																		type="date"
@@ -526,57 +512,16 @@ localStorage.clear()
 																			true
 																		}
 																	/>
-																</div>
+																</div> */}
 															</td>
-															<td className="px-6 py-4">{item?.payment_id}</td>
-															<td className="px-6 py-4">
-																{item?.tr_type === "D"
-																	? "Disbursement"
-																	: item?.tr_type === "I"
-																	? "Interest"
-																	: item?.tr_type === "R"
-																	? "Recovery"
-																	: item?.tr_type === "O"
-																	? "Overdue"
-																	: "Error"}
-															</td>
-															<td className="px-6 py-4">
-																{item?.debit || 0}/-
-															</td>
-															<td className="px-6 py-4">
-																{item?.credit || 0}/-
-															</td>
-															{/* <td className="px-6 py-4">
-																{item?.prn_bal || 0}/-
-															</td>
-															<td className="px-6 py-4">
-																{item?.intt_balance || 0}/-
-															</td> */}
-															<td className="px-6 py-4">
-																{item?.outstanding || 0}/-
-															</td>
-
-															{/* <td className="px-6 py-4">
-														{new Date(item?.payment_date).toLocaleDateString(
-															"en-GB"
-														) || ""}
-													</td> */}
-															{/* <td className="px-6 py-4">
-															{item?.cheque_id || 0}
-														</td>
-														<td className="px-6 py-4">
-															{new Date(item?.chq_dt).toLocaleDateString(
-																"en-GB"
-															) || ""}
-														</td> */}
-															<td className="px-6 py-4">
-																{item?.tr_mode === "B"
-																	? "Bank"
-																	: item?.tr_mode === "C"
-																	? "Cash"
-																	: "Error"}
-															</td>
-															<td className="px-6 py-4">{item?.particulars}</td>
+															<td className="px-6 py-4">{item?.trans_id}</td>
+															<td className="px-6 py-4">{item?.trans_dt}</td>
+															<td className="px-6 py-4">{item?.trans_type == 'D' ? 'Disbursement' : ''}</td>
+															<td className="px-6 py-4">{item?.dr_amt || 0}/-</td>
+															<td className="px-6 py-4">{item?.cr_amt || 0}/-</td>
+															<td className="px-6 py-4">{item?.curr_prn || 0}/-</td>
+															<td className="px-6 py-4">{item?.approval_status}</td>
+{/* 															
 															<td
 																className={`px-6 py-4 ${
 																	item?.status === "A"
@@ -592,23 +537,12 @@ localStorage.clear()
 																	? "Unapproved"
 																	: "Error"}
 															</td>
-															{/* <td className="px-6 py-4 text-right">
-														<button
-															onClick={() => {
-																navigate(
-																	`/homebm/memberloandetails/${item?.loan_id}`
-																)
-															}}
-															className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-														>
-															Edit
-														</button>
-													</td> */}
+															
 													<td>
 														{item?.approved_by && `${item?.approved_by} - `}
 														{item?.approved_at && `${moment(item?.approved_at).format('DD/MM/YYYY')}`}
 
-													</td>
+													</td> */}
 														</tr>
 													</>
 												)
@@ -621,7 +555,7 @@ localStorage.clear()
 													564654
 												</td>
 											</tr> */}
-											<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600">
+											{/* <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600">
 												<td colSpan={4} className="px-6 py-4 font-semibold">
 													Total
 												</td>
@@ -637,12 +571,45 @@ localStorage.clear()
 												>
 													{totalCredit?.toFixed(2)}/-
 												</td>
-											</tr>
+											</tr> */}
 										</tbody>
 									</table>
 								</div>
 							</Spin>
 						</div>
+						{tnxDetails[0]?.approval_status == 'Unapproved' &&(
+						<div className="flex justify-center mt-8">
+						<button
+						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+						onClick={async () => {
+						// await checkingBeforeApprove()
+						setVisible(true)
+						}}
+						>
+						<CheckCircleOutlined /> <span className={`ml-2`}>Accept Transaction</span>
+						</button>
+						</div>
+						)}
+						
+
+						<DialogBox
+					flag={4}
+					onPress={() => setVisible(!visible)}
+					visible={visible}
+					onPressYes={async () => {
+
+						await approveDisbursement()
+							.then(() => {
+							})
+							.catch((err) => {
+								console.log("Err in RecoveryCoApproveTable.jsx", err)
+							})
+						setVisible(!visible)
+					}}
+					onPressNo={() => {
+						setVisible(!visible)
+					}}
+				/>
 
 						{/* {!disableCondition() && (
 							<div className="text-center mt-6">
@@ -712,7 +679,7 @@ localStorage.clear()
 			</Spin>
 
 			{/* For Approve */}
-			<DialogBox
+			{/* <DialogBox
 				flag={4}
 				onPress={() => setVisible(!visible)}
 				visible={visible}
@@ -722,7 +689,7 @@ localStorage.clear()
 					setVisible(!visible)
 				}}
 				onPressNo={() => setVisible(!visible)}
-			/>
+			/> */}
 
 			{/* For Reject */}
 			<DialogBox
@@ -752,4 +719,4 @@ localStorage.clear()
 	)
 }
 
-export default MemberLoanDetailsForm
+export default MemberLoanDetailsForm_BDCCB

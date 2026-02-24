@@ -95,6 +95,10 @@ const SearchMemberForDisbursePACS_BDCCB = lazy(() => import("./Screens/PACSHome/
 const DisbursedLoanApproveSinglePACS_BDCCB =  lazy(() => import("./Screens/PACSHome/DisbursedLoanApproveSinglePACS_BDCCB.jsx"));
 const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/AcceptDisburseFormPACS_BDCCB.jsx"));
 
+const SearchViewLoanBM = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_BDCCB.jsx"))
+const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
+const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
+
 //////////////// BDCCB PACS End ////////////////
 
 //////////////// BDCCB Transaction Open Start ////////////////
@@ -157,13 +161,8 @@ const EditMasterBank = lazy(() =>
 const EditRecoveryApproveFormBM = lazy(() =>
 	import("./Screens/BMHome/EditRecoveryApproveFormBM")
 )
-const SearchViewLoanBM = lazy(() => import("./Screens/BMHome/SearchViewLoanBM"))
-const EditViewLoanFormBM = lazy(() =>
-	import("./Screens/BMHome/EditViewLoanFormBM")
-)
-const MemberLoanDetailsBM = lazy(() =>
-	import("./Screens/BMHome/MemberLoanDetailsBM")
-)
+
+
 const MemberwiseRecoveryReport = lazy(() =>
 	import("./Screens/Reports/MemberwiseRecoveryReport")
 )
@@ -560,6 +559,18 @@ const router = createBrowserRouter([
 							{
 								path: "approvedisbursed/:id",
 								element: <AcceptDisburseFormPACS_BDCCB />,
+							},
+							{
+								path: "viewloan",
+								element: <SearchViewLoanBM />,
+							},
+							{
+								path: "viewloan/:id",
+								element: <EditViewLoanFormBM />,
+							},
+							{
+								path: "memberloandetails/:id",
+								element: <MemberLoanDetailsBM />,
 							},
 							
 						],

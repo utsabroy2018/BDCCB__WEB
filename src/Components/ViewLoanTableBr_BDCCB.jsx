@@ -14,7 +14,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import { Tag } from "antd"
 
-function ViewLoanTableBr({
+function ViewLoanTableBr_BDCCB({
 	loanAppData,
 	setSearch,
 	title,
@@ -126,7 +126,10 @@ function ViewLoanTableBr({
 								Group Name
 							</th>
 							<th scope="col" className="p-4">
-								Group Type
+								Total Member
+							</th>
+							<th scope="col" className="p-4">
+								Total Outstanding
 							</th>
 							{/* <th scope="col" className="p-4">
 								Member Code
@@ -169,38 +172,14 @@ function ViewLoanTableBr({
 									</th> */}
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
+									<td className="px-6 py-3 text-slate-700">{item.tot_member}</td>
+									<td className="px-6 py-3 text-slate-700">{item.tot_outstanding}</td>
 									<td className="px-6 py-3 text-slate-700">
-										{item.group_type === "J" ? "JLG" : "SHG"}
-									</td>
-									<td className="px-6 py-3 text-slate-700">
-										{flag !== "BM" ? (
-											// <Link
-											// 	to={
-											// 		routePaths.MIS_ASSISTANT_EDIT_GROUP +
-											// 		item?.prov_grp_code
-											// 	}
-											// >
-											<button
+										<button
 												// to={routePaths.BM_EDIT_GRT + item?.form_no}
 												onClick={() => {
 													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homeco/viewloan/${item?.group_code}`, {
-														state: item,
-													})
-												}}
-											>
-												<EditOutlined
-													className={`text-md text-[#DA4167]
-													}`}
-												/>
-											</button>
-										) : (
-											// </Link>
-											<button
-												// to={routePaths.BM_EDIT_GRT + item?.form_no}
-												onClick={() => {
-													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homebm/viewloan/${item?.group_code}`, {
+													navigate(`/homepacs/viewloan/${item?.group_code}`, {
 														state: item,
 													})
 												}}
@@ -211,7 +190,6 @@ function ViewLoanTableBr({
 													}`}
 												/>
 											</button>
-										)}
 									</td>
 								</tr>
 							)) :<tr
@@ -238,4 +216,4 @@ function ViewLoanTableBr({
 	)
 }
 
-export default ViewLoanTableBr
+export default ViewLoanTableBr_BDCCB

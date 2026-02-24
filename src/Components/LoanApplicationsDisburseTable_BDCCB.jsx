@@ -91,7 +91,7 @@ function LoanApplicationsDisburseTable_BDCCB({
 									></Column> */}
 				
 									<Column
-										field="trans_id"
+										field="tran_id"
 										header="Transaction ID"
 										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
 									></Column>

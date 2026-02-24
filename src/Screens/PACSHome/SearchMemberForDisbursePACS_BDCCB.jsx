@@ -187,7 +187,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 													transition={{ delay: 1, type: "just" }}
 													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
-													{"Loan Disburse Branch to PACS"}
+													{"Indirect Loan"}
 												</motion.h2>
 											{/* </div> */}
 										</div>

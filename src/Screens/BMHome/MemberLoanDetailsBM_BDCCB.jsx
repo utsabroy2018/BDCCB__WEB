@@ -14,9 +14,9 @@ import RecoveryForm from "../Forms/RecoveryForm"
 import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 import axios from "axios"
 import { url } from "../../Address/BaseUrl"
-import MemberLoanDetailsForm from "../Forms/MemberLoanDetailsForm"
+import MemberLoanDetailsForm from "../Forms/MemberLoanDetailsForm_BDCCB"
 
-function MemberLoanDetailsBM() {
+function MemberLoanDetailsBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -107,4 +107,4 @@ function MemberLoanDetailsBM() {
 	)
 }
 
-export default MemberLoanDetailsBM
+export default MemberLoanDetailsBM_BDCCB

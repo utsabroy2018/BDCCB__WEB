@@ -72,8 +72,8 @@ const formatINR = (num) =>
 	const form_validationSchema = Yup.object({
 		member_from: Yup.string().required("** This field is mandatory"),
 		member_to: Yup.string().required("** This field is mandatory").test('not-same', 'From and To cannot be the same', function (value) {
-      		return value !== this.parent.member_from;
-    	}),
+			return value !== this.parent.member_from;
+		}),
 	})
 function GroupExtendedForm({ groupDataArr }) {
 // 	const markers = [
@@ -118,6 +118,9 @@ const containerStyle = {
 	const [visible, setVisible] = useState(() => false)
 	const [pendingValues, setPendingValues] = useState(null);
 	const [mobileExists, setMobileExists] = useState();
+	const [adharNoExists, setAdharNoExists] = useState();
+	const [adharStatus, setAdharStatus] = useState({})
+	const [SBAccountStatus, setSBAccountStatus] = useState({})
 
 	const initialValues = {
 		g_group_name: "",
@@ -141,9 +144,10 @@ const containerStyle = {
 				member_id : 0,
 				member_name: "",
 				address: "",
+				sb_acc_no: "",
 				aadhar_no: "",
 				gp_leader_flag: "N",
-    			asst_gp_leader_flag: "N",
+				asst_gp_leader_flag: "N",
 				},
 			],
 	}
@@ -162,91 +166,42 @@ const containerStyle = {
 		village_id: Yup.mixed(),
 		g_phone1: Yup.mixed().required("Mobile No. is required"),
 
-		// 🔥 MEMBER VALIDATION
-		// members: Yup.array().of(
-		// Yup.object({
-		// member_name: Yup.string().required("Member name required"),
-		// address: Yup.string().required("Address required"),
-		// aadhar_no: Yup.string()
-		// .length(12, "Aadhaar must be 12 digits")
-		// .required("Aadhaar required"),
-		// is_leader: Yup.boolean(),
-		// })
-		// )
-		// .min(1, "At least one member required"),
-		// 🔥 MEMBER VALIDATION
-// members: Yup.array()
-//   .of(
-//     Yup.object({
-//       member_name: Yup.string().required("Member name required"),
+		members: Yup.array()
+		.of(
+			Yup.object({
+			member_name: Yup.string().required("Member name required"),
 
-//       address: Yup.string().required("Address required"),
+			address: Yup.string().required("Address required"),
+			sb_acc_no: Yup.string().required("SB Acc No. required"),
+			aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
+			// aadhar_no: Yup.string(),
 
-//       aadhar_no: Yup.string()
-//         .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
-//         .required("Aadhaar required"),
+			gp_leader_flag: Yup.string()
+				.oneOf(["Y", "N"])
+				.required(),
 
-//       gp_leader_flag: Yup.boolean(),
-//       asst_gp_leader_flag: Yup.boolean(),
-//     })
-//   )
-//   .min(1, "At least one member required")
+			asst_gp_leader_flag: Yup.string()
+				.oneOf(["Y", "N"])
+				.required(),
+			})
+		).min(1, "At least one member required")
 
-//   // 🔐 ROLE VALIDATION
-//   .test(
-//     "leader-assistant-rule",
-//     "Only one Group Leader and one Assistant Member allowed",
-//     (members = []) => {
-//       const leaderCount = members.filter(
-//         (m) => m.gp_leader_flag
-//       ).length;
+		// 🔐 ROLE VALIDATION
+		.test(
+			"leader-assistant-rule",
+			"Only one Group Leader and one Assistant Member allowed",
+			(members = []) => {
+			const leaderCount = members.filter(
+				(m) => m.gp_leader_flag === "Y"
+			).length;
 
-//       const assistantCount = members.filter(
-//         (m) => m.asst_gp_leader_flag
-//       ).length;
+			const assistantCount = members.filter(
+				(m) => m.asst_gp_leader_flag === "Y"
+			).length;
 
-//       return leaderCount <= 1 && assistantCount <= 1;
-//     }
-//   )
-
-members: Yup.array()
-  .of(
-    Yup.object({
-      member_name: Yup.string().required("Member name required"),
-
-      address: Yup.string().required("Address required"),
-
-    //   aadhar_no: Yup.string()
-    //     .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
-    //     .required("Aadhaar required"),
-	aadhar_no: Yup.string(),
-
-      gp_leader_flag: Yup.string()
-        .oneOf(["Y", "N"])
-        .required(),
-
-      asst_gp_leader_flag: Yup.string()
-        .oneOf(["Y", "N"])
-        .required(),
-    })
-  ).min(1, "At least one member required")
-
-  // 🔐 ROLE VALIDATION
-  .test(
-    "leader-assistant-rule",
-    "Only one Group Leader and one Assistant Member allowed",
-    (members = []) => {
-      const leaderCount = members.filter(
-        (m) => m.gp_leader_flag === "Y"
-      ).length;
-
-      const assistantCount = members.filter(
-        (m) => m.asst_gp_leader_flag === "Y"
-      ).length;
-
-      return leaderCount <= 1 && assistantCount <= 1;
-    }
-  )
+			return leaderCount <= 1 && assistantCount <= 1;
+			}
+		)
 
 
 
@@ -265,6 +220,8 @@ members: Yup.array()
 
 	// wherever you open popup (e.g. on submit)
 	const handleOpenConfirm = (values) => {
+		
+		
 	setPendingValues(values);   // store formik values
 	setVisible(true);           // open dialog
 	};
@@ -274,6 +231,7 @@ members: Yup.array()
 		// if (params?.id > 0) {
 		// 	editGroup(values)
 		// }
+		console.log(values, 'values');
 		handleOpenConfirm(values)
 			
 	}
@@ -697,7 +655,7 @@ members: Yup.array()
 		})
 			.then((res) => {
 
-		console.log('gggggggggggggggggggggggg', res?.data?.data);
+		// console.log('gggggggggggggggggggggggg', res?.data?.data);
 
 			if(res?.data?.success){
 			setVillName(res?.data?.data?.map((item, i) => ({
@@ -782,69 +740,69 @@ const handleFormikMasterChange = async (e) => {
 
   // 2️⃣ District changed
   if (name === "dist_id") {
-    if (value?.length > 0) {
-      fetchBlock(value);
-      fetchPoliceStation(value);
-      fetchPosOffice(value);
-      fetchBranch(value);
-      console.log("load district");
-    } else {
-      setBlocks([]);
-      setPoliceStation([]);
-      setPostOffice([]);
-      setBranch([]);
-      console.log("reset district");
-    }
+	if (value?.length > 0) {
+	  fetchBlock(value);
+	  fetchPoliceStation(value);
+	  fetchPosOffice(value);
+	  fetchBranch(value);
+	  console.log("load district");
+	} else {
+	  setBlocks([]);
+	  setPoliceStation([]);
+	  setPostOffice([]);
+	  setBranch([]);
+	  console.log("reset district");
+	}
 
-    // reset dependent Formik fields
-    formik.setFieldValue("block_id", "");
-    formik.setFieldValue("ps_id", "");
-    formik.setFieldValue("po_id", "");
-    formik.setFieldValue("gp_id", "");
-    formik.setFieldValue("village_id", "");
-    formik.setFieldValue("branch_code", "");
-    setGpName([]);
-    setVillName([]);
+	// reset dependent Formik fields
+	formik.setFieldValue("block_id", "");
+	formik.setFieldValue("ps_id", "");
+	formik.setFieldValue("po_id", "");
+	formik.setFieldValue("gp_id", "");
+	formik.setFieldValue("village_id", "");
+	formik.setFieldValue("branch_code", "");
+	setGpName([]);
+	setVillName([]);
   }
 
   // 3️⃣ Block changed
   if (name === "block_id") {
-    const distId = formik.values.dist_id;
+	const distId = formik.values.dist_id;
 
-    if (distId?.length > 0 && value?.length > 0) {
-      fetchGPList(distId, value);
-    } else {
-      setGpName([]);
-    }
+	if (distId?.length > 0 && value?.length > 0) {
+	  fetchGPList(distId, value);
+	} else {
+	  setGpName([]);
+	}
 
-    // reset downstream
-    formik.setFieldValue("gp_id", "");
-    formik.setFieldValue("village_id", "");
-    setVillName([]);
+	// reset downstream
+	formik.setFieldValue("gp_id", "");
+	formik.setFieldValue("village_id", "");
+	setVillName([]);
   }
 
   // 4️⃣ GP changed
   if (name === "gp_id") {
-    const distId = formik.values.dist_id;
-    const blockId = formik.values.block_id;
+	const distId = formik.values.dist_id;
+	const blockId = formik.values.block_id;
 
-    if (distId?.length > 0 && blockId?.length > 0 && value?.length > 0) {
-      fetchVillList(distId, blockId, value);
-    } else {
-      setVillName([]);
-    }
+	if (distId?.length > 0 && blockId?.length > 0 && value?.length > 0) {
+	  fetchVillList(distId, blockId, value);
+	} else {
+	  setVillName([]);
+	}
 
-    // reset village
-    formik.setFieldValue("village_id", "");
+	// reset village
+	formik.setFieldValue("village_id", "");
   }
 };
 
 
 const handleGroupLeaderChange = (index) => {
   const updated = formik.values.members.map((m, i) => ({
-    ...m,
-    gp_leader_flag: i === index ? "Y" : "N",
-    asst_gp_leader_flag: i === index ? "N" : m.asst_gp_leader_flag,
+	...m,
+	gp_leader_flag: i === index ? "Y" : "N",
+	asst_gp_leader_flag: i === index ? "N" : m.asst_gp_leader_flag,
   }));
 
   formik.setFieldValue("members", updated);
@@ -855,9 +813,9 @@ const handleGroupLeaderChange = (index) => {
 
 const handleAssistantChange = (index) => {
   const updated = formik.values.members.map((m, i) => ({
-    ...m,
-    asst_gp_leader_flag: i === index ? "Y" : "N",
-    gp_leader_flag: i === index ? "N" : m.gp_leader_flag,
+	...m,
+	asst_gp_leader_flag: i === index ? "Y" : "N",
+	gp_leader_flag: i === index ? "N" : m.gp_leader_flag,
   }));
 
   formik.setFieldValue("members", updated);
@@ -865,18 +823,19 @@ const handleAssistantChange = (index) => {
 
 const checkMobileExists = async (mobile) => {
   try {
-    const res = await axios.get(`${url_bdccb}/user/checkuser`, {
-      params: { user_id: mobile },
-    });
+	const res = await axios.get(`${url_bdccb}/user/checkuser`, {
+	  params: { user_id: mobile },
+	});
 
 	setMobileExists(res.data)
 	
-    return res.data; // true / false
+	return res.data; // true / false
   } catch (err) {
-    console.log(err);
-    return false;
+	console.log(err);
+	return false;
   }
 };
+
 
 
 const handleMobileChange = async (e) => {
@@ -885,20 +844,128 @@ const handleMobileChange = async (e) => {
   formik.setFieldValue("g_phone1", value);
 
   if (value.length === 10) {
-    const exists = await checkMobileExists(value);
+	const exists = await checkMobileExists(value);
 
 
-    if (exists?.user_status == 1) {
-      formik.setFieldValue("g_phone1", "");
-    }
+	if (exists?.user_status == 1) {
+	  formik.setFieldValue("g_phone1", "");
+	}
   }
 };
 
 
+const checkAdharNoExists = async (aadhaarNo, index) => {
+	try {
+	const res = await axios.get(`${url_bdccb}/group/checkaddhar`, {
+	  params: { aadhar_no: aadhaarNo },
+	});
+
+	setAdharStatus(prev => ({
+	  ...prev,
+	  [index]: res.data
+	}));
+  } catch (err) {
+	console.log(err);
+  }
+};
 
 
+const handleAdharNoChange = (e, index) => {
+  let value = e.target.value.replace(/\D/g, "");
+
+  if (value.length > 12) return;
+
+  const members = [...formik.values.members];
+
+  // 🔴 DUPLICATE CHECK INSIDE FORM
+  const isDuplicate = members.some(
+	(m, i) => i !== index && m.aadhar_no === value
+  );
+
+  if (isDuplicate) {
+	// set error message for this row
+	setAdharStatus(prev => ({
+	  ...prev,
+	  [index]: {
+		user_status: 1,
+		msg: "Duplicate Aadhaar No.",
+	  },
+	}));
+  } else {
+	// clear duplicate message
+	setAdharStatus(prev => {
+	  const copy = { ...prev };
+	  delete copy[index];
+	  return copy;
+	});
+
+	// call API only if 12 digits and not duplicate
+	if (value.length === 12) {
+	  checkAdharNoExists(value, index);
+	}
+  }
+
+  members[index].aadhar_no = value;
+  formik.setFieldValue("members", members);
+};
+
+const checkSBAccNoExists = async (sbAcc, index) => {
+	try {
+	const res = await axios.get(`${url_bdccb}/group/checacc_no`, {
+	  params: { account_no: sbAcc },
+	});
+
+	setSBAccountStatus(prev => ({
+	  ...prev,
+	  [index]: res.data
+	}));
+  } catch (err) {
+	console.log(err);
+  }
+};
 
 
+const handleSBAccNoChange = (e, index) => {
+  let value = e.target.value.replace(/\D/g, "");
+
+//   console.log(value, 'valuevaluevaluevalue');
+  
+
+//   if (value.length === 12) return;
+
+  const members = [...formik.values.members];
+
+  // 🔴 DUPLICATE CHECK INSIDE FORM
+  const isDuplicate = members.some(
+	(m, i) => i !== index && m.sb_acc_no === value
+  );
+
+  if (isDuplicate) {
+	// set error message for this row
+	setSBAccountStatus(prev => ({
+	  ...prev,
+	  [index]: {
+		user_status: 1,
+		msg: "Duplicate SB A/C No.",
+	  },
+	}));
+  } else {
+	// clear duplicate message
+	setSBAccountStatus(prev => {
+	  const copy = { ...prev };
+	  delete copy[index];
+	  return copy;
+	});
+
+	// call API only if 12 digits and not duplicate
+	// if (value.length > 0) {
+	  checkSBAccNoExists(value, index);
+	// }
+  }
+
+  members[index].sb_acc_no = value;
+  formik.setFieldValue("members", members);
+};
 	return (
 		<>
 		{/* {
@@ -1033,9 +1100,9 @@ const handleMobileChange = async (e) => {
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="Mobile No. Of Group Leader"
+									placeholder="Mobile No. Of Group Leader/Sahayika"
 									type="number"
-									label="Mobile No. Of Group Leader"
+									label="Mobile No. Of Group Leader/Sahayika"
 									name="g_phone1"
 									// handleChange={formik.handleChange}
 									handleChange={handleMobileChange} 
@@ -1043,8 +1110,6 @@ const handleMobileChange = async (e) => {
 									formControlName={formik.values.g_phone1}
 									mode={1}
 								/>
-								
-								{/* {JSON.stringify(mobileExists, null, 2)} */}
 								{mobileExists?.user_status == 1 ?(
 									<div style={{fontSize:12, color:'red'}}>{mobileExists?.msg}</div>
 								) : (
@@ -1218,154 +1283,178 @@ const handleMobileChange = async (e) => {
   
 
   {formik.values.members.map((member, index) => {
-    const isRowFilled =
-      member.member_name &&
-      member.address &&
-      member.aadhar_no;
+	const isRowFilled =
+	  member.member_name &&
+	  member.address &&
+	  member.aadhar_no &&
+	  String(member.aadhar_no).length === 12 &&
+	  member.sb_acc_no;
+	//   String(member.sb_acc_no).length === 2;
 
-    return (
-      <div
-        key={index}
-        className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{position:'relative'}}
-      >
-        {/* Leader */}
-        {/* <div className="col-span-2 flex flex-col gap-1 items-start">
-  <label className="flex items-center gap-2 text-xs">
-    <input
-      type="checkbox"
-      name={`members[${index}].is_leader`}
-      checked={member.is_leader}
-      onChange={formik.handleChange}
-    />
-    Group Leader
-  </label>
-
-  <label className="flex items-center gap-2 text-xs">
-    <input
-      type="checkbox"
-      name={`members[${index}].is_assistant`}
-      checked={member.is_assistant}
-      onChange={formik.handleChange}
-    />
-    Assistant Member
-  </label>
-</div> */}
+	return (
+	  <div
+		key={index}
+		className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{position:'relative'}}
+	  >
+	 
 
 {/* Designation */}
 <div className="col-span-12 flex flex-col gap-1" style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'start'}}>
   {/* Group Leader */}
   <label className="flex items-center gap-1 text-xs" style={{fontSize:11}}>
-    <input
-      type="checkbox"
-    //   checked={member.gp_leader_flag}
+	<input
+	  type="checkbox"
+	//   checked={member.gp_leader_flag}
 	checked={member.gp_leader_flag === "Y"}
-      onChange={() => handleGroupLeaderChange(index)}
-    />
-    Group Leader
+	  onChange={() => handleGroupLeaderChange(index)}
+	/>
+	Group Leader
   </label>
 
   {/* Assistant Member */}
   <label className="flex items-center gap-1 text-xs" style={{fontSize:11}}>
-    <input
-      type="checkbox"
-    //   checked={member.asst_gp_leader_flag}
+	<input
+	  type="checkbox"
+	//   checked={member.asst_gp_leader_flag}
 	checked={member.asst_gp_leader_flag === "Y"}
-      onChange={() => handleAssistantChange(index)}
-    />
-    Assistant Leader
+	  onChange={() => handleAssistantChange(index)}
+	/>
+	Assistant Leader  
   </label>
 </div>
 
 
-        {/* Name */}
-        <div className="col-span-3">
-          <TDInputTemplateBr
-            placeholder="Member Name"
-            type="text"
-            name={`members[${index}].member_name`}
-            formControlName={member.member_name}
-            handleChange={formik.handleChange}
-            mode={1}
-          />
-        </div>
+		{/* Name */}
+		<div className="col-span-2">
+		  <TDInputTemplateBr
+			placeholder="Member Name"
+			type="text"
+			name={`members[${index}].member_name`}
+			formControlName={member.member_name}
+			handleChange={formik.handleChange}
+			mode={1}
+		  />
+		</div>
 
-        {/* Address */}
-        <div className="col-span-4">
-          <TDInputTemplateBr
-            placeholder="Address"
-            type="text"
-            name={`members[${index}].address`}
-            formControlName={member.address}
-            handleChange={formik.handleChange}
-            mode={1}
-          />
-        </div>
+		
 
-        {/* Aadhaar */}
-        <div className="col-span-5">
-          <TDInputTemplateBr
-            placeholder="Aadhaar No"
-            type="number"
-            name={`members[${index}].aadhar_no`}
-            formControlName={member.aadhar_no}
-            handleChange={formik.handleChange}
-            mode={1}
-          />
+		{/* SB ACC */}
+		<div className="col-span-2">
+		<TDInputTemplateBr
+			placeholder="SB A/C No."
+			type="text"   // ✅ MUST be text
+			name={`members[${index}].sb_acc_no`}
+			formControlName={member.sb_acc_no}
+			handleChange={(e) => handleSBAccNoChange(e, index)}
+			mode={1}
+			disabled={params?.id > 0}
+		/>
+
+		{/* {JSON.stringify(SBAccountStatus[index], null, 2)} */}
+
+		{member.sb_acc_no?.length > 0 && SBAccountStatus[index] && (
+		SBAccountStatus[index]?.user_status == 1 ? (
+			<div style={{ fontSize: 12, color: "red" }}>
+			{SBAccountStatus[index]?.msg}
+			</div>
+		) : (
+			<div style={{ fontSize: 12, color: "green" }}>
+			{SBAccountStatus[index]?.msg}
+			</div>
+		)
+		)}
 		  
-        </div>
+		</div>
 
-        {/* Remove */}
-        <div className="col-span-1 text-center" style={{position:'absolute', right:10}}>
-          {formik.values.members.length > 1 && (
-            <button
-              type="button"
-              onClick={() => {
-                const updated = [...formik.values.members];
-                updated.splice(index, 1);
-                formik.setFieldValue("members", updated);
-              }}
-              className="text-red-600 font-bold" style={{
-  background: "rgb(218 65 103 / var(--tw-bg-opacity))",
-  padding: "0 7px",
-  height: "25px",
-  color: "#fff",
-  lineHeight: "25px",
-  borderRadius: "5px",
-  marginTop: "13px",
-  fontSize: "13px",
-}}
-            >
-              ✕
-            </button>
-          )}
-        </div>
+		{/* Aadhaar */}
+		<div className="col-span-3">
+		<TDInputTemplateBr
+			placeholder="Aadhaar No"
+			type="text"   // ✅ MUST be text
+			name={`members[${index}].aadhar_no`}
+			formControlName={member.aadhar_no}
+			handleChange={(e) => handleAdharNoChange(e, index)}
+			mode={1}
+		/>
+		{/* {JSON.stringify(adharStatus[index], null, 2)} */}
+		{member.aadhar_no?.length === 12 && adharStatus[index] && (
+		adharStatus[index].user_status == 1 ? (
+			<div style={{ fontSize: 12, color: "red" }}>
+			{adharStatus[index].msg}
+			</div>
+		) : (
+			<div style={{ fontSize: 12, color: "green" }}>
+			{adharStatus[index].msg}
+			</div>
+		)
+		)}
+		  
+		</div>
 
-        {/* Add Button */}
-        {index === formik.values.members.length - 1 && (
-          <div className="col-span-12 text-right">
-            <Button
-              type="primary"
-              disabled={!isRowFilled}
-              onClick={() =>
-                formik.setFieldValue("members", [
-                  ...formik.values.members,
-                  {
+		{/* Address */}
+		<div className="col-span-5">
+		  <TDInputTemplateBr
+			placeholder="Address"
+			type="text"
+			name={`members[${index}].address`}
+			formControlName={member.address}
+			handleChange={formik.handleChange}
+			mode={1}
+		  />
+		</div>
+
+		{/* Remove */}
+		<div className="col-span-1 text-center" style={{position:'absolute', right:10}}>
+		  {formik.values.members.length > 1 && (
+			<button
+			  type="button"
+			  onClick={() => {
+				const updated = [...formik.values.members];
+				updated.splice(index, 1);
+				formik.setFieldValue("members", updated);
+			  }}
+			  className="text-red-600 font-bold" style={{
+			background: "rgb(218 65 103 / var(--tw-bg-opacity))",
+			padding: "0 7px",
+			height: "25px",
+			color: "#fff",
+			lineHeight: "25px",
+			borderRadius: "5px",
+			marginTop: "13px",
+			fontSize: "13px",
+			}}
+			>
+			  ✕
+			</button>
+		  )}
+		</div>
+
+		{/* Add Button */}
+		{index === formik.values.members.length - 1 && (
+		  <div className="col-span-12 text-right">
+			<Button
+			  type="primary"
+			  disabled={!isRowFilled || adharStatus[index]?.user_status == 1}
+			  onClick={() =>
+				formik.setFieldValue("members", [
+				  ...formik.values.members,
+				  {
 					member_id : 0,
-                    member_name: "",
-                    address: "",
-                    aadhar_no: "",
-                    gp_leader_flag: "N",
-        			asst_gp_leader_flag: "N",
-                  },
-                ])
-              }
-            >
-              + Add Member
-            </Button>
-          </div>
-        )}
-      </div>
-    );
+					member_name: "",
+					address: "",
+					aadhar_no: "",
+					gp_leader_flag: "N",
+					asst_gp_leader_flag: "N",
+				  },
+				])
+			  }
+			>
+			  + Add Member
+			</Button>
+		  </div>
+		)}
+	  </div>
+	);
   })}
 </div>
 {/* ===================================================== */}
@@ -1559,81 +1648,7 @@ const handleMobileChange = async (e) => {
 						</>
 					)}
 
-					{/* {params?.id < 1 && (
-						<>
-							{COMemList_s.length > 0 && (
-								<div className="sm:col-span-2 mt-5">
-									<div>
-										<label
-											className="block mb-2 text-sm capitalize font-bold text-slate-800
-					dark:text-gray-100"
-										>
-											{" "}
-											Assign Group Member
-											<span
-												style={{ color: "red" }}
-												className="ant-tag ml-2 ant-tag-error ant-tag-borderless text-[12.6px] my-2"
-											>
-												(You can Select Maxmimum 5 Member)
-											</span>
-										</label>
-
-										
-										<Toast ref={toast} />
-										<DataTable
-											value={COMemList_s?.map((item, i) => [
-												{ ...item, id: i },
-											]).flat()}
-											// expandedRows={expandedRows}
-											// onRowToggle={(e) => setExpandedRows(e.data)}
-											// onRowExpand={onRowExpand}
-											// onRowCollapse={onRowCollapse}
-											selectionMode="checkbox"
-											selection={COMemList_select}
-											// onSelectionChange={(e) => setSelectedProducts(e.value)}
-											onSelectionChange={(e) => handleSelectionChange(e)}
-											tableStyle={{ minWidth: "50rem" }}
-											// rowExpansionTemplate={rowExpansionTemplate}
-											dataKey="id"
-											paginator
-											rows={rowsPerPage}
-											first={currentPage}
-											onPage={onPageChange}
-											rowsPerPageOptions={[5, 10, 20]} // Add options for number of rows per page
-											tableClassName="w-full text-sm text-left rtl:text-right shadow-lg text-green-900dark:text-gray-400 table_Custome table_Custome_1st" // Apply row classes
-										>
-											<Column
-												header="Sl No."
-												body={(rowData) => (
-													<span style={{ fontWeight: "bold" }}>
-														{rowData?.id + 1}
-													</span>
-												)}
-											></Column>
-											
-											<Column
-												selectionMode="multiple"
-												headerStyle={{ pointerEvents: "none" }} // Disable "Select All"
-											></Column>
-											<Column
-												field="client_name"
-												header="Name "
-												// body={(rowData) =>
-												// new Date(rowData?.transaction_date).toLocaleDateString("en-GB")
-												// }
-											></Column>
-
-											<Column
-												field="form_no"
-												header="Form No."
-												// footer={<span style={{ fontWeight: "bold" }}>Total Amount:</span>}
-											></Column>
-										</DataTable>
-									</div>
-								</div>
-							)}
-						</>
-					)} */}
+					
 
 					{/* {userDetails?.id != 3 &&  */}
 					<BtnComp mode="A" onReset={formik.resetForm} param={params?.id} />
@@ -1646,17 +1661,17 @@ const handleMobileChange = async (e) => {
 				onPress={() => setVisible(!visible)}
 				visible={visible}
 				 onPressYes={() => {
-    if (pendingValues) {
+	if (pendingValues) {
 		if(params?.id > 0) {
 			editGroup(pendingValues);
 		} else {
 			saveGroupData(pendingValues) 
 		}
-        
+		
 	  
 	 // 🔥 pass values here
-    }
-    setVisible(false);
+	}
+	setVisible(false);
   }}
 				onPressNo={() => setVisible(!visible)}
 			/>
@@ -1665,10 +1680,10 @@ const handleMobileChange = async (e) => {
   onPress={() => setVisible(!visible)}
   visible={visible}
   onPressYes={() => {
-    if (pendingValues) {
-      editGroup(pendingValues);   // 🔥 pass values here
-    }
-    setVisible(false);
+	if (pendingValues) {
+	  editGroup(pendingValues);   // 🔥 pass values here
+	}
+	setVisible(false);
   }}
   onPressNo={() => setVisible(false)}
 /> */}

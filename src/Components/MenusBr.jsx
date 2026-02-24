@@ -2435,12 +2435,12 @@ const items_bdccb = [
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homepacs/disburseloan"}>Loan Disburse Branch to PACS</Link>,
+					label: <Link to={"/homepacs/disburseloan"}>Indirect Loan</Link>,
 				},
 				{
 					key: "sub4-2",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homebm/disburseloan"}>Loan Disburse Branch to SHG</Link>,
+					label: <Link to={"/homebm/disburseloan"}>Direct Loan</Link>,
 				}
 			],
 		},
@@ -2547,7 +2547,7 @@ const items_bdccb_PACS = [
 						{
 							key: "sub4-2-2",
 							icon: <CheckCircleOutlined />,
-							label: <Link to={""}>Recovery</Link>,
+							label: <Link to={"/homepacs/viewloan"}>Disburse 2</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
 					],
