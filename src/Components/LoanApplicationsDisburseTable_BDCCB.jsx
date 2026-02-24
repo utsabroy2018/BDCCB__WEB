@@ -91,17 +91,17 @@ function LoanApplicationsDisburseTable_BDCCB({
 									></Column> */}
 				
 									<Column
-										field="tran_id"
-										header="Transaction ID"
+										field="sanction_no"
+										header="Sanction No."
 										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
 									></Column>
 				
 									<Column
-										field="trans_dt"
-										header="Transaction Date"
-										body={(rowData) =>
-											new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
-										}
+										field="sanction_dt"
+										header="Sanction Date"
+										// body={(rowData) =>
+										// 	new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
+										// }
 										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
 									></Column>
 				

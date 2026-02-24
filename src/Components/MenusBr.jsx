@@ -2527,27 +2527,27 @@ const items_bdccb_PACS = [
 			icon: <ThunderboltOutlined />,
 			label: "Loans",
 			children: [
-				{
-					key: "sub4-1",
-					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homebm/disburseloan"}>Loan Disburse PACS to SHG</Link>,
-				},
+				// {
+				// 	key: "sub4-1",
+				// 	icon: <ThunderboltOutlined />,
+				// 	label: <Link to={"/homebm/disburseloan"}>Loan Disburse PACS to SHG</Link>,
+				// },
 				{
 					key: "sub4-2",
 					icon: <CheckCircleOutlined />,
 					label: "Accept Transaction",
 					// hidden: data?.approve_transaction == "Y" ? false : true,
 					children: [
-						{
-							key: "sub4-2-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homepacs/approvedisbursed"}>Disburse</Link>,
-							// hidden: data?.approve_transaction == "Y" ? false : true,
-						},
+						// {
+						// 	key: "sub4-2-1",
+						// 	icon: <CheckCircleOutlined />,
+						// 	label: <Link to={"/homepacs/approvedisbursed"}>Disburse</Link>,
+						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+						// },
 						{
 							key: "sub4-2-2",
 							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homepacs/viewloan"}>Disburse 2</Link>,
+							label: <Link to={"/homepacs/viewloan"}>Disburse</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
 					],

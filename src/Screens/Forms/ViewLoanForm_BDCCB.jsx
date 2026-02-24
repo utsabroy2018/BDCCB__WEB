@@ -73,6 +73,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	const [period_mode_val, setPeriodModeVal] = useState(0)
 	const [weekOfRecovery, setWeekOfRecovery] = useState(0)
 	const [actionType, setActionType] = useState(""); 
+	const [rej_res, setRejRes] = useState("")
 
 	const containerRef = useRef(null)
 
@@ -416,7 +417,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 
 	const approveDisbursement = async () => {
 	
-	alert('approveDisbursement')
+	// alert('approveDisbursement')
 
 	setLoading(true)
 
@@ -427,21 +428,23 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	branch_id: userDetails[0]?.brn_code,
 	voucher_dt: formatDateToYYYYMMDD(new Date()),
 	voucher_id: 0,
-	// trans_id: tnxDetails[0]?.trans_id,
+	trans_id: groupData[0]?.disb_details[0]?.trans_id,
 	voucher_type: "J",
 	acc_code: "23101",
-	// trans_type: tnxDetails[0]?.trans_type,
-	// dr_amt: tnxDetails[0]?.disb_amt,
-	// cr_amt: tnxDetails[0]?.disb_amt,
-	// loan_id: tnxDetails[0]?.loan_id,
-	// member_loan_id: tnxDetails[0]?.loan_id,
+	trans_type: 'C',
+	dr_amt: groupData[0]?.disb_details[0]?.disb_amt,
+	cr_amt: groupData[0]?.disb_details[0]?.disb_amt,
+	disb_amt : groupData[0]?.disb_details[0]?.disb_amt,
+	loan_id: groupData[0]?.disb_details[0]?.loan_id,
+	loan_acc_no: groupData[0]?.disb_details[0]?.loan_acc_no,
+	member_ids: groupData[0]?.memb_dt,
 	created_by: userDetails[0]?.emp_id,
 	ip_address: ip,
 	}
 
 
 	console.log(creds, 'formDataformDataformDataformData');
-	return
+	// return
 
 	await saveMasterData({
 	endpoint: "account/save_loan_voucher",
@@ -462,35 +465,24 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 
 	const rejectDisbursement = async () => {
 	
-	alert('rejectDisbursement')
+	// alert('rejectDisbursement')
 
 	setLoading(true)
 
 	const ip = await getClientIP()
 
 	const creds = {
-	tenant_id: userDetails[0]?.tenant_id,
-	branch_id: userDetails[0]?.brn_code,
-	voucher_dt: formatDateToYYYYMMDD(new Date()),
-	voucher_id: 0,
-	// trans_id: tnxDetails[0]?.trans_id,
-	voucher_type: "J",
-	acc_code: "23101",
-	// trans_type: tnxDetails[0]?.trans_type,
-	// dr_amt: tnxDetails[0]?.disb_amt,
-	// cr_amt: tnxDetails[0]?.disb_amt,
-	// loan_id: tnxDetails[0]?.loan_id,
-	// member_loan_id: tnxDetails[0]?.loan_id,
+	group_code: groupData[0]?.group_code,
+	trans_id: groupData[0]?.disb_details[0]?.trans_id,
+	loan_id: groupData[0]?.disb_details[0]?.loan_id,
+	loan_acc_no: groupData[0]?.disb_details[0]?.loan_acc_no,
+	reject_remarks: rej_res,
 	created_by: userDetails[0]?.emp_id,
 	ip_address: ip,
 	}
 
-
-	console.log(creds, 'formDataformDataformDataformData');
-	return
-
 	await saveMasterData({
-	endpoint: "account/save_loan_voucher",
+	endpoint: "loan/reject_disbursement",
 	creds,
 	navigate,
 	successMsg: "Transaction Accepted",
@@ -510,9 +502,9 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 		if(actionType == 'A'){
 			approveDisbursement()
 		}
-		if(actionType == 'R'){
-			rejectDisbursement()
-		}
+		// if(actionType == 'R'){
+		// 	rejectDisbursement()
+		// }
 	}
 
 	return (
@@ -531,7 +523,9 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 				<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
 					<div className="flex flex-col justify-start gap-5">
 						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
-						{/* {JSON.stringify(groupData[0]?.disb_details[0]?.approval_status, 2)} */}
+						{/* {JSON.stringify(groupData[0], 2)} ///
+						{JSON.stringify(groupData[0]?.memb_dt[0]?.approval_status, 2)} mmmmmmmmm
+						{JSON.stringify(groupData[0]?.disb_details[0], 2)} */}
 							<div className="text-[#DA4167] text-lg font-bold sm:col-span-3"> Society Loan Details</div>
 							{/* {params?.id > 0 && (
 								<div className="sm:col-span-2">
@@ -1255,7 +1249,8 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						param={params?.id}
 					/> */}
 
-					{groupData[0]?.disb_details[0]?.approval_status == 'U' &&(
+					{/* {groupData[0]?.disb_details[0]?.approval_status == 'U' &&( */}
+					{groupData[0]?.memb_dt[0]?.approval_status == 'U' &&(	
 						<div className="flex justify-center  sm:gap-6 mt-8">
 						<button
 						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
@@ -1269,7 +1264,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						<CheckCircleOutlined /> <span className={`ml-2`}>Accept Transaction</span>
 						</button>
 
-						<button
+						{/* <button
 						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] duration-300 rounded-full  dark:focus:ring-primary-900`}
 						onClick={async () => {
 						// await checkingBeforeApprove()
@@ -1279,7 +1274,48 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						}}
 						>
 						<CloseCircleOutlined /> <span className={`ml-2`}>Reject Transaction</span>
-						</button>
+						</button> */}
+
+						<div>
+				<Popconfirm
+				title={`Reject Transaction?`}
+				description={
+				<>
+				<div>
+				<TDInputTemplateBr
+				placeholder="Please give a reason behind rejecting this item"
+				type="date"
+				label="Please give a reason behind rejecting this item"
+				name="fromDate"
+				formControlName={rej_res}
+				handleChange={(e) => setRejRes(e.target.value)}
+				// min={"1900-12-31"}
+				mode={3}
+				/>
+				</div>
+				</>
+				}
+				onConfirm={async () => {
+				await rejectDisbursement()
+				// setData([])
+				Message("success", "Transaction Rejected.")
+				}}
+				onCancel={() => setRejRes("")}
+				okText="Reject"
+				cancelText="No"
+				// disabled={selectedRowIndices?.length === 0}
+				>
+				<a
+				className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
+				>
+				<CloseCircleOutlined />{" "}
+				<span className="ml-2">Reject Transaction</span>
+				</a>
+				</Popconfirm>
+				</div>
+
+						
+											
 						</div>
 						)} 
 
@@ -1301,6 +1337,10 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 							}}
 						/>
 				</form>
+
+			
+
+
 			</Spin>
 
 			{/* <DialogBox

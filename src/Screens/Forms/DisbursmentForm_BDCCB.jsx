@@ -345,7 +345,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 	const editGroup = async (formData) => {
 		if(formik.values.rows.reduce((sum, r) => sum + Number(r.amount || 0),0) > Number(formik.values.disb_amt)){
-			return Message("error", "Total Amount Gratter Than Disbursement Amount")
+			return Message("error", "Total Amount Greater Than Disbursement Amount")
 		}
 		// return;
 		const formattedRows = formData?.rows?.map(row => ({
@@ -465,9 +465,8 @@ function DisbursmentForm_BDCCB({ flag }) {
 			endpoint: "loan/save_disbursement",
 			creds,
 			navigate,
-			successMsg: "Loan Disburse details saved.",
+			successMsg: "Loan Disburse Successfully",
 			onSuccess: () => navigate(-1),
-
 			// 🔥 fully dynamic failure handling
 			failureRedirect: routePaths.LANDING,
 			clearStorage: true,
@@ -531,7 +530,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 		const creds = {
 			loan_to: 'P',
-			branch_code: 0,
+			branch_code: userDetails[0]?.brn_code,
 			branch_shg_id: value,
 			tenant_id: userDetails[0]?.tenant_id,
 		}
@@ -737,7 +736,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 			.then((res) => {
 
 				if (res?.data?.success) {
-					console.log(res?.data?.data, 'valueeeeeeeeeeeeeeeeeeeeeeee', res.data.data.tot_memb);
+					// console.log(res?.data?.data, 'valueeeeeeeeeeeeeeeeeeeeeeee', res.data.data.tot_memb);
 					// const totMemb = Number(res.data.data);
 					// const totMemb = res.data.data;
 
@@ -893,21 +892,6 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 										)}
 
-
-										{/* {loanAppData?.approval_status != 'A' && (
-							<>
-							<div className="pt-6">
-							{userDetails[0]?.user_type == 'P'&& (
-							<div className="flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-2 rounded-lg shadow-sm">
-							<span className="text-sm font-medium">
-							Balance:</span>
-							<span className="text-base font-semibold">₹{remainDisburseAmt?.toLocaleString("en-IN")}
-							</span>
-							</div>
-							)}
-							</div>
-							</>
-							)} */}
 
 
 									</div>

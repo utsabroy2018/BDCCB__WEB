@@ -1113,7 +1113,9 @@ const handleSBAccNoChange = (e, index) => {
 								{mobileExists?.user_status == 1 ?(
 									<div style={{fontSize:12, color:'red'}}>{mobileExists?.msg}</div>
 								) : (
-									<div style={{fontSize:12, color:'green'}}>{mobileExists?.msg}</div>
+									<>
+									{/* <div style={{fontSize:12, color:'green'}}>{mobileExists?.msg}</div> */}
+									</>
 								)}
 								{formik.errors.g_phone1 && formik.touched.g_phone1 ? (
 									<VError title={formik.errors.g_phone1} />
@@ -1358,9 +1360,11 @@ const handleSBAccNoChange = (e, index) => {
 			{SBAccountStatus[index]?.msg}
 			</div>
 		) : (
-			<div style={{ fontSize: 12, color: "green" }}>
+			<>
+			{/* <div style={{ fontSize: 12, color: "green" }}>
 			{SBAccountStatus[index]?.msg}
-			</div>
+			</div> */}
+			</>
 		)
 		)}
 		  
@@ -1383,9 +1387,11 @@ const handleSBAccNoChange = (e, index) => {
 			{adharStatus[index].msg}
 			</div>
 		) : (
-			<div style={{ fontSize: 12, color: "green" }}>
-			{adharStatus[index].msg}
-			</div>
+			<>
+			 {/* <div style={{ fontSize: 12, color: "green" }}>
+			 {adharStatus[index].msg}
+			 </div> */}
+			</>
 		)
 		)}
 		  

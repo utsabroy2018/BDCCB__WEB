@@ -33,18 +33,20 @@ export const saveMasterData = async ({
 		)
 
 		if (res?.data?.success) {
-			Message("success", successMsg)
+			// Message("success", successMsg)
+			Message("success", res?.data?.msg)
 			onSuccess && onSuccess(res)
 		} else {
+
 			Message("error", res?.data?.msg || "Request failed")
 
-			if (clearStorage) {
-				localStorage.clear()
-			}
+			// if (clearStorage) {
+			// 	localStorage.clear()
+			// }
 
-			if (failureRedirect && navigate) {
-				navigate(failureRedirect)
-			}
+			// if (failureRedirect && navigate) {
+			// 	navigate(failureRedirect)
+			// }
 
 			onFailure && onFailure(res)
 		}

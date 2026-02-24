@@ -140,12 +140,11 @@ const SignInPage = () => {
 	const handleSignIn = async (creds, api_name) =>{
 
 			// forceClearSession()
-			
 			await axios
 			.post(`${url_bdccb}/${api_name}`, creds)
 			.then((res) => {
 
-
+				
 				// console.log(res?.data?.suc, 'credscreds');
 				
 				if (res?.data?.suc === 0) {
@@ -159,44 +158,38 @@ const SignInPage = () => {
 					// setVisible(true)
 					return forceClearSession()
 				}
-
-				
-				console.log(res?.data?.token, 'ggggggggggggggggg', res?.data?.refresh_token);
 				
 
 				var userDtls = res?.data?.user_dtls
-				userDtls["brn_code"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? formik.values.brnch : res?.data?.user_dtls?.brn_code
-				userDtls["branch_name"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? branches.filter((item) => item.code == formik.values.brnch)[0]?.name : res?.data?.user_dtls?.branch_name
+				// userDtls["brn_code"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? formik.values.brnch : res?.data?.user_dtls?.brn_code
+				// userDtls["branch_name"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? branches.filter((item) => item.code == formik.values.brnch)[0]?.name : res?.data?.user_dtls?.branch_name
 				
+				console.log(res?.data, 'ggggggggggggggggg', res?.data?.msg, 'global');
+
 				// if (res?.data?.suc === 1) {
 				if (res?.data?.success) {
-					console.log(userDtls, 'userDtlsuserDtlsuserDtlsuserDtls', res?.data);
-					// console.log(creds, 'credscreds', res?.data);
+					// console.log(res?.data, 'ggggggggggggggggg', res?.data?.success, 'ok');
+					Message('success', res?.data?.msg)
+					
 					localStorage.setItem("session_id", sessionId)
 					localStorage.setItem("server_token", res?.data?.token)
 					localStorage.setItem("refresh_token", res?.data?.refresh_token)
 					localStorage.setItem("user_details", JSON.stringify(userDtls))
 
-					// console.log(res?.data?.token, 'responseeeeeeeeeee');
-					
-
-
 					localforage.setItem('tokenDetails', {
 					'token': res?.data?.token,
-					// 'expires_at': response?.expires_at,
 					}).then(() => {
-					// console.log('Value saved!', response);
 					}).catch((err) => {
 					console.error('Save error:', err);
 					});
 					
 					// Initialize socket connection with employee ID
-					Message("success", res?.data?.msg)
 					connectSocket(userDtls.emp_id)
 					
 					navigate(routePaths.BM_HOME)
 				} else {
-					Message("error", "No user found!")
+					// console.log(res?.data, 'ggggggggggggggggg', res?.data?.msg, 'error');
+					Message("error", res?.data?.msg)
 				}
 			})
 			.catch((err) => {

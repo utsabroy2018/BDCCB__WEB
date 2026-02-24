@@ -223,7 +223,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 						showSearch={false}
 						// setSearch={(data) => setSearch(data)}
 					/> */}
-					{/* {JSON.stringify(loanApplications, 2)} */}
+					{JSON.stringify(loanApplications, 2)}
 					<LoanBrnPacsDisburseTable_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}

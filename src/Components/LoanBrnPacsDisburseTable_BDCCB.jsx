@@ -100,7 +100,7 @@ function LoanBrnPacsDisburseTable_BDCCB({
 									></Column> */}
 				
 									<Column
-										field="trans_id"
+										field="tran_id"
 										header="Transaction ID"
 										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
 									></Column>
@@ -113,19 +113,24 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										}
 										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
 									></Column>
-				
+
+									<Column
+										field="loan_id"
+										header="Loan Id"
+									></Column>
+
 									<Column
 										field="loan_acc_no"
 										header="Loan Account No."
 									></Column>
 				
-									<Column
+									{/* <Column
 										field="loan_to_name"
 										header="Group Name "
 										// body={(rowData) =>
 										// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
 										// }
-									></Column>
+									></Column> */}
 									<Column
 										field="disb_dt"
 										header="Disburse Date"
@@ -135,11 +140,11 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										header="Disburse Amount"
 										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_dis}</span>}
 									></Column>
-									<Column
+									{/* <Column
 										field="curr_prn"
 										header="Current Princepal"
 										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_dis_Prn}</span>}
-									></Column>
+									></Column> */}
 
 				
 										{/* <Column

@@ -58,6 +58,7 @@ function SearchViewLoanBM_BDCCB() {
 
 				if(res?.data?.success){
 				setGroups(res?.data?.data)
+				setCopyLoanApplications(res?.data?.data)
 
 				} else {
 				navigate(routePaths.LANDING)
@@ -75,6 +76,23 @@ function SearchViewLoanBM_BDCCB() {
 	useEffect(()=>{
 	fetchSearchedGroups()
 	}, [])
+
+		const setSearch = (word) => {
+		console.log(word, "wordwordwordword", copyLoanApplications)
+		setGroups(
+			copyLoanApplications?.filter(
+				(e) =>
+					e?.group_name
+						?.toString()
+						?.toLowerCase()
+						.includes(word?.toLowerCase()) ||
+					e?.group_code
+						?.toString()
+						?.toLowerCase()
+						?.includes(word?.toLowerCase())
+			)
+		)
+	}
 
 	return (
 		<div>
@@ -139,7 +157,8 @@ function SearchViewLoanBM_BDCCB() {
 								id="default-search"
 								className="block mt-10 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
 								placeholder="Search Loans by Group Name / Code"
-								onChange={(e) => setSearchKeywords(e.target.value)}
+								// onChange={(e) => setSearchKeywords(e.target.value)}
+								onChange={(text) => setSearch(text.target.value)}
 							/>
 							<button
 								type="submit"
@@ -157,7 +176,7 @@ function SearchViewLoanBM_BDCCB() {
 						loanAppData={groups}
 						title="Find Loans by Group"
 						showSearch={false}
-						// setSearch={(data) => setSearch(data)}
+						setSearch={(data) => setSearch(data)}
 					/>
 					{/* <DialogBox
 					visible={visible}

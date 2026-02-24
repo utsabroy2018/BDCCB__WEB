@@ -168,10 +168,6 @@ function SignUp() {
 		}
 
 		const creds = {
-			// emp_id: values?.user_id,
-			// pwd: values?.password,
-			// created_by: values?.user_id,
-
 			add_edit_flag: 0,
 			user_id: values?.user_id,
 			pwd: values?.password,
@@ -196,13 +192,14 @@ function SignUp() {
 			}
 		})
 			.then((res) => {
-				console.log(res?.data, 'sssssssssssssssssssss', creds);
-				
 				if(res?.data?.success){
+				console.log(res?.data, 'signnnnnnnnnnnnnnnnnn');
+				
 				navigate(routePaths.SIGN_UP)
 				formik.resetForm()
 				setUserIDAvailableMsg('')
 				setUserIDAvailable(null)
+				Message('success', res?.data?.msg)
 				} else {
 				Message('error', res?.data?.msg)
 				// navigate(routePaths.LANDING)
@@ -348,6 +345,8 @@ function SignUp() {
 		
 				setLoading(false)
 			};
+
+
 
 	return (
 		<div className="bg-blue-800 p-20 flex justify-center min-h-screen min-w-screen">
@@ -527,11 +526,14 @@ function SignUp() {
 							label="User ID"
 							name="user_id"
 							formControlName={formik.values.user_id}
-							// handleChange={formik.handleChange}
-							// handleBlur={handleEmployeeIdBlur}
+							// handleChange={(e) => {
+							// 	formik.handleChange(e)   // update formik
+							// 	handleEmployeeIdChange(e.target.value) // call API
+							// }}
 							handleChange={(e) => {
-								formik.handleChange(e)   // update formik
-								handleEmployeeIdChange(e.target.value) // call API
+								const value = e.target.value.replace(/\s/g, "");
+								formik.setFieldValue("user_id", value);
+								handleEmployeeIdChange(value);
 							}}
 							handleBlur={formik.handleBlur}
 							onChange={()=>{}}
@@ -541,12 +543,11 @@ function SignUp() {
 							<VError title={formik.errors.user_id} />
 						) : null}
 
-						{uerIDAvailable === true && (
+						{/* {uerIDAvailable === true && (
 						<p className="text-green-600 text-sm mt-1">
-						{/* User ID is available ✓ */}
 						{uerIDAvailableMsg} ✓
 						</p>
-						)}
+						)} */}
 
 						{uerIDAvailable === false && (
 						<p className="text-red-600 text-sm mt-1">
