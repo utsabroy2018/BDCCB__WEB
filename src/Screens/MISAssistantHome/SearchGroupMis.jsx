@@ -51,6 +51,24 @@ localStorage.clear()
 		setLoading(false)
 	}
 
+	const setSearch = (word) => {
+		setLoanApplications(
+			copyLoanApplications?.filter(
+				(e) =>
+					e?.group_name
+						?.toString()
+						?.toLowerCase()
+						.includes(word?.toLowerCase()) ||
+					e?.group_code
+						?.toString()
+						?.toLowerCase()
+						?.includes(word?.toLowerCase())
+					// e?.ifsc?.toString()?.toLowerCase()?.includes(word?.toLowerCase()) ||
+					// e?.sol_id?.toString()?.toLowerCase()?.includes(word?.toLowerCase())
+			)
+		)
+	}
+
 	return (
 		<div>
 			<Sidebar mode={1} />
@@ -89,7 +107,7 @@ localStorage.clear()
 						loanAppData={groups}
 						title="Groups"
 						showSearch={false}
-						// setSearch={(data) => setSearch(data)}
+						setSearch={(data) => setSearch(data)}
 					/>
 					{/* <DialogBox
 					visible={visible}

@@ -24,7 +24,16 @@ function SearchGroupBM() {
 	const navigate = useNavigate()
 
 	useEffect(()=>{
+
+		if(userDetails[0]?.user_type == 'B'){
 		fetchSearchedGroups()
+		}
+
+		if(userDetails[0]?.user_type == 'P'){
+		fetchSearchedGroups_ForPacs()
+		}
+
+		
 	}, [searchKeywords])
 	
 
@@ -59,6 +68,39 @@ function SearchGroupBM() {
 	})
 	setLoading(false)
 	}
+
+	const fetchSearchedGroups_ForPacs = async () => {
+
+		console.log(searchKeywords, 'search', userDetails[0]?.brn_code);
+		
+		setLoading(true)
+		const creds = {
+		group_name: searchKeywords,
+		branch_code: userDetails[0]?.brn_code,
+		}
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+		await axios.post(`${url_bdccb}/group/fetch_pacs_group_details`, creds, {
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		},
+		})
+		.then((res) => {
+// console.log(searchKeywords, 'search', res);
+	if(res?.data?.success){
+	setGroups(res?.data?.data)
+	} else {
+	navigate(routePaths.LANDING)
+	localStorage.clear()
+	}
+
+	})
+	.catch((err) => {
+	Message("error", "Some error occurred while searching...")
+	})
+	setLoading(false)
+	}
+
 
 	return (
 		<div>

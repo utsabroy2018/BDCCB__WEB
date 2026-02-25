@@ -142,6 +142,9 @@ function UserManagementTable({
 								Branch Name
 							</th> */}
 							<th scope="col" className="p-4">
+								Branch Name
+							</th>
+							<th scope="col" className="p-4">
 								Status
 							</th>
 							<th scope="col" className="p-4">
@@ -169,6 +172,9 @@ function UserManagementTable({
 									</td>
 									<td className="px-6 py-3  text-slate-700">
 										{item?.user_name}
+									</td>
+									<td className="px-6 py-3  text-slate-700">
+										{item?.branch_society_name}
 									</td>
 									{/* <td className="px-6 py-3 text-slate-700">{item?.brn_code}</td>
 									<td className="px-6 py-3 text-slate-700">

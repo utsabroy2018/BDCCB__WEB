@@ -141,6 +141,8 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const [remainDisburseAmt, setRemainDisburseAmt] = useState(null);
 	const [groupMemberTotal, setGroupMemberTotal] = useState();
 	const [memberOptions, setMemberOptions] = useState({});
+	const [checkDuplicateGroup, setCheckDuplicateGroup] = useState({})
+	const [checkDuplicateMember, setCheckDuplicateMember] = useState({})
 
 	const initialValues = {
 		// loan_id: "",
@@ -409,7 +411,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const saveGroupData = async (formData) => {
 
 		if(formik.values.rows.reduce((sum, r) => sum + Number(r.amount || 0),0) > Number(formik.values.disb_amt)){
-			return Message("error", "Total Amount Gratter Than Disbursement Amount")
+			return Message("error", "Total Amount Greater Than Disbursement Amount")
 		}
 		const formattedRows = formData?.rows?.map(row => ({
 			mem_loan_id: 0,
@@ -718,6 +720,37 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const fetchGroupData = async (value, rowIndex) => {
 		// console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
 
+		 const groups = [...formik.values.rows];
+
+		// 🔴 DUPLICATE CHECK INSIDE FORM
+		const isDuplicate = groups.some(
+			(m, i) => i !== rowIndex && m.shg_id === value
+		);
+
+		if (isDuplicate) {
+			// set error message for this row
+			setCheckDuplicateGroup(prev => ({
+			...prev,
+			[rowIndex]: {
+				user_status: 1,
+				msg: "Duplicate Group Name",
+			},
+			}));
+		} else {
+			// clear duplicate message
+			setCheckDuplicateGroup(prev => {
+			const copy = { ...prev };
+			delete copy[rowIndex];
+			return copy;
+			});
+
+			// call API only if 12 digits and not duplicate
+			// if (value.length > 0) {
+			//   checkSBAccNoExists(value, index);
+			// }
+		}
+
+
 		setLoading(true)
 		const creds = {
 			branch_code: formik.values.branch_shg_id,
@@ -764,6 +797,43 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 		setLoading(false)
 	};
+
+
+	const checkDuplicateMember_FN = async (value, rowIndex) => {
+		// console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
+
+		 const groups = [...formik.values.rows];
+
+		// 🔴 DUPLICATE CHECK INSIDE FORM
+		const isDuplicate = groups.some(
+			(m, i) => i !== rowIndex && m.member_id === value
+		);
+
+		if (isDuplicate) {
+			// set error message for this row
+			setCheckDuplicateMember(prev => ({
+			...prev,
+			[rowIndex]: {
+				user_status: 1,
+				msg: "Duplicate Member Name",
+			},
+			}));
+		} else {
+			// clear duplicate message
+			setCheckDuplicateMember(prev => {
+			const copy = { ...prev };
+			delete copy[rowIndex];
+			return copy;
+			});
+
+			// call API only if 12 digits and not duplicate
+			// if (value.length > 0) {
+			//   checkSBAccNoExists(value, index);
+			// }
+		}
+
+	};
+	
 
 	return (
 		<>
@@ -1143,6 +1213,18 @@ function DisbursmentForm_BDCCB({ flag }) {
 											// row.loany_member &&
 											row.amount;
 
+										  // ⭐⭐ IMPORTANT LOGIC HERE ⭐⭐
+										const currentGroupId = formik.values.rows[index].shg_id;
+
+										const selectedMembersInSameGroup = formik.values.rows
+											.filter((r, i) => i !== index && r.shg_id === currentGroupId)
+											.map(r => r.member_id);
+
+										const filteredMembers = (memberOptions[index] || []).filter(
+											member => !selectedMembersInSameGroup.includes(member.member_id)
+										);
+
+
 										return (
 											<div
 												key={index}
@@ -1173,13 +1255,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 									 dark:text-gray-100">Select Group</label>
 													<Select
 														showSearch
-														placeholder={
-															userDetails[0]?.user_type === "B"
-																? "Choose SHG"
-																: userDetails[0]?.user_type === "P"
-																	? "Choose SHG"
-																	: "Choose"
-														}
+														placeholder="Choose Group"
 														value={row.shg_id}
 														style={{ width: "100%" }}
 														optionFilterProp="children"
@@ -1189,17 +1265,9 @@ function DisbursmentForm_BDCCB({ flag }) {
 														onSearch={(value) => {
 															handleSearchSHGChange(value, formik.values.branch_shg_id, index);
 														}}
-
 														// ✅ selecting option (ROW SAFE)
 														onChange={(value) => {
-															// console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
-															// fetchGroupData(value)
-															// formik.setFieldValue(
-															// 	`rows[${index}].branch_shg_id`,
-															// 	value
-															// );
 															formik.setFieldValue(`rows[${index}].shg_id`, value);
-
 															// 🔥 fetch and auto-fill total member
 															fetchGroupData(value, index);
 														}}
@@ -1218,7 +1286,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 														}
 													>
 														<Select.Option value="" disabled>
-															Choose SHG
+															Choose Group
 														</Select.Option>
 
 														{SHGList?.map((data) => (
@@ -1229,9 +1297,20 @@ function DisbursmentForm_BDCCB({ flag }) {
 													</Select>
 												</>
 											)}
-
-													
-
+												
+											{/* {checkDuplicateGroup[index] && (
+											checkDuplicateGroup[index]?.user_status == 1 ? (
+												<div style={{ fontSize: 12, color: "red" }}>
+												{checkDuplicateGroup[index]?.msg}
+												</div>
+											) : (
+												<>
+												<div style={{ fontSize: 12, color: "green" }}>
+												{SBAccountStatus[index]?.msg}
+												</div>
+												</>
+											)
+											)} */}
 
 
 													{formik.touched.rows?.[index]?.shg_id &&
@@ -1263,40 +1342,59 @@ function DisbursmentForm_BDCCB({ flag }) {
 												<>
 												<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800 dark:text-gray-100">Select Member</label>
 
+
 													<Select
-														placeholder="Select Member"
-														value={formik.values.rows[index].member_id}
-														style={{ width: "100%" }}
-														onChange={(value) => {
+													placeholder="Select Member"
+													value={formik.values.rows[index].member_id}
+													style={{ width: "100%" }}
+													onChange={(value) => {
 
-															// ✅ set member id
-															formik.setFieldValue(`rows[${index}].member_id`, value);
+													formik.setFieldValue(`rows[${index}].member_id`, value);
 
-															// ✅ find selected member object
-															const selectedMember = memberOptions[index]?.find(
-																(m) => m.member_id === value
-															);
+													const selectedMember = memberOptions[index]?.find(
+													(m) => m.member_id === value
+													);
 
-															// ✅ auto-fill SB account number
-															formik.setFieldValue(
-																`rows[${index}].sb_acc_no`,
-																selectedMember?.sb_acc_no || ""
-															);
-														}}
+													formik.setFieldValue(
+													`rows[${index}].sb_acc_no`,
+													selectedMember?.sb_acc_no || ""
+													);
+
+													checkDuplicateMember_FN(value, index);
+													}}
 													>
-														<Select.Option value="" disabled>
-															Choose Member
-														</Select.Option>
-														{(memberOptions[index] || []).map((member) => (
-															<Select.Option
-																key={member.member_id}
-																value={member.member_id}
-															>
-																{member.member_name}
-															</Select.Option>
-														))}
+													<Select.Option value="" disabled>
+													Choose Member
+													</Select.Option>
+
+													{/* 🔥 USE FILTERED MEMBERS */}
+													{filteredMembers.map((member) => (
+													<Select.Option
+													key={member.member_id}
+													value={member.member_id}
+													>
+													{member.member_name}
+													</Select.Option>
+													))}
 													</Select>
+													
+
+													
 												</>
+											)}
+
+											{checkDuplicateMember[index] && (
+											checkDuplicateMember[index]?.user_status == 1 ? (
+												<div style={{ fontSize: 12, color: "red" }}>
+												{checkDuplicateMember[index]?.msg}
+												</div>
+											) : (
+												<>
+												{/* <div style={{ fontSize: 12, color: "green" }}>
+												{SBAccountStatus[index]?.msg}
+												</div> */}
+												</>
+											)
 											)}
 													
 
@@ -1311,15 +1409,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 												{/* Account Number */}
 												<div className="col-span-2">
-													{/* <TDInputTemplateBr
-																			placeholder="SB Acc No."
-																			label="SB Acc No."
-																			type="text"
-																			name={`rows[${index}].sb_acc_no`}
-																			formControlName={row.sb_acc_no}
-																			handleChange={formik.handleChange}
-																			mode={1}
-																		/> */}
+
 													<TDInputTemplateBr
 														placeholder="SB Account No."
 														type="text"
@@ -1336,24 +1426,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 												</div>
 
-												{/* No of Member */}
-												{/* <div className="col-span-2">
-																		<TDInputTemplateBr
-																			placeholder="Loanee Member"
-																			label="Loanee Member"
-																			type="number"
-																			name={`rows[${index}].loany_member`}
-																			formControlName={row.loany_member}
-																			handleChange={formik.handleChange}
-																			mode={1}
-																			max={row.total_member}
-																		/>
-																		{formik.touched.rows?.[index]?.loany_member &&
-																		formik.errors.rows?.[index]?.loany_member && (
-																		<VError title={formik.errors.rows[index].loany_member} />
-																		)}
-					
-																	</div> */}
+												
 
 												{/* Amount */}
 												<div className="col-span-3">

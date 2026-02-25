@@ -341,7 +341,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 	const editGroup = async (formData) => {
 		if(formik.values.rows.reduce((sum, r) => sum + Number(r.amount || 0),0) > Number(formik.values.disb_amt)){
-			return Message("error", "Total Amount Gratter Than Disbursement Amount")
+			return Message("error", "Total Amount Greater Than Disbursement Amount")
 		}
 		// return;
 		const formattedRows = formData?.rows?.map(row => ({
@@ -405,7 +405,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 	const saveGroupData = async (formData) => {
 
 		if(formik.values.rows.reduce((sum, r) => sum + Number(r.amount || 0),0) > Number(formik.values.disb_amt)){
-			return Message("error", "Total Amount Gratter Than Disbursement Amount")
+			return Message("error", "Total Amount Greater Than Disbursement Amount")
 		}
 		const formattedRows = formData?.rows?.map(row => ({
 			mem_loan_id: 0,

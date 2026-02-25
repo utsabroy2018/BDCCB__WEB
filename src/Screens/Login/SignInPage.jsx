@@ -147,24 +147,24 @@ const SignInPage = () => {
 				
 				// console.log(res?.data?.suc, 'credscreds');
 				
-				if (res?.data?.suc === 0) {
-					Message("error", res?.data?.msg)
-					// setVisible(true)
-					// formik.handleSubmit()
-				}
+				// if (res?.data?.suc === 0) {
+				// 	Message("error", res?.data?.msg)
+				// 	// setVisible(true)
+				// 	// formik.handleSubmit()
+				// }
 
-				if (res?.data?.suc === 3) {
-					// Message("error", res?.data?.msg)
-					// setVisible(true)
-					return forceClearSession()
-				}
+				// if (res?.data?.suc === 3) {
+				// 	// Message("error", res?.data?.msg)
+				// 	// setVisible(true)
+				// 	return forceClearSession()
+				// }
 				
 
 				var userDtls = res?.data?.user_dtls
 				// userDtls["brn_code"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? formik.values.brnch : res?.data?.user_dtls?.brn_code
 				// userDtls["branch_name"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? branches.filter((item) => item.code == formik.values.brnch)[0]?.name : res?.data?.user_dtls?.branch_name
 				
-				console.log(res?.data, 'ggggggggggggggggg', res?.data?.msg, 'global');
+				// console.log(res?.data, 'ggggggggggggggggg', res?.data?.msg, 'global');
 
 				// if (res?.data?.suc === 1) {
 				if (res?.data?.success) {

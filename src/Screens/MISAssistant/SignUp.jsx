@@ -206,27 +206,7 @@ function SignUp() {
 				// localStorage.clear()
 				}
 
-				// if (res?.data?.suc === 1) {
-				// 	// Message("success", res?.data?.msg)
-				// 	// setLoginUserDetails()
-
-				// 	localStorage.setItem(
-				// 		"user_details",
-				// 		JSON.stringify(res?.data?.user_dtls)
-				// 	)
-
-				// 	if (res?.data?.user_dtls?.id == 2) {
-				// 		navigate(routePaths.BM_HOME)
-				// 	}
-
-				// 	if (res?.data?.user_dtls?.id == 3) {
-				// 		navigate(routePaths.MIS_ASSISTANT_HOME)
-				// 	}
-				// } else if (res?.data?.suc === 0) {
-				// 	Message("error", res?.data?.msg)
-				// } else {
-				// 	Message("error", "No user found!")
-				// }
+				
 			})
 			.catch((err) => {
 				Message("error", "Some error on server while logging in...")
@@ -256,7 +236,14 @@ function SignUp() {
 	}, [departmentStatus])
 
 	useEffect(()=>{
-		fetchBranch()
+		if(departmentStatus == 'B'){
+			fetchBranch()
+		} 
+
+		if(departmentStatus == 'P'){
+			fetchBranch_ForPacs()
+		} 
+		
 	}, [departmentStatus])
 
 	const fetchBranch = async () => {
@@ -295,6 +282,45 @@ function SignUp() {
 				})
 			setLoading(false)
 		}
+
+	const fetchBranch_ForPacs = async () => {
+			setLoading(true)
+				const tokenValue = await getLocalStoreTokenDts(navigate);
+			
+				await axios
+					.get(`${url_bdccb}/master/pacs_list`, {
+						params: {
+						dist_id: 0, tenant_id: 1 ,branch_id: 0, branch_type: departmentStatus
+						},
+				headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+				},
+				})
+				.then((res) => {
+	
+				// console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
+		
+				if(res?.data?.success){
+				setBranch(res?.data?.data?.map((item, i) => ({
+				code: item?.branch_id,
+				name: item?.branch_name,
+				})))
+				} else {
+				Message('error', res?.data?.msg)
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+	
+				})
+				.catch((err) => {
+					Message("error", "Some error occurred while fetching data!")
+					console.log("ERRR", err)
+				})
+			setLoading(false)
+		}
+	
+		
 
 
 		const handleSearchChange = async (value) => {
@@ -372,7 +398,7 @@ function SignUp() {
 					</a>
 
 					<span className="text-4xl font-thin text-blue-800">
-						Sign Up
+						Sign Up {departmentStatus}
 					</span>
 					</nav>
 				

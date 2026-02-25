@@ -51,40 +51,22 @@ import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 // import { format } from "date-fns"
 import { saveMasterData } from "../../services/masterService"
+import Radiobtn from "../../Components/Radiobtn"
 
 
+const group_trans_process = [
+	{
+		label: "Direct Group Transfer",
+		value: "D",
+	},
+	{
+		label: "Indirect Group Transfer",
+		value: "I",
+	}
+]
 
-const mapOptions = {
-  disableDefaultUI: true,
-  gestureHandling: 'none',
-  zoomControl: false,
-  draggable: false,
-  scrollwheel: false,
-  disableDoubleClickZoom: true,
-};
-const formatINR = (num) =>
-	new Intl.NumberFormat("en-IN", {
-		style: "currency",
-		currency: "INR",
-		minimumFractionDigits: 2,
-	}).format(num || 0)
-
-	const form_validationSchema = Yup.object({
-		member_from: Yup.string().required("** This field is mandatory"),
-		member_to: Yup.string().required("** This field is mandatory").test('not-same', 'From and To cannot be the same', function (value) {
-			return value !== this.parent.member_from;
-		}),
-	})
 function GroupExtendedForm({ groupDataArr }) {
-// 	const markers = [
-//   { id: 1, position: { lat: 40.748817, lng: -73.985428 }, title: 'Empire State Building' },
-//   { id: 2, position: { lat: 40.689247, lng: -74.044502 }, title: 'Statue of Liberty' },
-//   { id: 3, position: { lat: 40.706192, lng: -74.009160 }, title: 'Wall Street' },
-// ];
-// const center = {
-//   lat: 40.748817,
-//   lng: -73.985428,
-// };
+
 const containerStyle = {
   width: '100%',
   height: '400px',
@@ -121,8 +103,15 @@ const containerStyle = {
 	const [adharNoExists, setAdharNoExists] = useState();
 	const [adharStatus, setAdharStatus] = useState({})
 	const [SBAccountStatus, setSBAccountStatus] = useState({})
+	
+	const [directIndirectStatus, setDirectIndirectStatus] = useState("D")
+	const [branchList, setBranchList] = useState([]);
+	const [PACKSList, setPACKSList] = useState([]);
+
 
 	const initialValues = {
+		branch_id: "",
+		packs_id: "",
 		g_group_name: "",
 		// g_group_type: "J",
 		g_address: "",
@@ -151,10 +140,23 @@ const containerStyle = {
 				},
 			],
 	}
+
 	const [formValues, setValues] = useState(initialValues)
+	
+	const onChange = (e) => {
+		// console.log("radio1 checked", e)
+		setDirectIndirectStatus(e)
+		
+	}
 
 	
 	const validationSchema = Yup.object({
+		branch_id: Yup.string().required("Branch name is required"),
+		packs_id: Yup.string().when("directIndirectStatus", {
+			is: "I",
+			then: (schema) => schema.required("PACKS name is required"),
+			otherwise: (schema) => schema.notRequired(),
+		}),
 		g_group_name: Yup.string().required("Group name is required"),
 		g_address: Yup.string().required("Address is required"),
 		sahayika_id: Yup.string().required("Sahayika name is required"),
@@ -210,11 +212,28 @@ const containerStyle = {
 
 	useEffect(() => {
 		if (params?.id > 0) {
+			if(userDetails[0]?.user_type == 'B'){
 			fetchGroupDetails()
+			}
+
+			if(userDetails[0]?.user_type == 'P'){
+			fetchGroupDetails_ForPacs()
+			}
+			
 		}
 		fetchSahayikaList()
 
 	}, [])
+
+	useEffect(()=>{
+		console.log(userDetails[0]?.user_type, 'ddddddddddddddddddddddddd');
+		
+		fetchBranch_Group()
+		// if (params?.id < 1) {
+		formik.setFieldValue("packs_id", '')
+		// }
+
+	}, [directIndirectStatus])
 
 	
 
@@ -260,7 +279,7 @@ const containerStyle = {
 	const fetchGroupDetails = async () => {
 		const creds = {
 			group_name: params?.id,
-			branch_code: userDetails[0]?.brn_code,
+			// branch_code: userDetails[0]?.brn_code,
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -281,6 +300,8 @@ const containerStyle = {
 				setValues({
 
 					g_group_name: res?.data?.data[0]?.group_name,
+					branch_id : res?.data?.data[0]?.branch_code,
+					packs_id : res?.data?.data[0]?.pacs_id,
 					// g_group_type: "J",
 					g_address: res?.data?.data[0]?.group_addr,
 					group_leader_name: res?.data?.data[0]?.group_leader_name,
@@ -299,6 +320,8 @@ const containerStyle = {
 					members: res?.data?.data[0]?.memb_dt
 
 				})
+				setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
+				fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
 				fetchBlock(res?.data?.data[0]?.dist_id)
 				fetchPoliceStation(res?.data?.data[0]?.dist_id)
@@ -323,6 +346,77 @@ const containerStyle = {
 			})
 	}
 
+	const fetchGroupDetails_ForPacs = async () => {
+		const creds = {
+			group_name: params?.id,
+			branch_code: userDetails[0]?.brn_code,
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/group/fetch_pacs_group_details`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+				
+				
+				if(res?.data?.success){
+					console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
+
+
+				setValues({
+
+					g_group_name: res?.data?.data[0]?.group_name,
+					branch_id : res?.data?.data[0]?.branch_code,
+					packs_id : res?.data?.data[0]?.pacs_id,
+					// g_group_type: "J",
+					g_address: res?.data?.data[0]?.group_addr,
+					group_leader_name: res?.data?.data[0]?.group_leader_name,
+					sahayika_id: res?.data?.data[0]?.sahayika_id,
+					g_pin: res?.data?.data[0]?.pin_no,
+					g_phone1: res?.data?.data[0]?.phone1,
+					g_bank_branch: res?.data?.data[0]?.branch_name,
+					// g_acc1: res?.data?.data[0]?.sb_ac_no,
+					dist_id: res?.data?.data[0]?.dist_id,
+					ps_id: res?.data?.data[0]?.ps_id,
+					po_id: res?.data?.data[0]?.po_id,
+					block_id: res?.data?.data[0]?.block_id,
+					gp_id: res?.data?.data[0]?.gp_id,
+					village_id: res?.data?.data[0]?.village_id,
+					branch_code: res?.data?.data[0]?.branch_code,
+					members: res?.data?.data[0]?.memb_dt
+
+				})
+				setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
+				fetchPacks_Group(res?.data?.data[0]?.branch_code)
+
+				fetchBlock(res?.data?.data[0]?.dist_id)
+				fetchPoliceStation(res?.data?.data[0]?.dist_id)
+				fetchPosOffice(res?.data?.data[0]?.dist_id)
+				fetchBranch(res?.data?.data[0]?.dist_id)
+
+				fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+				fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
+
+				// setDisCode(res?.data?.msg[0]?.disctrict)
+				console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
+				
+				setGroupData(res?.data?.data[0]?.memb_dt);
+				
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+	}
+	
+
 
 	const editGroup = async (formData) => {
 				setLoading(true)
@@ -333,7 +427,11 @@ const containerStyle = {
 				group_code: groupDataArr?.group_code,
 				tenant_id: userDetails[0]?.tenant_id,
 				// branch_code: masterData?.branch_code,
-				branch_code: userDetails[0]?.brn_code,
+				// branch_code: userDetails[0]?.brn_code,
+				// branch_code: directIndirectStatus == 'D' ? formData?.branch_id : formData?.packs_id,
+				branch_code: formData?.branch_id,
+				pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+				direct_indirect_flag: directIndirectStatus,
 				group_name: formData?.g_group_name,
 				// gp_leader_id: 2, ///////////////
 				phone1: formData?.g_phone1,
@@ -381,7 +479,9 @@ const containerStyle = {
 				// branch_code: masterData?.branch_code,
 				group_code: 0,
 				tenant_id: userDetails[0]?.tenant_id,
-				branch_code: userDetails[0]?.brn_code,
+				branch_code: formData?.branch_id,
+				pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+				direct_indirect_flag: directIndirectStatus,
 				group_name: formData?.g_group_name,
 				phone1: formData?.g_phone1,
 				sahayika_id: formData?.sahayika_id, ///////////////
@@ -458,7 +558,91 @@ const containerStyle = {
 		setLoading(false)
 	}
 
+	// useEffect(()=>{
+	// 	fetchBranch_Group()
+	// }, [])
 
+
+
+
+	const fetchBranch_Group = async () => {
+		// setPACKSList([])
+		setLoading(true)
+
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+		}
+
+			const tokenValue = await getLocalStoreTokenDts(navigate);
+		
+			await axios.post(`${url_bdccb}/group/fetch_branch_name`, creds, {
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+
+				console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
+			if(res?.data?.success){
+			setBranchList(res?.data?.data?.map((item, i) => ({
+			code: item?.branch_id,
+			name: item?.branch_name,
+			// tenant_id: item?.tenant_id,
+			})))
+			} else {
+			Message('error', res?.data?.msg)
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
+
+	const fetchPacks_Group = async (branch_id) => {
+		
+		setLoading(true)
+
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+			branch_id: branch_id
+		}
+
+			const tokenValue = await getLocalStoreTokenDts(navigate);
+		
+			await axios.post(`${url_bdccb}/group/fetch_society_name`, creds, {
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+
+			console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
+	
+			if(res?.data?.success){
+			setPACKSList(res?.data?.data?.map((item, i) => ({
+			code: item?.branch_id,
+			name: item?.branch_name,
+			})))
+			} else {
+			Message('error', res?.data?.msg)
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
 
 
 	const fetchBlock = async (dist_id) => {
@@ -686,7 +870,6 @@ const containerStyle = {
 		// }
 
 			const tokenValue = await getLocalStoreTokenDts(navigate);
-		console.log({dist_id: dist_id, tenant_id: userDetails[0]?.tenant_id , branch_id: 0}, 'userDetailsuserDetailsuserDetails');
 		
 			await axios
 				.get(`${url_bdccb}/master/branch_list`, {
@@ -984,10 +1167,80 @@ const handleSBAccNoChange = (e, index) => {
 				
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
-
+						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
 							
-							<div>
+					<div className="sm:col-span-3 radioBtn_addgrp">
+						{userDetails[0]?.user_type == 'B' ? 
+							(
+							<Radiobtn
+							data={group_trans_process}
+							val={directIndirectStatus}
+							// disabled={true}
+							onChangeVal={(value) => {
+							onChange(value)
+							}}
+							/>
+							):(
+							<label for="g_group_name" class="block mb-2 text-sm capitalize font-bold text-slate-800
+				 dark:text-gray-100"> {directIndirectStatus == "D" ? "Direct Group Transfer" : "Indirect Group Transfer"}  </label>
+							)}
+						
+						
+					</div>
+					
+					<div className="sm:col-span-2">
+					<TDInputTemplateBr
+					placeholder="Select Branch"
+					type="text"
+					label="Select Branch *"
+					name="branch_id"
+					// formControlName={masterData.dist_id}
+					// handleChange={handleChangeMaster}
+					disabled={userDetails[0]?.user_type == 'P' ? true : false}
+					formControlName={formik.values.branch_id}
+					handleChange={(value) => { 
+						formik.setFieldValue("branch_id", value.target.value)
+						fetchPacks_Group(value.target.value)
+					 }}
+					handleBlur={formik.handleBlur}
+					data={branchList}
+					mode={2}
+					/>
+
+					{formik.errors.branch_id && formik.touched.branch_id ? (
+					<VError title={formik.errors.branch_id} />
+					) : null}
+					
+					</div>
+
+					{directIndirectStatus == 'I' &&(
+						<div className="sm:col-span-2">
+
+					<TDInputTemplateBr
+					placeholder="Select PACS"
+					type="text"
+					label="Select PACS *"
+					name="packs_id"
+					disabled={userDetails[0]?.user_type == 'P' ? true : false}
+					// formControlName={masterData.dist_id}
+					// handleChange={handleChangeMaster}
+					formControlName={formik.values.packs_id}
+					handleChange={formik.handleChange}
+					// handleChange={handleFormikMasterChange} 
+					handleBlur={formik.handleBlur}
+					data={PACKSList}
+					mode={2}
+					/>		
+					
+					{formik.errors.packs_id && formik.touched.packs_id ? (
+					<VError title={formik.errors.packs_id} />
+					) : null}
+					
+					</div>
+					)}
+					
+
+							<div className="sm:col-span-4">
 								<TDInputTemplateBr
 									placeholder="Group Name"
 									type="text"
@@ -1003,37 +1256,6 @@ const handleSBAccNoChange = (e, index) => {
 								) : null}
 							</div>
 
-							{/* <div>
-								
-
-								<TDInputTemplateBr
-									placeholder="Group Type"
-									type="text"
-									label="Group Type"
-									name="g_group_type"
-									formControlName={formik.values.g_group_type || "J"} // Default to SHG
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									data={[
-										// {
-										//   code: "S",
-										//   name: "SHG",
-										// },
-										{
-											code: "J",
-											name: "SHG",
-										},
-									]}
-									mode={2}
-									disabled={true}
-								/>
-
-								{formik.errors.g_group_type && formik.touched.g_group_type ? (
-									<VError title={formik.errors.g_group_type} />
-								) : null}
-							</div> */}
-
-							
 							</div>
 							</div>
 							<div className="flex justify-start gap-5 mb-3">
@@ -1440,7 +1662,7 @@ const handleSBAccNoChange = (e, index) => {
 		  <div className="col-span-12 text-right">
 			<Button
 			  type="primary"
-			  disabled={!isRowFilled || adharStatus[index]?.user_status == 1}
+			  disabled={!isRowFilled || adharStatus[index]?.user_status == 1 || SBAccountStatus[index]?.user_status == 1}
 			  onClick={() =>
 				formik.setFieldValue("members", [
 				  ...formik.values.members,
