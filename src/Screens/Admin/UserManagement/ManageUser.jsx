@@ -46,6 +46,7 @@ function ManageUser() {
 			tenant_id: userDetails[0]?.tenant_id, 
 			branch_id: userDetails[0]?.user_type == 'H' ? 0 : userDetails[0]?.brn_code, 
 			user_type: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+			branch_type: userDetails[0]?.user_type,
 			user_status: approvalStatus
 		},
 		headers: {

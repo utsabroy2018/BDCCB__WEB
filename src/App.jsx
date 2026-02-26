@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { routePaths } from "./Assets/Data/Routes"
 import useIdleTimer from "./Hooks/useIdleTimer"
-import { url } from "./Address/BaseUrl"
+import { url, url_bdccb } from "./Address/BaseUrl"
 import { Message } from "./Components/Message"
 import axios from "axios"
 import { SocketProvider, useSocket } from "./Context/SocketContext"
@@ -92,13 +92,17 @@ function AppContent() {
 
 
 	useEffect(() => {
+		
+		
 		getPublicIP()
 		// Handle logout cleanup
 		const handleLogout = async () => {
+			// alert('logout app')
 			const userDetails = JSON.parse(localStorage.getItem("user_details") || "{}")
+			// console.log(userDetails, 'userDetailsuserDetailsuserDetails', 'hhhh');
 			if (userDetails?.emp_id) {
 				try {
-					await axios.post(`${url}/logout`, {
+					await axios.post(`${url_bdccb}/logout`, {
 						emp_id: userDetails.emp_id,
 						session_id: sessionId,
 						branch_code: userDetails.brn_code,

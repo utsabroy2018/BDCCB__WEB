@@ -56,11 +56,11 @@ import Radiobtn from "../../Components/Radiobtn"
 
 const group_trans_process = [
 	{
-		label: "Direct Group Transfer",
+		label: "Direct",
 		value: "D",
 	},
 	{
-		label: "Indirect Group Transfer",
+		label: "Indirect",
 		value: "I",
 	}
 ]
@@ -151,7 +151,12 @@ const containerStyle = {
 
 	
 	const validationSchema = Yup.object({
-		branch_id: Yup.string().required("Branch name is required"),
+		branch_id: Yup.string().when("directIndirectStatus", {
+		is: "D",
+		then: (schema) => schema.required("Branch name is required"),
+		otherwise: (schema) => schema.notRequired(),
+		}),
+
 		packs_id: Yup.string().when("directIndirectStatus", {
 			is: "I",
 			then: (schema) => schema.required("PACKS name is required"),
@@ -279,7 +284,7 @@ const containerStyle = {
 	const fetchGroupDetails = async () => {
 		const creds = {
 			group_name: params?.id,
-			// branch_code: userDetails[0]?.brn_code,
+			branch_code: userDetails[0]?.brn_code,
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -321,7 +326,7 @@ const containerStyle = {
 
 				})
 				setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
-				fetchPacks_Group(res?.data?.data[0]?.branch_code)
+				// fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
 				fetchBlock(res?.data?.data[0]?.dist_id)
 				fetchPoliceStation(res?.data?.data[0]?.dist_id)
@@ -391,7 +396,7 @@ const containerStyle = {
 
 				})
 				setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
-				fetchPacks_Group(res?.data?.data[0]?.branch_code)
+				// fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
 				fetchBlock(res?.data?.data[0]?.dist_id)
 				fetchPoliceStation(res?.data?.data[0]?.dist_id)
@@ -407,8 +412,8 @@ const containerStyle = {
 				setGroupData(res?.data?.data[0]?.memb_dt);
 				
 				} else {
-				navigate(routePaths.LANDING)
-				localStorage.clear()
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
 				}
 			})
 			.catch((err) => {
@@ -429,7 +434,7 @@ const containerStyle = {
 				// branch_code: masterData?.branch_code,
 				// branch_code: userDetails[0]?.brn_code,
 				// branch_code: directIndirectStatus == 'D' ? formData?.branch_id : formData?.packs_id,
-				branch_code: formData?.branch_id,
+				branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
 				pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
 				direct_indirect_flag: directIndirectStatus,
 				group_name: formData?.g_group_name,
@@ -479,7 +484,7 @@ const containerStyle = {
 				// branch_code: masterData?.branch_code,
 				group_code: 0,
 				tenant_id: userDetails[0]?.tenant_id,
-				branch_code: formData?.branch_id,
+				branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
 				pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
 				direct_indirect_flag: directIndirectStatus,
 				group_name: formData?.g_group_name,
@@ -558,9 +563,9 @@ const containerStyle = {
 		setLoading(false)
 	}
 
-	// useEffect(()=>{
-	// 	fetchBranch_Group()
-	// }, [])
+	useEffect(()=>{
+		fetchPacks_Group()
+	}, [])
 
 
 
@@ -571,6 +576,7 @@ const containerStyle = {
 
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
+			branch_code: userDetails[0]?.brn_code,
 		}
 
 			const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -604,13 +610,14 @@ const containerStyle = {
 		setLoading(false)
 	}
 
-	const fetchPacks_Group = async (branch_id) => {
+	const fetchPacks_Group = async () => {
 		
 		setLoading(true)
 
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
-			branch_id: branch_id
+			// branch_code: branch_id
+			branch_id: userDetails[0]?.brn_code,
 		}
 
 			const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -1187,7 +1194,7 @@ const handleSBAccNoChange = (e, index) => {
 						
 						
 					</div>
-					
+					{directIndirectStatus == 'D' &&(
 					<div className="sm:col-span-2">
 					<TDInputTemplateBr
 					placeholder="Select Branch"
@@ -1200,7 +1207,7 @@ const handleSBAccNoChange = (e, index) => {
 					formControlName={formik.values.branch_id}
 					handleChange={(value) => { 
 						formik.setFieldValue("branch_id", value.target.value)
-						fetchPacks_Group(value.target.value)
+						// fetchPacks_Group(value.target.value)
 					 }}
 					handleBlur={formik.handleBlur}
 					data={branchList}
@@ -1211,7 +1218,9 @@ const handleSBAccNoChange = (e, index) => {
 					<VError title={formik.errors.branch_id} />
 					) : null}
 					
+					
 					</div>
+					)}
 
 					{directIndirectStatus == 'I' &&(
 						<div className="sm:col-span-2">
@@ -1504,7 +1513,12 @@ const handleSBAccNoChange = (e, index) => {
 			Add Group Members
 		</Tag>
 	)}
-  
+<div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50" style={{position:'relative'}}>
+<div className="col-span-2 text-sm font-semibold">Member Name</div>
+<div className="col-span-2 text-sm font-semibold">SB A/C No.</div>
+<div className="col-span-3 text-sm font-semibold">Aadhaar No.</div>
+<div className="col-span-5 text-sm font-semibold">Address</div>
+</div>
 
   {formik.values.members.map((member, index) => {
 	const isRowFilled =

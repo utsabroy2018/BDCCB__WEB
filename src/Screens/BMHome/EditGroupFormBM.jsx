@@ -28,7 +28,7 @@ function EditGroupFormBM() {
 				<div className=" p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
 						<FormHeader
-							text={`${params?.id == 0 ? "Add Group" : "Edit/Preview Group pppp"}`}
+							text={`${params?.id == 0 ? "Add Group" : "Edit/Preview Group"}`}
 							mode={2}
 						/>
 					</div>

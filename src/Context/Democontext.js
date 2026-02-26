@@ -1,6 +1,6 @@
 import React, { useState, createContext, useEffect } from "react"
 import axios from "axios"
-import { url } from "../Address/BaseUrl"
+import { url, url_bdccb } from "../Address/BaseUrl"
 
 export const loadingContext = createContext()
 
@@ -29,23 +29,25 @@ function Democontext({ children }) {
 
 
 	const handleLogOut = async () => {
+		// alert('logout demon')
+		const userDetails = JSON.parse(localStorage.getItem("user_details")) || "";
 		
-		const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 		setLoading(true)
 		const creds = {
-			emp_id: userDetails?.emp_id,
+			emp_id: userDetails[0]?.emp_id,
 			session_id: localStorage.getItem("session_id"),
-			modified_by: userDetails?.emp_id,
+			modified_by: userDetails[0]?.emp_id,
 			myIP: machineIP,
 			in_out_flag:"O",
 			flag:'W',
-			branch_code:userDetails?.brn_code
+			branch_code:userDetails[0]?.brn_code
 		}
-		console.log(creds, 'login____');
+		// console.log(creds, 'login____');
 		// console.log(creds);
 		await axios
-			.post(`${url}/logout`, creds)
+			.post(`${url_bdccb}/logout`, creds)
 			.then((res) => {
+				console.log(creds, 'login____', 'hhhh', res.data);
 				if (res.data.suc === 1) {
 					localStorage.clear()
 				} else {
@@ -53,6 +55,7 @@ function Democontext({ children }) {
 				}
 			})
 			.catch((err) => {
+				console.log(creds, 'login____', 'err', err);
 				console.error(err)
 			})
 		setLoading(false)

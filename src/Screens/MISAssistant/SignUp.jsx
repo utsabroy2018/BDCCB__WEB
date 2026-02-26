@@ -398,7 +398,7 @@ function SignUp() {
 					</a>
 
 					<span className="text-4xl font-thin text-blue-800">
-						Sign Up {departmentStatus}
+						Sign Up 
 					</span>
 					</nav>
 				

@@ -288,7 +288,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		// console.log(loanAppData?.loan_to_name, 'loan_to_name', userDetails[0]?.user_type);
 		if (params.id > 0) {
 
-			handleSearchPacsChange(loanAppData?.loan_to_name)
+			// handleSearchPacsChange(loanAppData?.loan_to_name)
 			fetchDisburseDetails()
 			// handleSearchSHGChange(loanAppData?.loan_to_name, loanAppData?.loan_to_name)
 			// console.log(loanAppData?.loan_to_name, 'loan_to_name', userDetails[0]?.user_type);
@@ -363,7 +363,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 		const creds = {
 			loan_id: loanAppData?.loan_id,
-			tran_id: loanAppData?.tran_id,
+			tran_id: 0,
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
 			loan_acc_no: formData?.loan_ac_no,
@@ -500,26 +500,17 @@ function DisbursmentForm_BDCCB({ flag }) {
 		}
 	}, [formik.values.curr_roi]);
 
-	// useEffect(() => {
-	// formik.setFieldValue("rows", [
-	// {
-	// sb_acc_no: "",
-	// branch_shg_id: "",
-	// member_id: "",
-	// // loany_member: "",
-	// amount: "",
-	// }
-	// ])
-		
-	// }, [formik.values.branch_shg_id]);
+	useEffect(() => {
+	handleSearchPacsChange()
+	}, []);
 
 
 
 	const handleSearchPacsChange = async (value) => {
-		if (value.length < 3) {
-			Message("error", "Minimum type 3 character")
-			return;
-		}
+		// if (value.length < 3) {
+		// 	// Message("error", "Minimum type 3 character")
+		// 	return;
+		// }
 		setPACS_SHGList([])
 		setLoading(true)
 
@@ -533,7 +524,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		const creds = {
 			loan_to: 'P',
 			branch_code: userDetails[0]?.brn_code,
-			branch_shg_id: value,
+			branch_shg_id: '',
 			tenant_id: userDetails[0]?.tenant_id,
 		}
 
@@ -548,6 +539,9 @@ function DisbursmentForm_BDCCB({ flag }) {
 			.then((res) => {
 
 				if (res?.data?.success) {
+
+					console.log(creds, 'credscredscredscreds', res?.data?.data);
+					
 
 					if (userDetails[0]?.user_type == 'B') {
 						setPACS_SHGList(res?.data?.data?.map((item, i) => ({
@@ -587,7 +581,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const handleSearchSHGChange = async (value, branch_shg_id, index) => {
 
 		if (value.length < 3) {
-			Message("error", "Minimum type 3 character")
+			// Message("error", "Minimum type 3 character")
 			return;
 		}
 		setPACS_SHGList([])
@@ -619,7 +613,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 				if (res?.data?.success) {
 
-					console.log(res?.data?.data, 'shgggggggggggggg');
+					console.log(res?.data?.data, 'credscredscredscreds____', creds);
 
 
 					// if(userDetails[0]?.user_type == 'B'){
@@ -633,6 +627,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 					setSHGList(res?.data?.data?.map((item, i) => ({
 						code: item?.group_code,
 						name: item?.group_name,
+						pacs_id: item?.pacs_id,
 					})))
 					// }
 
@@ -709,15 +704,17 @@ function DisbursmentForm_BDCCB({ flag }) {
 	useEffect(() => {
 		if (Number(params?.id) > 0) {
 			formik.values.rows.forEach((row, index) => {
+				// console.log(row, 'rowwwwwwwwwwwwwwwwwww');
+				
 				if (row.shg_id) {
-					fetchGroupData(row.shg_id, index);
+					fetchGroupData(row.shg_id, index); // mmust be go pacsId 
 				}
 			});
 		}
 	}, [formik.values.rows]);
 
 
-	const fetchGroupData = async (value, rowIndex) => {
+	const fetchGroupData = async (value, rowIndex, pacsId) => {
 		// console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
 
 		 const groups = [...formik.values.rows];
@@ -753,7 +750,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 		setLoading(true)
 		const creds = {
-			branch_code: formik.values.branch_shg_id,
+			branch_code: pacsId,
 			group_code: value,
 			tenant_id: userDetails[0]?.tenant_id,
 		}
@@ -769,7 +766,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 			.then((res) => {
 
 				if (res?.data?.success) {
-					// console.log(res?.data?.data, 'valueeeeeeeeeeeeeeeeeeeeeeee', res.data.data.tot_memb);
+					console.log(res?.data?.data, 'valueeeeeeeeeeeeeeeeeeeeeeee', creds);
 					// const totMemb = Number(res.data.data);
 					// const totMemb = res.data.data;
 
@@ -884,46 +881,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 
 
-										{/* <div>
-								{userDetails[0]?.user_type == 'H' || userDetails[0]?.user_type == 'B' ? (
-									<>
-									<TDInputTemplateBr
-									placeholder="Select One"
-									type="text"
-									label="Loan To *"
-									name="loan_to"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.loan_to}
-									data={loan_to}
-									mode={2}
-									disabled={params.id > 0 ? true : false}
-								/>
-								{formik.errors.loan_to && formik.touched.loan_to ? (
-									<VError title={formik.errors.loan_to} />
-								) : null}
-									</>
-								) : (
-									<>
-									<TDInputTemplateBr
-									placeholder="Select One"
-									type="text"
-									label="Loan To *"
-									name="loan_to"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.loan_to}
-									data={loan_to_For_Pacs}
-									mode={2}
-									disabled={params.id > 0 ? true : false}
-								/>
-								{formik.errors.loan_to && formik.touched.loan_to ? (
-									<VError title={formik.errors.loan_to} />
-								) : null}
-									</>
-								)}
-								
-							</div> */}
+									
 
 										{loanAppData?.approval_status == 'A' && (
 											<>
@@ -987,13 +945,18 @@ function DisbursmentForm_BDCCB({ flag }) {
 												optionFilterProp="children"
 												name="branch_shg_id"
 												// 🔍 typing search
-												onSearch={(value) => {
-													handleSearchPacsChange(value);   // your search function
-													// userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-												}}
+												// onSearch={(value) => {
+												// 	console.log(value, 'valuevaluevaluevalue');
+													
+												// 	// handleSearchPacsChange(value);   // your search function
+												// 	// userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+												// }}
 												// disabled={formik.values.loan_to.length > 0 ? false :  true}
 												// ✅ selecting option
-												onChange={(value) => { formik.setFieldValue("branch_shg_id", value) }}
+												onChange={(value) => { 
+													formik.setFieldValue("branch_shg_id", value)
+													// handleSearchPacsChange()
+												 }}
 												disabled={params.id > 0 ? true : false}
 												onBlur={formik.handleBlur}
 												filterOption={(input, option) =>
@@ -1205,6 +1168,13 @@ function DisbursmentForm_BDCCB({ flag }) {
 										</Tag>
 									)}
 
+{/* <div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50 relative">
+<div className="col-span-3 text-sm font-semibold">Select Group</div>
+<div className="col-span-4 text-sm font-semibold">Select Member</div>
+<div className="col-span-2 text-sm font-semibold">SB Acc No.</div>
+<div className="col-span-3 text-sm font-semibold">Amount</div>
+</div> */}
+
 									{formik.values.rows.map((row, index) => {
 										const isRowFilled =
 											row.sb_acc_no &&
@@ -1233,7 +1203,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 												{/* SHG / PACS */}
 												<div className="col-span-3">
-
+												{/* {JSON.stringify(SHGList, null, 2)} */}
 												{params.id > 0 ?(
 													<>
 													
@@ -1264,12 +1234,18 @@ function DisbursmentForm_BDCCB({ flag }) {
 														// 🔍 typing search
 														onSearch={(value) => {
 															handleSearchSHGChange(value, formik.values.branch_shg_id, index);
+															handleSearchPacsChange();
 														}}
 														// ✅ selecting option (ROW SAFE)
 														onChange={(value) => {
+															formik.setFieldValue(`rows[${index}].member_id`, "")
 															formik.setFieldValue(`rows[${index}].shg_id`, value);
-															// 🔥 fetch and auto-fill total member
-															fetchGroupData(value, index);
+															const selectedGroup = SHGList.find(item => item.code === value);
+															const pacsId = selectedGroup?.pacs_id;
+															// console.log("credscredscredscreds____", value, "PACS ID:", pacsId);
+															// console.log(value, 'credscredscredscreds____');
+															
+															fetchGroupData(value, index, pacsId);
 														}}
 
 														onBlur={() =>
