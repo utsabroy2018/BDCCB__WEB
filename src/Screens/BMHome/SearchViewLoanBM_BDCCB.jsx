@@ -170,7 +170,7 @@ function SearchViewLoanBM_BDCCB() {
 							</button>
 						</div>
 					</div>
-					{/* {JSON.stringify(groups, 2)} */}
+					{JSON.stringify(groups, 2)}
 					<ViewLoanTableBr
 						flag="BM"
 						loanAppData={groups}

@@ -407,7 +407,7 @@ const containerStyle = {
 				fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
 
 				// setDisCode(res?.data?.msg[0]?.disctrict)
-				console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
+				// console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
 				
 				setGroupData(res?.data?.data[0]?.memb_dt);
 				
@@ -618,6 +618,7 @@ const containerStyle = {
 			tenant_id: userDetails[0]?.tenant_id,
 			// branch_code: branch_id
 			branch_id: userDetails[0]?.brn_code,
+			user_type: userDetails[0]?.user_type,
 		}
 
 			const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -630,7 +631,7 @@ const containerStyle = {
 			})
 			.then((res) => {
 
-			console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
+			console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxxpacssssssss');
 	
 			if(res?.data?.success){
 			setPACKSList(res?.data?.data?.map((item, i) => ({
@@ -1177,6 +1178,7 @@ const handleSBAccNoChange = (e, index) => {
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
 							
 					<div className="sm:col-span-3 radioBtn_addgrp">
+						
 						{userDetails[0]?.user_type == 'B' ? 
 							(
 							<Radiobtn
@@ -1188,8 +1190,17 @@ const handleSBAccNoChange = (e, index) => {
 							}}
 							/>
 							):(
-							<label for="g_group_name" class="block mb-2 text-sm capitalize font-bold text-slate-800
-				 dark:text-gray-100"> {directIndirectStatus == "D" ? "Direct Group Transfer" : "Indirect Group Transfer"}  </label>
+							<Radiobtn
+							data={[{
+							label: directIndirectStatus == "D" ? "Direct" : "Indirect",
+							value: directIndirectStatus,
+							}]}
+							val={directIndirectStatus}
+							disabled
+							onChangeVal={(value) => {
+							onChange(value)
+							}}
+							/>
 							)}
 						
 						
@@ -1224,7 +1235,7 @@ const handleSBAccNoChange = (e, index) => {
 
 					{directIndirectStatus == 'I' &&(
 						<div className="sm:col-span-2">
-
+{/* {JSON.stringify(PACKSList, null, 2)} */}
 					<TDInputTemplateBr
 					placeholder="Select PACS"
 					type="text"

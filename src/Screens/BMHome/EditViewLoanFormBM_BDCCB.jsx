@@ -47,54 +47,7 @@ function EditViewLoanFormBM_BDCCB() {
 				</div>
 			</section>
 
-			{/* <DialogBox
-				flag={4}
-				onPress={() => setVisibleModal(!visibleModal)}
-				visible={visibleModal}
-				onPressYes={() => {
-					if (commentsBranchManager) {
-						setVisibleModal(!visibleModal)
-						sendToCreditManager("A")
-					} else {
-						Message("error", "Write Comments.")
-						setVisibleModal(!visibleModal)
-					}
-				}}
-				onPressNo={() => {
-					setVisibleModal(!visibleModal)
-					Message("warning", "User cancelled operation.")
-				}}
-			/> */}
-
-			{/* <DialogBox
-				flag={4}
-				onPress={() => setVisibleModal2(!visibleModal2)}
-				visible={visibleModal2}
-				onPressYes={(e) => {
-					if (commentsBranchManager && creditManagerId) {
-						setVisibleModal2(!visibleModal2)
-						handleReject("R", e)
-					} else {
-						Message("error", "Write Comments.")
-						setVisibleModal2(!visibleModal2)
-					}
-				}}
-				onPressNo={() => {
-					setVisibleModal2(!visibleModal2)
-					Message("warning", "User cancelled operation.")
-				}}
-			/> */}
-			{/* <DialogBox
-				flag={4}
-				onPress={() => setVisibleModal2(!visibleModal2)}
-				visible={visibleModal2}
-				onPressYes={() => {
-					setVisibleModal2(!visibleModal2)
-				}}
-				onPressNo={() => {
-					setVisibleModal2(!visibleModal2)
-				}}
-			/> */}
+			
 		</>
 	)
 }
