@@ -82,6 +82,9 @@ const EditSahayikaFormBM = lazy(() => import("./Screens/BMHome/EditSahayikaFormB
 const EditDisburseFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditDisburseFormBM_BDCCB"))
 const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB.jsx"))
 
+const SearchViewLoanBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_Branch_BDCCB.jsx"))
+const EditViewLoanFormBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_Branch_BDCCB.jsx"))
+
 //////////////// BDCCB BM End ////////////////
 
 //////////////// BDCCB PACS Start ////////////////
@@ -376,6 +379,14 @@ const router = createBrowserRouter([
 							{
 								path: "manageuser",
 								element: <ManageUser />,
+							},
+							{
+								path: "viewloan_branch",
+								element: <SearchViewLoanBM_Branch_BDCCB />,
+							},
+							{
+								path: "viewloan_branch/:id",
+								element: <EditViewLoanFormBM_Branch_BDCCB />,
 							},
 
 							// {

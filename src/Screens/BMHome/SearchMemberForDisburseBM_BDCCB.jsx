@@ -24,6 +24,10 @@ const options_Disburs = [
 	{
 		label: "Accepted",
 		value: "A",
+	},
+	{
+		label: "Rejected",
+		value: "R",
 	}
 ]
 

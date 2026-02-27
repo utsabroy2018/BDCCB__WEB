@@ -10,8 +10,9 @@ import { useLocation } from "react-router"
 import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
 import ViewLoanForm from "../Forms/ViewLoanForm_BDCCB"
+import ViewLoanForm_Branch_BDCCB from "../Forms/ViewLoanForm_Branch_BDCCB"
 
-function EditViewLoanFormBM_BDCCB() {
+function EditViewLoanFormBM_Branch_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -32,7 +33,7 @@ function EditViewLoanFormBM_BDCCB() {
 				{/* {JSON.stringify(loanAppData)} */}
 				<div className=" p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text={`View Society Loan Details`} mode={2} />
+						<FormHeader text={`View Group Loan Details`} mode={2} />
 					</div>
 					<Spin
 						indicator={<LoadingOutlined spin />}
@@ -41,7 +42,7 @@ function EditViewLoanFormBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card border-2 p-5 mx-16 bg-white shadow-lg rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-							<ViewLoanForm />
+							<ViewLoanForm_Branch_BDCCB />
 						</div>
 					</Spin>
 				</div>
@@ -52,4 +53,4 @@ function EditViewLoanFormBM_BDCCB() {
 	)
 }
 
-export default EditViewLoanFormBM_BDCCB
+export default EditViewLoanFormBM_Branch_BDCCB

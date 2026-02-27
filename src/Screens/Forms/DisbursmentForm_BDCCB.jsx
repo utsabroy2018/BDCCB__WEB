@@ -33,6 +33,7 @@ import {
 	SyncOutlined,
 	UsergroupAddOutlined,
 	UserOutlined,
+	CloseCircleOutlined,
 } from "@ant-design/icons"
 import FormHeader from "../../Components/FormHeader"
 import { routePaths } from "../../Assets/Data/Routes"
@@ -846,13 +847,15 @@ function DisbursmentForm_BDCCB({ flag }) {
 						className="text-blue-800 dark:text-gray-400"
 						spinning={loading}
 					>
-						{/* {JSON.stringify(loanAppData, 2)}  */}
+						{JSON.stringify(loanAppData, 2)} 
 						{/* {JSON.stringify(loanAppData, null, 2)} */}
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 							{loanAppData?.approval_status == 'A' && (<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
 								Disbursement Accepted </div>)}
 							{loanAppData?.approval_status == 'U' && (<div className="pending_dis"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />
 								Disbursement Pending </div>)}
+							{loanAppData?.approval_status == 'R' && (<div className="pending_dis"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />
+								Disbursement Rejected </div>)}
 							<form onSubmit={formik.handleSubmit}>
 								<div className="flex justify-start gap-5">
 									<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
@@ -1138,24 +1141,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 											) : null}
 										</div>
 
-										{/* <div>
-
-					<TDInputTemplateBr
-						placeholder="Member Total"
-						type="number"
-						label="Member Total"
-						name="member_total"
-						formControlName={formik.values.member_total}
-						handleChange={formik.handleChange}
-						handleBlur={formik.handleBlur}
-						mode={1}
-						disabled={loanAppData?.approval_status == 'A' ? true : false}
-						/>
-
-						{formik.errors.member_total && formik.touched.member_total ? (
-									<VError title={formik.errors.member_total} />
-								) : null}
-					</div> */}
+										
 
 									</div>
 								</div>
@@ -1499,10 +1485,26 @@ function DisbursmentForm_BDCCB({ flag }) {
 									</div>
 								</div>
 
+							{loanAppData?.approval_status == 'R' && (
+							<div className="sm:col-span-3">
+								<TDInputTemplateBr
+									type="text"
+									label="Remarks "
+									name="remarks"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={loanAppData?.reject_remarks}
+									mode={3}
+									disabled
+								/>
+							</div>
+							)}
+
+
 
 
 								{/* {userDetails?.id != 3 &&  */}
-								{loanAppData?.approval_status != 'A' && (
+								{loanAppData?.approval_status == 'U' && (
 									<BtnComp mode="A" onReset={formik.resetForm} param={params?.id}/>
 								)}
 

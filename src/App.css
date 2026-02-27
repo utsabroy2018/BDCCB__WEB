@@ -159,5 +159,10 @@ table.table_Custome_2nd thead tr th:first-child{width: auto;}
 
 .radioBtn_addgrp .ant-radio-group{margin-left: -10px;  padding-bottom: 0;  margin-bottom: 0;}
 
+.pending_dis_2{background: #be4444; color: #fff; 
+  margin-top: 0; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 20px; font-size: 11px;}
+.accept_dis_2{background: #6cbb3f; color: #fff; 
+  margin-top: 0; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 20px; font-size: 11px;}
+
 
 

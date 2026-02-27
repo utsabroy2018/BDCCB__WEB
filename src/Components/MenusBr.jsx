@@ -2441,9 +2441,24 @@ const items_bdccb = [
 					key: "sub4-2",
 					icon: <ThunderboltOutlined />,
 					label: <Link to={"/homebm/disburseloan"}>Direct Loan</Link>,
-				}
+				},
+				{
+					key: "sub4-2",
+					icon: <CheckCircleOutlined />,
+					label: "Accept Transaction",
+					children: [
+						{
+							key: "sub4-2-2",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/viewloan_branch"}>Disburse</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+					],
+				},
 			],
 		},
+
+		
 
 		{
 			key: "sub5",

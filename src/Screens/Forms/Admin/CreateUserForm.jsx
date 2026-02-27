@@ -215,6 +215,7 @@ function CreateUserForm() {
 			branch_id: userDetails[0]?.user_type == 'H' ? 0 : userDetails[0]?.brn_code, 
 			user_type: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
 			user_status: userState?.active_flag,
+			branch_type: userDetails[0]?.user_type,
 			user_id: params?.id
 		},
 		headers: {

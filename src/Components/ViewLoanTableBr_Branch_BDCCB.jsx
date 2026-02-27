@@ -16,7 +16,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import { Tag } from "antd"
 
-function ViewLoanTableBr_BDCCB({
+function ViewLoanTableBr_Branch_BDCCB({
 	loanAppData,
 	setSearch,
 	title,
@@ -136,7 +136,6 @@ function ViewLoanTableBr_BDCCB({
 							<th scope="col" className="p-4">
 								Status
 							</th>
-							
 							<th scope="col" className="p-4">
 								Action
 							</th>
@@ -163,22 +162,21 @@ function ViewLoanTableBr_BDCCB({
 									<td className="px-6 py-3 text-slate-700">{item.tot_member}</td>
 									<td className="px-6 py-3 text-slate-700">{item.tot_outstanding}</td>
 									<td className="px-6 py-3 text-slate-700">
-										{item.approval_status == "U" ? (
-						<div className="pending_dis_2"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />Unapproved </div>
-											) : item.approval_status == "A" ? (
-						<div className="accept_dis_2"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />Approved </div>
-											) : (
-						<div className="pending_dis_2"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />Rejected </div>
-											
-											)}
-										
-										</td>
+									{item.approval_status == "U" ? (
+									<div className="pending_dis_2"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />Unapproved </div>
+									) : item.approval_status == "A" ? (
+									<div className="accept_dis_2"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />Approved </div>
+									) : (
+									<div className="pending_dis_2"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />Rejected </div>
+									)}
+									</td>
+									
 									<td className="px-6 py-3 text-slate-700">
 										<button
 												// to={routePaths.BM_EDIT_GRT + item?.form_no}
 												onClick={() => {
 													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homepacs/viewloan/${item?.group_code}`, {
+													navigate(`/homebm/viewloan_branch/${item?.group_code}`, {
 														state: item,
 													})
 												}}
@@ -215,4 +213,4 @@ function ViewLoanTableBr_BDCCB({
 	)
 }
 
-export default ViewLoanTableBr_BDCCB
+export default ViewLoanTableBr_Branch_BDCCB

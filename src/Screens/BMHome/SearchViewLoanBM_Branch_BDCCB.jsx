@@ -10,6 +10,7 @@ import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import { routePaths } from "../../Assets/Data/Routes"
+import ViewLoanTableBr_Branch_BDCCB from "../../Components/ViewLoanTableBr_Branch_BDCCB"
 
 const options = [
 	{
@@ -22,7 +23,7 @@ const options = [
 	// }
 ]
 
-function SearchViewLoanBM_BDCCB() {
+function SearchViewLoanBM_Branch_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -40,7 +41,7 @@ function SearchViewLoanBM_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
-			// approval_status: loanType
+			approval_status: loanType
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -171,10 +172,10 @@ function SearchViewLoanBM_BDCCB() {
 						</div>
 					</div>
 					{JSON.stringify(groups, 2)}
-					<ViewLoanTableBr
+					<ViewLoanTableBr_Branch_BDCCB
 						flag="BM"
 						loanAppData={groups}
-						title="Find Loans by Society"
+						title="Find Loans by Group"
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
 					/>
@@ -189,4 +190,4 @@ function SearchViewLoanBM_BDCCB() {
 	)
 }
 
-export default SearchViewLoanBM_BDCCB
+export default SearchViewLoanBM_Branch_BDCCB

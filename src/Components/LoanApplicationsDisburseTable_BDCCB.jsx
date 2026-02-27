@@ -161,7 +161,9 @@ function LoanApplicationsDisburseTable_BDCCB({
 										<EditOutlined className="text-md text-slate-800" />
 										) : disbursementStatus === "A" ? (
 										<EyeOutlined className="text-md text-slate-800" />
-										) : null}
+										) : 
+										<EyeOutlined className="text-md text-slate-800" />
+										}
 											
 										</button>
 										</div>
