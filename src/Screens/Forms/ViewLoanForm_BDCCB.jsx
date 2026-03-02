@@ -864,7 +864,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 				onConfirm={async () => {
 				await rejectDisbursement()
 				// setData([])
-				Message("success", "Transaction Rejected.")
+				// Message("success", "Transaction Rejected.")
 				}}
 				onCancel={() => setRejRes("")}
 				okText="Reject"

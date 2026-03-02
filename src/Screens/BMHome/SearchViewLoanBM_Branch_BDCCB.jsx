@@ -41,13 +41,13 @@ function SearchViewLoanBM_Branch_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
-			approval_status: loanType
+			// approval_status: loanType
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/loan/fetch_disburse_dtls`, creds, {
+			.post(`${url_bdccb}/loan/fetch_shg_disburse_dtls`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -171,7 +171,7 @@ function SearchViewLoanBM_Branch_BDCCB() {
 							</button>
 						</div>
 					</div>
-					{JSON.stringify(groups, 2)}
+					{/* {JSON.stringify(groups, 2)} */}
 					<ViewLoanTableBr_Branch_BDCCB
 						flag="BM"
 						loanAppData={groups}
