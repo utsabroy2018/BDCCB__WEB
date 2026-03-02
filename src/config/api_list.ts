@@ -11,6 +11,8 @@ export const ADDRESSES = {
     FETCH_MEMBERS_DETAILS: `${BASE_URL_BDCCB}/loan/fetch_memb_details`,
     SAVE_SHG_MEMBER_DISBURS: `${BASE_URL_BDCCB}/loan/save_shg_member_disbursement`,
     FETCH_MEMBER_LOAN_DETAILS: `${BASE_URL_BDCCB}/dashboard/fetch_member_loan_dtls`,
+    FETCH_LOAN_DETAILS: `${BASE_URL_BDCCB}/recov/fetch_loan_details`,
+    SAVE_GRP_RECOVERY: `${BASE_URL_BDCCB}/recov/save_grp_recovery`,
     
     //////////////// BDCCB End ////////////////
 

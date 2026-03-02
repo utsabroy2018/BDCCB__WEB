@@ -14,6 +14,11 @@ const navigationRoutes = {
 
     disbMemberNavigation: "DISBMemberNavigation",
     disbMemberScreen: "DISBMemberScreen",
+    loanRecoveryNavigation: "LoanRecoveryNavigation",
+
+    loanRecoveryFormNavigation: "LoanRecoveryFormNavigation",
+    recoveryGroupFormScreen: "RecoveryGroupFormScreen",
+
     
 
     groupNavigation: "GroupNavigation",
@@ -25,7 +30,9 @@ const navigationRoutes = {
     recoveryReportScreen: "RecoveryReportScreen",
     groupwiseRecovery: "GroupwiseRecovery",
     disbursementReportScreen: "DisbursementReportScreen",
-    loanRecoveryNavigation: "LoanRecoveryNavigation",
+    
+
+
     DemandNavigation: "DemandNavigation",
     searchLoanRecoveryScreen: "SearchLoanRecoveryScreen",
     recoveryGroupScreen: "RecoveryGroupScreen",

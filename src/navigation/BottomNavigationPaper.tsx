@@ -17,6 +17,7 @@ import ReportsNavigation from "./ReportsNavigation"
 import DemandNavigation from './DemandNavigation'
 // import useCheckOpenCloseDate from '../components/useCheckOpenCloseDate'
 import { useIsFocused } from '@react-navigation/native'
+import LoanRecoveryFormNavigation from './LoanRecoveryFormNavigation'
 // import { loginStorage } from "../storage/appStorage"
 // import { LoginDataMessage } from "../models/api_types"
 
@@ -146,12 +147,50 @@ function BottomNavigationPaper() {
                 screen: navigationRoutes.searchLoanRecoveryScreen,
                 })
                 },
-    })}
+                })}
             />
             {/* )} */}
             
             </>
         {/* } */}
+
+
+         <>
+            {/* {openDtCloseDt === "O" &&( */}
+            <Tab.Screen
+                name={navigationRoutes.loanRecoveryFormNavigation}
+                component={LoanRecoveryFormNavigation}
+                
+                options={{
+                    tabBarLabel: "Loan Recovery",
+                    tabBarIcon: ({ color, focused }) =>
+                        // !focused ? (
+                        //     <MaterialCommunityIcons
+                        //         name="refresh"
+                        //         color={color}
+                        //         size={26}
+                        //     />
+                        // ) : (
+                        //     <MaterialCommunityIcons name="refresh-circle" color={color} size={26} />
+                        // ),
+                        <MaterialCommunityIcons name="refresh-circle" color={color} size={26} />
+                }}
+
+                listeners={({ navigation }) => ({
+                tabPress: e => {
+                e.preventDefault()
+                navigation.navigate(navigationRoutes.loanRecoveryFormNavigation, {
+                screen: navigationRoutes.recoveryGroupFormScreen,
+                })
+                },
+                })}
+            />
+            {/* )} */}
+            
+            </>
+
+
+        
 
 {(loginStore?.id === 1 || loginStore?.id === 2) &&  
 
