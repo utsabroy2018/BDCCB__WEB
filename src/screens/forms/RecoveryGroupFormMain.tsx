@@ -54,6 +54,7 @@ const RecoveryGroupFormMain = () => {
         penal_roi: "",
         disb_dt: "",
         disb_amt: "",
+        // isChecked: false,
         // loan_amt: "",
         // sb_amt: "",
         txnDate: new Date(),
@@ -181,8 +182,8 @@ const RecoveryGroupFormMain = () => {
             }
         }
         ).then(async res => {
-            console.log("LALALALLA syart", res?.data?.data[0],  'endddddddddd')
-            console.log("Array LALALALLA syart", res?.data?.data[0]?.members, 'Array endddddddddd')
+            console.log("LALALALLA syart", res?.data?.data,  'endddddddddd', creds)
+            console.log("Array LALALALLA syart", res?.data?.data[0], 'Array endddddddddd', loginStore)
 
             if(res?.data?.success) {
                 setFetchedData(res?.data?.data[0])
@@ -190,6 +191,7 @@ const RecoveryGroupFormMain = () => {
                 setMemberDetailsArray(
                 res?.data?.data[0]?.members.map(m => ({
                     ...m,
+                    isChecked: true,
                     loan_amt: m.cr_amt || "",
                     sb_amt: m.sb_amt || "",
                 }))
@@ -197,40 +199,20 @@ const RecoveryGroupFormMain = () => {
 
                  setFormData({
                 groupName: loginStore?.emp_name || "",
-                ccb_loan_acc_no: fetchedData?.ccb_loan_acc_no || "",
-                loan_acc_no: fetchedData?.society_acc_no || "",
-                pacs_name: fetchedData?.pacs_name || "",
-                sanction_dt: fetchedData?.sanction_dt || "",
-                sanction_no: fetchedData?.sanction_no || "",
-                period: fetchedData?.period || "",
-                curr_roi: fetchedData?.curr_roi || "",
-                penal_roi: fetchedData?.penal_roi || "",
-                disb_dt: fetchedData?.disb_dt || "",
-                disb_amt: fetchedData?.disb_amt || "",
-                // loan_amt: "",
-                // sb_amt: "",
+                ccb_loan_acc_no: res?.data?.data[0]?.ccb_loan_acc_no || "",
+                loan_acc_no: res?.data?.data[0]?.society_acc_no || "",
+                pacs_name: res?.data?.data[0]?.pacs_name || "",
+                sanction_dt: res?.data?.data[0]?.sanction_dt || "",
+                sanction_no: res?.data?.data[0]?.sanction_no || "",
+                period: res?.data?.data[0]?.period || "",
+                curr_roi: res?.data?.data[0]?.curr_roi || "",
+                penal_roi: res?.data?.data[0]?.penal_roi || "",
+                disb_dt: res?.data?.data[0]?.disb_dt || "",
+                disb_amt: res?.data?.data[0]?.disb_amt || "",
+                // isChecked: false,
                 txnDate: new Date(),
-
-                ////////////////////////////////////////
-
-            // last_trn_dt: "",
-            // groupType: "",
-            // groupTypeName: "",
-            // totalPrincipleAmount: "",
-            // totalInterestAmount: "",
-            // totalAmount: "",
-            // // //////////////////////
-            // // prn_amt: "",
-            // roi: "",
-            // periodMode: "",
-            // txnMode: "C",
-            
-            // // txnDate: loginStore?.transaction_date,
-            // chequeDate: new Date(),
-            // bankName: "",
-            // chequeId: "",
-            
-        })
+ 
+                })
 
                
                 
@@ -250,46 +232,7 @@ const RecoveryGroupFormMain = () => {
         }
     }, [isFocused])
 
-    useEffect(() => {
-        // setFormData({
-        //     groupName: loginStore?.emp_name || "",
-        //     ccb_loan_acc_no: fetchedData?.ccb_loan_acc_no || "",
-        //     loan_acc_no: fetchedData?.society_acc_no || "",
-        //     pacs_name: fetchedData?.pacs_name || "",
-        //     sanction_dt: fetchedData?.sanction_dt || "",
-        //     sanction_no: fetchedData?.sanction_no || "",
-        //     period: fetchedData?.period || "",
-        //     curr_roi: fetchedData?.curr_roi || "",
-        //     penal_roi: fetchedData?.penal_roi || "",
-        //     disb_dt: fetchedData?.disb_dt || "",
-        //     disb_amt: fetchedData?.disb_amt || "",
-        //     loan_amt: "",
-        //     sb_amt: "",
-        //     txnDate: new Date(),
-
-        //     ////////////////////////////////////////
-
-        //     last_trn_dt: "",
-        // groupType: "",
-        // groupTypeName: "",
-        // totalPrincipleAmount: "",
-        // totalInterestAmount: "",
-        // totalAmount: "",
-        // // //////////////////////
-        // // prn_amt: "",
-        // roi: "",
-        // periodMode: "",
-        // txnMode: "C",
-        
-        // // txnDate: loginStore?.transaction_date,
-        // chequeDate: new Date(),
-        // bankName: "",
-        // chequeId: "",
-            
-        // })
-
-        
-    }, [memberDetailsArray])
+    
 
     // const [totalEMI, setTotalEMI] = useState(() => "")
 
@@ -420,7 +363,17 @@ const RecoveryGroupFormMain = () => {
 
     const sendRecoveryEMI = async () => {
 
-        setLoading(true)
+        // setLoading(true)
+
+        var memberDetailsArray_new = memberDetailsArray
+        .filter(m => m.isChecked === true)
+        .map(m => ({
+            mem_trn_id: m.recov_trans_id,
+            mem_loan_id: m.mem_loan_id,
+            principal_amt: m.principal_amt,
+            cr_amt: m.loan_amt,
+            sb_amt: m.sb_amt,
+        }));
 
         const ip = await getClientIP()
 
@@ -433,83 +386,24 @@ const RecoveryGroupFormMain = () => {
         loan_id : fetchedData?.loan_id,
         created_by : loginStore?.emp_id,
         ip_address: ip,
-
-        members: memberDetailsArray.map(m => ({
-            mem_trn_id: 0,
-            mem_loan_id: m.mem_loan_id,
-            principal_amt: m.principal_amt,
-            cr_amt: m.loan_amt,
-            sb_amt: m.sb_amt,
-        }))
+        members: memberDetailsArray_new
+        // members: memberDetailsArray.map(m => ({
+        //     mem_trn_id: 0,
+        //     mem_loan_id: m.mem_loan_id,
+        //     principal_amt: m.principal_amt,
+        //     cr_amt: m.loan_amt,
+        //     sb_amt: m.sb_amt,
+        // }))
     };
 
 
 
 
-    console.log("===== EMI RECOVERY DATA =====", memberDetailsArray);
-    console.log(JSON.stringify(payload, null, 2));
-
-
+    console.log("===== EMI RECOVERY DATA =====Colect", memberDetailsArray_new, 'enddddddddddddddddd', payload);
+    // console.log(JSON.stringify(payload, null, 2));
     // return;
 
-        // if (hasBeforeUpnapproveTransDate) {
-        //     ToastAndroid.show(`There are unapproved ${errMsg} before this date. Please check and try again.`, ToastAndroid.SHORT)
-        //     return;
-        // }
-        
-        // const transformedObj = memberDetailsArray.filter((item, i) => item.isChecked && item.credit > 0).map((item) => ({
-        //     // loan_id: item.loan_id,
-        //     // credit: item.credit,
-        //     // // credit: isNaN,
-        //     // intt_cal_amt: item.intt_cal_amt,
-        //     // prn_emi: item.prn_emi,
-        //     // intt_emi: item.intt_emi,
-        //     // instl_paid: item.instl_paid,
-        //     // // balance:item.balance,
-        //     // group_code: fetchedData.group_code,
-        //     // prn_amt: item?.prn_amt,
-        //     // // prn_amt: 'aaa',
-        //     // intt_amt: item?.intt_amt,
-        //     // last_trn_dt: formattedDate(formData.txnDate),
-        //     // upload_on: new Date().toLocaleTimeString("en-GB")
-        // }));
-
-
-        // const creds = {
-        //     "branch_code": loginStore?.brn_code,
-        //     "created_by": loginStore?.emp_id,
-        //     "modified_by": loginStore?.emp_id,
-        //     // "trn_lat": location.latitude,
-        //     // "trn_long": location.longitude,
-        //     // "trn_addr": geolocationFetchedAddress,
-        //     "trn_lat": 0,
-        //     "trn_long": 0,
-        //     "trn_addr": "",
-        //     "tr_mode": formData.txnMode,
-        //     "bank_name": formData?.bankName || "",
-        //     "cheque_id": formData?.chequeId || 0,
-        //     // "cheque_id": 0,
-        //     "chq_dt": formattedDate(formData?.chequeDate) || "",
-        //     "group_code": fetchedData?.group_code,
-        //     // "prn_amt":formData?.prn_amt,
-        //     // "balance": fetchedData?.balance,
-        //     // "recovdtls": [{
-        //     //     "loan_id": "",
-        //     //     "credit": "",
-        //     //     "balance": "",
-        //     //     "intt_cal_amt": "",
-        //     //     "prn_emi": "",
-        //     //     "intt_emi": "",
-        //     //     "instl_paid": "",
-        //     //     "last_trn_dt": ""
-        //     // }],
-        //     "recovdtls": transformedObj
-        // }
-
-        // console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP')
-        // // return
-        
-        await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
+    await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
             headers: {
                 Authorization: loginStore?.token, // example header
                 "Content-Type": "application/json", // optional
@@ -517,7 +411,7 @@ const RecoveryGroupFormMain = () => {
         }
         ).then(async res => {
             console.log("RESSSSS", res?.data)
-            if (res?.data?.suc === 0) {
+             if(res?.data?.success) {
                 Alert.alert("Alert", res?.data?.msg, [
                     { text: "Back", onPress: () => navigation.goBack() }
                 ], {
@@ -556,7 +450,17 @@ const RecoveryGroupFormMain = () => {
 
     const editeRecoveryEMI = async () => {
 
-        setLoading(true)
+        // setLoading(true)
+
+        var memberDetailsArray_new = memberDetailsArray
+        .filter(m => m.isChecked === true)
+        .map(m => ({
+            mem_trn_id: m.recov_trans_id,
+            mem_loan_id: m.mem_loan_id,
+            principal_amt: m.principal_amt,
+            cr_amt: m.loan_amt,
+            sb_amt: m.sb_amt,
+        }));
 
         const ip = await getClientIP()
 
@@ -569,19 +473,20 @@ const RecoveryGroupFormMain = () => {
         loan_id : fetchedData?.loan_id,
         created_by : loginStore?.emp_id,
         ip_address: ip,
-
-        members: memberDetailsArray.map(m => ({
-            mem_trn_id: m.recov_trans_id,
-            mem_loan_id: m.mem_loan_id,
-            principal_amt: m.principal_amt,
-            cr_amt: m.loan_amt,
-            sb_amt: m.sb_amt,
-        }))
+        members: memberDetailsArray_new
+        // members: memberDetailsArray.map(m => ({
+        //     mem_trn_id: m.recov_trans_id,
+        //     mem_loan_id: m.mem_loan_id,
+        //     principal_amt: m.principal_amt,
+        //     cr_amt: m.loan_amt,
+        //     sb_amt: m.sb_amt,
+        // }))
     };
 
 
-    console.log("===== EMI RECOVERY DATA =====", memberDetailsArray);
-    console.log(JSON.stringify(payload, null, 2));
+    console.log("===== EMI RECOVERY DATA =====", memberDetailsArray_new, 'enddddddddddddddddd');
+    // // console.log(JSON.stringify(payload, null, 2));
+    // return;
 
         await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
             headers: {
@@ -662,13 +567,33 @@ const handleSBChange = (txt, index) => {
   });
 };
 
-const isAmountEmpty = memberDetailsArray.some(
-  item =>
-    item.loan_amt === "" ||
-    item.loan_amt === undefined ||
-    item.sb_amt === "" ||
-    item.sb_amt === undefined
-);
+
+
+const checkedMembers = memberDetailsArray?.filter(item => {
+    return item.isChecked;
+});
+const isMemberChecked = checkedMembers?.length > 0;
+
+// const checkedMembers = memberDetailsArray?.filter(item => item.isChecked);
+
+const isAmountEmpty = checkedMembers?.some(item => {
+  const cr = Number(item.cr_amt || 0);
+  const sb = Number(item.sb_amt || 0);
+
+//   console.log(cr, sb, "checking values");
+
+  return cr < 1 && sb < 1;
+});
+
+// if (checkedMembers.length === 0) {
+//   console.log("Select at least 1 member");
+// } else if (checkedMembers.some(m => m.cr_amt <= 0 || m.sb_amt <= 0)) {
+//   console.log("Amount must be greater than 0");
+// }
+
+// useEffect(() => {
+//   console.log(checkedMembers, "Updated memberDetailsArray:", JSON.stringify(memberDetailsArray, null, 2));
+// }, [memberDetailsArray]);
 
     return (
         <SafeAreaView>
@@ -688,29 +613,31 @@ const isAmountEmpty = memberDetailsArray.some(
                         backgroundColor: theme.colors.background,
                     }} disabled />
                     <Divider /> */}
-                    {/* <Text>{JSON.stringify(memberDetailsArray[0]?.approval_status, null, 2)}</Text>
-                    <Text>{JSON.stringify(fetchedData, null, 2)}</Text> */}
+                   
+                    {/* <Text>{JSON.stringify(fetchedData, null, 2)}</Text> */}
+                    
+
                     <InputPaper label="Group Name*" leftIcon='account-group-outline' keyboardType="default" value={formData.groupName} onChangeText={(txt: any) => handleFormChange("groupName", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
                     }} disabled />
 
                    
 
-                    <InputPaper label="Society Loan A/C No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.ccb_loan_acc_no} onChangeText={(txt: any) => handleFormChange("ccb_loan_acc_no", txt)} customStyle={{
+                    {/* <InputPaper label="Society Loan A/C No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.ccb_loan_acc_no} onChangeText={(txt: any) => handleFormChange("ccb_loan_acc_no", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
-                    }} disabled />
+                    }} disabled /> */}
 
-                    <InputPaper label="Loan Account No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.loan_acc_no} onChangeText={(txt: any) => handleFormChange("loan_acc_no", txt)} customStyle={{
+                    {/* <InputPaper label="Loan Account No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.loan_acc_no} onChangeText={(txt: any) => handleFormChange("loan_acc_no", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
-                    }} disabled />
+                    }} disabled /> */}
 
-                    <InputPaper label="Sanction Date" maxLength={15} leftIcon='calendar' keyboardType="default" value={formData.sanction_dt} onChangeText={(txt: any) => handleFormChange("sanction_dt", txt)} customStyle={{
+                    {/* <InputPaper label="Sanction Date" maxLength={15} leftIcon='calendar' keyboardType="default" value={formData.sanction_dt} onChangeText={(txt: any) => handleFormChange("sanction_dt", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
-                    }} disabled />
+                    }} disabled /> */}
 
-                    <InputPaper label="Sanction No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.sanction_no} onChangeText={(txt: any) => handleFormChange("sanction_no", txt)} customStyle={{
+                    {/* <InputPaper label="Sanction No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.sanction_no} onChangeText={(txt: any) => handleFormChange("sanction_no", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
-                    }} disabled />
+                    }} disabled /> */}
 
                     <InputPaper label="Period (In Month)" maxLength={15} leftIcon='clock-time-five-outline' keyboardType="default" value={formData.period} onChangeText={(txt: any) => handleFormChange("period", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
@@ -774,220 +701,236 @@ const isAmountEmpty = memberDetailsArray.some(
 
                         </ButtonPaper>
                     </View>
-                    {/* <DatePicker
-                        maximumDate={new Date()}
-                        modal
-                        mode="date"
-                        open={openDate}
-                        date={formData.txnDate}
-                        onConfirm={date => {
-                            setOpenDate(false)
-                            handleFormChange("txnDate", date)
-                        }}
-                        onCancel={() => {
-                            setOpenDate(false)
-                        }}
-                    /> */}
+                    
 
 
 
 
-                    {/* <ButtonPaper icon="alert-circle-check-outline" mode="contained" style={{
-                        backgroundColor: theme.colors.tertiary,
-                    }} onPress={async () => await checkCanTxn()} loading={loading}
-                        // disabled={loading || memberDetailsArray.reduce((sum, item) => sum + +item.credit, 0) === 0 || memberDetailsArray.filter((item, _) => +item.credit > (+item.prn_amt + +item.intt_amt)).length > 0}>
-                        disabled={loading || memberDetailsArray.reduce((sum, item) => sum + +item.credit, 0) === 0 || memberDetailsArray.filter((item, _) => +item.credit > Number((Number(item?.prn_amt) + Number(item?.intt_amt)).toFixed(2))).length > 0}
-                        >
-                        {"Check TXN Availability"}
-                    </ButtonPaper> */}
-
-                    {/* <View style={{
-                        justifyContent: "flex-start",
-                        alignItems: "flex-start",
-                        gap: 3,
-                        width: "100%",
-                    }}>
-                        <Icon source={"information-outline"} size={20} color={theme.colors.tertiary} />
-                        <Text variant='bodySmall' style={{
-                            color: theme.colors.onTertiaryContainer,
-                            fontStyle: "italic",
-                        }}>
-                            Always click above button to check if you can proceed the transaction, even after changing the members or txn date. If not, please change the Txn Date and re-check.
-                        </Text>
-                    </View> */}
-
+                   
+                    {/* <Text>
+                        {memberDetailsArray.map(m =>{
+                            if(m.isChecked) {
+                                return `${m.member_name} - ${m.loan_amt || 0}/- \n`
+                            }
+                        })}
+                        {JSON.stringify(isAmountEmpty, null, 2)} /// 
+                        {JSON.stringify(isMemberChecked, null, 2)}
+                        </Text> */}
+                    
                     <View style={{marginTop:20}}>
                         <Text variant="labelLarge" style={{
                             marginBottom: 10,
                             color: theme.colors.primary
                         }}>Members</Text>
-                        <View style={{
+                        {/* <View style={{
                             flexDirection: "column",
                             gap: 8,
                             flexWrap: "wrap"
-                        }}>
-                            {memberDetailsArray?.map((item, i) => (
-                                <View key={i} style={{ width: "100%", padding:0 }}>
-                                <List.Item
-                                key={i}
-                                title={() => (
-                                // 🔹 Row 1 — Name + Outstanding
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <Text style={{ color: theme.colors.primary }}>
-                                {item?.member_name}
-                                </Text>
+                        }}> */}
+                        {memberDetailsArray?.map((item, i) => (
+                        <View key={i} style={{ width: "100%", padding: 0 }}>
+                        <List.Item
+                        key={i}
+                        title={() => (
+                        // 🔹 Row 1 — Checkbox + Name + Outstanding
+                        <View
+                        style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        }}
+                        >
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        {/* <Checkbox
+                        status={item?.isChecked ? "checked" : "unchecked"}
+                        onPress={() => {
+                        setMemberDetailsArray(prevArray =>
+                        prevArray.map((member, index) =>
+                        index === i
+                        ? {
+                        ...member,
+                        isChecked: !member.isChecked,
+                        credit: member?.isChecked
+                        ? 0
+                        : member?.demand?.demand?.ld_demand
+                        ? member?.demand?.demand?.ld_demand
+                        : 0,
+                        }
+                        : member
+                        )
+                        );
+                        }}
+                        /> */}
 
-                                <Text style={{ color: theme.colors.green, fontSize: 12 }}>
-                                Outstanding - {item?.principal_amt + "/-"}
-                                </Text>
-                                </View>
-                                )}
+                        <Checkbox
+                        status={item?.isChecked ? "checked" : "unchecked"}
+                        onPress={() => {
+                            setMemberDetailsArray(prev =>
+                            prev.map((member, index) =>
+                                index === i
+                                ? { ...member, isChecked: !member.isChecked }
+                                : member
+                            )
+                            );
+                        }}
+                        />
 
-                                description={() => (
-                                // 🔹 Row 2 — Loan Amt + SB Amt inputs
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 6 }}>
-
-                                <View style={{ flex: 1, marginRight: 6 }}>
-                                <InputPaper
-                                selectTextOnFocus
-                                label="Loan Amt."
-                                maxLength={8}
-                                keyboardType="numeric"
-                                value={item?.loan_amt}
-                                onChangeText={(txt) => handleLoanChange(txt, i)}
-                                customStyle={{
-                                backgroundColor: theme.colors.background,
-                                padding: 0,
-                                margin: 0,
-                                }}
-                                />
-                                </View>
-
-                                <View style={{ flex: 1, marginLeft: 6 }}>
-                                <InputPaper
-                                selectTextOnFocus
-                                label="SB Amt."
-                                maxLength={8}
-                                keyboardType="numeric"
-                                value={item?.sb_amt}
-                                // onChangeText={(txt) => handleEMIChange(txt, i)}
-                                onChangeText={(txt) => handleSBChange(txt, i)}
-                                customStyle={{
-                                backgroundColor: theme.colors.background,
-                                padding: 0,
-                                margin: 0,
-                                }}
-                                />
-                                </View>
-
-                                </View>
-                                )}
-                                />
-
-                                <Divider />
-                                </View>
-                            ))}
-
-
-
-
-
-                            {/* Total Calculated EMI */}
-                            {/* <View style={{ width: "100%" }}>
-                                <List.Item
-                                    titleStyle={{
-                                        color: theme.colors.primary,
-                                    }}
-                                    descriptionStyle={{
-                                        color: theme.colors.secondary,
-                                    }}
-                                    title={`TOTAL AMOUNT`}
-                                    // left={props => <List.Icon {...props} icon="account-circle-outline" />}
-                                    right={() => (
-                                        <Text>fdgfdgdfg/-</Text>
-                                    )}
-                                />
-                                <Divider />
-                            </View> */}
+                        <Text style={{ color: theme.colors.primary }}>
+                        {item?.member_name}
+                        </Text>
                         </View>
-                        {/* <View style={{ width: "100%" }}>
-                            <List.Item
-                                titleStyle={{
-                                    color: theme.colors.primary,
-                                }}
-                                descriptionStyle={{
-                                    color: theme.colors.secondary,
-                                }}
-                                title={`TOTAL AMOUNT`}
-                                // left={props => <List.Icon {...props} icon="account-circle-outline" />}
-                                right={() => (
-                                    <Text variant='titleMedium'>{formData.disb_amt}/-</Text>
-                                )}
-                            />
-                            <Divider />
-                        </View> */}
+
+                        <Text style={{ color: theme.colors.green, fontSize: 12 }}>
+                        Outstanding - {item?.principal_amt + "/-"}
+                        </Text>
+                        </View>
+                        )}
+
+                        description={() => (
+                        // 🔹 Row 2 — Loan Amt + SB Amt inputs
+                        <View
+                        style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        marginTop: 6,
+                        }}
+                        >
+                        <View style={{ flex: 1, marginRight: 6 }}>
+                        <InputPaper
+                        selectTextOnFocus
+                        label="Loan Amt."
+                        maxLength={8}
+                        keyboardType="numeric"
+                        value={item?.loan_amt}
+                        onChangeText={(txt) => handleLoanChange(txt, i)}
+                        customStyle={{
+                        backgroundColor: theme.colors.background,
+                        padding: 0,
+                        margin: 0,
+                        }}
+                        disabled={!item?.isChecked}
+                        />
+                        </View>
+
+                        <View style={{ flex: 1, marginLeft: 6 }}>
+                        <InputPaper
+                        selectTextOnFocus
+                        label="SB Amt."
+                        maxLength={8}
+                        keyboardType="numeric"
+                        value={item?.sb_amt}
+                        onChangeText={(txt) => handleSBChange(txt, i)}
+                        customStyle={{
+                        backgroundColor: theme.colors.background,
+                        padding: 0,
+                        margin: 0,
+                        }}
+                        disabled={!item?.isChecked}
+                        />
+                        </View>
+                        </View>
+                        )}
+                        />
+
+                        <Divider />
+                        </View>
+                        ))}
+
+                            <View style={{ width: "100%" }}>
+                        <List.Item
+                        titleStyle={{
+                        color: theme.colors.primary,
+                        }}
+                        descriptionStyle={{
+                        color: theme.colors.secondary,
+                        }}
+                        title={`TOTAL AMOUNT`}
+                        // left={props => <List.Icon {...props} icon="account-circle-outline" />}
+                        right={() => (
+                        <Text variant='titleMedium'>
+                            {memberDetailsArray.reduce(
+                            (sum, item) => item.isChecked ? sum + Number(item.loan_amt || 0) + Number(item.sb_amt || 0) : sum,
+                            0
+                            )}/-</Text>
+                        )}
+                        />
+
+                        </View>
+
+
+
+
+
+                            
+                        {/* </View> */}
+                       
                     </View>
 
                     
-                    {fetchedData?.approval_status == 'U' &&(
-                    <>
-                    {fetchedData?.is_editable ?(
-                        <View style={{
-                        flexDirection: "row",
-                        marginTop: 10,
-                        justifyContent: "center",
-                        gap: 10
-                    }}>
-                        <ButtonPaper icon="cash-register" mode="contained" onPress={() => {
-                            Alert.alert(`Collect Loan Amount ${memberDetailsArray.reduce((sum, item) => sum + +item.loan_amt, 0)}/-?`, `Are you sure, you want to deposit this amount?`, [{
-                                onPress: () => null,
-                                text: "No"
-                            }, {
-                                onPress: async () => await editeRecoveryEMI(),
-                                text: "Yes"
-                            }])
-
-                        }} loading={loading} 
-                    //    disabled={
-                    //         loading ||
-                    //         memberDetailsArray.every(
-                    //         item =>
-                    //             (!item.loan_amt && Number(item.loan_amt) === 0) &&
-                    //             (!item.sb_amt && Number(item.sb_amt) === 0)
-                    //         )
-                    //     }
-                    disabled={loading || isAmountEmpty}
-                        >
-                            
-                            {!loading ? "Edit Collect Amount" : "DON'T CLOSE THIS PAGE..."}
-                        </ButtonPaper>
+                    {/* {fetchedData?.approval_status == 'U' &&(
+                    <> */}
+                    {fetchedData?.approval_status === 'U' && fetchedData?.is_editable === true ? (
+                    <View
+                    style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                    justifyContent: "center",
+                    gap: 10
+                    }}
+                    >
+                    <ButtonPaper
+                    icon="cash-register"
+                    mode="contained"
+                    onPress={() => {
+                    Alert.alert(
+                    `Collect Loan Amount ${memberDetailsArray.reduce((sum, item) => sum + +item.loan_amt, 0)}/-?`,
+                    "Are you sure, you want to deposit this amount?",
+                    [
+                    { text: "No", onPress: () => null },
+                    { text: "Yes", onPress: async () => await editeRecoveryEMI() }
+                    ]
+                    )
+                    }}
+                    loading={loading}
+                    disabled={loading || !isMemberChecked || isAmountEmpty }
+                    >
+                    {!loading ? "Edit Collect Amount" : "DON'T CLOSE THIS PAGE..."}
+                    </ButtonPaper>
                     </View>
-                    ) : (
-                        <View style={{
-                        flexDirection: "row",
-                        marginTop: 10,
-                        justifyContent: "center",
-                        gap: 10
-                    }}>
-                        <ButtonPaper icon="cash-register" mode="contained" onPress={() => {
-                            Alert.alert(`Collect Loan Amount ${memberDetailsArray.reduce((sum, item) => sum + +item.loan_amt, 0)}/-?`, `Are you sure, you want to deposit this amount?`, [{
-                                onPress: () => null,
-                                text: "No"
-                            }, {
-                                onPress: async () => await sendRecoveryEMI(),
-                                text: "Yes"
-                            }])
 
-                        }} loading={loading} 
-                        disabled={loading || isAmountEmpty}
-                        >
-                            
-                            {!loading ? "Collect Amount" : "DON'T CLOSE THIS PAGE..."}
-                        </ButtonPaper>
+                    ) : fetchedData?.approval_status === null && fetchedData?.is_editable === false ? (
+
+                    <View
+                    style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                    justifyContent: "center",
+                    gap: 10
+                    }}
+                    >
+                    <ButtonPaper
+                    icon="cash-register"
+                    mode="contained"
+                    onPress={() => {
+                    Alert.alert(
+                    `Collect Loan Amount ${memberDetailsArray.reduce((sum, item) => sum + +item.loan_amt, 0)}/-?`,
+                    "Are you sure, you want to deposit this amount?",
+                    [
+                    { text: "No", onPress: () => null },
+                    { text: "Yes", onPress: async () => await sendRecoveryEMI() }
+                    ]
+                    )
+                    }}
+                    loading={loading}
+                    disabled={loading || !isMemberChecked || isAmountEmpty }
+                    >
+                    {!loading ? "Collect Amount" : "DON'T CLOSE THIS PAGE..."}
+                    </ButtonPaper>
                     </View>
-                    )}
-                    </>
-                    )}
+
+                    )  : null}
+                    {/* </>
+                    )} */}
                     
 
                     {/* <View>

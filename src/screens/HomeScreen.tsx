@@ -920,7 +920,7 @@ const HomeScreen = () => {
             {/* openDtCloseDt */}
             
             {/* {loginStore?.id === 1 &&  */}
-            <AnimatedFABPaper
+            {/* <AnimatedFABPaper
                 color={theme.colors.onTertiaryContainer}
                 variant="tertiary"
                 icon="form-select"
@@ -937,7 +937,7 @@ const HomeScreen = () => {
                 animateFrom="left"
                 iconMode="dynamic"
                 customStyle={[styles.fabStyle, { backgroundColor: theme.colors.tertiaryContainer }]}
-            />
+            /> */}
             {/* } */}
             
           
