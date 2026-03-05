@@ -29,7 +29,7 @@ import SearchMemberBM from "./Screens/BMHome/SearchMemberBM"
 
 // const DisbursedLoanApproveSingleBM =  lazy(() => import("./Screens/BMHome/DisbursedLoanApproveSingleBM.jsx__BDCCB"));
 // const ApproveMemberTransfer = lazy(() => import("./Screens/BMHome/ApproveMemberTransfer.jsx__BDCCB"));
-// const AttendanceBM = lazy(() => import("./Screens/BMHome/AttendanceBM.jsx__BDCCB"));
+
 
 
 ////////////////////////////////////////////// BDCCB Start //////////////////////////////////////////////
@@ -101,6 +101,8 @@ const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/Acce
 const SearchViewLoanBM = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_BDCCB.jsx"))
 const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
 const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
+
+const LoanDetails_PACS_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_PACS_BDCCB.jsx"));
 
 //////////////// BDCCB PACS End ////////////////
 
@@ -351,10 +353,6 @@ const router = createBrowserRouter([
 								path: "editSahayikaFormBM/:id",
 								element: <EditSahayikaFormBM />,
 							},
-							// {
-							// 	path: "attendancebm",
-							// 	element: <AttendanceBM />,
-							// },
 							{
 								path: "disburseloan",
 								element: <SearchMemberForDisburseBM_BDCCB />,
@@ -583,6 +581,10 @@ const router = createBrowserRouter([
 								path: "memberloandetails/:id",
 								element: <MemberLoanDetailsBM />,
 							},
+							{
+								path: "loandetails-pacs",
+								element: <LoanDetails_PACS_BDCCB />,
+							}
 							
 						],
 					},

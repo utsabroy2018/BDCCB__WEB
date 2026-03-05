@@ -232,6 +232,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	cr_amt: groupData[0]?.disb_amt,
 	society_acc_no : formik.values.society_loan_acc,
 	member_ids: member_ids,
+	group_code: loanAppData?.group_code,
 	created_by: userDetails[0]?.emp_id,
 	ip_address: ip,
 	}
@@ -317,6 +318,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 				<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
 					{/* {JSON.stringify(groupData[0], null, 2)} fdghfghfhg
 						{JSON.stringify(loanAppData, 2)}  */}
+						{/* {JSON.stringify(loanAppData, 2)}  */}
 					<div className="flex flex-col justify-start gap-5">
 						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
 						

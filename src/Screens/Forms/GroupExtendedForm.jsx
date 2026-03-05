@@ -1596,7 +1596,7 @@ const handleSBAccNoChange = (e, index) => {
 			formControlName={member.sb_acc_no}
 			handleChange={(e) => handleSBAccNoChange(e, index)}
 			mode={1}
-			disabled={params?.id > 0}
+			// disabled={params?.id > 0}
 		/>
 
 		{/* {JSON.stringify(SBAccountStatus[index], null, 2)} */}

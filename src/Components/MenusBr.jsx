@@ -2542,11 +2542,11 @@ const items_bdccb_PACS = [
 			icon: <ThunderboltOutlined />,
 			label: "Loans",
 			children: [
-				// {
-				// 	key: "sub4-1",
-				// 	icon: <ThunderboltOutlined />,
-				// 	label: <Link to={"/homebm/disburseloan"}>Loan Disburse PACS to SHG</Link>,
-				// },
+				{
+					key: "sub4-1",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homepacs/loandetails-pacs"}>Loan Details</Link>,
+				},
 				{
 					key: "sub4-2",
 					icon: <CheckCircleOutlined />,
