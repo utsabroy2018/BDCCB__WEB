@@ -368,7 +368,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 	const saveGroupData = async (formData) => {
 
-		console.log(rows, 'rowsrowsrowsrowsrows', formData);
+		console.log(rows, 'formDataformDataformData', formData);
 		// return
 
 		const formattedRows = formData?.rows?.map(row => ({
@@ -397,7 +397,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			ip_address: ip,
 		}
 
-
+		
 
 		// console.log(formData, 'formDataformDataformDataformData', creds, userDetails[0]);
 
