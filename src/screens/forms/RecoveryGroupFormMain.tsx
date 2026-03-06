@@ -366,7 +366,7 @@ const RecoveryGroupFormMain = () => {
         // setLoading(true)
 
         var memberDetailsArray_new = memberDetailsArray
-        .filter(m => m.isChecked === true)
+        // .filter(m => m.isChecked === true)
         .map(m => ({
             mem_trn_id: m.recov_trans_id,
             mem_loan_id: m.mem_loan_id,
@@ -399,8 +399,8 @@ const RecoveryGroupFormMain = () => {
 
 
 
-    console.log("===== EMI RECOVERY DATA =====Colect", memberDetailsArray_new, 'enddddddddddddddddd', payload);
-    // console.log(JSON.stringify(payload, null, 2));
+    // console.log("===== EMI RECOVERY DATA =====Colect", memberDetailsArray_new, 'enddddddddddddddddd');
+    // // console.log(JSON.stringify(payload, null, 2));
     // return;
 
     await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
@@ -453,7 +453,7 @@ const RecoveryGroupFormMain = () => {
         // setLoading(true)
 
         var memberDetailsArray_new = memberDetailsArray
-        .filter(m => m.isChecked === true)
+        // .filter(m => m.isChecked === true)
         .map(m => ({
             mem_trn_id: m.recov_trans_id,
             mem_loan_id: m.mem_loan_id,
@@ -484,8 +484,8 @@ const RecoveryGroupFormMain = () => {
     };
 
 
-    console.log("===== EMI RECOVERY DATA =====", memberDetailsArray_new, 'enddddddddddddddddd');
-    // // console.log(JSON.stringify(payload, null, 2));
+    // console.log("===== EMI RECOVERY DATA =====", memberDetailsArray_new, 'enddddddddddddddddd');
+    // // // console.log(JSON.stringify(payload, null, 2));
     // return;
 
         await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
@@ -507,23 +507,7 @@ const RecoveryGroupFormMain = () => {
                 return
             }
             ToastAndroid.show("Loan recovery EMI installment done.", ToastAndroid.SHORT)
-            // console.log("Loan recovery EMI installment done.", res?.data)
-            // await handlePrint(res?.data?.msg)
-
-            // console.log('lllll', res?.data?.msg, 'dddddddddddddddd', res?.data?.not_inserted_row);
             
-
-            // navigation.dispatch(
-            //             CommonActions.navigate({
-            //                 name: navigationRoutes.recoveryGroupScreenResult,
-            //                 params: {
-            //                 resultData: res?.data?.msg,
-            //                 not_inserted_row: res?.data?.not_inserted_row,
-            //                 },
-            //             }),
-            //         )
-
-            // navigation.goBack()
         }).catch(err => {
             ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
             console.log("Some error occurred while submitting EMI.", err)
@@ -576,24 +560,13 @@ const isMemberChecked = checkedMembers?.length > 0;
 
 // const checkedMembers = memberDetailsArray?.filter(item => item.isChecked);
 
-const isAmountEmpty = checkedMembers?.some(item => {
+// const isAmountEmpty = checkedMembers?.some(item => {
+const isAmountEmpty = memberDetailsArray?.some(item => {
   const cr = Number(item.cr_amt || 0);
   const sb = Number(item.sb_amt || 0);
-
-//   console.log(cr, sb, "checking values");
-
   return cr < 1 && sb < 1;
 });
 
-// if (checkedMembers.length === 0) {
-//   console.log("Select at least 1 member");
-// } else if (checkedMembers.some(m => m.cr_amt <= 0 || m.sb_amt <= 0)) {
-//   console.log("Amount must be greater than 0");
-// }
-
-// useEffect(() => {
-//   console.log(checkedMembers, "Updated memberDetailsArray:", JSON.stringify(memberDetailsArray, null, 2));
-// }, [memberDetailsArray]);
 
     return (
         <SafeAreaView>
@@ -741,28 +714,8 @@ const isAmountEmpty = checkedMembers?.some(item => {
                         }}
                         >
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        
                         {/* <Checkbox
-                        status={item?.isChecked ? "checked" : "unchecked"}
-                        onPress={() => {
-                        setMemberDetailsArray(prevArray =>
-                        prevArray.map((member, index) =>
-                        index === i
-                        ? {
-                        ...member,
-                        isChecked: !member.isChecked,
-                        credit: member?.isChecked
-                        ? 0
-                        : member?.demand?.demand?.ld_demand
-                        ? member?.demand?.demand?.ld_demand
-                        : 0,
-                        }
-                        : member
-                        )
-                        );
-                        }}
-                        /> */}
-
-                        <Checkbox
                         status={item?.isChecked ? "checked" : "unchecked"}
                         onPress={() => {
                             setMemberDetailsArray(prev =>
@@ -773,14 +726,14 @@ const isAmountEmpty = checkedMembers?.some(item => {
                             )
                             );
                         }}
-                        />
+                        /> */}
 
-                        <Text style={{ color: theme.colors.primary }}>
+                        <Text style={{ color: theme.colors.primary, borderColor: theme.colors.primary, borderWidth: 1, paddingHorizontal: 6, borderRadius: 4, fontSize: 12, marginRight: 10 }}>
                         {item?.member_name}
                         </Text>
                         </View>
 
-                        <Text style={{ color: theme.colors.green, fontSize: 12 }}>
+                        <Text style={{ color: theme.colors.green, fontSize: 12, borderColor: theme.colors.green, borderWidth: 1, paddingHorizontal: 6, borderRadius: 4 }}>
                         Outstanding - {item?.principal_amt + "/-"}
                         </Text>
                         </View>
@@ -795,11 +748,11 @@ const isAmountEmpty = checkedMembers?.some(item => {
                         marginTop: 6,
                         }}
                         >
-                        <View style={{ flex: 1, marginRight: 6 }}>
+                        <View style={{ flex: 1, marginRight: 6, padding: 0 }}>
                         <InputPaper
                         selectTextOnFocus
                         label="Loan Amt."
-                        maxLength={8}
+                        // maxLength={8}
                         keyboardType="numeric"
                         value={item?.loan_amt}
                         onChangeText={(txt) => handleLoanChange(txt, i)}
@@ -808,7 +761,7 @@ const isAmountEmpty = checkedMembers?.some(item => {
                         padding: 0,
                         margin: 0,
                         }}
-                        disabled={!item?.isChecked}
+                        // disabled={!item?.isChecked}
                         />
                         </View>
 
@@ -816,7 +769,7 @@ const isAmountEmpty = checkedMembers?.some(item => {
                         <InputPaper
                         selectTextOnFocus
                         label="SB Amt."
-                        maxLength={8}
+                        // maxLength={8}
                         keyboardType="numeric"
                         value={item?.sb_amt}
                         onChangeText={(txt) => handleSBChange(txt, i)}
@@ -825,7 +778,7 @@ const isAmountEmpty = checkedMembers?.some(item => {
                         padding: 0,
                         margin: 0,
                         }}
-                        disabled={!item?.isChecked}
+                        // disabled={!item?.isChecked}
                         />
                         </View>
                         </View>
@@ -847,9 +800,15 @@ const isAmountEmpty = checkedMembers?.some(item => {
                         title={`TOTAL AMOUNT`}
                         // left={props => <List.Icon {...props} icon="account-circle-outline" />}
                         right={() => (
+                        // <Text variant='titleMedium'>
+                        //     {memberDetailsArray.reduce(
+                        //     (sum, item) => item.isChecked ? 
+                        //     sum + Number(item.loan_amt || 0) + Number(item.sb_amt || 0) : sum,
+                        //     0
+                        //     )}/-</Text>
                         <Text variant='titleMedium'>
                             {memberDetailsArray.reduce(
-                            (sum, item) => item.isChecked ? sum + Number(item.loan_amt || 0) + Number(item.sb_amt || 0) : sum,
+                            (sum, item) => sum + Number(item.loan_amt || 0) + Number(item.sb_amt || 0),
                             0
                             )}/-</Text>
                         )}
@@ -892,7 +851,8 @@ const isAmountEmpty = checkedMembers?.some(item => {
                     )
                     }}
                     loading={loading}
-                    disabled={loading || !isMemberChecked || isAmountEmpty }
+                    // disabled={loading || !isMemberChecked || isAmountEmpty }
+                    disabled={loading}
                     >
                     {!loading ? "Edit Collect Amount" : "DON'T CLOSE THIS PAGE..."}
                     </ButtonPaper>
@@ -922,7 +882,8 @@ const isAmountEmpty = checkedMembers?.some(item => {
                     )
                     }}
                     loading={loading}
-                    disabled={loading || !isMemberChecked || isAmountEmpty }
+                    // disabled={loading || !isMemberChecked || isAmountEmpty }
+                    disabled={loading}
                     >
                     {!loading ? "Collect Amount" : "DON'T CLOSE THIS PAGE..."}
                     </ButtonPaper>
