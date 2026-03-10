@@ -167,7 +167,7 @@ function UserManagementTable({
 									>
 										{item.sl_no}
 									</th> */}
-									<td className="px-6 py-3 text-slate-800 font-bold">
+									<td className="px-6 py-3 text-slate-800">
 										{item?.user_id}
 									</td>
 									<td className="px-6 py-3  text-slate-700">

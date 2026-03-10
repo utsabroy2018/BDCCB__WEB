@@ -10,6 +10,8 @@ import {
 	PrinterOutlined,
 	FileExcelOutlined,
 	CheckCircleOutlined,
+	WalletOutlined,
+	SaveOutlined,
 } from "@ant-design/icons"
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../../Utils/formateDate"
@@ -33,6 +35,7 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import VError from "../../../Components/VError"
 import BtnComp from "../../../Components/BtnComp"
+import { saveMasterData } from "../../../services/masterService"
 
 // const { RangePicker } = DatePicker
 // const dateFormat = "YYYY/MM/DD"
@@ -61,6 +64,8 @@ function LoanDetails() {
 	const [loading, setLoading] = useState(false)
 	const [societyLoanNo, setSocietyLoanNo] = useState('')
 	const [loanDetails, setLoanDetails] = useState([])
+	const [recoveryBtnShowOff, setRecoveryBtnShowOff] = useState(false)
+	const [allRecoverySubBtnShowOff, setAllRecoverySubBtnShowOff] = useState(false)
 
 	const navigate = useNavigate()
 
@@ -76,6 +81,7 @@ function LoanDetails() {
 				ccb_loan_id: "",
 				cr_amt: "",
 				mem_outstanding: "",
+				calc_interest: "",
 				princAmt: "",
 				intAmt: "",
 				},
@@ -132,6 +138,8 @@ function LoanDetails() {
 		console.log(societyLoanNo, 'formDataformDataformDataformDataccccccccccc');
 
 		setLoading(true)
+		setRecoveryBtnShowOff(false)
+		setAllRecoverySubBtnShowOff(false)
 
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
@@ -142,7 +150,7 @@ function LoanDetails() {
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/loan/fetch_loan_dtls_based_socacc_no`, creds, {
+		await axios.post(`${url_bdccb}/recov/fetch_loan_dtls_based_socacc_no`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -199,6 +207,8 @@ function LoanDetails() {
 	}
 
 	const calculatePrincIntarest = async () => {
+
+		setRecoveryBtnShowOff(false)
 		
 		const princAmt = formik.values.principal_amount || 0
 		const intAmt = formik.values.interest_amount || 0	
@@ -236,7 +246,7 @@ function LoanDetails() {
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/loan/calculate_prn_intt_amt`, creds, {
+		await axios.post(`${url_bdccb}/recov/calculate_prn_intt_amt`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -246,15 +256,19 @@ function LoanDetails() {
 				
 				
 				if(res?.data?.success){
-					console.log(res?.data?.data, 'resresresresresresres', creds);
+					
 					// setLoanDetails(res?.data?.data || [])
 					const members = (res?.data?.data || []).map(item => ({
 						...item,
 						cr_amt: item.mem_amount ,
 						mem_outstanding: item.mem_outstanding ,
-						princAmt: item.principal_amount,
-						intAmt: item.interest_amount  // replace mem_amount with cr_amt
+						princAmt: item.principal_amount || 0,
+						intAmt: item.interest_amount || 0, // replace mem_amount with cr_amt
+						calc_interest: item.calculated_interest,
+
 					}))
+
+					console.log(res?.data?.data, 'resresresresresresres', members, 'mmmmmmmmmmmmmmmmmm');
 
 					setValues({
 						...formValues,
@@ -265,6 +279,7 @@ function LoanDetails() {
 						// 	loan_id : res?.data?.data?.loan_id,
 						// }
 					})
+					setRecoveryBtnShowOff(true)
 				} else {
 				navigate(routePaths.LANDING)
 				localStorage.clear()
@@ -276,7 +291,166 @@ function LoanDetails() {
 			setLoading(false)
 		
 	}
+
+
+	const recoveryLoan = async () => {
+
+		setLoading(true)
+		
+		// const member_list = loanDetails[0]?.member_list.map(item => ({
+		const member_list = formik.values.members.map(item => ({	
+		loan_id: item.loan_id,
+		member_name: item.member_name,
+		mem_amount: item.cr_amt,
+		mem_outstanding: item.mem_outstanding,
+		calculated_interest: item.calculated_interest,
+		}));
+
+		const ip = await getClientIP()
+
+		const creds = {
+		memb_loan_amt :  member_list
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/recov/calculate_prn_intt_recov`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+				
+				if(res?.data?.success){
+					
+				const members = (res?.data?.data || []).map(item => ({
+				...item,
+				cr_amt: item.mem_amount ,
+				mem_outstanding: item.mem_outstanding ,
+				princAmt: item.prn_recov,
+				intAmt: item.intt_recov, // replace mem_amount with cr_amt
+				calc_interest: item.calculated_interest,
+				}))
+
+				setValues({
+				...formValues,
+				principal_amount: formik.values?.principal_amount || "",
+				interest_amount: formik.values?.interest_amount || "",
+				members: members
+				})
+
+				setAllRecoverySubBtnShowOff(true)
+				Message("success", res?.data?.msg)
+
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+			setLoading(false)
+	}
+
+	const allRecoverySubmit___ = async () => {
+		setLoading(true)
+		
+		const member_list = formik.values.members.map(item => ({	
+		loan_id: item.loan_id,
+		calculated_interest: item.calculated_interest,
+		curr_prn: item.mem_outstanding,
+		amount: item.cr_amt,
+		prn_recov: item.princAmt,
+		intt_recov: item.intAmt,
+		}));
+
+
+		const ip = await getClientIP()
+
+		const creds = {
+		ccb_loan_id : loanDetails[0]?.member_list[0]?.ccb_loan_id,
+		tenant_id : userDetails[0]?.tenant_id,
+		branch_id : userDetails[0]?.brn_code,
+		loan_acc_no : societyLoanNo,
+		loan_to : userDetails[0]?.user_type,
+		society_recov :  member_list
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/recov/submit_society_recovery`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+				
+				if(res?.data?.success){
+
+				console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
+					
+				setAllRecoverySubBtnShowOff(true)
+				Message("success", res?.data?.msg)
+
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+			setLoading(false)
+		
+	}
+
+
+	const allRecoverySubmit = async (formData) => {
+					setLoading(true)
+				
+					const ip = await getClientIP()
+
+					const member_list = formik.values.members.map(item => ({	
+					loan_id: item.loan_id,
+					calculated_interest: item.calculated_interest,
+					curr_prn: item.mem_outstanding,
+					amount: item.cr_amt,
+					prn_recov: item.princAmt,
+					intt_recov: item.intAmt,
+					}));
+				
+					const creds = {
+					ccb_loan_id : loanDetails[0]?.member_list[0]?.ccb_loan_id,
+					tenant_id : userDetails[0]?.tenant_id,
+					branch_id : userDetails[0]?.brn_code,
+					loan_acc_no : societyLoanNo,
+					loan_to : userDetails[0]?.user_type,
+					society_recov :  member_list
+					}
 	
+	
+					console.log(creds, 'credscredscredscreds', formData);
+	
+					// return;
+					
+				
+					await saveMasterData({
+					endpoint: "recov/submit_society_recovery",
+					creds,
+					navigate,
+					successMsg: "Group details saved.",
+					onSuccess: () => navigate(-1),
+				
+					// 🔥 fully dynamic failure handling
+					failureRedirect: routePaths.LANDING,
+					clearStorage: true,
+					})
+				
+					setLoading(false)
+					}
 
 	return (
 		<div>
@@ -336,9 +510,9 @@ function LoanDetails() {
 							{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
 						</div>
 					</div>
-					{/* {JSON.stringify(loanDetails[0], null, 2)} llllllll
-					{JSON.stringify(formik.values.members, null, 2)} */}
 
+					{JSON.stringify(loanDetails[0], null, 2)}
+					
 					{loanDetails.length > 0 && (
 					<>
 					{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
@@ -494,18 +668,28 @@ function LoanDetails() {
 
 						<div className="sm:col-span-1 mt-7">
 							<button
-							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-slate-600 border-slate-500 bg-slate-700 transition ease-in-out hover:bg-slate-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-slate-600 border-slate-500 bg-slate-700 transition ease-in-out hover:bg-slate-600 duration-300 rounded-full dark:focus:ring-primary-900`}
 							onClick={() => {
 							calculatePrincIntarest()
 							}}
 							>
 							<SearchOutlined /> <span className={`ml-2`}>Calculate</span>
 							</button>
+
+							<button
+							className={`inline-flex items-center text-white ml-6 disabled:bg-[#ee7c98] bg-[#DA4167] hover:bg-[#DA4167] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
+							onClick={() => {
+							recoveryLoan()
+							}}
+							disabled={!recoveryBtnShowOff}
+							>
+							<WalletOutlined /> <span className={`ml-2`}>Recovery</span>
+							</button>
 						</div>
 
 						</div>
 						</div>
-
+							<div>{JSON.stringify(formik.values.members, null, 2)}</div>
 						{/* <div className="grid grid-cols-4 gap-5 mt-5"> */}
 
 						{formik.values.members?.length > 0 && (
@@ -518,7 +702,7 @@ function LoanDetails() {
 
 						{formik.values.members.map((member, index) => (
 
-						<div key={index} className="grid grid-cols-6 gap-5 mt-2">
+						<div key={index} className="grid grid-cols-7 gap-5 mt-2">
 
 						<div>
 						<TDInputTemplateBr
@@ -570,24 +754,36 @@ function LoanDetails() {
 
 						<div>
 						<TDInputTemplateBr
-						placeholder="Principal Amount"
-						type="text"
-						label="Principal Amount"
-						name={`members.${index}.princAmt`}
-						formControlName={member.princAmt}
-						// disabled={true}
+						placeholder="Calculated Interest"
+						type="number"
+						label="Calculated Interest"
+						name={`members.${index}.calc_interest`}
+						formControlName={member.calc_interest}
+						disabled={true}
 						mode={1}
 						/>
 						</div>
 
 						<div>
 						<TDInputTemplateBr
-						placeholder=" Interest Amount"
+						placeholder="Principal Recovery"
 						type="text"
-						label=" Interest Amount"
+						label="Principal Recovery"
+						name={`members.${index}.princAmt`}
+						formControlName={member.princAmt}
+						disabled={true}
+						mode={1}
+						/>
+						</div>
+
+						<div>
+						<TDInputTemplateBr
+						placeholder=" Interest Recovery"
+						type="text"
+						label=" Interest Recovery"
 						name={`members.${index}.intAmt`}
 						formControlName={member.intAmt}
-						// disabled={true}
+						disabled={true}
 						mode={1}
 						/>
 						</div>
@@ -596,7 +792,7 @@ function LoanDetails() {
 
 						))}
 
-						<div className="grid grid-cols-6 gap-2 mt-2 bg-slate-100 p-2 rounded-lg bg-slate-200">
+						<div className="grid grid-cols-7 gap-2 mt-2 bg-slate-100 p-2 rounded-lg bg-slate-200">
 							<div className="text-black font-semibold text-base">Total</div>
 							<div></div>
 							<div className="pl-3 text-base">
@@ -608,6 +804,12 @@ function LoanDetails() {
 							<div className="pl-3 text-base">
 							{formik.values.members.reduce(
                             (sum, item) => sum + Number(item.mem_outstanding || 0),
+                            0
+                            )}
+							</div>
+							<div className="pl-3 text-base">
+							{formik.values.members.reduce(
+                            (sum, item) => sum + Number(item.calc_interest || 0),
                             0
                             )}
 							</div>
@@ -629,12 +831,31 @@ function LoanDetails() {
 						</>
 						)}
 
+						{allRecoverySubBtnShowOff && (
+						<>
+						{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
+						<div className="flex justify-center mt-7">
 						
+							<button
+							className={`inline-flex items-center px-6 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+							onClick={() => {
+							allRecoverySubmit()
+							}}
+							disabled={!recoveryBtnShowOff}
+							>
+							<SaveOutlined /> <span className={`ml-2`}>Submit</span>
+							</button>
+
+						</div>
+						</>
+						)}
 
 						{/* </div> */}
 					
 					</>
 					)}
+
+					
 					
 					
 				</main>
