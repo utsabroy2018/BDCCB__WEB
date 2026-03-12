@@ -12,11 +12,11 @@ export default function LoanRecoveryFormNavigation() {
 
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name={navigationRoutes.searchLoanRecoveryScreen} component={SearchLoanRecoveryScreen} />
+            {/* <Stack.Screen name={navigationRoutes.searchLoanRecoveryScreen} component={SearchLoanRecoveryScreen} /> */}
             <Stack.Screen name={navigationRoutes.recoveryGroupFormScreen} component={RecoveryGroupFormScreen} />
             
-            <Stack.Screen name={navigationRoutes.recoveryMemberScreen} component={RecoveryMemberScreen} />
-            <Stack.Screen name={navigationRoutes.recoveryGroupScreenResult} component={RecoveryGroupScreenResult} />
+            {/* <Stack.Screen name={navigationRoutes.recoveryMemberScreen} component={RecoveryMemberScreen} />
+            <Stack.Screen name={navigationRoutes.recoveryGroupScreenResult} component={RecoveryGroupScreenResult} /> */}
         </Stack.Navigator>
     )
 }

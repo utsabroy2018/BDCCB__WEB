@@ -80,7 +80,7 @@ const SettingsScreen = () => {
   };
 
   useEffect(() => {
-    requestPermissions()
+    // requestPermissions()
   }, [])
 
   // const testPrint = async () => {
@@ -129,7 +129,7 @@ const SettingsScreen = () => {
           gap: 10
         }}>
           <ButtonPaper mode='contained' icon="logout" onPress={logginOut}>LOG OUT</ButtonPaper>
-          <CollectionButtonsWrapper>
+          {/* <CollectionButtonsWrapper>
             <CollectionButton
               icon={"printer-outline"}
               text="Printer Connect"
@@ -141,7 +141,7 @@ const SettingsScreen = () => {
                 }))
               }}
             />
-          </CollectionButtonsWrapper>
+          </CollectionButtonsWrapper> */}
         </View>
 
 

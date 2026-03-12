@@ -22,7 +22,7 @@ const DISBMemberScreen = () => {
         }}
         
         >
-                {isHeaderShown && <HeadingComp title="Member Details" subtitle="Details" isBackEnabled />}
+                {isHeaderShown && <HeadingComp title="Member Loan" subtitle="Details" isBackEnabled />}
                 <View style={{
                     paddingHorizontal: isHeaderShown ? 20 : 0,
                     paddingTop: isHeaderShown  ? 10 : 0,

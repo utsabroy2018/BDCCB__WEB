@@ -8,11 +8,14 @@ export const ADDRESSES = {
     FETCH_DISBURS_DTLS: `${BASE_URL_BDCCB}/loan/fetch_disburse_dtls`,
     SAVE_LOAN_VOUCHER: `${BASE_URL_BDCCB}/account/save_loan_voucher`,
     FETCH_MAX_BALANCE: `${BASE_URL_BDCCB}/loan/fetch_max_balance`,
-    FETCH_MEMBERS_DETAILS: `${BASE_URL_BDCCB}/loan/fetch_memb_details`,
+    // FETCH_MEMBERS_DETAILS: `${BASE_URL_BDCCB}/loan/fetch_memb_details`,
+    FETCH_LOAN_BALANCE: `${BASE_URL_BDCCB}/dashboard/dashboard_grp_loan_bal`,
     SAVE_SHG_MEMBER_DISBURS: `${BASE_URL_BDCCB}/loan/save_shg_member_disbursement`,
     FETCH_MEMBER_LOAN_DETAILS: `${BASE_URL_BDCCB}/dashboard/fetch_member_loan_dtls`,
     FETCH_LOAN_DETAILS: `${BASE_URL_BDCCB}/recov/fetch_loan_details`,
+    FETCH_MEMBER_OUTSTANDING_DTLS: `${BASE_URL_BDCCB}/dashboard/fetch_member_outstanding_dtls`,
     SAVE_GRP_RECOVERY: `${BASE_URL_BDCCB}/recov/save_grp_recovery`,
+    // LOGOUT_APP:`${BASE_URL_BDCCB}/logout_app`,
     
     //////////////// BDCCB End ////////////////
 

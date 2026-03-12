@@ -121,7 +121,7 @@ function BottomNavigationPaper() {
             {/* {(loginStore?.id === 1 || loginStore?.id === 2) &&  */}
             <>
             {/* {openDtCloseDt === "O" &&( */}
-            <Tab.Screen
+            {/* <Tab.Screen
                 name={navigationRoutes.loanRecoveryNavigation}
                 component={LoanRecoveryNavigation}
                 
@@ -148,7 +148,7 @@ function BottomNavigationPaper() {
                 })
                 },
                 })}
-            />
+            /> */}
             {/* )} */}
             
             </>

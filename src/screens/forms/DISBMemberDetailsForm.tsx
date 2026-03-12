@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-import { Alert, Linking, PermissionsAndroid, Platform, SafeAreaView, ScrollView, StyleSheet, ToastAndroid, TouchableOpacity, View } from 'react-native'
-import { Checkbox, Icon, IconButton, RadioButton, Text } from "react-native-paper"
+import { Alert, Linking, PermissionsAndroid, Platform, SafeAreaView, ScrollView, StyleSheet, ToastAndroid, View } from 'react-native'
+import { Checkbox, Icon, Text } from "react-native-paper"
 import { usePaperColorScheme } from '../../theme/theme'
 import { Divider, List } from 'react-native-paper'
 import InputPaper from '../../components/InputPaper'
@@ -10,7 +10,7 @@ import ButtonPaper from '../../components/ButtonPaper'
 import axios from 'axios'
 import { ADDRESSES } from '../../config/api_list'
 import { loginStorage } from '../../storage/appStorage'
-import { CommonActions, useIsFocused, useNavigation } from '@react-navigation/native'
+import { CommonActions, useIsFocused, useNavigation, useRoute } from '@react-navigation/native'
 import navigationRoutes from '../../routes/routes'
 import useGeoLocation from '../../hooks/useGeoLocation'
 import RadioComp from '../../components/RadioComp'
@@ -20,762 +20,855 @@ import { useEscPosPrint } from "../../hooks/useEscPosPrint"
 import { BASE_URL } from '../../config/config'
 import dayjs from 'dayjs'
 import { AppStore } from '../../context/AppContext'
-import { disableCondition } from '../../utils/disableCondition'
-import { KeyboardAvoidingView } from "react-native";
-
-const DISBMemberDetailsForm = ({ fetchedData, branchCode }) => {
-  const theme = usePaperColorScheme()
-  const navigation = useNavigation()
-  const isFocused = useIsFocused()
-  const [hasBeforeUpnapproveTransDate, setHasBeforeUpnapproveTransDate] = useState(false);
-  const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "")
-
-  const { location, error } = useGeoLocation()
-  const [geolocationFetchedAddress, setGeolocationFetchedAddress] = useState(() => "")
-  const [errMsg, setErrMsg] = useState(() => "")
-  const [openDate2, setOpenDate2] = useState(() => false)
-  const [openDate, setOpenDate] = useState(() => false)
-  const { handlePrint } = useEscPosPrint()
-  const [remainDisburseAmt, setRemainDisburseAmt] = useState('');
-
-  const [memberList, setMemberList] = useState([]);
-  const [members, setMembers] = useState([
-    {
-      // id: 1,
-      // member_name: "",
-      // disb_amt: "",
-      // gp_leader_flag: 'Y',
-      // approve_member: "N",
-
-      id: 1,
-      member_id: "",
-      member_name: "",
-      disb_amt: "",
-      approve_member: "N", // ⭐ NEW
-      loan_id: "",
-
-    },
-  ]);
+import { SCREEN_HEIGHT } from 'react-native-normalize'
 
 
-  const [recoveryFlag, setRecoveryFlag] = useState<"Y" | "N">("Y");
+// const DISBMemberDetailsForm = ({ fetchedData, approvalStatus = "U" }) => {
+const DISBMemberDetailsForm = ({ fetchedData:any, branchCode }) => {
+    const theme = usePaperColorScheme()
+    const navigation = useNavigation()
+    const isFocused = useIsFocused()
+    const [hasBeforeUpnapproveTransDate, setHasBeforeUpnapproveTransDate] = useState(false);
+    const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "")
 
-  const canEdit = recoveryFlag === "Y";
+    // const { location, error } = useGeoLocation()
+    const [geolocationFetchedAddress, setGeolocationFetchedAddress] = useState(() => "")
+    const [errMsg, setErrMsg] = useState(() => "")
+    const { handlePrint } = useEscPosPrint()
+    const route = useRoute();
+    const { group_code } = route.params as { group_code: number };
 
+    // console.log("LOGIN DATAAA =============", loginStore)
+    // console.log("4444444444444444444ffffffffffffffff", fetchedData)
+    // console.log("tr_dt", fetchedData.memb_dtls[0].last_trn_dt)
+    // console.log("membbbbbbbbbbbbb", fetchedData.memb_dtls[0])
 
+    const [loading, setLoading] = useState(() => false)
 
-  const [loading, setLoading] = useState(() => false)
-
-  const [formData, setFormData] = useState({
-
-    period: "",
-    curr_roi: "",
-    penal_roi: "",
-    disb_dt: new Date(),
-    grand_total: "",
-  })
-
-
-
-
-  const handleFormChange = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-
-  const requestBluetoothPermissions = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.requestMultiple([
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        ]);
-
-        if (
-          granted['android.permission.BLUETOOTH_SCAN'] === PermissionsAndroid.RESULTS.GRANTED &&
-          granted['android.permission.BLUETOOTH_CONNECT'] === PermissionsAndroid.RESULTS.GRANTED
-        ) {
-          console.log('Bluetooth permissions granted.');
-        } else {
-          console.log('Bluetooth permissions denied.');
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
-
-  const requestNearbyDevicesPermission = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Nearby devices permission granted.');
-        } else {
-          console.log('Nearby devices permission denied.');
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
-
-  const requestPermissions = async () => {
-    await requestBluetoothPermissions();
-    await requestNearbyDevicesPermission();
-  };
-
-  useEffect(() => {
-    // requestPermissions()
-  }, [])
-
-
-
-  const getClientIP = async () => {
-    const res = await fetch("https://api.ipify.org?format=json")
-    const data = await res.json()
-    return data.ip
-  }
-
-  const newDisbursement = async () => {
-
-
-    const selected = members.filter(m => m.approve_member === "Y");
-
-    if (selected.length === 0) {
-      Alert.alert("Validation", "Please select at least one member");
-      setLoading(false);
-      return;
-    }
-
-    const invalidAmount = selected.find(
-      m => !m.disb_amt || Number(m.disb_amt) <= 0
-    );
-
-    if (invalidAmount) {
-      Alert.alert("Validation", "Enter valid amount for selected members");
-      setLoading(false);
-      return;
-    }
-
-    const payload_member = selected.map(m => ({
-    member_id: m.member_id,
-    loan_id: m.loan_id,
-    member_name: m.member_name,
-    disb_amt: Number(m.disb_amt),
-    approve_member: m.approve_member,
-    }));
-
-    setLoading(true)
-
-    const ip = await getClientIP()
-
-    const formattedDate = new Date(formData.disb_dt).toISOString().split("T")[0];
-    
-
-    const creds = {
-      group_code: loginStore?.emp_id,
-      tenant_id: loginStore?.tenant_id,
-      branch_id: loginStore?.brn_code,
-      period: formData?.period,
-      curr_roi: formData?.curr_roi,
-      penal_roi: formData?.penal_roi,
-      // disb_dt: new Date(formData.disb_dt).toLocaleDateString("en-GB"),
-      disb_dt: formattedDate,
-      members: payload_member,
-      created_by: loginStore?.emp_id,
-      ip_address: ip,
-    }
-
-    console.log('start', creds, "RESSSSSsssssssssssssssssssssssssss", payload_member, 'endddddddddd')
-
-    // return
-    
-
-    await axios.post(ADDRESSES.SAVE_SHG_MEMBER_DISBURS, creds, {
-      headers: {
-        Authorization: loginStore?.token, // example header
-        "Content-Type": "application/json", // optional
-      }
-    }
-    ).then(async res => {
-      
-      
-      if (res?.data?.success) {
-        Alert.alert("Alert", res?.data?.msg, [
-          { text: "Back", onPress: () => navigation.goBack() }
-        ], {
-          cancelable: false
-        })
-        return
-      }
-      ToastAndroid.show("Disbursment Done.", ToastAndroid.SHORT)
-      // await handlePrint(res?.data?.msg)
-
-      navigation.dispatch(
-        CommonActions.navigate({
-          name: navigationRoutes.homeScreen,
-          params: {
-            resultData: res?.data?.msg,
-            not_inserted_row: res?.data?.not_inserted_row,
-          },
-        }),
-      )
-
-    }).catch(err => {
-      ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
+    const [formData, setFormData] = useState({
+        groupName: "",
+        ccb_loan_acc_no: "",
+        loan_acc_no: "",
+        pacs_name: "",
+        sanction_dt: "",
+        sanction_no: "",
+        period: "",
+        curr_roi: "",
+        penal_roi: "",
+        disb_dt: "",
+        disb_amt: "",
+        // isChecked: false,
+        // loan_amt: "",
+        // sb_amt: "",
+        txnDate: new Date(),
     })
-    setLoading(false)
-  }
 
-  useEffect(() => {
-    fetchMemberDetails()
-  }, [isFocused])
+    const [memberDetailsArray, setMemberDetailsArray] = useState<any[]>(() => [])
+    const [banks, setBanks] = useState([])
+    // const [last_trn_dt, setLastTrnDt] = useState(fetchedData.memb_dtls[0].last_trn_dt)
+    const [last_trn_dt, setLastTrnDt] = useState()
+    const [openDate, setOpenDate] = useState(() => false)
+    const [openDate2, setOpenDate2] = useState(() => false)
+    // const formattedTnxDate = formattedDate(formData?.txnDate)
+    const [canTxnCheckFlag, setCanTxnCheckFlag] = useState<"D" | "F">(() => "F")
+    const { handleLogout } = useContext<any>(AppStore)
+    const [fetchedData, setFetchedData] = useState<any>(() => ({}))
 
+    // const groupTypes = [
+    //     {
+    //         title: "SHG",
+    //         func: () => {
+    //             handleFormChange("groupType", "S");
+    //             handleFormChange("groupTypeName", "SHG")
+    //         }
+    //     },
+    //     {
+    //         title: "JLG",
+    //         func: () => {
+    //             handleFormChange("groupType", "J");
+    //             handleFormChange("groupTypeName", "JLG")
+    //         }
+    //     }
+    // ]
 
-  const fetchMemberDetails = async () => {
-
-    setLoading(true)
-
-    const creds = {
-      group_code: loginStore?.emp_id,
-      tenant_id: loginStore?.tenant_id,
-      branch_id: loginStore?.brn_code,
+    const handleFormChange = (field: string, value: any) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value,
+        }))
     }
-    console.log('start', creds, "////////////////////////////////")
+    // useEffect(() => {
+    //     console.log("Recovery Group Form useEffect called")
+    // }, [])
+    // useEffect(() => {
+    //     if (error) {
+    //         Alert.alert("Turn on Geolocation", "Give access to Location or Turn on GPS from app settings.", [{
+    //             text: "Go to Settings",
+    //             onPress: () => { navigation.dispatch(CommonActions.goBack()); Linking.openSettings() }
+    //         }])
+    //     }
+    // }, [isFocused, error])
 
-    await axios.post(ADDRESSES.FETCH_MEMBER_LOAN_DETAILS, creds, {
-      headers: {
-        Authorization: loginStore?.token, // example header
-        "Content-Type": "application/json", // optional
-      }
-    }
-    ).then(async res => {
-      // 
-      if (res?.data?.success) {
-        setFormData({
-          period: res?.data?.data?.period?.toString() || "",
-          curr_roi: res?.data?.data?.curr_roi?.toString() || "",
-          penal_roi: res?.data?.data?.penal_roi?.toString() || "",
-          disb_dt: res?.data?.data?.disb_dt ? new Date(res?.data?.data?.disb_dt) : new Date(),
-          grand_total: res?.data?.data?.grand_total?.toString() || "",
+
+    // useEffect(() => {
+    //     console.log("APPROVAL STATUS", approvalStatus)
+    //     if (location?.latitude && location.longitude && approvalStatus === "A") {
+    //         console.log("LOCATION CHANGED, FETCHING GEO ADDRESS...")
+    //         // fetchGeoLocaltionAddress()
+    //     }
+    // }, [location])
+
+    // const requestBluetoothPermissions = async () => {
+    //     if (Platform.OS === 'android') {
+    //         try {
+    //             const granted = await PermissionsAndroid.requestMultiple([
+    //                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+    //                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+    //                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    //             ]);
+
+    //             if (
+    //                 granted['android.permission.BLUETOOTH_SCAN'] === PermissionsAndroid.RESULTS.GRANTED &&
+    //                 granted['android.permission.BLUETOOTH_CONNECT'] === PermissionsAndroid.RESULTS.GRANTED
+    //             ) {
+    //                 console.log('Bluetooth permissions granted.');
+    //             } else {
+    //                 console.log('Bluetooth permissions denied.');
+    //             }
+    //         } catch (err) {
+    //             console.error(err);
+    //         }
+    //     }
+    // };
+
+    // const requestNearbyDevicesPermission = async () => {
+    //     if (Platform.OS === 'android') {
+    //         try {
+    //             const granted = await PermissionsAndroid.request(
+    //                 PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES
+    //             );
+    //             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //                 console.log('Nearby devices permission granted.');
+    //             } else {
+    //                 console.log('Nearby devices permission denied.');
+    //             }
+    //         } catch (err) {
+    //             console.error(err);
+    //         }
+    //     }
+    // };
+
+    // const requestPermissions = async () => {
+    //     await requestBluetoothPermissions();
+    //     await requestNearbyDevicesPermission();
+    // };
+
+    useEffect(() => {
+        // requestPermissions()
+        console.log(group_code, 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', route.params);
+        
+    }, [])
+
+
+    const fetchLoanDetailsData = async () => {
+        // setBanks([]);
+        // setLoading(true)
+
+        const creds = {
+            tenant_id : loginStore?.tenant_id,
+            group_code : group_code,
+            loan_to : loginStore?.user_type
+        }
+
+        await axios.post(ADDRESSES.FETCH_MEMBER_OUTSTANDING_DTLS, creds, {
+            headers: {
+                Authorization: loginStore?.token, // example header
+                "Content-Type": "application/json", // optional
+            }
+        }
+        ).then(async res => {
+            // console.log("LALALALLA syart", res?.data?.data,  'endddddddddd', creds)
+            console.log("Array LALALALLA syart", res?.data?.data[0], 'Array endddddddddd')
+
+            if(res?.data?.success) {
+                setFetchedData(res?.data?.data[0])
+                //  setMemberDetailsArray(res?.data?.data[0]?.members)
+                setMemberDetailsArray(
+                res?.data?.data[0]?.members.map(m => ({
+                    ...m,
+                    isChecked: true,
+                    loan_amt: m.principal_amt || "",
+                    sb_amt: m.interest_amt || "",
+                    interest_calculated_date: m.interest_calculated_date,
+                }))
+                );
+
+                 setFormData({
+                groupName: loginStore?.emp_name || "",
+                ccb_loan_acc_no: res?.data?.data[0]?.ccb_loan_acc_no || "",
+                loan_acc_no: res?.data?.data[0]?.society_acc_no || "",
+                pacs_name: res?.data?.data[0]?.pacs_name || "",
+                sanction_dt: res?.data?.data[0]?.sanction_dt || "",
+                sanction_no: res?.data?.data[0]?.sanction_no || "",
+                period: res?.data?.data[0]?.period || "",
+                curr_roi: res?.data?.data[0]?.curr_roi || "",
+                penal_roi: res?.data?.data[0]?.penal_roi || "",
+                disb_dt: res?.data?.data[0]?.disb_dt || "",
+                disb_amt: res?.data?.data[0]?.disb_amt || "",
+                // isChecked: false,
+                txnDate: new Date(),
+ 
+                })
+
+               
+                
+                } else{
+                // handleLogout()
+                
+            }
+        }).catch(err => {
+            ToastAndroid.show("Some error while fetching Sub Purposes of Loan!", ToastAndroid.SHORT)
         })
-        // setMemberList(res?.data?.data?.members || [])
-        // setMembers(res?.data?.data?.members || [])
+        // setLoading(false)
+    }
 
-        setRecoveryFlag(res?.data?.data?.recovery_flag);   // ⭐ important
+    useEffect(() => {
+        if(isFocused){
+        fetchLoanDetailsData()
+        }
+    }, [isFocused])
 
-        // Map API members to UI members
-        // const mappedMembers = (res?.data?.data?.members || []).map((m: any, index: number) => ({
-        //   id: index + 1,
-        //   member_name: m.member_name,
-        //   disb_amt: String(m.disb_amt),
-        //   gp_leader_flag: m.gp_leader_flag,
-        //   loan_id: m.loan_id,
-        //   member_id: m.member_id,
-        // }));
+    
 
-        console.log('start', res?.data?.data?.members, "Testttttttttttttttttttttttttttttttttttttttttt")
+    // const [totalEMI, setTotalEMI] = useState(() => "")
 
-        const mappedMembers = (res?.data?.data?.members || []).map((m: any, index: number) => ({
-          id: index + 1,
-          member_id: m.member_id,
-          member_name: m.member_name,
-          disb_amt: String(m.disb_amt || ""),
-          approve_member: m.approve_member ?? "N", // ⭐ NEW
-          // approve_member: "Y",
-          loan_id: m.loan_id,
+    const handleEMIChange = (txt: string, i: any) => {
+
+        setMemberDetailsArray(prevArray =>
+            prevArray.map((member, index) =>
+                index === i ? { 
+                    ...member, 
+                    credit: txt, 
+                    // intt_emi: currentInterestCalculate(+txt), 
+                    // prn_emi: currentPrincipalCalculate(+txt), 
+                    instl_paid: 0 
+                } : member
+            )
+        )
+    }
+
+   
+
+    const checkCanTxn = async () => {
+        setLoading(true);
+        setHasBeforeUpnapproveTransDate(false);
+        const payload = {
+            branch_code: loginStore?.brn_code,
+            transaction_date: dayjs(formData?.txnDate).format('YYYY-MM-DD'),
+        }
+        axios.post(`${BASE_URL}/admin/fetch_unapprove_dtls_before_trns_dt`, payload, {headers: {
+                                Authorization: loginStore?.token, // example header
+                                "Content-Type": "application/json", // optional
+                            }
+                        }).then((res) => {
+            // console.log('res?.data?.msg');
+
+            // console.log(res?.data, 'fffffffffffffffffffffffffff', res?.data?.msg);
+            if(res?.data?.suc === 0) {
+
+                handleLogout()
+            } else{
+                if (res?.data?.msg?.length > 0) {
+                    const hasNonZero = res?.data?.msg.some(item => Object.values(item).some(value => value != 0));
+                    setHasBeforeUpnapproveTransDate(hasNonZero);
+                    if (hasNonZero) {
+                        setLoading(false);
+                        let txt = `${res?.data?.msg[0]?.transactions > 0 ? 'transaction(s),' : ''} ${res?.data?.msg[0]?.group_migrate > 0 ? 'group migrate(s),' : ''} ${res?.data?.msg[0]?.member_migrate > 0 ? 'member migrate(s)' : ''} `;
+                        setErrMsg(txt);
+                        Alert.alert(`Cannot proceed`, `There are unapproved ${txt}before this date. Please check and try again.`, [
+                            {
+                                text: "OK", onPress: () => null
+                            }
+                        ])
+                        // ToastAndroid.show(`There are unapproved ${txt} before this date. Please check and try again.`, ToastAndroid.SHORT)
+                    }
+                    else {
+                        const transformedObj = memberDetailsArray.filter((item, i) => item.isChecked && item.credit > 0).map((item) => ({
+                            loan_id: item.loan_id,
+                            last_trn_dt: formattedDate(formData.txnDate),
+                        }));
+
+
+                        axios.post(`${ADDRESSES.CHECK_CAN_TXN}`, {
+                            checkdatedtls: transformedObj
+                        }, {
+                            headers: {
+                                Authorization: loginStore?.token, // example header
+                                "Content-Type": "application/json", // optional
+                            }
+                        }
+                        ).then(res => {
+
+                            // console.log(res?.data, 'NNNNNNNNNNNNNNNNNNNNN', {checkdatedtls: transformedObj});
+
+                            
+                            setLoading(false);
+                            // console.log("CAN TXN", res?.data)
+                            if(res?.data?.suc === 0) {
+                                handleLogout()
+                            }
+                            else{
+                            setCanTxnCheckFlag(res?.data?.tr_flag)
+                            if (res?.data?.tr_flag === "F") {
+                                Alert.alert("Cannot proceed", "Some future transactions found! You cannot proceed this transaction. Try changing Txn Date instead.", [
+                                    {
+                                        text: "OK", onPress: () => null
+                                    }
+                                ])
+                            } else if (res?.data?.tr_flag === "D") {
+                                Alert.alert("Approved", "Now you can collect amount.", [
+                                    {
+                                        text: "OK", onPress: () => null
+                                    }
+                                ])
+                            }
+                        }
+                        }
+                        ).catch(err => {
+                            setLoading(false);
+                            console.log("CAN TXN ERR", err)
+                            setCanTxnCheckFlag("F")
+                        })
+                    }
+                }
+            }
+        }).
+            catch((err) => {
+                setLoading(false);
+                Alert.alert("Cannot proceed", "We are unable to process your request!! Please try again later", [
+                    {
+                        text: "OK", onPress: () => null
+                    }
+                ])
+            })
+
+        //
+
+        //
+    }
+
+    // useEffect(() => {
+    //     setCanTxnCheckFlag('F')
+    // }, [memberDetailsArray, formData.txnDate])
+
+     const getClientIP = async () => {
+        const res = await fetch("https://api.ipify.org?format=json")
+        const data = await res.json()
+        return data.ip
+      }
+
+    const sendRecoveryEMI = async () => {
+
+        // setLoading(true)
+
+        var memberDetailsArray_new = memberDetailsArray
+        // .filter(m => m.isChecked === true)
+        .map(m => ({
+            mem_trn_id: m.recov_trans_id,
+            mem_loan_id: m.mem_loan_id,
+            principal_amt: m.principal_amt,
+            cr_amt: m.loan_amt?.length > 0 ? m.loan_amt : "0",
+            sb_amt: m.sb_amt?.length > 0 ? m.sb_amt : "0",
         }));
 
+        const ip = await getClientIP()
 
-        setMembers(mappedMembers);
+        const payload = {
+        tenant_id : loginStore?.tenant_id,
+        branch_id : loginStore?.brn_code,
+        loan_acc_no : fetchedData?.society_acc_no,
+        loan_to : "S",
+        branch_shg_id : fetchedData?.branch_shg_id,
+        loan_id : fetchedData?.loan_id,
+        created_by : loginStore?.emp_id,
+        ip_address: ip,
+        members: memberDetailsArray_new
+        // members: memberDetailsArray.map(m => ({
+        //     mem_trn_id: 0,
+        //     mem_loan_id: m.mem_loan_id,
+        //     principal_amt: m.principal_amt,
+        //     cr_amt: m.loan_amt,
+        //     sb_amt: m.sb_amt,
+        // }))
+    };
 
-      }
 
 
-    }).catch(err => {
-      ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
-    })
-    setLoading(false)
-  }
+
+    console.log("===== EMI RECOVERY DATA =====Colect", memberDetailsArray_new, 'enddddddddddddddddd');
+    // // console.log(JSON.stringify(payload, null, 2));
+    // return;
+
+    await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
+            headers: {
+                Authorization: loginStore?.token, // example header
+                "Content-Type": "application/json", // optional
+            }
+        }
+        ).then(async res => {
+            console.log("RESSSSS", res?.data)
+             if(res?.data?.success) {
+
+                ToastAndroid.show(res?.data?.msg, ToastAndroid.SHORT)
+
+                Alert.alert("Alert", res?.data?.msg, [
+                    { text: "Back", onPress: () => navigation.goBack() }
+                ], {
+                    cancelable: false
+                })
+                return
+            } else {
+                // ToastAndroid.show(res?.data?.msg, ToastAndroid.SHORT)
+                Alert.alert("Alert", res?.data?.msg)
+            }
+            
+            // console.log("Loan recovery EMI installment done.", res?.data)
+            // await handlePrint(res?.data?.msg)
+
+            // console.log('lllll', res?.data?.msg, 'dddddddddddddddd', res?.data?.not_inserted_row);
+            
+
+            // navigation.dispatch(
+            //             CommonActions.navigate({
+            //                 name: navigationRoutes.recoveryGroupScreenResult,
+            //                 params: {
+            //                 resultData: res?.data?.msg,
+            //                 not_inserted_row: res?.data?.not_inserted_row,
+            //                 },
+            //             }),
+            //         )
+
+            // navigation.goBack()
+        }).catch(err => {
+            ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
+            console.log("Some error occurred while submitting EMI.", err)
+        })
+        // বিঃ দ্রঃ - দোয়া করে এই রিসিটটির একটি ফটোকপি রাখবেন। 
+
+        // console.log("JJJJJJJJJJJJJJJJJJJJ", transformedObj)
+        setLoading(false)
+    }
 
 
-//   const toggleMember = (id: number) => {
-//   if (!canEdit) return;
+    const editeRecoveryEMI = async () => {
 
-//   setMembers(prev =>
-//     prev.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             approve_member: item.approve_member === "Y" ? "N" : "Y",
-//             disb_amt:
-//               item.approve_member === "Y" ? "" : item.disb_amt,
-//           }
-//         : item
-//     )
-//   );
-// };
+        // setLoading(true)
 
-// const toggleMember = (id: number) => {
-//   if (!canEdit) return;
+        var memberDetailsArray_new = memberDetailsArray
+        // .filter(m => m.isChecked === true)
+        .map(m => ({
+            mem_trn_id: m.recov_trans_id,
+            mem_loan_id: m.mem_loan_id,
+            principal_amt: m.principal_amt,
+            cr_amt: m.loan_amt,
+            sb_amt: m.sb_amt,
+        }));
 
-//   setMembers(prev =>
-//     prev.map(item =>
-//       item.id === id
-//         ? {
-//             ...item,
-//             approve_member: item.approve_member === "Y" ? "N" : "Y",
-//             disb_amt:
-//               item.approve_member === "Y" ? "" : item.disb_amt, // clear on uncheck
-//           }
-//         : item
-//     )
-//   );
-// };
+        const ip = await getClientIP()
 
-const toggleMember = (id: number) => {
-  setMembers(prev =>
-    prev.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            approve_member: item.approve_member === "Y" ? "N" : "Y",
-            disb_amt:
-              item.approve_member === "Y" ? "" : item.disb_amt,
-          }
-        : item
-    )
-  );
+        const payload = {
+        tenant_id : loginStore?.tenant_id,
+        branch_id : loginStore?.brn_code,
+        loan_acc_no : fetchedData?.society_acc_no,
+        loan_to : "S",
+        branch_shg_id : fetchedData?.branch_shg_id,
+        loan_id : fetchedData?.loan_id,
+        created_by : loginStore?.emp_id,
+        ip_address: ip,
+        members: memberDetailsArray_new
+        // members: memberDetailsArray.map(m => ({
+        //     mem_trn_id: m.recov_trans_id,
+        //     mem_loan_id: m.mem_loan_id,
+        //     principal_amt: m.principal_amt,
+        //     cr_amt: m.loan_amt,
+        //     sb_amt: m.sb_amt,
+        // }))
+    };
+
+
+    // console.log("===== EMI RECOVERY DATA =====", memberDetailsArray_new, 'enddddddddddddddddd');
+    // // // console.log(JSON.stringify(payload, null, 2));
+    // return;
+
+        await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
+            headers: {
+                Authorization: loginStore?.token, // example header
+                "Content-Type": "application/json", // optional
+            }
+        }
+        ).then(async res => {
+            console.log("RESSSSS", res?.data)
+            if(res?.data?.success) {
+
+                
+                Alert.alert("Alert", res?.data?.msg, [
+                    { text: "Back", onPress: () => navigation.goBack() }
+                ], {
+                    cancelable: false
+                })
+                return
+            }
+            ToastAndroid.show("Loan recovery EMI installment done.", ToastAndroid.SHORT)
+            
+        }).catch(err => {
+            ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
+            console.log("Some error occurred while submitting EMI.", err)
+        })
+        // বিঃ দ্রঃ - দোয়া করে এই রিসিটটির একটি ফটোকপি রাখবেন। 
+
+        // console.log("JJJJJJJJJJJJJJJJJJJJ", transformedObj)
+        setLoading(false)
+    }
+
+    const inputDisableLogic = () => {
+        // return approvalStatus === "U"
+    }
+
+    const handleLoanChange = (txt: string | number, index: number) => {
+  setMemberDetailsArray(prev => {
+    const updated = [...prev];
+
+    const maxAmt = parseFloat(updated[index].principal_amt);
+    const enteredAmt = parseFloat(String(txt) || "0");
+
+    if (enteredAmt > maxAmt) {
+      ToastAndroid.show(
+        "Loan amount cannot exceed outstanding",
+        ToastAndroid.SHORT
+      );
+      return prev; // prevent update
+    }
+
+    updated[index].loan_amt = txt;
+    return updated;
+  });
+};
+
+
+const handleSBChange = (txt, index) => {
+  setMemberDetailsArray(prev => {
+    const updated = [...prev];
+    updated[index].sb_amt = txt;
+    return updated;
+  });
 };
 
 
 
+const checkedMembers = memberDetailsArray?.filter(item => {
+    return item.isChecked;
+});
+const isMemberChecked = checkedMembers?.length > 0;
 
-  useEffect(() => {
-    if (loginStore?.user_type == 'S') {
-      remainingDisburseAmt()
-    }
-  }, [remainDisburseAmt])
+// const checkedMembers = memberDetailsArray?.filter(item => item.isChecked);
 
-  const remainingDisburseAmt = async () => {
-    // if (hasBeforeUpnapproveTransDate) {
-    //     ToastAndroid.show(`There are unapproved ${errMsg} before this date. Please check and try again.`, ToastAndroid.SHORT)
-    //     return;
-    // }
-    setLoading(true)
+// const isAmountEmpty = checkedMembers?.some(item => {
+const isAmountEmpty = memberDetailsArray?.some(item => {
+  const cr = Number(item.cr_amt || 0);
+  const sb = Number(item.sb_amt || 0);
+  return cr < 1 && sb < 1;
+});
 
-    const ip = await getClientIP()
-
-    const creds = {
-      // pacs_shg_id: loginStore?.emp_id,
-      // loan_to: loginStore?.user_type,
-      tenant_id: loginStore?.tenant_id,
-      branch_shg_id : loginStore?.emp_id,
-      loan_to : loginStore?.user_type,
-    }
+// const totalAmount = memberDetailsArray.reduce(
+//   (sum, item) => sum + Number(item.loan_amt || 0) + Number(item.sb_amt || 0),
+//   0
+// );
+const totalAmount = 0
 
 
-
-    // console.log("PAYLOAD---RECOVERY", creds, 'PPPPPPPPPPPPPPP', loginStore)
-    // return
-
-    await axios.post(ADDRESSES.FETCH_MEMBERS_DETAILS, creds, {
-      headers: {
-        Authorization: loginStore?.token, // example header
-        "Content-Type": "application/json", // optional
-      }
-    }
-    ).then(async res => {
-      // console.log("RESSSSS", res?.data)
-      if (res?.data?.success) {
-        console.log(loginStore?.user_type, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.data)
-        if (res?.data?.data.length > 0) {
-          // setRemainDisburseAmt(res?.data?.loan_amount)
-          
-        } else {
-          // setRemainDisburseAmt("0")
-        }
-
-      }
-
-    }).catch(err => {
-      ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
-    })
-    setLoading(false)
-  }
-
-
-
-  const totalDisbAmt = members.reduce(
-    (sum, item) => sum + Number(item.disb_amt || 0),  0);
-
-
-  const removeRow = (id: any) => {
-    setMembers(prev => prev.filter(item => item.id !== id));
-  };
-
-  const canAddMember = () => {
-    if (Number(totalDisbAmt) > Number(remainDisburseAmt)) {
-      return false;
-    }
-
-    if (members.length === 0) return true;
-
-    const last = members[members.length - 1];
     return (
-      last.member_name?.trim().length > 0 &&
-      last.disb_amt?.trim().length > 0
-    );
-
-  };
-
-
-
-  // const addRow = () => {
-  //   setMembers(prev => [
-  //     ...prev,
-  //     {
-  //       id: prev.length + 1,
-  //       member_name: "",
-  //       disb_amt: "",
-  //       //   gp_leader_flag: false,
-  //       gp_leader_flag: "N",
-  //     },
-  //   ]);
-  // };
-
-
-  const selectMember = (id: any) => {
-    setMembers(prev =>
-      prev.map(item => ({
-        ...item,
-        //   gp_leader_flag: item.id === id,
-        gp_leader_flag: item.id === id ? "Y" : "N",
-      }))
-    );
-  };
-
-  const isToday = (someDate: Date) => {
-    const today = new Date()
-    return (
-      someDate.getDate() === today.getDate() &&
-      someDate.getMonth() === today.getMonth() &&
-      someDate.getFullYear() === today.getFullYear()
-    )
-  }
-
-  useEffect(() => {
-    const currRoi = Number(formData.curr_roi);
-
-    if (!isNaN(currRoi) && currRoi > 0) {
-      handleFormChange("penal_roi", String(currRoi + 2));
-    } else {
-      handleFormChange("penal_roi", "");
-    }
-  }, [formData.curr_roi]);
-
-
-
-  const handleResetForm = () => {
-    fetchMemberDetails();
-  }
-
-
-  return (
-    <SafeAreaView>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        // behavior={Platform.OS === "ios" ? "padding" : "height"}
-        // keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-      >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 120 }}
-          showsVerticalScrollIndicator={false}
-          style={{
-            backgroundColor: theme.colors.background,
-          }}>
-          <View style={{
-            // paddingBottom: 50,
-            // gap: 14
-            paddingTop: 10,
-            gap: 10,
-            paddingBottom: 40,
-          }}>
-
-            <InputPaper
-              label="Group Name" keyboardType="default"
-              leftIcon='account-group'
-              value={loginStore.emp_name}
-              onChangeText={(txt: any) => handleFormChange("emp_name", txt)}
-              customStyle={{
+        <SafeAreaView>
+            <ScrollView keyboardShouldPersistTaps="handled" style={{
                 backgroundColor: theme.colors.background,
-              }} disabled />
+            }}>
+                <View style={{
+                    // paddingBottom: 10,
+                    // gap: 14
+                    // minHeight: SCREEN_HEIGHT,
+                    height: "auto",
+                    paddingHorizontal: 20,
+                    paddingBottom: 80
+                }}>
+                  
+                   
+                   
+                    
+
+                    <InputPaper label="Group Name*" leftIcon='account-group-outline' keyboardType="default" value={formData.groupName} onChangeText={(txt: any) => handleFormChange("groupName", txt)} customStyle={{
+                        backgroundColor: theme.colors.background,
+                    }} disabled />
+
+
+                    <InputPaper label="Period (In Month)" maxLength={15} leftIcon='clock-time-five-outline' keyboardType="default" value={formData.period} onChangeText={(txt: any) => handleFormChange("period", txt)} customStyle={{
+                        backgroundColor: theme.colors.background,
+                    }} disabled />
+
+                    <InputPaper label="Current ROI" maxLength={15} leftIcon='percent-outline' keyboardType="default" value={formData.curr_roi} onChangeText={(txt: any) => handleFormChange("curr_roi", txt)} customStyle={{
+                        backgroundColor: theme.colors.background,
+                    }} disabled />
+
+                    <InputPaper label="Ovd ROI" maxLength={15} leftIcon='percent-outline' keyboardType="default" value={formData.penal_roi} onChangeText={(txt: any) => handleFormChange("penal_roi", txt)} customStyle={{
+                        backgroundColor: theme.colors.background,
+                    }} disabled />
+
+                    <InputPaper label="Disburse Date" maxLength={15} leftIcon='calendar' keyboardType="default" value={formData.disb_dt} onChangeText={(txt: any) => handleFormChange("disb_dt", txt)} customStyle={{
+                        backgroundColor: theme.colors.background,
+                    }} disabled />
+
+                    <InputPaper label="Total Disbursement*" maxLength={15} leftIcon='cash-100' keyboardType="numeric" value={formData.disb_amt} onChangeText={(txt: any) => handleFormChange("disb_amt", txt)} customStyle={{
+                        backgroundColor: theme.colors.background,
+                    }} disabled />
+
+                    
+
+                    <Divider />
+                   
+
+                    <View style={{
+                        marginHorizontal: 3, marginTop:20
+                    }}>
+                        <ButtonPaper
+                            textColor={theme.colors.primary}
+                            onPress={() => setOpenDate(true)}
+                            mode="elevated"
+                            icon="calendar"
+                            disabled={true}
+                     
+                        >
+                           
+                            TXN. DATE:   {formData.txnDate?.toLocaleDateString("en-GB")}
+                          
+
+                        </ButtonPaper>
+                    </View>
+                    
 
 
 
 
+                   
+                    {/* <Text>
+                        {JSON.stringify(memberDetailsArray, null, 2)}
+                        </Text> */}
+                    
+                    <View style={{marginTop:20}}>
+                     
+                        <Text variant="labelLarge" style={{
+                            marginBottom: 10,
+                            color: theme.colors.primary
+                        }}>Members</Text>
+                        {/* <View style={{
+                            flexDirection: "column",
+                            gap: 8,
+                            flexWrap: "wrap"
+                        }}> */}
+                        {memberDetailsArray?.map((item, i) => (
+                        <View
+style={{
+    backgroundColor: theme.colors.outline,   // background color
+    borderRadius: 10,                        // rounded corner
+    padding: 10,
+    marginBottom: 10,
+}}
+>
+<List.Item
+    style={{ paddingHorizontal: 0 }}
+    title={() => (
+        <>
+        <View
+        style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+        }}
+        >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Text
+        style={{
+            color: theme.colors.inversePrimary,
+            borderColor: theme.colors.inversePrimary,
+            // backgroundColor: theme.colors.inversePrimary,
+            borderWidth: 1,
+            paddingVertical: 5,
+            paddingHorizontal: 6,
+            borderRadius: 4,
+            fontSize: 13,
+            marginRight: 10
+        }}>
+        {item?.member_name}
+        </Text>
+        </View>
 
+        <Text
+        style={{
+            color: theme.colors.onPrimary,
+            fontSize: 13,
+            borderColor: theme.colors.onPrimary,
+            borderWidth: 1,
+            paddingVertical: 5,
+            paddingHorizontal: 6,
+            borderRadius: 4
+        }}>
+        Outstanding - {item?.principal_amt + "/-"}
+        </Text>
+        </View>
+        </>
+    )}
 
-            {/* <InputPaper 
-                    label="Disburse Date *" keyboardType="default" 
-                    leftIcon='calendar'
-                    value={new Date(formData.disb_dt).toLocaleDateString("en-GB")} 
-                    onChangeText={(txt: any) => handleFormChange("disb_dt", txt)} 
-                    disabled
-                    customStyle={{
-                    backgroundColor: theme.colors.background,
-                    }} /> */}
+    description={() => (
+        <View
+        style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 6
+        }}
+        >
+        <View style={{ flex: 1, marginRight: 6 }}>
+        <InputPaper
+            label="Principal Amt."
+            keyboardType="numeric"
+            value={item?.loan_amt}
+            onChangeText={(txt) => handleLoanChange(txt, i)}
+            customStyle={{
+                backgroundColor: theme.colors.background
+            }}
+            disabled={true}
+        />
+        </View>
 
+        <View style={{ flex: 1, marginLeft: 6 }}>
+        <InputPaper
+            label="Interest Amt."
+            keyboardType="numeric"
+            value={item?.sb_amt}
+            onChangeText={(txt) => handleSBChange(txt, i)}
+            customStyle={{
+                backgroundColor: theme.colors.background
+            }}
+            disabled={true}
+        />
+        </View>
+        </View>
+    )}
+/>
 
-            <ButtonPaper
-              textColor={theme.colors.primary}
-              onPress={() => setOpenDate(true)}
-              mode="elevated"
-              icon="calendar"
-            // disabled={disableCondition(approvalStatus, branchCode)}
-            >
-              {/* CHOOSE DOB: {formData.dob?.toLocaleDateString("en-GB")} */}
-              {/* Choose Disbursment Date {isToday(formData.disb_dt) ? "*" : formData.disb_dt?.toLocaleDateString("en-GB")} */}
-              Choose Disbursment Date {formData.disb_dt?.toLocaleDateString("en-GB")}
-            </ButtonPaper>
-
-            <DatePicker
-              modal
-              mode="date"
-              // minimumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 55))}
-              // maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
-              maximumDate={new Date()}
-              open={openDate}
-              date={formData.disb_dt}
-              onConfirm={date => {
-                setOpenDate(false)
-                handleFormChange("disb_dt", date)
-              }}
-              onCancel={() => {
-                setOpenDate(false)
-              }}
-            />
-
-            {/* <DatePicker
-                    modal
-                    mode="date"
-                    open={openDate2}
-                    date={formData.disb_dt ? new Date(formData.disb_dt) : new Date()}
-                    onConfirm={(date) => {
-                        setOpenDate2(false);
-                        handleFormChange("disb_dt", date.toISOString()); // keep string
-                    }}
-                    onCancel={() => setOpenDate2(false)}
-                    /> */}
-
-
-            <InputPaper
-              label="Period (In Month) *" keyboardType="number-pad"
-              leftIcon='calendar'
-              value={formData.period}
-              onChangeText={(txt: any) => handleFormChange("period", txt)}
-              customStyle={{
-                backgroundColor: theme.colors.background,
-              }} />
-
-            <InputPaper
-              label="Current ROI *" keyboardType="number-pad"
-              leftIcon='percent'
-              value={formData.curr_roi}
-              onChangeText={(txt: any) => handleFormChange("curr_roi", txt)}
-              customStyle={{
-                backgroundColor: theme.colors.background,
-              }} />
-
-            <InputPaper
-              label="Ovd ROI *" keyboardType="number-pad"
-              leftIcon='percent'
-              value={formData.penal_roi}
-              onChangeText={(txt: any) => handleFormChange("penal_roi", txt)}
-              customStyle={{
-                backgroundColor: theme.colors.background,
-              }} />
-
-            {/* <View>
-              {loginStore?.user_type === "S" && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#ECFDF5", // emerald-50
-                    borderColor: "#6EE7B7",     // emerald-300
-                    borderWidth: 1,
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    borderRadius: 12,
-                    elevation: 2,              // shadow (Android)
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "500",
-                      color: "#065F46",         // emerald-800
-                      marginRight: 6,
-                    }}
-                  >
-                    Balance:
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: "600",
-                      color: "#065F46",
-                    }}
-                  >
-                    ₹{Number(remainDisburseAmt)?.toLocaleString("en-IN")}
-                  </Text>
-                </View>
-              )}
-            </View> */}
-
-            {/* <View>
-    <Text>{JSON.stringify(members, null, 2)} </Text>
-</View> */}
-            <View style={{ padding: 5 }}>
-
-  {/* Title */}
-  <Text
-    style={{
-      fontSize: 16,
-      fontWeight: "700",
-      marginBottom: 10,
-      color: theme.colors.primary,
-    }}
-  >
-    Member List
-  </Text>
-
- {members.map(item => (
-  <View
-    key={item.id}
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 8,
-    }}
-  >
-    {/* Checkbox */}
-    <Checkbox
-      status={item.approve_member === "Y" ? "checked" : "unchecked"}
-      onPress={() => toggleMember(item.id)}
-      disabled
-    />
-
-    {/* Member Name */}
-    <InputPaper
-      label="Member"
-      value={item.member_name}
-      onChangeText={(txt: any) => handleFormChange("member_name", txt)} 
-      disabled
-      customStyle={{
-        backgroundColor: theme.colors.background,
-        marginRight: 6,
-        flex: 2.5,
-        fontSize: 13,
-      }}
-    />
-
-    {/* Amount */}
-    <InputPaper
-      label="Amount"
-      keyboardType="numeric"
-      // onChangeText={(txt: any) => handleFormChange("member_name", txt)} 
-      // disabled
-      value={item.disb_amt}
-      onChangeText={(txt: string) => {
-        setMembers(prev =>
-          prev.map(m =>
-            m.id === item.id
-              ? { ...m, disb_amt: txt }
-              : m
-          )
-        );
-      }}
-      customStyle={{
-        backgroundColor: theme.colors.background,
-        flex: 1.2,
-        fontSize: 13,
-      }}
-    />
-  </View>
-))}
-
-  {/* Total Amount */}
-  <View style={{ alignItems: "flex-end", marginTop: 6 }}>
-    <Text style={{ fontSize: 12, color: theme.colors.error }}>
-      Total Amount
-    </Text>
-
-    <Text
+      <View
       style={{
-        fontSize: 14,
-        fontWeight: "600",
-        color:
-          theme.colors.primary,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginTop: -5, marginLeft:18, marginRight:22, marginBottom: 15,
+      borderColor: theme.colors.onPrimary,
+      borderWidth: 1,
+      borderRadius: 4
       }}
-    >
-      ₹ {totalDisbAmt.toLocaleString("en-IN")}
-    </Text>
-  </View>
+      >
+        <View>
+      <Text
+      style={{
+      color: theme.colors.onPrimary,
+      paddingVertical: 5,
+      paddingHorizontal: 6,
+      fontSize: 13
+      }}
+      >
+      {item?.interest_calculated_date
+      ? `Interest Calculated On - ${new Date(item?.interest_calculated_date).toLocaleDateString("en-GB")}`
+      : "Interest Not Calculated Yet"}
+      </Text>
+      </View>
+      </View>
 
 </View>
+                        ))}
+
+                        {/* <View style={{ width: "100%" }}>
+                        <List.Item
+                        titleStyle={{
+                        color: theme.colors.primary,
+                        }}
+                        descriptionStyle={{
+                        color: theme.colors.secondary,
+                        }}
+                        title={`TOTAL AMOUNT`}
+                        right={() => (
+                        
+                        <Text variant='titleMedium'>
+                            
+                            
+                            {totalAmount}/-</Text>
+                        )}
+                        />
+
+                        </View> */}
 
 
-            <View style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            gap: 1,
-            marginBottom: 45
-            }}>
-
-            {/* {canEdit &&( */}
-            <ButtonPaper mode="text"
-            textColor={theme.colors.error} onPress={handleResetForm} icon="backup-restore">
-            <Text variant='labelMedium' style={{
-            color: theme.colors.error
-            }}>RESET FORM</Text>
-            </ButtonPaper>
-            {/* )} */}
 
 
-            <ButtonPaper icon="cash-register" mode="contained" onPress={() => {
-              Alert.alert(`Submit Disbursment?`, `Are you sure, you want to submit?`, [{
-                onPress: () => null,
-                text: "No"
-              }, {
-                onPress: async () => await newDisbursement(),
-                text: "Yes"
-              }])
 
-            }} loading={loading}
-              disabled={formData?.period === "" || formData?.curr_roi === "" || formData?.penal_roi === "" || loading}
-            >
- 
-              {!loading ? "Submit Disb." : "Please wait..."}
-            </ButtonPaper>
-            </View>
+                            
+                        {/* </View> */}
+                       
+                    </View>
 
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+                    
+                    
 
-    </SafeAreaView>
-  )
+                    {/* <View
+                    style={{
+                    flexDirection: "row",
+                    marginTop: 10,
+                    justifyContent: "center",
+                    gap: 10
+                    }}
+                    >
+                    <ButtonPaper
+                    icon="cash-register"
+                    mode="contained"
+                    onPress={() => {
+                    Alert.alert(
+                    `Collect Loan Amount ${memberDetailsArray.reduce((sum, item) => sum + +item.loan_amt, 0)}/-?`,
+                    "Are you sure, you want to deposit this amount?",
+                    [
+                    { text: "No", onPress: () => null },
+                    { text: "Yes", onPress: async () => await sendRecoveryEMI() }
+                    ]
+                    )
+                    }}
+                    loading={loading}
+                    // disabled={loading || !isMemberChecked || isAmountEmpty }
+                    disabled={loading || totalAmount === 0}
+                    >
+                    {!loading ? "Collect Amount" : "DON'T CLOSE THIS PAGE..."}
+                    </ButtonPaper>
+                    </View> */}
+
+                  
+
+
+                    {/* </>
+                    )} */}
+                    
+
+                    {/* <View>
+                        <Divider />
+                    </View> */}
+
+                </View>
+            </ScrollView>
+
+        </SafeAreaView>
+    )
 }
 
 export default DISBMemberDetailsForm

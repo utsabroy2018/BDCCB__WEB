@@ -30,7 +30,7 @@ const RecoveryGroupFormMain = () => {
     const [hasBeforeUpnapproveTransDate, setHasBeforeUpnapproveTransDate] = useState(false);
     const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "")
 
-    const { location, error } = useGeoLocation()
+    // const { location, error } = useGeoLocation()
     const [geolocationFetchedAddress, setGeolocationFetchedAddress] = useState(() => "")
     const [errMsg, setErrMsg] = useState(() => "")
     const { handlePrint } = useEscPosPrint()
@@ -182,11 +182,11 @@ const RecoveryGroupFormMain = () => {
             }
         }
         ).then(async res => {
-            console.log("LALALALLA syart", res?.data?.data,  'endddddddddd', creds)
-            console.log("Array LALALALLA syart", res?.data?.data[0], 'Array endddddddddd', loginStore)
+            // console.log("LALALALLA syart", res?.data?.data,  'endddddddddd', creds)
+            console.log("Array LALALALLA syart", res?.data?.data, 'Array endddddddddd')
 
             if(res?.data?.success) {
-                setFetchedData(res?.data?.data[0])
+                setFetchedData(res?.data?.data)
                 //  setMemberDetailsArray(res?.data?.data[0]?.members)
                 setMemberDetailsArray(
                 res?.data?.data[0]?.members.map(m => ({
@@ -371,8 +371,8 @@ const RecoveryGroupFormMain = () => {
             mem_trn_id: m.recov_trans_id,
             mem_loan_id: m.mem_loan_id,
             principal_amt: m.principal_amt,
-            cr_amt: m.loan_amt,
-            sb_amt: m.sb_amt,
+            cr_amt: m.loan_amt?.length > 0 ? m.loan_amt : "0",
+            sb_amt: m.sb_amt?.length > 0 ? m.sb_amt : "0",
         }));
 
         const ip = await getClientIP()
@@ -380,10 +380,10 @@ const RecoveryGroupFormMain = () => {
         const payload = {
         tenant_id : loginStore?.tenant_id,
         branch_id : loginStore?.brn_code,
-        loan_acc_no : fetchedData?.society_acc_no,
+        loan_acc_no : fetchedData[0]?.society_acc_no,
         loan_to : "S",
-        branch_shg_id : fetchedData?.branch_shg_id,
-        loan_id : fetchedData?.loan_id,
+        branch_shg_id : fetchedData[0]?.branch_shg_id,
+        loan_id : fetchedData[0]?.loan_id,
         created_by : loginStore?.emp_id,
         ip_address: ip,
         members: memberDetailsArray_new
@@ -395,9 +395,6 @@ const RecoveryGroupFormMain = () => {
         //     sb_amt: m.sb_amt,
         // }))
     };
-
-
-
 
     // console.log("===== EMI RECOVERY DATA =====Colect", memberDetailsArray_new, 'enddddddddddddddddd');
     // // console.log(JSON.stringify(payload, null, 2));
@@ -412,14 +409,20 @@ const RecoveryGroupFormMain = () => {
         ).then(async res => {
             console.log("RESSSSS", res?.data)
              if(res?.data?.success) {
+
+                ToastAndroid.show(res?.data?.msg, ToastAndroid.SHORT)
+
                 Alert.alert("Alert", res?.data?.msg, [
                     { text: "Back", onPress: () => navigation.goBack() }
                 ], {
                     cancelable: false
                 })
                 return
+            } else {
+                // ToastAndroid.show(res?.data?.msg, ToastAndroid.SHORT)
+                Alert.alert("Alert", res?.data?.msg)
             }
-            ToastAndroid.show("Loan recovery EMI installment done.", ToastAndroid.SHORT)
+            
             // console.log("Loan recovery EMI installment done.", res?.data)
             // await handlePrint(res?.data?.msg)
 
@@ -467,10 +470,10 @@ const RecoveryGroupFormMain = () => {
         const payload = {
         tenant_id : loginStore?.tenant_id,
         branch_id : loginStore?.brn_code,
-        loan_acc_no : fetchedData?.society_acc_no,
+        loan_acc_no : fetchedData[0]?.society_acc_no,
         loan_to : "S",
-        branch_shg_id : fetchedData?.branch_shg_id,
-        loan_id : fetchedData?.loan_id,
+        branch_shg_id : fetchedData[0]?.branch_shg_id,
+        loan_id : fetchedData[0]?.loan_id,
         created_by : loginStore?.emp_id,
         ip_address: ip,
         members: memberDetailsArray_new
@@ -567,6 +570,11 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
   return cr < 1 && sb < 1;
 });
 
+const totalAmount = memberDetailsArray?.reduce(
+  (sum, item) => sum + Number(item?.loan_amt || 0) + Number(item?.sb_amt || 0),
+  0
+);
+
 
     return (
         <SafeAreaView>
@@ -581,36 +589,16 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
                     paddingHorizontal: 20,
                     paddingBottom: 80
                 }}>
-                    {/* <Text>{formData?.txnDate?.toLocaleDateString("en-GB")}</Text> */}
-                    {/* <InputPaper label="Last Transaction Date" leftIcon='account-group-outline' keyboardType="default" value={new Date(last_trn_dt).toLocaleDateString("en-GB")} onChangeText={(txt: any) => handleFormChange("last_trn_dt", txt)} customStyle={{
-                        backgroundColor: theme.colors.background,
-                    }} disabled />
-                    <Divider /> */}
-                   
-                    {/* <Text>{JSON.stringify(fetchedData, null, 2)}</Text> */}
                     
-
+                    {/* <Text>
+                        {JSON.stringify(fetchedData, null, 2)}
+                        </Text> */}
+                        
+                {fetchedData.length > 0 ? (
+                    <>
                     <InputPaper label="Group Name*" leftIcon='account-group-outline' keyboardType="default" value={formData.groupName} onChangeText={(txt: any) => handleFormChange("groupName", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
                     }} disabled />
-
-                   
-
-                    {/* <InputPaper label="Society Loan A/C No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.ccb_loan_acc_no} onChangeText={(txt: any) => handleFormChange("ccb_loan_acc_no", txt)} customStyle={{
-                        backgroundColor: theme.colors.background,
-                    }} disabled /> */}
-
-                    {/* <InputPaper label="Loan Account No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.loan_acc_no} onChangeText={(txt: any) => handleFormChange("loan_acc_no", txt)} customStyle={{
-                        backgroundColor: theme.colors.background,
-                    }} disabled /> */}
-
-                    {/* <InputPaper label="Sanction Date" maxLength={15} leftIcon='calendar' keyboardType="default" value={formData.sanction_dt} onChangeText={(txt: any) => handleFormChange("sanction_dt", txt)} customStyle={{
-                        backgroundColor: theme.colors.background,
-                    }} disabled /> */}
-
-                    {/* <InputPaper label="Sanction No." maxLength={15} leftIcon='folder-account' keyboardType="default" value={formData.sanction_no} onChangeText={(txt: any) => handleFormChange("sanction_no", txt)} customStyle={{
-                        backgroundColor: theme.colors.background,
-                    }} disabled /> */}
 
                     <InputPaper label="Period (In Month)" maxLength={15} leftIcon='clock-time-five-outline' keyboardType="default" value={formData.period} onChangeText={(txt: any) => handleFormChange("period", txt)} customStyle={{
                         backgroundColor: theme.colors.background,
@@ -636,25 +624,7 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
 
                     <Divider />
 
-                    {/* <RadioComp
-                        title="Txn. Mode*"
-                        icon="bank-transfer"
-                        dataArray={[
-                            {
-                                optionName: "CASH",
-                                optionState: formData.txnMode,
-                                currentState: "C",
-                                optionSetStateDispathFun: (e) => handleFormChange("txnMode", e)
-                            },
-                            {
-                                optionName: "UPI",
-                                optionState: formData.txnMode,
-                                currentState: "B",
-                                optionSetStateDispathFun: (e) => handleFormChange("txnMode", e)
-                            },
-                        ]}
-                    /> */}
-
+                    
                    
 
                     <View style={{
@@ -675,20 +645,6 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
                         </ButtonPaper>
                     </View>
                     
-
-
-
-
-                   
-                    {/* <Text>
-                        {memberDetailsArray.map(m =>{
-                            if(m.isChecked) {
-                                return `${m.member_name} - ${m.loan_amt || 0}/- \n`
-                            }
-                        })}
-                        {JSON.stringify(isAmountEmpty, null, 2)} /// 
-                        {JSON.stringify(isMemberChecked, null, 2)}
-                        </Text> */}
                     
                     <View style={{marginTop:20}}>
                         <Text variant="labelLarge" style={{
@@ -807,10 +763,12 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
                         //     0
                         //     )}/-</Text>
                         <Text variant='titleMedium'>
-                            {memberDetailsArray.reduce(
+                            {/* {memberDetailsArray.reduce(
                             (sum, item) => sum + Number(item.loan_amt || 0) + Number(item.sb_amt || 0),
                             0
-                            )}/-</Text>
+                            )} */}
+                            
+                            {totalAmount}/-</Text>
                         )}
                         />
 
@@ -828,7 +786,7 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
                     
                     {/* {fetchedData?.approval_status == 'U' &&(
                     <> */}
-                    {fetchedData?.approval_status === 'U' && fetchedData?.is_editable === true ? (
+                    {/* {fetchedData?.approval_status === 'U' && fetchedData?.is_editable === true ? (
                     <View
                     style={{
                     flexDirection: "row",
@@ -858,7 +816,7 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
                     </ButtonPaper>
                     </View>
 
-                    ) : fetchedData?.approval_status === null && fetchedData?.is_editable === false ? (
+                    ) : fetchedData?.approval_status === null && fetchedData?.is_editable === false ? ( */}
 
                     <View
                     style={{
@@ -883,13 +841,24 @@ const isAmountEmpty = memberDetailsArray?.some(item => {
                     }}
                     loading={loading}
                     // disabled={loading || !isMemberChecked || isAmountEmpty }
-                    disabled={loading}
+                    disabled={loading || totalAmount === 0}
                     >
                     {!loading ? "Collect Amount" : "DON'T CLOSE THIS PAGE..."}
                     </ButtonPaper>
                     </View>
+                    </>
+                    ) : (
+                        
+                        <View>
+                        <Text style={{ textAlign: "center", marginTop: 20, color: theme.colors.primary }}>No data found!</Text>
+                        </View>
+                        
+                    )}
+                    
 
-                    )  : null}
+                    {/* )  : null} */}
+
+
                     {/* </>
                     )} */}
                     

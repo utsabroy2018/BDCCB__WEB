@@ -39,6 +39,8 @@ const LoginScreen = () => {
     const [selectedBranch, setSelectedBranch] = useState("");
     const [branch, setBranch] = useState([]);
     const [branchLoadPending, setBranchLoadPending] = useState(false);
+
+    
     const requestBluetoothPermissions = async () => {
         if (Platform.OS === 'android') {
             try {
@@ -92,7 +94,7 @@ const LoginScreen = () => {
     };
 
     useEffect(() => {
-        requestPermissions()
+        // requestPermissions()
         fetchCurrentVersion()
         requestUserPermission();
     }, [])
@@ -124,7 +126,7 @@ const LoginScreen = () => {
 
     if (enabled) {
       console.log("Notification permission status:", authStatus);
-      getFcmToken();
+    //   getFcmToken();
     } else {
       Alert.alert("Push Notification permission denied");
     }
@@ -274,13 +276,13 @@ const LoginScreen = () => {
                                 color: theme.colors.primary
                             }}>Login</Text>
                         </View>
-                        <InputPaper label='Employee ID' onChangeText={(e: string) => {
+                        <InputPaper keyboardType="phone-pad" label='Employee ID' onChangeText={(e: string) => {
                             setUsername(e);
                             // 
                         }} 
                         onBlur={() => {
                             // console.log("EMP ID BLUR", username);
-                            fetchEmpType(username);
+                            // fetchEmpType(username);
                         }}
                         value={username} customStyle={{
                             backgroundColor: theme.colors.background

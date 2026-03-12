@@ -13,6 +13,8 @@
 // export const BASE_URL_BDCCB = "http://192.168.1.33:3017/v1" //Local Sayantika
 
 
+
+// export const BASE_URL = "https://bdccbshg.opentech4u.co.in/v1" //UAT
 export const BASE_URL = "https://ssvwsadmin.opentech4u.co.in" //UAT
 export const BASE_URL_BDCCB = "https://bdccbshg.opentech4u.co.in/v1" //UAT
 
