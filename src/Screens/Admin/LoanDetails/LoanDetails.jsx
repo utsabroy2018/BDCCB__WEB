@@ -511,7 +511,7 @@ function LoanDetails() {
 						</div>
 					</div>
 
-					{JSON.stringify(loanDetails[0], null, 2)}
+					{/* {JSON.stringify(loanDetails[0], null, 2)} */}
 					
 					{loanDetails.length > 0 && (
 					<>
@@ -689,7 +689,7 @@ function LoanDetails() {
 
 						</div>
 						</div>
-							<div>{JSON.stringify(formik.values.members, null, 2)}</div>
+							{/* <div>{JSON.stringify(formik.values.members, null, 2)}</div> */}
 						{/* <div className="grid grid-cols-4 gap-5 mt-5"> */}
 
 						{formik.values.members?.length > 0 && (

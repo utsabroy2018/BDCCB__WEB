@@ -791,7 +791,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 						className="text-blue-800 dark:text-gray-400"
 						spinning={loading}
 					>
-						{JSON.stringify(loanAppData, 2)} 
+						{/* {JSON.stringify(loanAppData, 2)}  */}
 						{/* {JSON.stringify(PACS_SHGList, null, 2)} */}
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 						{loanAppData?.approval_status == 'A' && (<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
