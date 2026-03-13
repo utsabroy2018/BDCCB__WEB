@@ -2565,6 +2565,12 @@ const items_bdccb_PACS = [
 							label: <Link to={"/homepacs/viewloan"}>Disburse</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
+						{
+							key: "sub4-2-3",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homepacs/viewloan-recovery"}>Recovery</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
 					],
 				},
 			],

@@ -66,6 +66,7 @@ function LoanDetails() {
 	const [loanDetails, setLoanDetails] = useState([])
 	const [recoveryBtnShowOff, setRecoveryBtnShowOff] = useState(false)
 	const [allRecoverySubBtnShowOff, setAllRecoverySubBtnShowOff] = useState(false)
+	const [memberAmount, setMemberAmount] = useState(false)
 
 	const navigate = useNavigate()
 
@@ -140,6 +141,7 @@ function LoanDetails() {
 		setLoading(true)
 		setRecoveryBtnShowOff(false)
 		setAllRecoverySubBtnShowOff(false)
+		setMemberAmount(false)
 
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
@@ -222,12 +224,26 @@ function LoanDetails() {
 			return Message("error", "Principal amount or Interest amount cannot be empty")
 		}
 
-		const member_list = loanDetails[0]?.member_list.map(item => ({
+
+		console.log(formik.values.members, 'member_listmember_list');
+		
+
+		// const member_list = loanDetails[0]?.member_list.map(item => ({
+		// loan_id: item.loan_id,
+		// member_name: item.member_name,
+		// mem_amount: item.cr_amt,
+		// mem_outstanding: item.mem_outstanding,
+		// }));
+
+
+		const member_list = formik.values.members.map(item => ({
 		loan_id: item.loan_id,
 		member_name: item.member_name,
 		mem_amount: item.cr_amt,
 		mem_outstanding: item.mem_outstanding,
 		}));
+
+		
 
 		setLoading(true)
 
@@ -280,6 +296,8 @@ function LoanDetails() {
 						// }
 					})
 					setRecoveryBtnShowOff(true)
+					setMemberAmount(true)
+
 				} else {
 				navigate(routePaths.LANDING)
 				localStorage.clear()
@@ -451,6 +469,10 @@ function LoanDetails() {
 				
 					setLoading(false)
 					}
+
+
+
+					
 
 	return (
 		<div>
@@ -666,7 +688,7 @@ function LoanDetails() {
 						) : null}
 						</div>
 
-						<div className="sm:col-span-1 mt-7">
+						<div className="sm:col-span-2 mt-7">
 							<button
 							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-slate-600 border-slate-500 bg-slate-700 transition ease-in-out hover:bg-slate-600 duration-300 rounded-full dark:focus:ring-primary-900`}
 							onClick={() => {
@@ -700,15 +722,56 @@ function LoanDetails() {
 						Member Loan List
 						</div>
 
+						{/* <div>{JSON.stringify(formik.values.members, null, 2)}</div> */}
+
+						<div className="grid grid-cols-7 gap-5 mt-2">
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Loan ID</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Member Name</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Amount</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Outstanding Amount</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Calculated Interest</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Principal Recovery</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Interest Recovery</label>
+							</div>
+
+
+						</div>
+
 						{formik.values.members.map((member, index) => (
 
-						<div key={index} className="grid grid-cols-7 gap-5 mt-2">
+						<div key={index} className="grid grid-cols-7 gap-5 mt-0">
 
 						<div>
 						<TDInputTemplateBr
 						placeholder="Loan ID"
 						type="text"
-						label="Loan ID"
+						// label="Loan ID"
 						name={`members.${index}.loan_id`}
 						formControlName={member.loan_id}
 						disabled={true}
@@ -720,7 +783,7 @@ function LoanDetails() {
 						<TDInputTemplateBr
 						placeholder="Member Name"
 						type="text"
-						label="Member Name"
+						// label="Member Name"
 						name={`members.${index}.member_name`}
 						formControlName={member.member_name}
 						disabled={true}
@@ -732,19 +795,43 @@ function LoanDetails() {
 						<TDInputTemplateBr
 						placeholder="Amount"
 						type="number"
-						label="Amount"
+						// label="Amount"
 						name={`members.${index}.cr_amt`}
-						formControlName={member.cr_amt}
-						disabled={true}
+						formControlName={formik.values.members[index].cr_amt}
+						  value={formik.values.members[index].cr_amt}
+						  handleChange={formik.handleChange}
+						disabled={memberAmount}
 						mode={1}
 						/>
+
+						{/* <TDInputTemplateBr
+						placeholder="Amount"
+						type="number"
+						name={`members.${index}.cr_amt`}
+						value={formik.values.members[index].cr_amt}
+						onChange={formik.handleChange}
+						disabled={memberAmount}
+						mode={1}
+						/>  */}
+
+						{/* <TDInputTemplateBr
+    placeholder="Amount"
+    type="number"
+    name={`members.${index}.cr_amt`}
+    value={formik.values.members[index].cr_amt}
+    handleChange={formik.handleChange}
+    handleBlur={formik.handleBlur}
+    disabled={memberAmount}
+    mode={1}
+/> */}
+
 						</div>
 
 						<div>
 						<TDInputTemplateBr
 						placeholder="Outstanding Amount"
 						type="number"
-						label="Outstanding Amount"
+						// label="Outstanding Amount"
 						name={`members.${index}.mem_outstanding`}
 						formControlName={member.mem_outstanding}
 						disabled={true}
@@ -756,7 +843,7 @@ function LoanDetails() {
 						<TDInputTemplateBr
 						placeholder="Calculated Interest"
 						type="number"
-						label="Calculated Interest"
+						// label="Calculated Interest"
 						name={`members.${index}.calc_interest`}
 						formControlName={member.calc_interest}
 						disabled={true}
@@ -768,7 +855,7 @@ function LoanDetails() {
 						<TDInputTemplateBr
 						placeholder="Principal Recovery"
 						type="text"
-						label="Principal Recovery"
+						// label="Principal Recovery"
 						name={`members.${index}.princAmt`}
 						formControlName={member.princAmt}
 						disabled={true}
@@ -780,7 +867,7 @@ function LoanDetails() {
 						<TDInputTemplateBr
 						placeholder=" Interest Recovery"
 						type="text"
-						label=" Interest Recovery"
+						// label=" Interest Recovery"
 						name={`members.${index}.intAmt`}
 						formControlName={member.intAmt}
 						disabled={true}

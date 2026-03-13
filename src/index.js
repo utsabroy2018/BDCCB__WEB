@@ -99,6 +99,8 @@ const DisbursedLoanApproveSinglePACS_BDCCB =  lazy(() => import("./Screens/PACSH
 const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/AcceptDisburseFormPACS_BDCCB.jsx"));
 
 const SearchViewLoanBM = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_BDCCB.jsx"))
+const SearchViewLoanRecoveryBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanRecoveryBM_BDCCB.jsx"))
+
 const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
 const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
 
@@ -572,6 +574,10 @@ const router = createBrowserRouter([
 							{
 								path: "viewloan",
 								element: <SearchViewLoanBM />,
+							},
+							{
+								path: "viewloan-recovery",
+								element: <SearchViewLoanRecoveryBM_BDCCB />,
 							},
 							{
 								path: "viewloan/:id",
