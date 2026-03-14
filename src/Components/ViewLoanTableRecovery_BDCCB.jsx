@@ -16,6 +16,10 @@ import {
 import { useNavigate } from "react-router-dom"
 import { Popconfirm, Tag } from "antd"
 import TDInputTemplateBr from "./TDInputTemplateBr"
+import axios from "axios"
+import { getLocalStoreTokenDts } from "./getLocalforageTokenDts"
+import { url_bdccb } from "../Address/BaseUrl"
+import { Message } from "./Message"
 
 function ViewLoanTableRecovery_BDCCB({
 	loanAppData,
@@ -25,12 +29,15 @@ function ViewLoanTableRecovery_BDCCB({
 	showSearch = true,
 	isForwardLoan = false,
 	isRejected = false,
+	refreshData
 }) {
 	const navigate = useNavigate()
 
 	const [first, setFirst] = useState(0)
 	const [rows, setRows] = useState(10)
 	const [rej_res, setRejRes] = useState("")
+	const userDetails = JSON.parse(localStorage.getItem("user_details")) || "";
+	const [loading, setLoading] = useState(false);
 
 	const onPageChange = (event) => {
 		setFirst(event.first)
@@ -47,10 +54,70 @@ function ViewLoanTableRecovery_BDCCB({
 	// 	goTo()
 	// })
 
-	const rejectDisbursement = async (groupCode) => {
-		console.log(groupCode, 'groupCodegroupCodegroupCode', rej_res, 'rej_resrej_resrej_res');
+	const getClientIP = async () => {
+	const res = await fetch("https://api.ipify.org?format=json")
+	const data = await res.json()
+	return data.ip
+	}
 
-		setRejRes('')
+	const rejectDisbursement = async (item) => {
+		console.log(item, 'groupCodegroupCodegroupCode', rej_res, 'rej_resrej_resrej_res');
+		 
+		
+		// return
+		setLoading(true)
+
+		const ip = await getClientIP()
+
+				// const creds = {
+				// 	branch_id: userDetails[0]?.brn_code ,
+				// 	tenant_id: userDetails[0]?.tenant_id,
+				// 	// from_dt: fromDate,
+				// 	// to_dt: toDate,
+				// 	// approval_status: loanType
+				// }
+
+				const creds = {
+				...item, // all existing fields
+				reject_remarks: rej_res || "",
+				created_by: userDetails[0]?.emp_id,
+				ip_address: ip
+				};
+
+				console.log(creds, 'dataaaaaaaaaaaaaaa');
+
+		
+				// return
+				const tokenValue = await getLocalStoreTokenDts(navigate);
+		
+				await axios
+					.post(`${url_bdccb}/recov/reject_society_recov`, creds, {
+					headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+					},
+					})
+					.then((res) => {
+						console.log(res?.data, 'dataaaaaaaaaaaaaaa');
+						
+		
+						if(res?.data?.success){
+						// setGroups(res?.data?.data)
+						// setCopyLoanApplications(res?.data?.data)
+						refreshData()
+						setRejRes('')
+						} else {
+						setRejRes('')
+						navigate(routePaths.LANDING)
+						localStorage.clear()
+						}
+		
+					})
+					.catch((err) => {
+						Message("error", "Some error occurred while rejecting...")
+						console.log("ERR", err)
+					})
+				setLoading(false)
 		
 	}
 
@@ -217,7 +284,7 @@ function ViewLoanTableRecovery_BDCCB({
 				</>
 				}
 				onConfirm={async () => {
-				await rejectDisbursement(item?.group_code)
+				await rejectDisbursement(item)
 				// setData([])
 				// Message("success", "Transaction Rejected.")
 				}}

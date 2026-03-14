@@ -217,6 +217,7 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 						title="Find Recovery Loans by Society"
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
+						refreshData={fetchSearchedGroups}
 					/>
 					{/* <DialogBox
 					visible={visible}
