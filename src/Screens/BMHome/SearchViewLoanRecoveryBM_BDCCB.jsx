@@ -11,6 +11,7 @@ import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import { routePaths } from "../../Assets/Data/Routes"
 import ViewLoanTableRecovery_BDCCB from "../../Components/ViewLoanTableRecovery_BDCCB"
+import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 
 const options = [
 	{
@@ -34,6 +35,23 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 	const [loanType, setLoanType] = useState("U")
+
+	const today = new Date().toISOString().split("T")[0];
+
+	const [fromDate, setFromDate] = useState(today);
+	const [toDate, setToDate] = useState(today);
+
+	// const initialValues = {
+	
+	// 		sanction_dt: "",
+			
+	// 	}
+	// 	const [formValues, setValues] = useState(initialValues)
+
+	// 	const validationSchema = Yup.object({
+	// 			sanction_dt: Yup.mixed(),
+		
+	// 		})
 	
 
 	const fetchSearchedGroups = async () => {
@@ -41,13 +59,15 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
+			from_dt: fromDate,
+			to_dt: toDate,
 			// approval_status: loanType
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/loan/fetch_disburse_dtls`, creds, {
+			.post(`${url_bdccb}/recov/fetch_society_recov_dtls`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -105,30 +125,43 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
-					{/* <div className="flex flex-row gap-3 mt-20">
-						<input
-							type="text"
-							placeholder="Search Loans by Group Name"
-							className={`bg-white border-1 border-gray-400 text-gray-800 text-sm rounded-lg ${
-								userDetails?.id == 3
-									? "active:border-slate-600 focus:ring-slate-600 focus:border-slate-800"
-									: "active:border-slate-600 focus:ring-slate-600 focus:border-slate-800"
-							} focus:border-1 duration-500 block w-full p-2 dark:bg-bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
-							onChange={(e) => setSearchKeywords(e.target.value)}
-						/>
-						<button
-							icon={<SearchOutlined />}
-							iconPosition="end"
-							className="bg-slate-700 text-white hover:bg-slate-800 p-5 text-center text-sm border-none rounded-lg w-36 h-10 flex justify-center items-center align-middle gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed active:ring-2 active:ring-slate-400"
-							onClick={fetchSearchedGroups}
-							disabled={!searchKeywords}
-						>
-							<SearchOutlined />
-							Search
-						</button>
-					</div> */}
+					<div className="flex flex-row gap-3 mt-20">
+						{/* <form onSubmit={formik.handleSubmit}> */}
+					<div>
+					<TDInputTemplateBr
+					type="date"
+					label="From Date"
+					name="from_dt"
+					formControlName={fromDate}
+					handleChange={(e) => setFromDate(e.target.value)}
+					mode={1}
+					/>
+					</div>
 
-					<div className="mt-20">
+					<div>
+					<TDInputTemplateBr
+					type="date"
+					label="To Date"
+					name="to_dt"
+					formControlName={toDate}
+					handleChange={(e) => setToDate(e.target.value)}
+					mode={1}
+					/>
+					</div>
+
+<button
+	type="button"
+	onClick={fetchSearchedGroups}
+	className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
+>
+	<SearchOutlined />
+	Search
+</button>
+										{/* </form> */}
+					</div>
+					
+
+					<div className="mt-5">
 						<label
 							for="default-search"
 							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -171,7 +204,13 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 							</button>
 						</div>
 					</div>
-					{/* {JSON.stringify(groups, 2)} */}
+					{/* {JSON.stringify(fromDate, 2)} */}
+
+					{/* {JSON.stringify(toDate, 2)} */}
+
+					{/* {JSON.stringify(groups[0], 2)} */}
+
+
 					<ViewLoanTableRecovery_BDCCB
 						flag="BM"
 						loanAppData={groups}

@@ -131,19 +131,25 @@ function ViewLoanTableRecovery_BDCCB({
 								#
 							</th> */}
 							<th scope="col" className="p-4">
+								Loan Id
+							</th>
+							<th scope="col" className="p-4">
 								Group Code
 							</th>
 							<th scope="col" className="p-4">
 								Group Name
 							</th>
 							<th scope="col" className="p-4">
-								Total Member
+								Disbursement Amount
 							</th>
 							<th scope="col" className="p-4">
-								Total Outstanding
+								Transaction Date
 							</th>
 							<th scope="col" className="p-4">
-								Status
+								Transaction ID
+							</th>
+							<th scope="col" className="p-4">
+								Credit Amount
 							</th>
 							
 							<th scope="col" className="p-4">
@@ -167,21 +173,14 @@ function ViewLoanTableRecovery_BDCCB({
 									>
 										{item.sl_no}
 									</th> */}
-									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
+									<td className="px-6 py-3 font-bold text-slate-800">{item.loan_id || "-----"}</td>
+									<td className="px-6 py-3 text-slate-700">{item.group_code}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
-									<td className="px-6 py-3 text-slate-700">{item.tot_member}</td>
-									<td className="px-6 py-3 text-slate-700">{item.tot_outstanding}</td>
-									<td className="px-6 py-3 text-slate-700 align-middle">
-										{item.approval_status == "U" ? (
-						<div className="pending_dis_2"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />Unapproved </div>
-											) : item.approval_status == "A" ? (
-						<div className="accept_dis_2"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />Approved </div>
-											) : (
-						<div className="pending_dis_2"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />Rejected </div>
-											
-											)}
-										
-										</td>
+									<td className="px-6 py-3 text-slate-700">{item.disb_amt}</td>
+									<td className="px-6 py-3 text-slate-700">{item.trans_dt}</td>
+									<td className="px-6 py-3 text-slate-700">{item.trans_id}</td>
+									<td className="px-6 py-3 text-slate-700">{item.credit_amount}</td>
+
 									<td className="px-6 py-3 text-slate-700">
 										{/* <button
 												// to={routePaths.BM_EDIT_GRT + item?.form_no}
@@ -242,7 +241,7 @@ function ViewLoanTableRecovery_BDCCB({
 										"bg-white border-2 font-bold text-slate-800 border-b-pink-200 dark:bg-gray-800 dark:border-gray-700"
 									}
 								>
-										<td className="text-center p-5" colSpan={5}>
+										<td className="text-center p-5" colSpan={8}>
 												<span className="text-lg">No Data Available</span>
 										</td>
 								</tr>
