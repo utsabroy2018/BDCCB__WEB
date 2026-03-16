@@ -10,6 +10,7 @@ import {
 	ClockCircleOutlined,
 	CloseCircleOutlined,
 	EditOutlined,
+	EyeOutlined,
 	FileTextOutlined,
 	SyncOutlined,
 } from "@ant-design/icons"
@@ -245,27 +246,27 @@ function ViewLoanTableRecovery_BDCCB({
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
 									<td className="px-6 py-3 text-slate-700">{item.disb_amt}</td>
 									<td className="px-6 py-3 text-slate-700">{item.trans_dt}</td>
-									<td className="px-6 py-3 text-slate-700">{item.trans_id}</td>
+									<td className="px-6 py-3 text-slate-700">{item.transaction_id}</td>
 									<td className="px-6 py-3 text-slate-700">{item.credit_amount}</td>
 
 									<td className="px-6 py-3 text-slate-700">
-										{/* <button
+										<button
 												// to={routePaths.BM_EDIT_GRT + item?.form_no}
 												onClick={() => {
-													console.log("LLSKSIODFUISFH", item)
-													navigate(`/homepacs/viewloan/${item?.group_code}`, {
+													// console.log("LLSKSIODFUISFH", item)
+													navigate(`/homepacs/viewloan-recovery/${item?.group_code}`, {
 														state: item,
 													})
 												}}
 											>
-												<EditOutlined
+												<EyeOutlined
 													className={`text-md ${
 														flag !== "BM" ? "text-slate-800" : "text-slate-800"
 													}`}
 												/>
-											</button> */}
+											</button>
 
-											<Popconfirm
+											{/* <Popconfirm
 				title={`Reject Transaction?`}
 				description={
 				<>
@@ -300,7 +301,7 @@ function ViewLoanTableRecovery_BDCCB({
 				<CloseCircleOutlined />{" "}
 				<span className="ml-1">Reject</span>
 				</a>
-				</Popconfirm>
+				</Popconfirm> */}
 									</td>
 								</tr>
 							)) :<tr

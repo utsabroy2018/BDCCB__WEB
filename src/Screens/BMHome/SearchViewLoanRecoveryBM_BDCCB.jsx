@@ -208,7 +208,7 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 
 					{/* {JSON.stringify(toDate, 2)} */}
 
-					{/* {JSON.stringify(groups[0], 2)} */}
+					{JSON.stringify(groups[0], 2)}
 
 
 					<ViewLoanTableRecovery_BDCCB

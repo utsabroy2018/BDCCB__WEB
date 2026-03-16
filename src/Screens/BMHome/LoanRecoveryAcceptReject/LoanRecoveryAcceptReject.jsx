@@ -12,6 +12,7 @@ import {
 	CheckCircleOutlined,
 	WalletOutlined,
 	SaveOutlined,
+	CloseCircleOutlined,
 } from "@ant-design/icons"
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../../Utils/formateDate"
@@ -36,6 +37,8 @@ import * as Yup from "yup"
 import VError from "../../../Components/VError"
 import BtnComp from "../../../Components/BtnComp"
 import { saveMasterData } from "../../../services/masterService"
+import DialogBox from "../../../Components/DialogBox"
+import { useParams } from "react-router"
 
 // const { RangePicker } = DatePicker
 // const dateFormat = "YYYY/MM/DD"
@@ -59,7 +62,7 @@ const options = [
 	// },
 ]
 
-function LoanDetails() {
+function LoanRecoveryAcceptReject() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 	const [societyLoanNo, setSocietyLoanNo] = useState('')
@@ -67,6 +70,10 @@ function LoanDetails() {
 	const [recoveryBtnShowOff, setRecoveryBtnShowOff] = useState(false)
 	const [allRecoverySubBtnShowOff, setAllRecoverySubBtnShowOff] = useState(false)
 	const [memberAmount, setMemberAmount] = useState(false)
+	const [actionType, setActionType] = useState("");
+	const [visible, setVisible] = useState(() => false)
+	const [rej_res, setRejRes] = useState("")
+	const params = useParams()
 
 	const navigate = useNavigate()
 
@@ -99,17 +106,8 @@ function LoanDetails() {
 	const validationSchema = Yup.object({
 	// socie_loan_ac_no: Yup.string().required("Type Society Loan A/C No. is required"),
 
-	principal_amount: Yup.number().required("Principal amount is required"),
-		// .test(
-		// "principal-check",
-		// "Principal amount must be less than Interest amount",
-		// function (value) {
-		// 	const { interest_amount } = this.parent
-		// 	return Number(value) < Number(interest_amount)
-		// }
-		// ),
-
-	interest_amount: Yup.number().required("Interest amount is required"),
+	principal_amount: Yup.number(),
+	interest_amount: Yup.number(),
 
 	})
 
@@ -119,7 +117,7 @@ function LoanDetails() {
 		// 	editGroup(values)
 		// }
 		
-		handleSubmit(values)
+		// handleSubmit(values)
 			
 	}
 
@@ -135,72 +133,72 @@ function LoanDetails() {
 	})
 
 
-	const handleSubmit = async () => {
-		console.log(societyLoanNo, 'formDataformDataformDataformDataccccccccccc');
+	// const handleSubmit = async () => {
+	// 	console.log(societyLoanNo, 'formDataformDataformDataformDataccccccccccc');
 
-		setLoading(true)
-		setRecoveryBtnShowOff(false)
-		setAllRecoverySubBtnShowOff(false)
-		setMemberAmount(false)
+	// 	setLoading(true)
+	// 	setRecoveryBtnShowOff(false)
+	// 	setAllRecoverySubBtnShowOff(false)
+	// 	setMemberAmount(false)
 
-		const creds = {
-			tenant_id: userDetails[0]?.tenant_id,
-			branch_id: userDetails[0]?.brn_code,
-			society_acc_no: societyLoanNo,
-			loan_to : userDetails[0]?.user_type
-		}
+	// 	const creds = {
+	// 		tenant_id: userDetails[0]?.tenant_id,
+	// 		branch_id: userDetails[0]?.brn_code,
+	// 		society_acc_no: societyLoanNo,
+	// 		loan_to : userDetails[0]?.user_type
+	// 	}
 
-		const tokenValue = await getLocalStoreTokenDts(navigate);
+	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/recov/fetch_loan_dtls_based_socacc_no`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
-			})
-			.then((res) => {
+	// 	await axios.post(`${url_bdccb}/recov/fetch_loan_dtls_based_socacc_no`, creds, {
+	// 		headers: {
+	// 		Authorization: `${tokenValue?.token}`, // example header
+	// 		"Content-Type": "application/json", // optional
+	// 		},
+	// 		})
+	// 		.then((res) => {
 				
 				
-				if(res?.data?.success){
+	// 			if(res?.data?.success){
 					
-					setLoanDetails(res?.data?.data || [])
+	// 				setLoanDetails(res?.data?.data || [])
 
-					const members = (res?.data?.data[0]?.member_list || []).map(item => ({
-						...item,
-						princAmt: "",
-						intAmt: ""  // replace mem_amount with cr_amt
-					}))
+	// 				const members = (res?.data?.data[0]?.member_list || []).map(item => ({
+	// 					...item,
+	// 					princAmt: "",
+	// 					intAmt: ""  // replace mem_amount with cr_amt
+	// 				}))
 
-					// console.log(res?.data?.data, 'resresresresresresres/////////////', creds, 'lllll', members);
+	// 				// console.log(res?.data?.data, 'resresresresresresres/////////////', creds, 'lllll', members);
 
-					setValues({
-						...formValues,
-						principal_amount: "",
-    					interest_amount: "",
-						// members: res?.data?.data[0]?.member_list || []
-						members: members || []
-					})
-					// setValues({
-					// 	g_group_name: res?.data?.data[0]?.group_name || "",
-					// 	disburse_date: res?.data?.data[0]?.disb_dt || "",
-					// 	period_month: res?.data?.data[0]?.period || "",
-					// 	current_roi: res?.data?.data[0]?.curr_roi || "",
-					// 	ovd_roi: res?.data?.data[0]?.penal_roi || "",
-					// 	disbursed_amount: res?.data?.data[0]?.disb_amt || "",
-					// 	loan_outstanding: res?.data?.data[0]?.loan_outstanding || "",
-					// })
+	// 				setValues({
+	// 					...formValues,
+	// 					principal_amount: "",
+    // 					interest_amount: "",
+	// 					// members: res?.data?.data[0]?.member_list || []
+	// 					members: members || []
+	// 				})
+	// 				// setValues({
+	// 				// 	g_group_name: res?.data?.data[0]?.group_name || "",
+	// 				// 	disburse_date: res?.data?.data[0]?.disb_dt || "",
+	// 				// 	period_month: res?.data?.data[0]?.period || "",
+	// 				// 	current_roi: res?.data?.data[0]?.curr_roi || "",
+	// 				// 	ovd_roi: res?.data?.data[0]?.penal_roi || "",
+	// 				// 	disbursed_amount: res?.data?.data[0]?.disb_amt || "",
+	// 				// 	loan_outstanding: res?.data?.data[0]?.loan_outstanding || "",
+	// 				// })
 					
 				
-				} else {
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-				}
-			})
-			.catch((err) => {
-				Message("error", "Some error occurred while fetching group form")
-			})
-			setLoading(false)
-	}
+	// 			} else {
+	// 			navigate(routePaths.LANDING)
+	// 			localStorage.clear()
+	// 			}
+	// 		})
+	// 		.catch((err) => {
+	// 			Message("error", "Some error occurred while fetching group form")
+	// 		})
+	// 		setLoading(false)
+	// }
 
 	const getClientIP = async () => {
 	const res = await fetch("https://api.ipify.org?format=json")
@@ -372,58 +370,7 @@ function LoanDetails() {
 			setLoading(false)
 	}
 
-	const allRecoverySubmit___ = async () => {
-		setLoading(true)
-		
-		const member_list = formik.values.members.map(item => ({	
-		loan_id: item.loan_id,
-		calculated_interest: item.calculated_interest,
-		curr_prn: item.mem_outstanding,
-		amount: item.cr_amt,
-		prn_recov: item.princAmt,
-		intt_recov: item.intAmt,
-		}));
-
-
-		const ip = await getClientIP()
-
-		const creds = {
-		ccb_loan_id : loanDetails[0]?.member_list[0]?.ccb_loan_id,
-		tenant_id : userDetails[0]?.tenant_id,
-		branch_id : userDetails[0]?.brn_code,
-		loan_acc_no : societyLoanNo,
-		loan_to : userDetails[0]?.user_type,
-		society_recov :  member_list
-		}
-
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		await axios.post(`${url_bdccb}/recov/submit_society_recovery`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
-			})
-			.then((res) => {
-				
-				if(res?.data?.success){
-
-				console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
-					
-				setAllRecoverySubBtnShowOff(true)
-				Message("success", res?.data?.msg)
-
-				} else {
-				navigate(routePaths.LANDING)
-				localStorage.clear()
-				}
-			})
-			.catch((err) => {
-				Message("error", "Some error occurred while fetching group form")
-			})
-			setLoading(false)
-		
-	}
+	
 
 
 	const allRecoverySubmit = async (formData) => {
@@ -472,7 +419,56 @@ function LoanDetails() {
 					setLoading(false)
 					}
 
+	const rejectDisbursement = async () => {
 
+	console.log(rej_res, 'xxxxxxxxxxxxxxxxxxxxxxx');
+	
+	
+	// const member_ids = groupData[0]?.members.map(item => ({
+	// loan_id: item.mem_loan_id,
+	// trans_id: item.tran_id,
+	// }));
+
+	// setLoading(true)
+
+	const ip = await getClientIP()
+
+	// const creds = {
+	// ccb_loan_id: groupData[0]?.loan_id,
+	// reject_remarks: rej_res,
+	// member_dt: member_ids,
+	// created_by: userDetails[0]?.emp_id,
+	// ip_address: ip,
+	// }
+
+	// return;
+
+	// await saveMasterData({
+	// endpoint: "loan/reject_pacs_disbursement",
+	// creds,
+	// navigate,
+	// successMsg: "Transaction Accepted",
+	// onSuccess: () => navigate(-1),
+
+	// // 🔥 fully dynamic failure handling
+	// failureRedirect: routePaths.LANDING,
+	// clearStorage: true,
+	// })
+
+	setLoading(false)
+
+	}
+
+	const approveDisbursement = async () => {
+		console.log('approve', 'xxxxxxxxxxxxxxxxxxxxxxx');
+		
+	}
+
+	// const acceptReject = async (actionType)=>{
+	// 	if(actionType == 'A'){
+	// 		approveDisbursement()
+	// 	}
+	// }
 
 					
 
@@ -488,7 +484,7 @@ function LoanDetails() {
 				<main className="px-4 pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-10 mx-32">
 					<div className="flex flex-row gap-3 py-3 rounded-xl">
 						<div className="text-3xl text-slate-700 font-bold">
-							Loan Details
+							Loan Recovery Accept/Reject
 						</div>
 					</div>
 
@@ -518,7 +514,7 @@ function LoanDetails() {
 								<SearchOutlined /> <span className={`ml-2`}>Search</span>
 							</button> */}
 
-							<button
+							{/* <button
 							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
 							onClick={() => {
 							handleSubmit()
@@ -530,14 +526,14 @@ function LoanDetails() {
 							}}
 							>
 							<SearchOutlined /> <span className={`ml-2`}>Search</span>
-							</button>
+							</button> */}
 							{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
 						</div>
 					</div>
 
 					{/* {JSON.stringify(loanDetails[0], null, 2)} */}
 					
-					{loanDetails.length > 0 && (
+					{/* {loanDetails.length > 0 && ( */}
 					<>
 					{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
 					<div className="grid grid-cols-4 gap-3 mt-5">
@@ -920,29 +916,92 @@ function LoanDetails() {
 						</>
 						)}
 
-						{allRecoverySubBtnShowOff && (
-						<>
-						{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
-						<div className="flex justify-center mt-7">
 						
-							<button
-							className={`inline-flex items-center px-6 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
-							onClick={() => {
-							allRecoverySubmit()
-							}}
-							disabled={!recoveryBtnShowOff}
-							>
-							<SaveOutlined /> <span className={`ml-2`}>Submit</span>
-							</button>
-
-						</div>
-						</>
-						)}
-
 						{/* </div> */}
 					
 					</>
-					)}
+					{/* )} */}
+
+					<div className="flex justify-center  sm:gap-6 mt-8">
+					<button
+					className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+
+
+					// }}
+					onClick={async () => {
+					// if (!formik.values.society_loan_acc) {
+					// 	formik.setFieldTouched("society_loan_acc", true);
+
+					// 	Message("error", "Society Loan A/C No. is required");
+					// 	return;
+					// }
+					setVisible(true); 
+					setActionType("A");
+					setVisible(true);
+					}}
+					>
+					<CheckCircleOutlined /> <span className={`ml-2`}>Accept Recovery Loan</span>
+					</button>
+
+					<DialogBox
+									flag={4}
+									onPress={() => setVisible(!visible)}
+									visible={visible}
+									 onPressYes={async () => {
+						// if (pendingValues) {
+							await approveDisbursement()
+							
+						  
+						 // 🔥 pass values here
+						// }
+						setVisible(false);
+					  }}
+									onPressNo={() => setVisible(!visible)}
+								/>
+
+
+
+					<div>
+					<Popconfirm
+					title={`Reject Recovery Loan`}
+					description={
+					<>
+					<div>
+					<TDInputTemplateBr
+					placeholder="Please give a reason behind rejecting this item"
+					type="date"
+					label="Please give a reason behind rejecting this item"
+					name="fromDate"
+					formControlName={rej_res}
+					handleChange={(e) => setRejRes(e.target.value)}
+					// min={"1900-12-31"}
+					mode={3}
+					/>
+					</div>
+					</>
+					}
+					onConfirm={async () => {
+					await rejectDisbursement()
+					// setData([])
+					// Message("success", "Transaction Rejected.")
+					}}
+					onCancel={() => setRejRes("")}
+					okText="Reject"
+					cancelText="No"
+					// disabled={selectedRowIndices?.length === 0}
+					>
+					<a
+					className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
+					>
+					<CloseCircleOutlined />{" "}
+					<span className="ml-2">Reject Transaction</span>
+					</a>
+					</Popconfirm>
+					</div>
+
+
+
+					</div>
 
 					
 					
@@ -953,4 +1012,4 @@ function LoanDetails() {
 	)
 }
 
-export default LoanDetails
+export default LoanRecoveryAcceptReject
