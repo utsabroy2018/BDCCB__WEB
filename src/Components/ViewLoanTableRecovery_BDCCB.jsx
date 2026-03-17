@@ -219,6 +219,9 @@ function ViewLoanTableRecovery_BDCCB({
 							<th scope="col" className="p-4">
 								Credit Amount
 							</th>
+							<th scope="col" className="p-4">
+								Status
+							</th>
 							
 							<th scope="col" className="p-4">
 								Action
@@ -248,6 +251,18 @@ function ViewLoanTableRecovery_BDCCB({
 									<td className="px-6 py-3 text-slate-700">{item.trans_dt}</td>
 									<td className="px-6 py-3 text-slate-700">{item.transaction_id}</td>
 									<td className="px-6 py-3 text-slate-700">{item.credit_amount}</td>
+
+									<td className="px-6 py-3 text-slate-700">
+									{item.approval_status == "U" ? (
+									<div className="pending_dis_2"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />Unapproved </div>
+									) : item.approval_status == "A" ? (
+									<div className="accept_dis_2"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />Accepted </div>
+									) : (
+									<div className="pending_dis_2"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />Rejected </div>
+
+									)}
+
+									</td>
 
 									<td className="px-6 py-3 text-slate-700">
 										<button
@@ -309,7 +324,7 @@ function ViewLoanTableRecovery_BDCCB({
 										"bg-white border-2 font-bold text-slate-800 border-b-pink-200 dark:bg-gray-800 dark:border-gray-700"
 									}
 								>
-										<td className="text-center p-5" colSpan={8}>
+										<td className="text-center p-5" colSpan={9}>
 												<span className="text-lg">No Data Available</span>
 										</td>
 								</tr>

@@ -85,6 +85,8 @@ const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/Sear
 const SearchViewLoanBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_Branch_BDCCB.jsx"))
 const EditViewLoanFormBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_Branch_BDCCB.jsx"))
 
+const LoanTransactionsMain = lazy(() => import("./Screens/Reports/LoanTransactions/LoanTransactionsMain.jsx"));
+
 //////////////// BDCCB BM End ////////////////
 
 //////////////// BDCCB PACS Start ////////////////
@@ -107,6 +109,8 @@ const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormB
 const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
 
 const LoanDetails_PACS_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_PACS_BDCCB.jsx"));
+const LoanDetails_Branch_SHG_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SHG_BDCCB.jsx"));
+const LoanDetails_Branch_SOCI_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SOCI_BDCCB.jsx"));
 
 //////////////// BDCCB PACS End ////////////////
 
@@ -134,6 +138,7 @@ const TransferUser = lazy(() => import("./Screens/Admin/UserManagement/TransferU
 const AuditReport = lazy(()=> import('./Screens/Admin/UserManagement/AuditReport'))
 const ALoanStatementMain = lazy(() => import("./Screens/Admin/Reports/LoanStatements/ALoanStatementMain"));
 const ALoanTransactionsMain = lazy(() => import("./Screens/Admin/Reports/LoanTransactions/ALoanTransactionsMain"));
+
 const ADemandReportsMain = lazy(() => import("./Screens/Admin/Reports/DemandReports/ADemandReportsMain"));
 const AOutstandingReportMain = lazy(() => import("./Screens/Admin/Reports/OutstandingReports/AOutstandingReportMain"));
 
@@ -390,6 +395,18 @@ const router = createBrowserRouter([
 								path: "viewloan_branch/:id",
 								element: <EditViewLoanFormBM_Branch_BDCCB />,
 							},
+							{
+								path: "loantxns",
+								element: <LoanTransactionsMain />,
+							},
+							{
+								path: "loan_branch_shg-recovery",
+								element: <LoanDetails_Branch_SHG_BDCCB />,
+							},
+							{
+								path: "loan_branch_soi-recovery",
+								element: <LoanDetails_Branch_SOCI_BDCCB />,
+							}
 
 							// {
 							// 	path: "transfermember",
@@ -469,7 +486,7 @@ const router = createBrowserRouter([
 							// },
 							// {
 							// 	path: "loantxns",
-							// 	element: <LoanTransactionsMain />,
+							// 	element: <ALoanTransactionsMain />,
 							// },
 							// {
 							// 	path:'previous-loantxns',
@@ -595,7 +612,7 @@ const router = createBrowserRouter([
 								element: <MemberLoanDetailsBM />,
 							},
 							{
-								path: "loandetails-pacs",
+								path: "loan-recovery",
 								element: <LoanDetails_PACS_BDCCB />,
 							}
 							

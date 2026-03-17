@@ -90,7 +90,7 @@ function LoanApplicationsDisburseTable_BDCCB({
 										headerStyle={{ width: "3rem" }}
 									></Column> */}
 				
-									<Column
+									{/* <Column
 										field="sanction_no"
 										header="Sanction No."
 										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
@@ -99,24 +99,23 @@ function LoanApplicationsDisburseTable_BDCCB({
 									<Column
 										field="sanction_dt"
 										header="Sanction Date"
-										// body={(rowData) =>
-										// 	new Date(rowData?.trans_dt).toLocaleDateString("en-GB")
-										// }
-										// footer={<span style={{ fontWeight: "bold" }}>{Outstanding}</span>}
-									></Column>
+									></Column> */}
 				
-									<Column
+									{/* <Column
 										field="loan_id"
 										header="Loan Id"
-									></Column>
+										
+									></Column> */}
 				
 									
 									<Column
 										field="loan_acc_no"
 										header="Loan Account No. "
-										// body={(rowData) =>
-										// 	new Date(rowData?.loan_acc_no).toLocaleDateString("en-GB")
-										// }
+										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
+									></Column>
+									<Column
+										field="group_name"
+										header="Society Name"
 									></Column>
 										<Column
 										field="disb_dt"

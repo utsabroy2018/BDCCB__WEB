@@ -12,7 +12,6 @@ import {
 	CheckCircleOutlined,
 	WalletOutlined,
 	SaveOutlined,
-	CloseCircleOutlined,
 } from "@ant-design/icons"
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../../Utils/formateDate"
@@ -29,7 +28,7 @@ import DynamicTailwindAccordion from "../../../Components/Reports/DynamicTailwin
 import DynamicTailwindTable from "../../../Components/Reports/DynamicTailwindTable"
 import Radiobtn from "../../../Components/Radiobtn"
 import { printTableReport } from "../../../Utils/printTableReport"
-import { useLocation, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 import { routePaths } from "../../../Assets/Data/Routes"
 import { getLocalStoreTokenDts } from "../../../Components/getLocalforageTokenDts"
 import { useFormik } from "formik"
@@ -37,15 +36,30 @@ import * as Yup from "yup"
 import VError from "../../../Components/VError"
 import BtnComp from "../../../Components/BtnComp"
 import { saveMasterData } from "../../../services/masterService"
-import DialogBox from "../../../Components/DialogBox"
-import { useParams } from "react-router"
 
 // const { RangePicker } = DatePicker
 // const dateFormat = "YYYY/MM/DD"
 
+const options = [
+	{
+		label: "All",
+		value: "",
+	},
+	{
+		label: "Late In",
+		value: "L",
+	},
+	{
+		label: "Early Out",
+		value: "E",
+	},
+	// {
+	// 	label: "Absent",
+	// 	value: "A",
+	// },
+]
 
-
-function LoanRecoveryAcceptReject() {
+function LoanDetailsBranchSHG() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 	const [societyLoanNo, setSocietyLoanNo] = useState('')
@@ -53,12 +67,7 @@ function LoanRecoveryAcceptReject() {
 	const [recoveryBtnShowOff, setRecoveryBtnShowOff] = useState(false)
 	const [allRecoverySubBtnShowOff, setAllRecoverySubBtnShowOff] = useState(false)
 	const [memberAmount, setMemberAmount] = useState(false)
-	const [actionType, setActionType] = useState("");
-	const [visible, setVisible] = useState(() => false)
-	const [rej_res, setRejRes] = useState("")
-	const params = useParams()
-	const location = useLocation();
-	const data_Receive = location.state;
+	const [societySrchMsg, setSocietySrchMsg] = useState('')
 
 	const navigate = useNavigate()
 
@@ -84,10 +93,25 @@ function LoanRecoveryAcceptReject() {
 	const [formValues, setValues] = useState(initialValues)
 
 
+	// const validationSchema = Yup.object({
+	// 		socie_loan_ac_no: Yup.string().required("Type Society Loan A/C No. is required"),
+	// 	})
+
 	const validationSchema = Yup.object({
 	// socie_loan_ac_no: Yup.string().required("Type Society Loan A/C No. is required"),
-	principal_amount: Yup.number(),
-	interest_amount: Yup.number(),
+
+	principal_amount: Yup.number().required("Principal amount is required"),
+		// .test(
+		// "principal-check",
+		// "Principal amount must be less than Interest amount",
+		// function (value) {
+		// 	const { interest_amount } = this.parent
+		// 	return Number(value) < Number(interest_amount)
+		// }
+		// ),
+
+	interest_amount: Yup.number().required("Interest amount is required"),
+
 	})
 
 	const onSubmit = async (values) => {
@@ -96,7 +120,7 @@ function LoanRecoveryAcceptReject() {
 		// 	editGroup(values)
 		// }
 		
-		// handleSubmit(values)
+		handleSubmit(values)
 			
 	}
 
@@ -112,20 +136,24 @@ function LoanRecoveryAcceptReject() {
 	})
 
 
-	const fetchDetails = async () => {
-		console.log(societyLoanNo, 'formDataformDataformDataformDataccccccccccc');
+	const handleSubmit = async () => {
+		setSocietySrchMsg('')
+
+		setLoading(true)
+		setRecoveryBtnShowOff(false)
+		setAllRecoverySubBtnShowOff(false)
+		setMemberAmount(false)
 
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
-			group_code: data_Receive?.group_code,
-			trans_dt: data_Receive?.trans_dt,
-			transaction_id : data_Receive?.transaction_id
+			society_acc_no: societyLoanNo,
+			loan_to : userDetails[0]?.user_type
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/recov/fetch_soc_mem_recov_dtls`, creds, {
+		await axios.post(`${url_bdccb}/recov/fetch_loan_dtls_based_socacc_no`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -144,15 +172,29 @@ function LoanRecoveryAcceptReject() {
 						intAmt: ""  // replace mem_amount with cr_amt
 					}))
 
-					console.log(res?.data?.data, 'resresresresresresres');
+					// console.log(res?.data, 'resresresresresresres', res?.data?.data.length);
+					Message("success", res?.data?.msg)
+					if(res?.data?.data.length < 1){
+					setSocietySrchMsg(res?.data?.msg)
+					}
+					
 
 					setValues({
 						...formValues,
-						// principal_amount: "",
-    					// interest_amount: "",
+						principal_amount: "",
+    					interest_amount: "",
 						// members: res?.data?.data[0]?.member_list || []
 						members: members || []
 					})
+					// setValues({
+					// 	g_group_name: res?.data?.data[0]?.group_name || "",
+					// 	disburse_date: res?.data?.data[0]?.disb_dt || "",
+					// 	period_month: res?.data?.data[0]?.period || "",
+					// 	current_roi: res?.data?.data[0]?.curr_roi || "",
+					// 	ovd_roi: res?.data?.data[0]?.penal_roi || "",
+					// 	disbursed_amount: res?.data?.data[0]?.disb_amt || "",
+					// 	loan_outstanding: res?.data?.data[0]?.loan_outstanding || "",
+					// })
 					
 				
 				} else {
@@ -336,7 +378,58 @@ function LoanRecoveryAcceptReject() {
 			setLoading(false)
 	}
 
-	
+	const allRecoverySubmit___ = async () => {
+		setLoading(true)
+		
+		const member_list = formik.values.members.map(item => ({	
+		loan_id: item.loan_id,
+		calculated_interest: item.calculated_interest,
+		curr_prn: item.mem_outstanding,
+		amount: item.cr_amt,
+		prn_recov: item.princAmt,
+		intt_recov: item.intAmt,
+		}));
+
+
+		const ip = await getClientIP()
+
+		const creds = {
+		ccb_loan_id : loanDetails[0]?.member_list[0]?.ccb_loan_id,
+		tenant_id : userDetails[0]?.tenant_id,
+		branch_id : userDetails[0]?.brn_code,
+		loan_acc_no : societyLoanNo,
+		loan_to : userDetails[0]?.user_type,
+		society_recov :  member_list
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/recov/submit_society_recovery`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+				
+				if(res?.data?.success){
+
+				console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
+					
+				setAllRecoverySubBtnShowOff(true)
+				Message("success", res?.data?.msg)
+
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+			setLoading(false)
+		
+	}
 
 
 	const allRecoverySubmit = async (formData) => {
@@ -362,10 +455,11 @@ function LoanRecoveryAcceptReject() {
 					society_recov :  member_list,
 					prn_amt: formik.values.principal_amount,
 					intt_amt : formik.values.interest_amount,
+					loan_outstanding : loanDetails[0]?.loan_outstanding,
 					}
 	
 	
-					// console.log(creds, 'credscredscredscreds', formData);
+					// console.log(creds, 'credscredscredscreds', loanDetails[0]);
 	
 					// return;
 					
@@ -385,133 +479,7 @@ function LoanRecoveryAcceptReject() {
 					setLoading(false)
 					}
 
-	const rejectDisbursement = async () => {
 
-			setLoading(true)
-
-			const ip = await getClientIP()
-
-			const member_list = formik.values.members.map(item => ({	
-			loan_id: item.loan_id,
-			trans_date: item.trans_date,
-			trans_id: item.trans_id,
-			}));
-
-			const creds = {
-			loan_id : data_Receive?.loan_id,
-			tenant_id : userDetails[0]?.tenant_id,
-			trans_dt : data_Receive?.trans_dt,
-			transaction_id : data_Receive?.transaction_id,
-			group_code : data_Receive?.group_code,
-			created_by: userDetails[0]?.emp_id,
-			ip_address : ip,
-			reject_remarks: rej_res,
-			reject_recovery :  member_list,
-
-			}
-
-
-			// {
-			// "loan_id" : "",
-			// "tenant_id" : "",
-			// "trans_dt" : "",
-			// "transaction_id" : "",
-			// "group_code" : "",
-			// "created_by" : "",
-			// "ip_address" : "",
-			// "reject_remarks" : "",
-			// "reject_recovery" : [
-			// {
-			// "loan_id" : "",
-			// "trans_date" : "",
-			// "trans_id" : ""
-			// },
-			// {
-			// "loan_id" : "",
-			// "trans_date" : "",
-			// "trans_id" : ""
-			// }
-			// ]
-			// }
-
-			console.log(creds, 'credscredscredscreds');
-
-			// return;
-
-
-			await saveMasterData({
-			endpoint: "recov/reject_society_recov",
-			creds,
-			navigate,
-			successMsg: "Reject Loan Recovery Successful.",
-			onSuccess: () => navigate(-1),
-
-			// 🔥 fully dynamic failure handling
-			failureRedirect: routePaths.LANDING,
-			clearStorage: true,
-			})
-
-			setLoading(false)
-
-	}
-
-	const approveDisbursement = async () => {
-		// console.log('approve', 'xxxxxxxxxxxxxxxxxxxxxxx');
-		setLoading(true)
-				
-					const ip = await getClientIP()
-
-					const member_list = formik.values.members.map(item => ({	
-					loan_id: item.loan_id,
-					credit_amount: item.credit_amount,
-					trans_date: item.trans_date,
-					trans_id: item.trans_id,
-					}));
-				
-					const creds = {
-					loan_id : data_Receive?.loan_id,
-					tenant_id : userDetails[0]?.tenant_id,
-					trans_dt : data_Receive?.trans_dt,
-					transaction_id : data_Receive?.transaction_id,
-					group_code : data_Receive?.group_code,
-					created_by: userDetails[0]?.emp_id,
-					ip_address : ip,
-					accept_recovery :  member_list,
-
-					}
-
-					console.log(creds, 'credscredscredscreds');
-	
-					// return;
-					
-				
-					await saveMasterData({
-					endpoint: "recov/accept_society_recovery",
-					creds,
-					navigate,
-					successMsg: "Accept Loan Recovery Successful.",
-					onSuccess: () => navigate(-1),
-				
-					// 🔥 fully dynamic failure handling
-					failureRedirect: routePaths.LANDING,
-					clearStorage: true,
-					})
-				
-					setLoading(false)
-		
-	}
-
-	// const acceptReject = async (actionType)=>{
-	// 	if(actionType == 'A'){
-	// 		approveDisbursement()
-	// 	}
-	// }
-
-	useEffect(()=>{
-		// console.log(data_Receive, 'paramsparamsparams');
-		fetchDetails()
-		
-	}, [])
 
 					
 
@@ -527,7 +495,7 @@ function LoanRecoveryAcceptReject() {
 				<main className="px-4 pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-10 mx-32">
 					<div className="flex flex-row gap-3 py-3 rounded-xl">
 						<div className="text-3xl text-slate-700 font-bold">
-							Loan Recovery Accept/Reject
+							Loan Recovery Of SHG
 						</div>
 					</div>
 
@@ -536,32 +504,77 @@ function LoanRecoveryAcceptReject() {
 					<div className="grid grid-cols-3 gap-5 mt-5">
 						<div>
 							<TDInputTemplateBr
-								placeholder="Society Loan A/C No..."
+								placeholder="CCB Loan A/C No..."
 								type="text"
-								label="Type Society Loan A/C No."
+								label="Type CCB Loan A/C No."
 								name="soci_loan_no"
-								// formControlName={societyLoanNo}
-								formControlName={loanDetails[0]?.loan_acc_no || ""}
-								// handleChange={(e) => setSocietyLoanNo(e.target.value)}
+								formControlName={societyLoanNo}
+								handleChange={(e) => setSocietyLoanNo(e.target.value)}
 								mode={1}
-								disabled={true}
 							/>
 
 						</div>
 						{/* )} */}
 						
+
+						<div className="mt-7">
+							{/* <button
+								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+								onClick={formik.handleSubmit}
+							>
+								<SearchOutlined /> <span className={`ml-2`}>Search</span>
+							</button> */}
+
+							<button
+							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+							onClick={() => {
+							handleSubmit()
+							// if (searchType2 !== "A") {
+							// handleSubmit()
+							// } else {
+							// handleFetchAbsentList()
+							// }
+							}}
+							>
+							<SearchOutlined /> <span className={`ml-2`}>Search</span>
+							</button>
+							{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
+						</div>
+
+						<div className="sm:col-span-12 mt-0">
+  {societySrchMsg.length > 0 && (
+    <p className="text-red-600 bg-red-100 border border-red-400 px-4 py-2 rounded-md text-sm">
+      {societySrchMsg}
+    </p>
+  )}
+</div>
 					</div>
 
-					{/* {JSON.stringify(data_Receive?.approval_status, null, 2)} ///////////////////
-
-					{JSON.stringify(loanDetails[0], null, 2)} */}
+					{/* {JSON.stringify(loanDetails[0], null, 2)} */}
 					
 					{/* {loanDetails.length > 0 && ( */}
 					<>
 					{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
 					<div className="grid grid-cols-4 gap-3 mt-5">
 						
-						
+						{/* <div>
+						<TDInputTemplateBr
+						placeholder="Group Name"
+						type="text"
+						label="Group Name"
+						name="g_group_name"
+						handleChange={formik.handleChange}
+						handleBlur={formik.handleBlur}
+						formControlName={loanDetails[0]?.group_name}
+						disabled={true}
+						mode={1}
+						/>
+						{formik.errors.g_group_name && formik.touched.g_group_name ? (
+						<VError title={formik.errors.g_group_name} />
+						) : null}
+						</div> */}
+
+						{/* <div className="sm:col-span-4 text-slate text-lg font-bold sm:col-span-3"> Loan Details</div> */}
 
 						<div>
 						<TDInputTemplateBr
@@ -654,7 +667,7 @@ function LoanRecoveryAcceptReject() {
 						</div>
 						{/* </div> */}
 
-						{/* <div className="border-2 border-pink-500/50 bg-pink-100 rounded-lg p-5 mt-5">
+						<div className="border-2 border-pink-500/50 bg-pink-100 rounded-lg p-5 mt-5">
 						<div className="grid grid-cols-4 gap-5 mt-0">
 						<div className="sm:col-span-1">
 						<TDInputTemplateBr
@@ -714,7 +727,7 @@ function LoanRecoveryAcceptReject() {
 						</div>
 
 						</div>
-						</div> */}
+						</div>
 							{/* <div>{JSON.stringify(formik.values.members, null, 2)}</div> */}
 						{/* <div className="grid grid-cols-4 gap-5 mt-5"> */}
 
@@ -801,13 +814,33 @@ function LoanRecoveryAcceptReject() {
 						type="number"
 						// label="Amount"
 						name={`members.${index}.cr_amt`}
-						// formControlName={formik.values.members[index].cr_amt}
-						formControlName={member.credit_amount}
-						// value={formik.values.members[index].cr_amt}
-						handleChange={formik.handleChange}
+						formControlName={formik.values.members[index].cr_amt}
+						  value={formik.values.members[index].cr_amt}
+						  handleChange={formik.handleChange}
 						disabled={memberAmount}
 						mode={1}
 						/>
+
+						{/* <TDInputTemplateBr
+						placeholder="Amount"
+						type="number"
+						name={`members.${index}.cr_amt`}
+						value={formik.values.members[index].cr_amt}
+						onChange={formik.handleChange}
+						disabled={memberAmount}
+						mode={1}
+						/>  */}
+
+						{/* <TDInputTemplateBr
+    placeholder="Amount"
+    type="number"
+    name={`members.${index}.cr_amt`}
+    value={formik.values.members[index].cr_amt}
+    handleChange={formik.handleChange}
+    handleBlur={formik.handleBlur}
+    disabled={memberAmount}
+    mode={1}
+/> */}
 
 						</div>
 
@@ -817,8 +850,7 @@ function LoanRecoveryAcceptReject() {
 						type="number"
 						// label="Outstanding Amount"
 						name={`members.${index}.mem_outstanding`}
-						// formControlName={member.mem_outstanding}
-						formControlName={member?.loan_outstanding}
+						formControlName={member.mem_outstanding}
 						disabled={true}
 						mode={1}
 						/>
@@ -830,8 +862,7 @@ function LoanRecoveryAcceptReject() {
 						type="number"
 						// label="Calculated Interest"
 						name={`members.${index}.calc_interest`}
-						// formControlName={member.calc_interest}
-						formControlName={member?.calculated_interest}
+						formControlName={member.calc_interest}
 						disabled={true}
 						mode={1}
 						/>
@@ -843,8 +874,7 @@ function LoanRecoveryAcceptReject() {
 						type="text"
 						// label="Principal Recovery"
 						name={`members.${index}.princAmt`}
-						// formControlName={member.princAmt}
-						formControlName={member?.principal_recovery}
+						formControlName={member.princAmt}
 						disabled={true}
 						mode={1}
 						/>
@@ -856,8 +886,7 @@ function LoanRecoveryAcceptReject() {
 						type="text"
 						// label=" Interest Recovery"
 						name={`members.${index}.intAmt`}
-						// formControlName={member.intAmt}
-						formControlName={member?.interest_recovery}
+						formControlName={member.intAmt}
 						disabled={true}
 						mode={1}
 						/>
@@ -872,35 +901,36 @@ function LoanRecoveryAcceptReject() {
 							<div></div>
 							<div className="pl-3 text-base">
 							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.credit_amount || 0),
+                            (sum, item) => sum + Number(item.cr_amt || 0),
                             0
                             )
 							)}
 							</div>
 							<div className="pl-3 text-base">
 							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.loan_outstanding || 0),
+                            (sum, item) => sum + Number(item.mem_outstanding || 0),
+                            0
+                            )
+							)}
+							</div>
+							<div className="pl-3 text-base">
+							{Math.round(
+							formik.values.members.reduce(
+								(sum, item) => sum + Number(item.calc_interest || 0),
+								0
+							)
+							)}
+							</div>
+							<div className="pl-3 text-base">
+							{Math.round(formik.values.members.reduce(
+                            (sum, item) => sum + Number(item.princAmt || 0),
                             0
                             )
 							)}
 							</div>
 							<div className="pl-3 text-base">
 							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.calculated_interest || 0),
-                            0
-                            )
-							)}
-							</div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.principal_recovery || 0),
-                            0
-                            )
-							)}
-							</div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.interest_recovery || 0),
+                            (sum, item) => sum + Number(item.intAmt || 0),
                             0
                             )
 							)}
@@ -911,95 +941,29 @@ function LoanRecoveryAcceptReject() {
 						</>
 						)}
 
+						{allRecoverySubBtnShowOff && (
+						<>
+						{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
+						<div className="flex justify-center mt-7">
 						
+							<button
+							className={`inline-flex items-center px-6 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+							onClick={() => {
+							allRecoverySubmit()
+							}}
+							disabled={!recoveryBtnShowOff}
+							>
+							<SaveOutlined /> <span className={`ml-2`}>Submit</span>
+							</button>
+
+						</div>
+						</>
+						)}
+
 						{/* </div> */}
 					
 					</>
 					{/* )} */}
-					
-					{data_Receive?.approval_status === "U" && (
-
-					
-					<div className="flex justify-center  sm:gap-6 mt-8">
-					
-					<button
-					className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
-					// }}
-					onClick={async () => {
-					// if (!formik.values.society_loan_acc) {
-					// 	formik.setFieldTouched("society_loan_acc", true);
-
-					// 	Message("error", "Society Loan A/C No. is required");
-					// 	return;
-					// }
-					setVisible(true); 
-					setActionType("A");
-					setVisible(true);
-					}}
-					>
-					<CheckCircleOutlined /> <span className={`ml-2`}>Accept Recovery Loan</span>
-					</button>
-
-					<DialogBox
-					flag={4}
-					onPress={() => setVisible(!visible)}
-					visible={visible}
-					onPressYes={async () => {
-					// if (pendingValues) {
-					await approveDisbursement()
-
-
-					// 🔥 pass values here
-					// }
-					setVisible(false);
-					}}
-					onPressNo={() => setVisible(!visible)}
-					/>
-
-
-
-					<div>
-					<Popconfirm
-					title={`Reject Recovery Loan`}
-					description={
-					<>
-					<div>
-					<TDInputTemplateBr
-					placeholder="Please give a reason behind rejecting this item"
-					type="date"
-					label="Please give a reason behind rejecting this item"
-					name="fromDate"
-					formControlName={rej_res}
-					handleChange={(e) => setRejRes(e.target.value)}
-					// min={"1900-12-31"}
-					mode={3}
-					/>
-					</div>
-					</>
-					}
-					onConfirm={async () => {
-					await rejectDisbursement()
-					// setData([])
-					// Message("success", "Transaction Rejected.")
-					}}
-					onCancel={() => setRejRes("")}
-					okText="Reject"
-					cancelText="No"
-					// disabled={selectedRowIndices?.length === 0}
-					>
-					<a
-					className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
-					>
-					<CloseCircleOutlined />{" "}
-					<span className="ml-2">Reject Transaction</span>
-					</a>
-					</Popconfirm>
-					</div>
-
-
-
-					</div>
-					)}
 
 					
 					
@@ -1010,4 +974,4 @@ function LoanRecoveryAcceptReject() {
 	)
 }
 
-export default LoanRecoveryAcceptReject
+export default LoanDetailsBranchSHG

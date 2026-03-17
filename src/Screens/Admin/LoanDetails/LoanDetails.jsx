@@ -67,6 +67,7 @@ function LoanDetails() {
 	const [recoveryBtnShowOff, setRecoveryBtnShowOff] = useState(false)
 	const [allRecoverySubBtnShowOff, setAllRecoverySubBtnShowOff] = useState(false)
 	const [memberAmount, setMemberAmount] = useState(false)
+	const [societySrchMsg, setSocietySrchMsg] = useState('')
 
 	const navigate = useNavigate()
 
@@ -136,7 +137,7 @@ function LoanDetails() {
 
 
 	const handleSubmit = async () => {
-		console.log(societyLoanNo, 'formDataformDataformDataformDataccccccccccc');
+		setSocietySrchMsg('')
 
 		setLoading(true)
 		setRecoveryBtnShowOff(false)
@@ -171,7 +172,12 @@ function LoanDetails() {
 						intAmt: ""  // replace mem_amount with cr_amt
 					}))
 
-					// console.log(res?.data?.data, 'resresresresresresres/////////////', creds, 'lllll', members);
+					// console.log(res?.data, 'resresresresresresres', res?.data?.data.length);
+					Message("success", res?.data?.msg)
+					if(res?.data?.data.length < 1){
+					setSocietySrchMsg(res?.data?.msg)
+					}
+					
 
 					setValues({
 						...formValues,
@@ -449,10 +455,11 @@ function LoanDetails() {
 					society_recov :  member_list,
 					prn_amt: formik.values.principal_amount,
 					intt_amt : formik.values.interest_amount,
+					loan_outstanding : loanDetails[0]?.loan_outstanding,
 					}
 	
 	
-					// console.log(creds, 'credscredscredscreds', formData);
+					// console.log(creds, 'credscredscredscreds', loanDetails[0]);
 	
 					// return;
 					
@@ -488,7 +495,7 @@ function LoanDetails() {
 				<main className="px-4 pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-10 mx-32">
 					<div className="flex flex-row gap-3 py-3 rounded-xl">
 						<div className="text-3xl text-slate-700 font-bold">
-							Loan Details
+							Loan Recovery
 						</div>
 					</div>
 
@@ -533,11 +540,19 @@ function LoanDetails() {
 							</button>
 							{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
 						</div>
+
+						<div className="sm:col-span-12 mt-0">
+  {societySrchMsg.length > 0 && (
+    <p className="text-red-600 bg-red-100 border border-red-400 px-4 py-2 rounded-md text-sm">
+      {societySrchMsg}
+    </p>
+  )}
+</div>
 					</div>
 
 					{/* {JSON.stringify(loanDetails[0], null, 2)} */}
 					
-					{loanDetails.length > 0 && (
+					{/* {loanDetails.length > 0 && ( */}
 					<>
 					{/* <div className="border-2 border-slate-500/50 bg-blue-100 rounded-lg p-5 mt-5"> */}
 					<div className="grid grid-cols-4 gap-3 mt-5">
@@ -885,34 +900,40 @@ function LoanDetails() {
 							<div className="text-black font-semibold text-base">Total</div>
 							<div></div>
 							<div className="pl-3 text-base">
-							{formik.values.members.reduce(
+							{Math.round(formik.values.members.reduce(
                             (sum, item) => sum + Number(item.cr_amt || 0),
                             0
-                            )}
+                            )
+							)}
 							</div>
 							<div className="pl-3 text-base">
-							{formik.values.members.reduce(
+							{Math.round(formik.values.members.reduce(
                             (sum, item) => sum + Number(item.mem_outstanding || 0),
                             0
-                            )}
+                            )
+							)}
 							</div>
 							<div className="pl-3 text-base">
-							{formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.calc_interest || 0),
-                            0
-                            )}
+							{Math.round(
+							formik.values.members.reduce(
+								(sum, item) => sum + Number(item.calc_interest || 0),
+								0
+							)
+							)}
 							</div>
 							<div className="pl-3 text-base">
-							{formik.values.members.reduce(
+							{Math.round(formik.values.members.reduce(
                             (sum, item) => sum + Number(item.princAmt || 0),
                             0
-                            )}
+                            )
+							)}
 							</div>
 							<div className="pl-3 text-base">
-							{formik.values.members.reduce(
+							{Math.round(formik.values.members.reduce(
                             (sum, item) => sum + Number(item.intAmt || 0),
                             0
-                            )}
+                            )
+							)}
 							</div>
 						</div>
 
@@ -942,7 +963,7 @@ function LoanDetails() {
 						{/* </div> */}
 					
 					</>
-					)}
+					{/* )} */}
 
 					
 					

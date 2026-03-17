@@ -525,7 +525,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
 						{/* <FormHeader text={`${params?.id == 0 ? `Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG` : loanAppData?.approval_status == 'A' ? `View Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'Pacs' : ''} to SHG Form` : `Edit/Preview Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'Pacs' : ''} to SHG Form`}`} mode={2} /> */}
-						<FormHeader text={`${params?.id == 0 ? "Add Direct Loan" : loanAppData?.approval_status == 'A' ? "View Direct Loan" : "Edit/Preview Direct Loan"}`} mode={2} />
+						<FormHeader text={`${params?.id == 0 ? "Add Disbursement to SHG" : loanAppData?.approval_status == 'A' ? "View Direct Loan" : "Edit/Preview SHG Disbursement"}`} mode={2} />
 					</div>
 
 					<Spin

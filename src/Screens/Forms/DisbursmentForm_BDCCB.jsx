@@ -840,7 +840,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text={`${params?.id == 0 ? "Add Indirect Loan" : loanAppData?.approval_status == 'A' ? "View Indirect Loan" : "Edit/Preview Indirect Loan"}`} mode={2} />
+						<FormHeader text={`${params?.id == 0 ? "Add Disbursement to Society" : loanAppData?.approval_status == 'A' ? "View Society Disbursement" : "Edit/Preview Society Disbursement"}`} mode={2} />
 					</div>
 
 					<Spin

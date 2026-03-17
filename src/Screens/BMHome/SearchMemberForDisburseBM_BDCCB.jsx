@@ -39,7 +39,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 	const [loanApplications, setLoanApplications] = useState(() => [])
 	const [copyLoanApplications, setCopyLoanApplications] = useState(() => [])
 
-	const [disbursementStatus, setDisbursementStatus] = useState("U")
+	const [disbursementStatus, setDisbursementStatus] = useState("A")
 	const navigate = useNavigate()
 
 	const onChange = (e) => {
@@ -99,7 +99,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 						?.toString()
 						?.toLowerCase()
 						.includes(word?.toLowerCase()) ||
-					e?.loan_acc_no
+					e?.group_name
 						?.toString()
 						?.toLowerCase()
 						?.includes(word?.toLowerCase())
@@ -120,13 +120,13 @@ function SearchMemberForDisburseBM_BDCCB() {
 			>
 				<main className="px-4 h-auto my-10 mx-32">
 
-					<Radiobtn
+					{/* <Radiobtn
 						data={options_Disburs}
 						val={disbursementStatus}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
-					/>
+					/> */}
 
 					<motion.section
 									initial={{ opacity: 0 }}
@@ -179,7 +179,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 															transition={{ delay: 1.1, type: "just" }}
 															className={`bg-white border rounded-lg  border-slate-700 bg-slate-300"
 															 text-gray-800 block w-full h-12 pl-10 dark:bg-gray-800 md:ml-4 duration-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-lg `}
-															placeholder="Search By Loan Account No."
+															placeholder="Search By Loan Account No. / SHG Name"
 															required=""
 															onChange={(text) => setSearch(text.target.value)}
 														/>
@@ -193,7 +193,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
 													{/* {`Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG`} */}
-													{`Direct Loan `}
+													{`Disbursement to SHG`}
 												</motion.h2>
 											{/* </div> */}
 										</div>
@@ -201,6 +201,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 								</motion.section>
 					
 {/* {JSON.stringify(loanApplications, null, 2)} */}
+
 					<LoanBrnPacsDisburseTable_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}
