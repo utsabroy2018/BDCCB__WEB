@@ -167,7 +167,7 @@ const RecoveryGroupFormMain = () => {
 
     const fetchLoanDetailsData = async () => {
         // setBanks([]);
-        // setLoading(true)
+        setLoading(true)
 
         const creds = {
             tenant_id : loginStore?.tenant_id,
@@ -183,7 +183,7 @@ const RecoveryGroupFormMain = () => {
         }
         ).then(async res => {
             // console.log("LALALALLA syart", res?.data?.data,  'endddddddddd', creds)
-            console.log("Array LALALALLA syart", res?.data?.data, 'Array endddddddddd')
+            // console.log("Array LALALALLA syart", res?.data?.data, 'Array endddddddddd', loginStore)
 
             if(res?.data?.success) {
                 setFetchedData(res?.data?.data)
@@ -223,7 +223,7 @@ const RecoveryGroupFormMain = () => {
         }).catch(err => {
             ToastAndroid.show("Some error while fetching Sub Purposes of Loan!", ToastAndroid.SHORT)
         })
-        // setLoading(false)
+        setLoading(false)
     }
 
     useEffect(() => {
