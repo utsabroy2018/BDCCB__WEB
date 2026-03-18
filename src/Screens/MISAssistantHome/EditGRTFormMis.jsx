@@ -90,7 +90,7 @@ localStorage.clear()
 		<>
 			<Sidebar mode={1} />
 			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
-				<div className=" p-5 w-4/5 min-h-screen rounded-3xl">
+				<div className=" p-5 w-full min-h-screen rounded-3xl">
 
 						{(userDetails?.id === 2 ||
 						userDetails?.id === 4 ||

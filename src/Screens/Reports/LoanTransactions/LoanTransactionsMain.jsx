@@ -168,9 +168,8 @@ function LoanTransactionsMain() {
 			})
 			.then((res) => {
 				if(res?.data?.suc === 0){
-				// Message('error', res?.data?.msg)
-				navigate(routePaths.LANDING)
-				localStorage.clear()
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
 				} else {
 				if(res?.data?.transaction_group_data?.suc == 1){
 					if(res?.data?.transaction_group_data?.msg.length > 0){
@@ -212,12 +211,11 @@ function LoanTransactionsMain() {
 			.then((res) => {
 				
 				if(res?.data?.suc === 0){
-// Message('error', res?.data?.msg)
-navigate(routePaths.LANDING)
-localStorage.clear()
-} else {
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
+				} else {
 				setFunds(res?.data?.msg)
-}
+				}
 
 			})
 			.catch((err) => {
@@ -260,9 +258,8 @@ localStorage.clear()
 			.then((res) => {
 				
 			if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			navigate(routePaths.LANDING)
-			localStorage.clear()
+			// navigate(routePaths.LANDING)
+			// localStorage.clear()
 			} else {
 
 			if(res?.data?.transaction_fund_data?.suc == 1){
@@ -311,9 +308,8 @@ Authorization: `${tokenValue?.token}`, // example header
 })
 			.then((res) => {
 				if(res?.data?.suc === 0){
-// Message('error', res?.data?.msg)
-navigate(routePaths.LANDING)
-localStorage.clear()
+// navigate(routePaths.LANDING)
+// localStorage.clear()
 } else {
 				setCOs(res?.data?.msg)
 }
@@ -364,10 +360,9 @@ localStorage.clear()
 			.then((res) => {
 
 				if(res?.data?.suc === 0){
-        // Message('error', res?.data?.msg)
-		navigate(routePaths.LANDING)
-		localStorage.clear()
-		} else {
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
+				} else {
 
 				// console.log("RESSSSS======>>>>", res?.data)
 				if(res?.data?.transaction_co_data?.suc == 1){
@@ -419,9 +414,8 @@ localStorage.clear()
 			.then((res) => {
 				
 			if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			navigate(routePaths.LANDING)
-			localStorage.clear()
+			// navigate(routePaths.LANDING)
+			// localStorage.clear()
 			} else {
 			if(res?.data?.transaction_branch_data?.suc == 1){
 			if(res?.data?.transaction_branch_data?.msg.length > 0){
@@ -473,9 +467,8 @@ localStorage.clear()
 			.then((res) => {
 				
 			if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			navigate(routePaths.LANDING)
-			localStorage.clear()
+			// navigate(routePaths.LANDING)
+			// localStorage.clear()
 			} else {
 
 			if(res?.data?.transaction_member_data?.suc == 1 ){
@@ -542,8 +535,8 @@ localStorage.clear()
 				
 				if(res?.data?.suc === 0){
 				Message('error', res?.data?.msg)
-				navigate(routePaths.LANDING)
-				localStorage.clear()
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
 				} else {
 				setBranches(res?.data?.msg)
 				console.log(res?.data?.msg, 'paraparaparaparaparaparaparapara');
@@ -865,7 +858,7 @@ localStorage.clear()
 				<main className="px-4 pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-10 mx-32">
 					<div className="flex flex-row gap-3 mt-20  py-3 rounded-xl">
 						<div className="text-3xl text-slate-700 font-bold">
-							LOAN TRANSACTIONS
+							LOAN TRANSACTIONS Reports
 						</div>
 					</div>
 

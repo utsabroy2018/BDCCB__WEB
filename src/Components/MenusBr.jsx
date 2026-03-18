@@ -2324,7 +2324,7 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 ];
 
 
-const items_bdccb = [
+const items_bdccb_SUpper_User = [
 		{
 			key: "sub1",
 			icon: <LineChartOutlined />,
@@ -2516,6 +2516,195 @@ const items_bdccb = [
 		
 	]
 
+const items_bdccb = [
+		{
+			key: "sub1",
+			icon: <LineChartOutlined />,
+			label: <Link to={"/homebm/"}>Dashboard</Link>,
+		},
+		{
+			key: "sub6",
+			icon: <ImportOutlined />,
+			label: "User Management",
+			// hidden: data?.user_management == "Y" ? false : true,
+			children: [
+				// {
+				// 	key: "sub7-1",
+				// 	icon: <UserAddOutlined />,
+				// 	label: <Link to={"/homeadmin/createuser/0"}>Create User</Link>,
+				// 	// hidden: data?.create_user == "Y" ? false : true,
+				// },
+				{
+					key: "sub6-1",
+					icon: <SettingOutlined />,
+					label: <Link to={"/homebm/manageuser/"}>Manage User</Link>,
+					// hidden: data?.manage_user == "Y" ? false : true,
+				},
+				
+			],
+		},
+		
+		// {
+		// 	key: "sub2",
+		// 	icon: <DatabaseOutlined />,
+		// 	label: "Master",
+		// 	children: [
+		// 		{
+		// 			key: "sub2-1",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/masterdistricts"}>District</Link>,
+		// 		},
+		// 		{
+		// 			key: "sub2-2",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/masterblocks"}>Blocks</Link>,
+		// 		},
+		// 		{
+		// 			key: "sub2-3",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/postMaster"}>Post Office Master</Link>,
+		// 		},
+		// 		{
+		// 			key: "sub2-4",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/policeStationMaster"}>Police Station Master</Link>,
+		// 		},
+		// 		{
+		// 			key: "sub2-5",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/gplistMaster"}>GP List Master</Link>,
+		// 		},
+		// 		{
+		// 			key: "sub2-6",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/villageMaster"}>Village Master</Link>,
+		// 		},
+		// 		{
+		// 			key: "sub2-7",
+		// 			icon: <DatabaseOutlined />,
+		// 			label: <Link to={"/homeadmin/branchMaster"}>Branch Master</Link>,
+		// 		},
+		// 	],
+		// },
+		
+		{
+			key: "sub3",
+			icon: <DeploymentUnitOutlined />,
+			label: "Groups",
+			children: [
+				{
+					key: "sub3-1",
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/editSahayikaFormBM/0"}>Add Sahayika</Link>,
+				},
+				{
+					key: "sub3-2",
+					icon: <FileSearchOutlined />,
+					label: <Link to={"/homebm/searchSahayikaBM/"}>Edit Sahayika</Link>,
+				},
+				{
+					key: "sub3-3",
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/editgroupform/0"}>Add Group</Link>,
+				},
+				{
+					key: "sub3-4",
+					icon: <FileSearchOutlined />,
+					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
+				}
+			],
+		},
+
+		{
+			key: "sub4",
+			icon: <ThunderboltOutlined />,
+			label: "Loans",
+			children: [
+				{
+					key: "sub4-1",
+					icon: <CheckCircleOutlined />,
+					label: "Disbursement",
+					children: [
+						{
+							key: "sub4-1-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homepacs/disburseloan"}>Society</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+						{
+							key: "sub4-1-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+					],
+				},
+				// {
+				// 	key: "sub4-1",
+				// 	icon: <ThunderboltOutlined />,
+				// 	label: <Link to={"/homepacs/disburseloan"}>Indirect Loan</Link>,
+				// },
+				// {
+				// 	key: "sub4-2",
+				// 	icon: <ThunderboltOutlined />,
+				// 	label: <Link to={"/homebm/disburseloan"}>Direct Loan</Link>,
+				// },
+				{
+					key: "sub4-2",
+					icon: <CheckCircleOutlined />,
+					label: "Recovery",
+					children: [
+						{
+							key: "sub4-2-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+						{
+							key: "sub4-2-2",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/loan_branch_shg-recovery"}>SHG</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+					],
+				},
+				{
+					key: "sub4-3",
+					icon: <CheckCircleOutlined />,
+					label: "Approve",
+					children: [
+						{
+							key: "sub4-3-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/viewloan_branch"}>Society</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						},
+						// {
+						// 	key: "sub4-2-2",
+						// 	icon: <CheckCircleOutlined />,
+						// 	label: <Link to={"/homepacs/viewloan"}>SHG</Link>,
+						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+						// }
+					],
+				},
+			],
+		},
+
+		// {
+		// 	key: "sub5",
+		// 	icon: <ThunderboltOutlined />,
+		// 	label: "SB Transaction",
+		// 	children: [
+		// 		{
+		// 			key: "sub5-1",
+		// 			icon: <ThunderboltOutlined />,
+		// 			label: <Link to={"/homebm/transaction"}>Transaction</Link>,
+		// 		}
+		// 	],
+		// },
+		
+	]
+
 const items_bdccb_PACS = [
 		{
 			key: "sub1",
@@ -2523,44 +2712,44 @@ const items_bdccb_PACS = [
 			label: <Link to={"/homebm/"}>Dashboard</Link>,
 		},
 
-		{
-			key: "sub5",
-			icon: <ImportOutlined />,
-			label: "Super User",
-			// hidden: data?.user_management == "Y" ? false : true,
-			children: [
-				{
-					key: "sub5-1",
-					icon: <SettingOutlined />,
-					label: <Link to={"#"}> All Loan Menus</Link>,
-					// hidden: data?.manage_user == "Y" ? false : true,
-				},
-				{
-					key: "sub5-1",
-					icon: <SettingOutlined />,
-					label: <Link to={"#"}> All Master Menus</Link>,
-					// hidden: data?.manage_user == "Y" ? false : true,
-				},
-				{
-					key: "sub5-1",
-					icon: <SettingOutlined />,
-					label: <Link to={"#"}> All Master Menus</Link>,
-					// hidden: data?.manage_user == "Y" ? false : true,
-				},
-				{
-					key: "sub5-1",
-					icon: <SettingOutlined />,
-					label: <Link to={"/homebm/manageuser/"}>User Management</Link>,
-					// hidden: data?.manage_user == "Y" ? false : true,
-				},
-				{
-					key: "sub5-1",
-					icon: <SettingOutlined />,
-					label: <Link to={"#"}>Group</Link>,
-					// hidden: data?.manage_user == "Y" ? false : true,
-				},
-			],
-		},
+		// {
+		// 	key: "sub5",
+		// 	icon: <ImportOutlined />,
+		// 	label: "Super User",
+		// 	// hidden: data?.user_management == "Y" ? false : true,
+		// 	children: [
+		// 		{
+		// 			key: "sub5-1",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"#"}> All Loan Menus</Link>,
+		// 			// hidden: data?.manage_user == "Y" ? false : true,
+		// 		},
+		// 		{
+		// 			key: "sub5-1",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"#"}> All Master Menus</Link>,
+		// 			// hidden: data?.manage_user == "Y" ? false : true,
+		// 		},
+		// 		{
+		// 			key: "sub5-1",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"#"}> All Master Menus</Link>,
+		// 			// hidden: data?.manage_user == "Y" ? false : true,
+		// 		},
+		// 		{
+		// 			key: "sub5-1",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"/homebm/manageuser/"}>User Management</Link>,
+		// 			// hidden: data?.manage_user == "Y" ? false : true,
+		// 		},
+		// 		{
+		// 			key: "sub5-1",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"#"}>Group</Link>,
+		// 			// hidden: data?.manage_user == "Y" ? false : true,
+		// 		},
+		// 	],
+		// },
 
 		// {
 		// 	key: "sub5",
@@ -2577,18 +2766,18 @@ const items_bdccb_PACS = [
 		// 	],
 		// },
 		
-		// {
-		// 	key: "sub3",
-		// 	icon: <DeploymentUnitOutlined />,
-		// 	label: "Groups",
-		// 	children: [
-		// 		{
-		// 			key: "sub3-4",
-		// 			icon: <FileSearchOutlined />,
-		// 			label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
-		// 		}
-		// 	],
-		// },
+		{
+			key: "sub3",
+			icon: <DeploymentUnitOutlined />,
+			label: "Groups",
+			children: [
+				{
+					key: "sub3-4",
+					icon: <FileSearchOutlined />,
+					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
+				}
+			],
+		},
 
 		{
 			key: "sub4",
@@ -2596,16 +2785,17 @@ const items_bdccb_PACS = [
 			label: "Loans",
 			children: [
 				{
-					key: "sub4-1",
-					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homepacs/loan-recovery"}>Recovery</Link>,
-				},
-				{
 					key: "sub4-2-2",
 					icon: <CheckCircleOutlined />,
 					label: <Link to={"/homepacs/viewloan"}>Accept Disbursement</Link>,
 					// hidden: data?.approve_transaction == "Y" ? false : true,
 				},
+				{
+					key: "sub4-1",
+					icon: <ThunderboltOutlined />,
+					label: <Link to={"/homepacs/loan-recovery"}>Recovery</Link>,
+				},
+				
 				{
 					key: "sub4-2-3",
 					icon: <CheckCircleOutlined />,

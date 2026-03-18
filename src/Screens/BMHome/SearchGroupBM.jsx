@@ -86,7 +86,7 @@ function SearchGroupBM() {
 		},
 		})
 		.then((res) => {
-// console.log(searchKeywords, 'search', res);
+console.log(res?.data?.data, 'searchsearchsearchsearch', res);
 	if(res?.data?.success){
 	setGroups(res?.data?.data)
 	} else {
@@ -155,10 +155,11 @@ function SearchGroupBM() {
 							</button>
 						</div>
 					</div>
+					{/* {JSON.stringify(groups, null, 2)} */}
 					<GroupsTableViewBr
 						flag="BM"
 						loanAppData={groups}
-						title="Groups"
+						title="Groups 000"
 						showSearch={false}
 					/>
 					

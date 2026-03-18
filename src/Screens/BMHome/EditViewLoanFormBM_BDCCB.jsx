@@ -30,7 +30,7 @@ function EditViewLoanFormBM_BDCCB() {
 				data={params.id && data ? data : ""}
 			/> */}
 				{/* {JSON.stringify(loanAppData)} */}
-				<div className=" p-5 w-4/5 min-h-screen rounded-3xl">
+				<div className=" p-5 w-full min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
 						<FormHeader text={`View Society Loan Details`} mode={2} />
 					</div>

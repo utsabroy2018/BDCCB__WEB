@@ -107,6 +107,7 @@ const containerStyle = {
 	const [directIndirectStatus, setDirectIndirectStatus] = useState("D")
 	const [branchList, setBranchList] = useState([]);
 	const [PACKSList, setPACKSList] = useState([]);
+	const [socityEditTimeBranch, setSocityEditTimeBranch] = useState([]);
 
 
 	const initialValues = {
@@ -129,16 +130,16 @@ const containerStyle = {
 		village_id: "",
 		branch_code: "",
 		members: [
-				{
-				member_id : 0,
-				member_name: "",
-				address: "",
-				sb_acc_no: "",
-				aadhar_no: "",
-				gp_leader_flag: "N",
-				asst_gp_leader_flag: "N",
-				},
-			],
+			{
+			member_id : 0,
+			member_name: "",
+			address: "",
+			sb_acc_no: "",
+			aadhar_no: "",
+			gp_leader_flag: "N",
+			asst_gp_leader_flag: "N",
+			}
+		],
 	}
 
 	const [formValues, setValues] = useState(initialValues)
@@ -151,17 +152,18 @@ const containerStyle = {
 
 	
 	const validationSchema = Yup.object({
-		branch_id: Yup.string().when("directIndirectStatus", {
-		is: "D",
-		then: (schema) => schema.required("Branch name is required"),
-		otherwise: (schema) => schema.notRequired(),
-		}),
+		branch_id: Yup.string().required("Branch name is required"),
+		// branch_id: Yup.string().when("directIndirectStatus", {
+		// is: "D",
+		// then: (schema) => schema.required("Branch name is required"),
+		// otherwise: (schema) => schema.notRequired(),
+		// }),
 
-		packs_id: Yup.string().when("directIndirectStatus", {
-			is: "I",
-			then: (schema) => schema.required("PACKS name is required"),
-			otherwise: (schema) => schema.notRequired(),
-		}),
+		// packs_id: Yup.string().when("directIndirectStatus", {
+		// 	is: "I",
+		// 	then: (schema) => schema.required("PACKS name is required"),
+		// 	otherwise: (schema) => schema.notRequired(),
+		// }),
 		g_group_name: Yup.string().required("Group name is required"),
 		g_address: Yup.string().required("Address is required"),
 		sahayika_id: Yup.string().required("Sahayika name is required"),
@@ -231,14 +233,12 @@ const containerStyle = {
 	}, [])
 
 	useEffect(()=>{
-		console.log(userDetails[0]?.user_type, 'ddddddddddddddddddddddddd');
-		
+		// console.log(userDetails[0]?.user_type, 'xxxxxxxxxxxxxxxxxxx_____________', userDetails[0]?.user_type == "P" ? loanAppData?.branch_code : userDetails[0]?.brn_code);
+		if(userDetails[0]?.user_type != "P"){
 		fetchBranch_Group()
-		// if (params?.id < 1) {
-		formik.setFieldValue("packs_id", '')
-		// }
+		}
 
-	}, [directIndirectStatus])
+	}, [])
 
 	
 
@@ -325,6 +325,10 @@ const containerStyle = {
 					members: res?.data?.data[0]?.memb_dt
 
 				})
+
+				setSocityEditTimeBranch([
+					
+				])
 				setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
 				// fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
@@ -395,6 +399,14 @@ const containerStyle = {
 					members: res?.data?.data[0]?.memb_dt
 
 				})
+
+				setBranchList([
+				{
+				code: res?.data?.data[0]?.branch_code,
+				name: res?.data?.data[0]?.branch_name,
+				}]
+				)
+
 				setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
 				// fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
@@ -434,8 +446,10 @@ const containerStyle = {
 				// branch_code: masterData?.branch_code,
 				// branch_code: userDetails[0]?.brn_code,
 				// branch_code: directIndirectStatus == 'D' ? formData?.branch_id : formData?.packs_id,
-				branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
-				pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+				// branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
+				branch_code: formData?.branch_id ,
+				// pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+				pacs_id: formData?.packs_id || 0,
 				direct_indirect_flag: directIndirectStatus,
 				group_name: formData?.g_group_name,
 				// gp_leader_id: 2, ///////////////
@@ -484,8 +498,10 @@ const containerStyle = {
 				// branch_code: masterData?.branch_code,
 				group_code: 0,
 				tenant_id: userDetails[0]?.tenant_id,
-				branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
-				pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+				// branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
+				branch_code: formData?.branch_id,
+				// pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+				pacs_id: formData?.packs_id || 0,
 				direct_indirect_flag: directIndirectStatus,
 				group_name: formData?.g_group_name,
 				phone1: formData?.g_phone1,
@@ -564,7 +580,9 @@ const containerStyle = {
 	}
 
 	useEffect(()=>{
+		
 		fetchPacks_Group()
+		
 	}, [])
 
 
@@ -577,6 +595,7 @@ const containerStyle = {
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_code: userDetails[0]?.brn_code,
+			// branch_id: userDetails[0]?.user_type == "P" ? loanAppData?.branch_code : userDetails[0]?.brn_code,
 		}
 
 			const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -589,13 +608,25 @@ const containerStyle = {
 			})
 			.then((res) => {
 
-				console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
+				console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx_____________');
 			if(res?.data?.success){
+			// if(userDetails[0]?.user_type == "P"){
+
+			// setBranchList([
+			// 	{
+			// 	code: loanAppData?.branch_code,
+			// 	name: loanAppData?.branch_name,
+			// 	}]
+			// )
+
+			// } else {
 			setBranchList(res?.data?.data?.map((item, i) => ({
 			code: item?.branch_id,
 			name: item?.branch_name,
 			// tenant_id: item?.tenant_id,
 			})))
+			// }
+			
 			} else {
 			Message('error', res?.data?.msg)
 			navigate(routePaths.LANDING)
@@ -631,7 +662,7 @@ const containerStyle = {
 			})
 			.then((res) => {
 
-			console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxxpacssssssss');
+			// console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxxpacssssssss');
 	
 			if(res?.data?.success){
 			setPACKSList(res?.data?.data?.map((item, i) => ({
@@ -1176,8 +1207,8 @@ const handleSBAccNoChange = (e, index) => {
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
-							
-					<div className="sm:col-span-3 radioBtn_addgrp">
+							{/* {JSON.stringify(branchList, null, 2)} */}
+					{/* <div className="sm:col-span-3 radioBtn_addgrp">
 						
 						{userDetails[0]?.user_type == 'B' ? 
 							(
@@ -1204,8 +1235,8 @@ const handleSBAccNoChange = (e, index) => {
 							)}
 						
 						
-					</div>
-					{directIndirectStatus == 'D' &&(
+					</div> */}
+					{/* {directIndirectStatus == 'D' &&( */}
 					<div className="sm:col-span-2">
 					<TDInputTemplateBr
 					placeholder="Select Branch"
@@ -1231,15 +1262,15 @@ const handleSBAccNoChange = (e, index) => {
 					
 					
 					</div>
-					)}
+					{/* )} */}
 
-					{directIndirectStatus == 'I' &&(
+					{/* {directIndirectStatus == 'I' &&( */}
 						<div className="sm:col-span-2">
 {/* {JSON.stringify(PACKSList, null, 2)} */}
 					<TDInputTemplateBr
-					placeholder="Select PACS"
+					placeholder="Select Society"
 					type="text"
-					label="Select PACS *"
+					label="Select Society *"
 					name="packs_id"
 					disabled={userDetails[0]?.user_type == 'P' ? true : false}
 					// formControlName={masterData.dist_id}
@@ -1257,7 +1288,7 @@ const handleSBAccNoChange = (e, index) => {
 					) : null}
 					
 					</div>
-					)}
+					{/* )} */}
 					
 
 							<div className="sm:col-span-4">
@@ -1342,9 +1373,9 @@ const handleSBAccNoChange = (e, index) => {
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="Mobile No. Of Group Leader/Sahayika"
+									placeholder="Mobile No. Of Group Leader"
 									type="number"
-									label="Mobile No. Of Group Leader/Sahayika"
+									label="Mobile No. Of Group Leader"
 									name="g_phone1"
 									// handleChange={formik.handleChange}
 									handleChange={handleMobileChange} 

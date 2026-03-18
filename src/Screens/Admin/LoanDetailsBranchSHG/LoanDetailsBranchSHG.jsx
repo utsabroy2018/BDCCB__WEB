@@ -12,6 +12,7 @@ import {
 	CheckCircleOutlined,
 	WalletOutlined,
 	SaveOutlined,
+	AppstoreAddOutlined,
 } from "@ant-design/icons"
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../../Utils/formateDate"
@@ -68,6 +69,8 @@ function LoanDetailsBranchSHG() {
 	const [allRecoverySubBtnShowOff, setAllRecoverySubBtnShowOff] = useState(false)
 	const [memberAmount, setMemberAmount] = useState(false)
 	const [societySrchMsg, setSocietySrchMsg] = useState('')
+	const [groupList, setGroupList] = useState([]);
+	const [selectedGroup, setSelectedGroup] = useState([]);
 
 	const navigate = useNavigate()
 
@@ -136,24 +139,34 @@ function LoanDetailsBranchSHG() {
 	})
 
 
-	const handleSubmit = async () => {
-		setSocietySrchMsg('')
+	const handlePopulate = async () => {
+		// setSocietySrchMsg('')
 
-		setLoading(true)
-		setRecoveryBtnShowOff(false)
-		setAllRecoverySubBtnShowOff(false)
-		setMemberAmount(false)
+		// setLoading(true)
+		// setRecoveryBtnShowOff(false)
+		// setAllRecoverySubBtnShowOff(false)
+		// setMemberAmount(false)
 
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
-			society_acc_no: societyLoanNo,
-			loan_to : userDetails[0]?.user_type
+			ccb_acc_no: societyLoanNo,
+			ccb_loan_id : selectedGroup?.loan_id
 		}
+
+		console.log(selectedGroup?.loan_id, 'groupegroupegroupe', creds);
+
+		// return;
+		// {
+		// "ccb_acc_no" : "",
+		// "branch_id" : "",
+		// "tenant_id" : "",
+		// "ccb_loan_id" : ""
+		// }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/recov/fetch_loan_dtls_based_socacc_no`, creds, {
+		await axios.post(`${url_bdccb}/recov/fetch_loan_dtls_based_ccbacc_no`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -172,7 +185,7 @@ function LoanDetailsBranchSHG() {
 						intAmt: ""  // replace mem_amount with cr_amt
 					}))
 
-					// console.log(res?.data, 'resresresresresresres', res?.data?.data.length);
+					console.log(res?.data, 'resresresresresresres');
 					Message("success", res?.data?.msg)
 					if(res?.data?.data.length < 1){
 					setSocietySrchMsg(res?.data?.msg)
@@ -196,6 +209,77 @@ function LoanDetailsBranchSHG() {
 					// 	loan_outstanding: res?.data?.data[0]?.loan_outstanding || "",
 					// })
 					
+				
+				} else {
+				navigate(routePaths.LANDING)
+				localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+			setLoading(false)
+	}
+
+	const handleSubmit = async () => {
+		setSocietySrchMsg('')
+
+		setLoading(true)
+		setRecoveryBtnShowOff(false)
+		setAllRecoverySubBtnShowOff(false)
+		setMemberAmount(false)
+
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+			branch_id: userDetails[0]?.brn_code,
+			ccb_loan_acc_no: societyLoanNo,
+			// loan_to : userDetails[0]?.user_type
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/recov/fetch_grp_dt`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+				
+				
+				if(res?.data?.success){
+					
+					// setLoanDetails(res?.data?.data || [])
+
+					// const members = (res?.data?.data[0]?.member_list || []).map(item => ({
+					// 	...item,
+					// 	princAmt: "",
+					// 	intAmt: ""  // replace mem_amount with cr_amt
+					// }))
+
+					console.log(res?.data?.data, 'resresresresresresres');
+
+					setGroupList(res?.data?.data?.map((item, i) => ({
+					code: item?.group_code,
+					name: item?.group_name,
+					loan_id: item?.loan_id
+					// tenant_id: item?.tenant_id,
+					})))
+
+
+					// Message("success", res?.data?.msg)
+					// if(res?.data?.data.length < 1){
+					// setSocietySrchMsg(res?.data?.msg)
+					// }
+					
+
+					// setValues({
+					// 	...formValues,
+					// 	principal_amount: "",
+    				// 	interest_amount: "",
+					// 	// members: res?.data?.data[0]?.member_list || []
+					// 	members: members || []
+					// })
 				
 				} else {
 				navigate(routePaths.LANDING)
@@ -290,7 +374,7 @@ function LoanDetailsBranchSHG() {
 
 					}))
 
-					console.log(res?.data?.data, 'resresresresresresres', members, 'mmmmmmmmmmmmmmmmmm');
+					// console.log(res?.data?.data, 'resresresresresresres', members, 'mmmmmmmmmmmmmmmmmm');
 
 					setValues({
 						...formValues,
@@ -445,18 +529,46 @@ function LoanDetailsBranchSHG() {
 					prn_recov: item.princAmt,
 					intt_recov: item.intAmt,
 					}));
+
+
 				
 					const creds = {
 					ccb_loan_id : loanDetails[0]?.member_list[0]?.ccb_loan_id,
 					tenant_id : userDetails[0]?.tenant_id,
 					branch_id : userDetails[0]?.brn_code,
+					branch_shg_id : loanDetails[0]?.member_list[0]?.branch_shg_id,
 					loan_acc_no : societyLoanNo,
-					loan_to : userDetails[0]?.user_type,
-					society_recov :  member_list,
+					loan_to : "S",
+					ccb_recov :  member_list,
 					prn_amt: formik.values.principal_amount,
 					intt_amt : formik.values.interest_amount,
 					loan_outstanding : loanDetails[0]?.loan_outstanding,
 					}
+
+// 					{
+//   "ccb_loan_id" : "",
+//   "tenant_id" : "",
+//   "branch_id" : "",
+//   "branch_shg_id" : "",
+//   "loan_acc_no" : "",
+//   "loan_to" : "S",
+//   "loan_outstanding" : "",
+//   "prn_amt" : "",
+//   "intt_amt" : "",
+//   "ccb_recov" : [
+
+//     {
+//       "loan_id" : "",
+//       "calculated_interest" : "",
+//       "curr_prn" : "",
+//       "amount" : "",
+//       "prn_recov" : "",
+//       "intt_recov" : ""
+//     }
+//     ],
+//   "created_by" : "",
+//   "ip_address" : ""
+// }
 	
 	
 					// console.log(creds, 'credscredscredscreds', loanDetails[0]);
@@ -465,7 +577,7 @@ function LoanDetailsBranchSHG() {
 					
 				
 					await saveMasterData({
-					endpoint: "recov/submit_society_recovery",
+					endpoint: "recov/submit_ccb_recovery",
 					creds,
 					navigate,
 					successMsg: "Group details saved.",
@@ -479,7 +591,12 @@ function LoanDetailsBranchSHG() {
 					setLoading(false)
 					}
 
-
+const groupDropdown = groupList.map(item => ({
+  code: item.code,
+  loan_id: item.loan_id,
+  original_name: item.name, // keep original
+  name: `${item.name} (${item.loan_id})` // display
+}));
 
 					
 
@@ -501,8 +618,8 @@ function LoanDetailsBranchSHG() {
 
 					
 
-					<div className="grid grid-cols-3 gap-5 mt-5">
-						<div>
+					<div className="grid grid-cols-4 gap-5 mt-5">
+						<div className="sm:col-span-1">
 							<TDInputTemplateBr
 								placeholder="CCB Loan A/C No..."
 								type="text"
@@ -517,7 +634,7 @@ function LoanDetailsBranchSHG() {
 						{/* )} */}
 						
 
-						<div className="mt-7">
+						<div className="mt-7 sm:col-span-1">
 							{/* <button
 								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
 								onClick={formik.handleSubmit}
@@ -540,8 +657,75 @@ function LoanDetailsBranchSHG() {
 							</button>
 							{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
 						</div>
+						
+						{groupList.length > 0 &&(
+							<>
+							<div className="sm:col-span-1">
+						{/* <TDInputTemplateBr
+						placeholder="Select Group Name..."
+						type="text"
+						label="Group Name"
+						name="group_name"
+						// formControlName={masterData.ps_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.ps_id}
+						handleChange={formik.handleChange}
+						// handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={groupList}
+						mode={2}
+						/> */}
+						{/* {JSON.stringify(groupList, null, 2)} /// {JSON.stringify(groupDropdown, null, 2)} */}
+			<TDInputTemplateBr
+			placeholder="Select Group Name..."
+			type="text"
+			label="Group Name"
+			name="group_name"
+			formControlName={formik.values.group_code} // bind with code
+			handleChange={(value) => {
+			const selected = groupDropdown?.find(item => {
+			return item.code === Number(value.target.value);
+			});
+			// console.log('selectedselectedselectedselected', selected);
 
-						<div className="sm:col-span-12 mt-0">
+			// handlePopulate(selected)
+			setSelectedGroup(selected)
+
+			// if (selected) {
+			// formik.setFieldValue("group_code", selected.code);
+			// formik.setFieldValue("loan_id", selected.loan_id);
+			// formik.setFieldValue("group_name", selected.original_name);
+			// }
+			}}
+			handleBlur={formik.handleBlur}
+			data={groupDropdown}
+			mode={2}
+			/>
+						</div>
+
+						<div className="mt-7 sm:col-span-1">
+							{/* <button
+								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+								onClick={formik.handleSubmit}
+							>
+								<SearchOutlined /> <span className={`ml-2`}>Search</span>
+							</button> */}
+
+							<button
+							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
+							onClick={() => {
+							handlePopulate()
+							}}
+							>
+							<AppstoreAddOutlined /> <span className={`ml-2`}>Populate</span>
+							</button>
+							{/* <BtnComp mode="A" onReset={formik.resetForm} /> */}
+						</div>
+							</>
+						)}
+						
+
+						<div className="sm:col-span-4 mt-0">
   {societySrchMsg.length > 0 && (
     <p className="text-red-600 bg-red-100 border border-red-400 px-4 py-2 rounded-md text-sm">
       {societySrchMsg}
@@ -550,7 +734,9 @@ function LoanDetailsBranchSHG() {
 </div>
 					</div>
 
-					{/* {JSON.stringify(loanDetails[0], null, 2)} */}
+  					
+
+					{JSON.stringify(loanDetails[0], null, 2)}
 					
 					{/* {loanDetails.length > 0 && ( */}
 					<>

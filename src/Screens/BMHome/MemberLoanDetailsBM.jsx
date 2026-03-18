@@ -27,7 +27,7 @@ function MemberLoanDetailsBM() {
 		<>
 			<Sidebar mode={2} />
 			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
-				<div className="  p-5 w-4/5 min-h-screen rounded-3xl">
+				<div className="  p-5 w-full min-h-screen rounded-3xl">
 					{/* <div className="ml-14 mt-5 flex flex-col justify-start align-middle items-start gap-2">
 						<div className="text-sm text-wrap w-96 italic text-blue-800">
 							CO: {recoveryDetailsData?.b_coName || "Nil"}, AT:{" "}

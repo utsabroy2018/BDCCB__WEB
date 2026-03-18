@@ -202,8 +202,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			.typeError("Disbursement Amount must be a number")
 			.required("Disbursement Amount is required")
 			.positive("Disbursement Amount must be greater than 0"),
-		approved_by: '',
-		approved_dt: '',
+		created_by: '',
+		created_date: '',
 		group_total: Yup.mixed().required("Group Total Of Intarest is required"),
 		// member_total: Yup.mixed().required("Member Total Of Intarest is required"),
 		rows: Yup.array()
@@ -326,8 +326,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			disb_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.disb_dt)),
 			sanction_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.sanction_dt)),
 			disb_amt: loanAppData?.disb_amt,
-			approved_by: loanAppData?.approved_by,
-			approved_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.approved_dt)),
+			created_by: loanAppData?.created_by,
+			created_date: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.created_date)),
 			group_total: loanAppData?.tot_grp,
 
 			// 🔥 THIS IS IMPORTANT
@@ -833,11 +833,11 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												<div>
 
 													<TDInputTemplateBr
-														placeholder="Approved By"
+														placeholder="Created By"
 														type="text"
-														label="Approved By"
-														name="approved_by"
-														formControlName={formik.values.approved_by}
+														label="Created By"
+														name="created_by"
+														formControlName={formik.values.created_by}
 														handleChange={formik.handleChange}
 														handleBlur={formik.handleBlur}
 														mode={1}
@@ -849,11 +849,11 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												<div>
 
 													<TDInputTemplateBr
-														placeholder="Approved Date"
+														placeholder="Created Date"
 														type="text"
-														label="Approved Date"
-														name="approved_dt"
-														formControlName={formik.values.approved_dt}
+														label="Created Date"
+														name="created_date"
+														formControlName={formik.values.created_date}
 														handleChange={formik.handleChange}
 														handleBlur={formik.handleBlur}
 														mode={1}
