@@ -502,6 +502,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 	const handleSearchPacsChange = async (value) => {
+		
 		// if (value.length < 3) {
 		// 	// Message("error", "Minimum type 3 character")
 		// 	return;
@@ -535,7 +536,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 				if (res?.data?.success) {
 
-					console.log(creds, 'credscredscredscreds', res?.data?.data);
+					console.log(creds, 'credscredscredscreds_____', res?.data?.data);
 					
 
 					if (userDetails[0]?.user_type == 'B') {
@@ -579,7 +580,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		// 	// Message("error", "Minimum type 3 character")
 		// 	return;
 		// }
-		setPACS_SHGList([])
+		// setPACS_SHGList([])
 		setLoading(true)
 
 		// const creds = {
@@ -782,7 +783,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text={`${params?.id == 0 ? "Add Disbursement to SHG" : loanAppData?.approval_status == 'A' ? "View SHG Disbursement" : "Edit/Preview SHG Disbursement"}`} mode={2} />
+						<FormHeader text={`${params?.id == 0 ? "Add Disbursement to SHG" : loanAppData?.approval_status == 'A' ? "View SHG Disbursement" : "Edit/Preview SHG Disbursement 66"}`} mode={2} />
 					</div>
 
 					<Spin
@@ -792,6 +793,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 						spinning={loading}
 					>
 						{/* {JSON.stringify(loanAppData, 2)}  */}
+						{/* {JSON.stringify(PACS_SHGList[0], 2)}  */}
+
 						{/* {JSON.stringify(PACS_SHGList, null, 2)} */}
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 						{loanAppData?.approval_status == 'A' && (<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
@@ -1445,11 +1448,11 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 								{/* {loanAppData?.approval_status != 'A' && ( */}
-								{loanAppData?.approval_status == 'U' && (
+								{/* {loanAppData?.approval_status == 'U' && (
 									<BtnComp mode="A" onReset={formik.resetForm} param={params?.id}/>
-								)}
+								)} */}
 
-								{params?.id == 0 && (
+								{params?.id < 1 && (
 									<BtnComp mode="A" onReset={formik.resetForm} param={params?.id}/>
 								)}
 

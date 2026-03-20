@@ -15,20 +15,21 @@ import DisbursmentForm_BDCCB from "../Forms/DisbursmentForm_BDCCB"
 import LoanApplicationsDisburseTable_BDCCB from "../../Components/LoanApplicationsDisburseTable_BDCCB"
 import { motion } from "framer-motion"
 import LoanBrnPacsDisburseTable_BDCCB from "../../Components/LoanBrnPacsDisburseTable_BDCCB"
+import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 
 const options_Disburs = [
 	{
-		label: "Acceptance Pending",
+		label: "Unapproved",
 		value: "U",
 	},
 	{
-		label: "Accepted",
+		label: "Approved",
 		value: "A",
 	},
-	{
-		label: "Rejected",
-		value: "R",
-	}
+	// {
+	// 	label: "Rejected",
+	// 	value: "R",
+	// }
 ]
 
 function SearchMemberForDisburseBM_BDCCB() {
@@ -39,7 +40,13 @@ function SearchMemberForDisburseBM_BDCCB() {
 	const [loanApplications, setLoanApplications] = useState(() => [])
 	const [copyLoanApplications, setCopyLoanApplications] = useState(() => [])
 
-	const [disbursementStatus, setDisbursementStatus] = useState("A")
+	const [disbursementStatus, setDisbursementStatus] = useState("U")
+
+	const today = new Date().toISOString().split("T")[0];
+	
+	const [fromDate, setFromDate] = useState(today);
+	const [toDate, setToDate] = useState(today);
+
 	const navigate = useNavigate()
 
 	const onChange = (e) => {
@@ -57,6 +64,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code,
 			approval_status: disbursementStatus,
+			from_dt: fromDate,
+			to_dt: toDate,
 			loan_to : "S"
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -77,8 +86,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 					setCopyLoanApplications(res?.data?.data)
 				} else {
 					Message('error', res?.data?.msg)
-					navigate(routePaths.LANDING)
-					localStorage.clear()
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
 					
 				}
 				
@@ -120,13 +129,52 @@ function SearchMemberForDisburseBM_BDCCB() {
 			>
 				<main className="px-4 h-auto my-10 mx-32">
 
-					{/* <Radiobtn
+					
+
+					<div className="flex flex-row gap-3 mt-20">
+											
+						<Radiobtn
 						data={options_Disburs}
 						val={disbursementStatus}
 						onChangeVal={(value) => {
-							onChange(value)
+						onChange(value)
 						}}
-					/> */}
+						/>
+											{/* <form onSubmit={formik.handleSubmit}> */}
+										<div className="mt-1">
+										<TDInputTemplateBr
+										type="date"
+										label="From Date"
+										name="from_dt"
+										formControlName={fromDate}
+										handleChange={(e) => setFromDate(e.target.value)}
+										mode={1}
+										/>
+										</div>
+					
+										<div className="mt-1">
+										<TDInputTemplateBr
+										type="date"
+										label="To Date"
+										name="to_dt"
+										formControlName={toDate}
+										handleChange={(e) => setToDate(e.target.value)}
+										mode={1}
+										/>
+										</div>
+										<div className="mt-1">
+										<button
+											type="button"
+											onClick={fetchApproveUapprove}
+											className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
+										>
+											<SearchOutlined />
+											Search
+										</button>
+										</div>
+					
+															{/* </form> */}
+										</div>
 
 					<motion.section
 									initial={{ opacity: 0 }}
@@ -200,7 +248,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 									</div>
 								</motion.section>
 					
-{/* {JSON.stringify(loanApplications, null, 2)} */}
+					{/* {JSON.stringify(loanApplications, null, 2)} */}
 
 					<LoanBrnPacsDisburseTable_BDCCB
 					flag="BM"

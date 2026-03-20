@@ -255,7 +255,7 @@ const containerStyle = {
 		// if (params?.id > 0) {
 		// 	editGroup(values)
 		// }
-		console.log(values, 'formDataformDataformDataformData');
+		// console.log(values, 'formDataformDataformDataformData');
 		handleOpenConfirm(values)
 			
 	}
@@ -531,7 +531,8 @@ const containerStyle = {
 				creds,
 				navigate,
 				successMsg: "Group details saved.",
-				onSuccess: () => navigate(-1),
+				// onSuccess: () => navigate(-1),
+				onSuccess: () => navigate('/homebm/searchgroup/'),
 			
 				// 🔥 fully dynamic failure handling
 				failureRedirect: routePaths.LANDING,

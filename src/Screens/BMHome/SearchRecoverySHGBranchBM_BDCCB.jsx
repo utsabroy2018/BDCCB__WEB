@@ -4,27 +4,33 @@ import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
 import { Spin, Button } from "antd"
-import { LoadingOutlined, SearchOutlined } from "@ant-design/icons"
+import { LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
 import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import { routePaths } from "../../Assets/Data/Routes"
-import ViewLoanTableBr_Branch_BDCCB from "../../Components/ViewLoanTableBr_Branch_BDCCB"
+import ViewLoanTableRecovery_BDCCB from "../../Components/ViewLoanTableRecovery_BDCCB"
+import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
+import RecoverySHGListTable_BDCCB from "../../Components/RecoverySHGListTable_BDCCB"
 import Radiobtn from "../../Components/Radiobtn"
 
-const options_Disburs = [
+const option_recovery = [
 	{
-		label: "Unapproved Disbursement",
+		label: "Unapproved Recovery",
 		value: "U",
 	},
 	{
-		label: "Approved Disbursement",
+		label: "Approved Recovery",
 		value: "A",
-	}
+	},
+	// {
+	// 	label: "Reject Recovery",
+	// 	value: "R",
+	// }
 ]
 
-function SearchViewLoanBM_Branch_BDCCB() {
+function SearchRecoverySHGBranchBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -35,32 +41,54 @@ function SearchViewLoanBM_Branch_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 	const [loanType, setLoanType] = useState("U")
-	const [disbursementStatus, setDisbursementStatus] = useState("U")
-	
+	const [recoveryStatus, setRecoveryStatus] = useState("U")
+
+	const today = new Date().toISOString().split("T")[0];
+
+	const [fromDate, setFromDate] = useState(today);
+	const [toDate, setToDate] = useState(today);
+
 	const onChange = (e) => {
 		console.log("radio1 checked", e)
-		setDisbursementStatus(e)
+		setRecoveryStatus(e)
 	}
+
+	// const initialValues = {
+	
+	// 		sanction_dt: "",
+			
+	// 	}
+	// 	const [formValues, setValues] = useState(initialValues)
+
+	// 	const validationSchema = Yup.object({
+	// 			sanction_dt: Yup.mixed(),
+		
+	// 		})
+	
 
 	const fetchSearchedGroups = async () => {
 		setLoading(true)
 		const creds = {
-			// branch_id: userDetails[0]?.brn_code ,
-			// tenant_id: userDetails[0]?.tenant_id,
-			// approval_status: disbursementStatus
-
-			branch_id: userDetails[0]?.brn_code,
-			approval_status: disbursementStatus,
-			from_dt: '',
-			to_dt: '',
-			loan_to : "S"
+			branch_id: userDetails[0]?.brn_code ,
+			tenant_id: userDetails[0]?.tenant_id,
+			from_dt: fromDate,
+			to_dt: toDate,
+			approval_status : recoveryStatus
+			// approval_status: loanType
 		}
+
+		// {
+		// "tenant_id" : "",
+		// "branch_id" : "",
+		// "from_dt" : "",
+		// "to_dt" : "",
+		// "approval_status" : "U/A"
+		// }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			// .post(`${url_bdccb}/loan/fetch_shg_disburse_dtls`, creds, {
-			.post(`${url_bdccb}/loan/show_loan_status`, creds, {	
+			.post(`${url_bdccb}/recov/fetch_ccb_recov_dtls`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -91,21 +119,21 @@ function SearchViewLoanBM_Branch_BDCCB() {
 	fetchSearchedGroups()
 	}, [])
 
+
 	useEffect(()=>{
 	fetchSearchedGroups()
-	}, [disbursementStatus])
-	
+	}, [recoveryStatus])
 
 		const setSearch = (word) => {
 		console.log(word, "wordwordwordword", copyLoanApplications)
 		setGroups(
 			copyLoanApplications?.filter(
 				(e) =>
-					e?.loan_id
+					e?.group_name
 						?.toString()
 						?.toLowerCase()
 						.includes(word?.toLowerCase()) ||
-					e?.group_name
+					e?.group_code
 						?.toString()
 						?.toLowerCase()
 						?.includes(word?.toLowerCase())
@@ -123,46 +151,60 @@ function SearchViewLoanBM_Branch_BDCCB() {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
-
-				{/* <Radiobtn
-				data={options_Disburs}
-				val={disbursementStatus}
-				onChangeVal={(value) => {
-				onChange(value)
-				}}
-				/> */}
-				
 					{/* <div className="flex flex-row gap-3 mt-20">
-						<input
-							type="text"
-							placeholder="Search Loans by Group Name"
-							className={`bg-white border-1 border-gray-400 text-gray-800 text-sm rounded-lg ${
-								userDetails?.id == 3
-									? "active:border-slate-600 focus:ring-slate-600 focus:border-slate-800"
-									: "active:border-slate-600 focus:ring-slate-600 focus:border-slate-800"
-							} focus:border-1 duration-500 block w-full p-2 dark:bg-bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
-							onChange={(e) => setSearchKeywords(e.target.value)}
-						/>
-						<button
-							icon={<SearchOutlined />}
-							iconPosition="end"
-							className="bg-slate-700 text-white hover:bg-slate-800 p-5 text-center text-sm border-none rounded-lg w-36 h-10 flex justify-center items-center align-middle gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed active:ring-2 active:ring-slate-400"
-							onClick={fetchSearchedGroups}
-							disabled={!searchKeywords}
-						>
-							<SearchOutlined />
-							Search
-						</button>
-					</div> */}
+						
+					<Radiobtn
+					data={option_recovery}
+					val={recoveryStatus}
+					onChangeVal={(value) => {
+					onChange(value)
+					}}
+					/>
+						
+					<div className="mt-1">
+					<TDInputTemplateBr
+					type="date"
+					label="From Date"
+					name="from_dt"
+					formControlName={fromDate}
+					handleChange={(e) => setFromDate(e.target.value)}
+					mode={1}
+					/>
+					</div>
 
-					<div className="mt-0">
+					<div className="mt-1">
+					<TDInputTemplateBr
+					type="date"
+					label="To Date"
+					name="to_dt"
+					formControlName={toDate}
+					handleChange={(e) => setToDate(e.target.value)}
+					mode={1}
+					/>
+					</div>
+					<div className="mt-1">
+					<button
+						type="button"
+						onClick={fetchSearchedGroups}
+						className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
+					>
+						<SearchOutlined />
+						Search
+					</button>
+					</div>
+
+								
+					</div> */}
+					
+
+					<div className="mt-5">
 						<label
 							for="default-search"
 							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
 						>
 							Search
 						</label>
-						<div className="relative mt-5">
+						<div className="relative mt-10">
 							<div className="absolute inset-y-0  start-0 flex items-center ps-3 pointer-events-none">
 								<svg
 									className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -183,8 +225,8 @@ function SearchViewLoanBM_Branch_BDCCB() {
 							<input
 								type="search"
 								id="default-search"
-								className="block mt-5 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
-								placeholder="Search Loans by Loan Id / Name"
+								className="block mt-10 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
+								placeholder="Search Loans by Group Name / Code"
 								// onChange={(e) => setSearchKeywords(e.target.value)}
 								onChange={(text) => setSearch(text.target.value)}
 							/>
@@ -198,14 +240,21 @@ function SearchViewLoanBM_Branch_BDCCB() {
 							</button>
 						</div>
 					</div>
-					{/* {JSON.stringify(groups, 2)} */}
-					<ViewLoanTableBr_Branch_BDCCB
+					{/* {JSON.stringify(fromDate, 2)} */}
+
+					{/* {JSON.stringify(toDate, 2)} */}
+
+					{/* {JSON.stringify(groups[0], 2)} */}
+
+
+					<RecoverySHGListTable_BDCCB
 						flag="BM"
 						loanAppData={groups}
-						title="Find Loans by Group"
+						// title="Find Recovery Loans by Society"
+						title="Find Recovery Loans"
 						showSearch={false}
-						disbursementStatus={disbursementStatus}
 						setSearch={(data) => setSearch(data)}
+						refreshData={fetchSearchedGroups}
 					/>
 					{/* <DialogBox
 					visible={visible}
@@ -218,4 +267,4 @@ function SearchViewLoanBM_Branch_BDCCB() {
 	)
 }
 
-export default SearchViewLoanBM_Branch_BDCCB
+export default SearchRecoverySHGBranchBM_BDCCB

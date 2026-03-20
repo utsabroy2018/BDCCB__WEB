@@ -5,8 +5,10 @@ import Tooltip from "@mui/material/Tooltip"
 import { Paginator } from "primereact/paginator"
 import { motion } from "framer-motion"
 import {
+	CheckCircleFilled,
 	CheckCircleOutlined,
 	ClockCircleOutlined,
+	CloseCircleOutlined,
 	EditOutlined,
 	EyeOutlined,
 	FileTextOutlined,
@@ -110,11 +112,11 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										header="Sanction Date"
 									></Column> */}
 
-									{/* <Column
+									<Column
 										field="loan_id"
 										header="Loan Id"
 										
-									></Column> */}
+									></Column>
 
 									<Column
 										field="loan_acc_no"
@@ -143,11 +145,35 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										header="Disburse Amount"
 										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_dis}</span>}
 									></Column>
-									{/* <Column
-										field="curr_prn"
-										header="Current Princepal"
-										footer={<span style={{ fontWeight: "bold" }}>{AmountTd_dis_Prn}</span>}
-									></Column> */}
+
+									<Column
+									field="approval_status"
+									header="Status"
+									body={(rowData) => {
+										if (rowData.approval_status === "U") {
+										return (
+											<div className="pending_dis_2">
+											<SyncOutlined style={{ color: "#fff", marginRight: 6 }} />
+											Unapproved
+											</div>
+										);
+										} else if (rowData.approval_status === "A") {
+										return (
+											<div className="accept_dis_2">
+											<CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
+											Approved
+											</div>
+										);
+										} else {
+										return (
+											<div className="pending_dis_2">
+											<CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />
+											Rejected
+											</div>
+										);
+										}
+									}}
+									/>
 
 				
 										{/* <Column
@@ -172,7 +198,7 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										onClick={() => {
 										console.log("ROW DATA:", rowData);
 										navigate(
-										`/homebm/disburseloan/${rowData?.loan_id}`,
+										`/homebm/disburseloan/${rowData?.loan_id.split(",")[0].trim()}`,
 										{ state: rowData }
 										);
 										}}

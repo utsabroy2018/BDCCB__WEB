@@ -469,7 +469,8 @@ function LoanDetails() {
 					creds,
 					navigate,
 					successMsg: "Group details saved.",
-					onSuccess: () => navigate(-1),
+					// onSuccess: () => navigate(-1),
+					onSuccess: () => navigate('/homepacs/viewloan-recovery'),
 				
 					// 🔥 fully dynamic failure handling
 					failureRedirect: routePaths.LANDING,
@@ -668,6 +669,9 @@ function LoanDetails() {
 						{/* </div> */}
 
 						<div className="border-2 border-pink-500/50 bg-pink-100 rounded-lg p-5 mt-5">
+						<div className="text-[#DA4167] text-lg font-bold mb-2 mt-0">
+						Recovery
+						</div>
 						<div className="grid grid-cols-4 gap-5 mt-0">
 						<div className="sm:col-span-1">
 						<TDInputTemplateBr

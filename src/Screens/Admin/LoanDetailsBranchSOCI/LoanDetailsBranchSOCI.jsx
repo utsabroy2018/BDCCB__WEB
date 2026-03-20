@@ -486,22 +486,23 @@ function LoanDetailsBranchSOCI() {
 	return (
 		<div>
 			{/* <Sidebar mode={2} /> */}
+			
 			<Spin
 				indicator={<LoadingOutlined spin />}
 				size="large"
 				className="text-slate-800 dark:text-gray-400"
 				spinning={loading}
 			>
-				<main className="px-4 pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-10 mx-32">
-					<div className="flex flex-row gap-3 py-3 rounded-xl">
+				<main className="pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-0">
+					{/* <div className="flex flex-row gap-3 py-3 rounded-xl">
 						<div className="text-3xl text-slate-700 font-bold">
 							Loan Recovery Of Society
 						</div>
-					</div>
+					</div> */}
 
 					
 
-					<div className="grid grid-cols-3 gap-5 mt-5">
+					<div className="grid grid-cols-3 gap-5 mt-0">
 						<div>
 							<TDInputTemplateBr
 								placeholder="Society Loan A/C No..."
@@ -668,6 +669,9 @@ function LoanDetailsBranchSOCI() {
 						{/* </div> */}
 
 						<div className="border-2 border-pink-500/50 bg-pink-100 rounded-lg p-5 mt-5">
+						<div className="text-[#DA4167] text-lg font-bold mb-2 mt-0">
+						Recovery
+						</div>
 						<div className="grid grid-cols-4 gap-5 mt-0">
 						<div className="sm:col-span-1">
 						<TDInputTemplateBr

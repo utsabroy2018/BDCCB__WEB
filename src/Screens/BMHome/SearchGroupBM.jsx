@@ -159,7 +159,7 @@ console.log(res?.data?.data, 'searchsearchsearchsearch', res);
 					<GroupsTableViewBr
 						flag="BM"
 						loanAppData={groups}
-						title="Groups 000"
+						title="Groups"
 						showSearch={false}
 					/>
 					

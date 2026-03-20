@@ -82,6 +82,10 @@ const EditSahayikaFormBM = lazy(() => import("./Screens/BMHome/EditSahayikaFormB
 const EditDisburseFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditDisburseFormBM_BDCCB"))
 const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB.jsx"))
 
+const SearchRecoverySHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchRecoverySHGBranchBM_BDCCB.jsx"))
+const RecoverySubmitStatusSHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBranchBM_BDCCB.jsx"))
+const BranchSHGLoanRecoveryDetails = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryDetails/BranchSHGLoanRecoveryDetails.jsx"))
+
 const SearchViewLoanBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_Branch_BDCCB.jsx"))
 const EditViewLoanFormBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_Branch_BDCCB.jsx"))
 
@@ -104,6 +108,8 @@ const SearchViewLoanBM = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_BD
 
 const SearchViewLoanRecoveryBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanRecoveryBM_BDCCB.jsx"))
 const LoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/LoanRecoveryAcceptReject/LoanRecoveryAcceptReject.jsx"))
+
+const BranchSHGLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryAcceptReject/BranchSHGLoanRecoveryAcceptReject.jsx"))
 
 const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
 const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
@@ -367,6 +373,15 @@ const router = createBrowserRouter([
 								element: <SearchMemberForDisburseBM_BDCCB />,
 							},
 							{
+								path: "recovery-shg-list",
+								element: <SearchRecoverySHGBranchBM_BDCCB />,
+							},
+							,
+							{
+								path: "loan-recovery-shg-list",
+								element: <RecoverySubmitStatusSHGBranchBM_BDCCB />,
+							},
+							{
 								path: "disburseloan/:id",
 								element: <EditDisburseFormBM_BDCCB />,
 							},
@@ -403,6 +418,15 @@ const router = createBrowserRouter([
 								path: "loan_branch_shg-recovery",
 								element: <LoanDetails_Branch_SHG_BDCCB />,
 							},
+							{
+								path: "viewloan-shg-recovery/:id",
+								element: <BranchSHGLoanRecoveryAcceptReject />,
+							},
+							{
+								path: "shg-recovery-details/:id",
+								element: <BranchSHGLoanRecoveryDetails />,
+							},
+							
 							{
 								path: "loan_branch_soi-recovery",
 								element: <LoanDetails_Branch_SOCI_BDCCB />,
