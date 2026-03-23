@@ -493,16 +493,16 @@ function LoanDetails() {
 				className="text-slate-800 dark:text-gray-400"
 				spinning={loading}
 			>
-				<main className="px-4 pb-5 bg-slate-50 rounded-lg shadow-lg h-auto my-10 mx-32">
-					<div className="flex flex-row gap-3 py-3 rounded-xl">
+				<main className="bg-slate-50 rounded-lg shadow-lg h-auto my-0">
+					{/* <div className="flex flex-row gap-3 py-3 rounded-xl">
 						<div className="text-3xl text-slate-700 font-bold">
 							Loan Recovery
 						</div>
-					</div>
+					</div> */}
 
 					
 
-					<div className="grid grid-cols-3 gap-5 mt-5">
+					<div className="grid grid-cols-3 gap-5 mt-0">
 						<div>
 							<TDInputTemplateBr
 								placeholder="Society Loan A/C No..."

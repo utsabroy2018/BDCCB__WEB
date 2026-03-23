@@ -16,6 +16,7 @@ import RecoverySHGListTable_BDCCB from "../../Components/RecoverySHGListTable_BD
 import Radiobtn from "../../Components/Radiobtn"
 import LoanRecoverySubmitSHGListTable_BDCCB from "../../Components/LoanRecoverySubmitSHGListTable_BDCCB"
 import { motion } from "framer-motion"
+import LoanRecoverySHGListTable_BDCCB from "../../Components/LoanRecoverySHGListTable_BDCCB"
 
 const option_recovery = [
 	{
@@ -32,7 +33,7 @@ const option_recovery = [
 	// }
 ]
 
-function RecoverySubmitStatusSHGBranchBM_BDCCB() {
+function RecoverySubmitStatusSHGBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -81,24 +82,25 @@ function RecoverySubmitStatusSHGBranchBM_BDCCB() {
 			// approval_status: loanType
 		}
 
-		// {
-		// "tenant_id" : "CCB-78945",
-		// "branch_id" : "7",
-		// "from_dt" : "1",
-		// "to_dt" : "70017"
-		// }
+// 		{
+//   "tenant_id" : "",
+//   "branch_id" : "",
+//   "from_dt" :"",
+//   "to_dt" : "",
+//   "approval_status" : ""
+// }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_ccb_dtls`, creds, {
+			.post(`${url_bdccb}/recov/fetch_society_dtls`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
 			},
 			})
 			.then((res) => {
-				console.log(res?.data, 'dataaaaaaaaaaaaaaa');
+				// console.log(res?.data, 'dataaaaaaaaaaaaaaa');
 				
 
 				if(res?.data?.success){
@@ -279,7 +281,7 @@ function RecoverySubmitStatusSHGBranchBM_BDCCB() {
 												<button
 												className="inline-flex items-center text-white ml-6 disabled:bg-[#ee7c98] bg-[#DA4167] hover:bg-[#DA4167] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 												onClick={() => {
-													navigate(`/homebm/loan_branch_shg-recovery`)
+													navigate(`/homepacs/loan-recovery`)
 												}}
 											>
 												{/* <PlusOutlined className="text-xl" /> */}
@@ -332,7 +334,7 @@ function RecoverySubmitStatusSHGBranchBM_BDCCB() {
 
 					{/* {JSON.stringify(groups, null, 2)} */}
 					
-					<LoanRecoverySubmitSHGListTable_BDCCB
+					<LoanRecoverySHGListTable_BDCCB
 						flag="BM"
 						loanAppData={groups}
 						// title="Find Recovery Loans by Society"
@@ -352,4 +354,4 @@ function RecoverySubmitStatusSHGBranchBM_BDCCB() {
 	)
 }
 
-export default RecoverySubmitStatusSHGBranchBM_BDCCB
+export default RecoverySubmitStatusSHGBM_BDCCB

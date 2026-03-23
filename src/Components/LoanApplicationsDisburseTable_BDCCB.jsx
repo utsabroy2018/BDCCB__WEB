@@ -101,17 +101,17 @@ function LoanApplicationsDisburseTable_BDCCB({
 										header="Sanction Date"
 									></Column> */}
 				
-									{/* <Column
+									<Column
 										field="loan_id"
-										header="Loan Id"
-										
-									></Column> */}
+										header="CCB Loan ID"
+										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
+									></Column>
 				
 									
 									<Column
 										field="loan_acc_no"
 										header="Loan Account No. "
-										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
+										
 									></Column>
 									<Column
 										field="group_name"

@@ -86,6 +86,10 @@ const SearchRecoverySHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/Sear
 const RecoverySubmitStatusSHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBranchBM_BDCCB.jsx"))
 const BranchSHGLoanRecoveryDetails = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryDetails/BranchSHGLoanRecoveryDetails.jsx"))
 
+
+const RecoverySubmitStatusSHGBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBM_BDCCB.jsx"))
+const SHGLoanRecoveryDetails = lazy(() => import("./Screens/BMHome/SHGLoanRecoveryDetails/SHGLoanRecoveryDetails.jsx"))
+
 const SearchViewLoanBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_Branch_BDCCB.jsx"))
 const EditViewLoanFormBM_Branch_BDCCB = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_Branch_BDCCB.jsx"))
 
@@ -376,7 +380,6 @@ const router = createBrowserRouter([
 								path: "recovery-shg-list",
 								element: <SearchRecoverySHGBranchBM_BDCCB />,
 							},
-							,
 							{
 								path: "loan-recovery-shg-list",
 								element: <RecoverySubmitStatusSHGBranchBM_BDCCB />,
@@ -638,7 +641,16 @@ const router = createBrowserRouter([
 							{
 								path: "loan-recovery",
 								element: <LoanDetails_PACS_BDCCB />,
-							}
+							},
+							{
+								path: "recovery-shg-list",
+								element: <RecoverySubmitStatusSHGBM_BDCCB />,
+							},
+							{
+								path: "shg-recovery/:id",
+								element: <SHGLoanRecoveryDetails />,
+							},
+							
 							
 						],
 					},

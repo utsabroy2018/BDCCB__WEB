@@ -233,12 +233,13 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	society_acc_no : formik.values.society_loan_acc,
 	member_ids: member_ids,
 	group_code: loanAppData?.group_code,
+	loan_acc_no: groupData[0]?.loan_acc_no,
 	created_by: userDetails[0]?.emp_id,
 	ip_address: ip,
 	}
 
 
-	// console.log(creds, 'formDataformDataformDataformData', formik.values.society_loan_acc);
+	// console.log(creds, 'formDataformDataformDataformData', 'approve');
 	// return
 
 	await saveMasterData({
@@ -253,7 +254,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	clearStorage: true,
 	})
 
-	console.log(creds, 'formDataformDataformDataformData');
+	// console.log(creds, 'formDataformDataformDataformData');
 
 	setLoading(false)
 	}
@@ -262,7 +263,9 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	
 	const member_ids = groupData[0]?.members.map(item => ({
 	loan_id: item.mem_loan_id,
+	disb_amt: item.disburse_amt,
 	trans_id: item.tran_id,
+	member_id: item.member_id,
 	}));
 
 	setLoading(true)
@@ -270,14 +273,21 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	const ip = await getClientIP()
 
 	const creds = {
-	ccb_loan_id: groupData[0]?.loan_id,
-	reject_remarks: rej_res,
-	member_dt: member_ids,
+	// ccb_loan_id: groupData[0]?.loan_id,
+	// loan_id: groupData[0]?.loan_id,
+	// trans_id: 0,
+	// group_code: groupData[0]?.group_code,
+
+	loan_id: [groupData[0]?.loan_id],
+	trans_id: '0',
+	group_code: [groupData[0]?.group_code],
+	// reject_remarks: rej_res,
+	member_reject: member_ids,
 	created_by: userDetails[0]?.emp_id,
 	ip_address: ip,
 	}
 
-	// console.log(creds, 'formDataformDataformDataformData', formik.values.society_loan_acc);
+	// console.log(creds, 'formDataformDataformDataformData', 'reject');
 	// return;
 
 	await saveMasterData({
@@ -300,6 +310,10 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 		if(actionType == 'A'){
 			approveDisbursement()
 		}
+		if(actionType == 'R'){
+			rejectDisbursement()
+		}
+		
 	}
 
 	return (
@@ -318,7 +332,6 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 				<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
 					{/* {JSON.stringify(groupData[0], null, 2)} fdghfghfhg
 						{JSON.stringify(loanAppData, 2)}  */}
-						{/* {JSON.stringify(loanAppData, 2)}  */}
 					<div className="flex flex-col justify-start gap-5">
 						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
 						
@@ -842,9 +855,33 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						<CheckCircleOutlined /> <span className={`ml-2`}>Accept Transaction</span>
 						</button>
 
+
+						<button
+						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
+						onClick={async () => {
+						// check value first
+						// if (!formik.values.society_loan_acc) {
+						// 	// mark field touched to show error
+						// 	formik.setFieldTouched("society_loan_acc", true);
+
+						// 	Message("error", "Society Loan A/C No. is required");
+						// 	return;
+						// }
+
+						// if value exists → console it
+						// console.log("Society Loan A/C No.:", formik.values.society_loan_acc);
+
+						// continue existing flow
+						setActionType("R");
+						setVisible(true);
+						}}
+						>
+						<CloseCircleOutlined /> <span className={`ml-2`}>Rejected Transaction</span>
+						</button>
+
 						
 
-						<div>
+						{/* <div>
 				<Popconfirm
 				title={`Reject Transaction?`}
 				description={
@@ -880,7 +917,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 				<span className="ml-2">Reject Transaction</span>
 				</a>
 				</Popconfirm>
-				</div>
+				</div> */}
 
 						
 											
@@ -896,7 +933,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 							.then(() => {
 							})
 							.catch((err) => {
-							console.log("Err in RecoveryCoApproveTable.jsx", err)
+							// console.log("Err in RecoveryCoApproveTable.jsx", err)
 							})
 							setVisible(!visible)
 							}}

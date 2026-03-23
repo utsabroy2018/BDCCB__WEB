@@ -59,9 +59,11 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
-			from_dt: fromDate,
-			to_dt: toDate,
-			// approval_status: loanType
+			// from_dt: fromDate,
+			// to_dt: toDate,
+			from_dt: '',
+			to_dt: '',
+			approval_status: loanType
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -74,7 +76,7 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 			},
 			})
 			.then((res) => {
-				console.log(res?.data, 'dataaaaaaaaaaaaaaa');
+				console.log(res?.data, 'dataaaaaaaaaaaaaaa', creds);
 				
 
 				if(res?.data?.success){
@@ -125,8 +127,7 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
-					<div className="flex flex-row gap-3 mt-20">
-						{/* <form onSubmit={formik.handleSubmit}> */}
+					{/* <div className="flex flex-row gap-3 mt-20">
 					<div>
 					<TDInputTemplateBr
 					type="date"
@@ -157,8 +158,8 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 	<SearchOutlined />
 	Search
 </button>
-										{/* </form> */}
-					</div>
+										
+					</div> */}
 					
 
 					<div className="mt-5">
@@ -168,7 +169,7 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 						>
 							Search
 						</label>
-						<div className="relative mt-10">
+						<div className="relative mt-0">
 							<div className="absolute inset-y-0  start-0 flex items-center ps-3 pointer-events-none">
 								<svg
 									className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -189,7 +190,7 @@ function SearchViewLoanRecoveryBM_BDCCB() {
 							<input
 								type="search"
 								id="default-search"
-								className="block mt-10 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
+								className="block mt-0 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
 								placeholder="Search Loans by Group Name / Code"
 								// onChange={(e) => setSearchKeywords(e.target.value)}
 								onChange={(text) => setSearch(text.target.value)}

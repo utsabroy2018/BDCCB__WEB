@@ -122,6 +122,9 @@ function ViewLoanTableBr_BDCCB({
 								#
 							</th> */}
 							<th scope="col" className="p-4">
+								CCB Loan ID
+							</th>
+							<th scope="col" className="p-4">
 								Group Code
 							</th>
 							<th scope="col" className="p-4">
@@ -158,6 +161,9 @@ function ViewLoanTableBr_BDCCB({
 									>
 										{item.sl_no}
 									</th> */}
+									
+									<td className="px-6 py-3 font-bold text-slate-800">{item.ccb_loan_id || "-----"}</td>
+									
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
 									<td className="px-6 py-3 text-slate-700">{item.tot_member}</td>
@@ -196,7 +202,7 @@ function ViewLoanTableBr_BDCCB({
 										"bg-white border-2 font-bold text-slate-800 border-b-pink-200 dark:bg-gray-800 dark:border-gray-700"
 									}
 								>
-										<td className="text-center p-5" colSpan={6}>
+										<td className="text-center p-5" colSpan={7}>
 												<span className="text-lg">No Data Available</span>
 										</td>
 								</tr>

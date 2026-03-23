@@ -2682,13 +2682,13 @@ const items_bdccb = [
 						{
 							key: "sub4-3-1",
 							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/viewloan_branch"}>Disbursement</Link>,
+							label: <Link to={"/homebm/viewloan_branch"}>Disbursement SHG</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
 						{
 							key: "sub4-3-2",
 							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/recovery-shg-list"}>Recovery</Link>,
+							label: <Link to={"/homebm/recovery-shg-list"}>Recovery SHG</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
 						// {
@@ -2802,12 +2802,16 @@ const items_bdccb_PACS = [
 					label: <Link to={"/homepacs/viewloan"}>Accept Disbursement</Link>,
 					// hidden: data?.approve_transaction == "Y" ? false : true,
 				},
+				// {
+				// 	key: "sub4-1",
+				// 	icon: <ThunderboltOutlined />,
+				// 	label: <Link to={"/homepacs/loan-recovery"}>Recovery</Link>,
+				// },
 				{
 					key: "sub4-1",
 					icon: <ThunderboltOutlined />,
-					label: <Link to={"/homepacs/loan-recovery"}>Recovery</Link>,
+					label: <Link to={"/homepacs/recovery-shg-list"}>Recovery</Link>,
 				},
-				
 				{
 					key: "sub4-2-3",
 					icon: <CheckCircleOutlined />,

@@ -64,10 +64,15 @@ function SearchMemberForDisburseBM_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code,
 			approval_status: disbursementStatus,
-			from_dt: fromDate,
-			to_dt: toDate,
+			// from_dt: fromDate,
+			from_dt: disbursementStatus == 'A' ? fromDate : '',
+			// to_dt: toDate,
+			to_dt: disbursementStatus == 'A' ? toDate : '',
 			loan_to : "S"
 		}
+
+		console.log(creds, 'formDataformDataformDataformData', fromDate, toDate);
+		
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 		await axios
 			// .post(`${url}/admin/fetch_loan_application_dtls`, creds)
@@ -140,40 +145,46 @@ function SearchMemberForDisburseBM_BDCCB() {
 						onChange(value)
 						}}
 						/>
-											{/* <form onSubmit={formik.handleSubmit}> */}
-										<div className="mt-1">
-										<TDInputTemplateBr
-										type="date"
-										label="From Date"
-										name="from_dt"
-										formControlName={fromDate}
-										handleChange={(e) => setFromDate(e.target.value)}
-										mode={1}
-										/>
-										</div>
-					
-										<div className="mt-1">
-										<TDInputTemplateBr
-										type="date"
-										label="To Date"
-										name="to_dt"
-										formControlName={toDate}
-										handleChange={(e) => setToDate(e.target.value)}
-										mode={1}
-										/>
-										</div>
-										<div className="mt-1">
-										<button
-											type="button"
-											onClick={fetchApproveUapprove}
-											className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
-										>
-											<SearchOutlined />
-											Search
-										</button>
-										</div>
-					
-															{/* </form> */}
+
+						{disbursementStatus == 'A' &&(
+						<>
+						{/* <form onSubmit={formik.handleSubmit}> */}
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="From Date"
+						name="from_dt"
+						formControlName={fromDate}
+						handleChange={(e) => setFromDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
+
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="To Date"
+						name="to_dt"
+						formControlName={toDate}
+						handleChange={(e) => setToDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
+						<div className="mt-1">
+						<button
+						type="button"
+						onClick={fetchApproveUapprove}
+						className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
+						>
+						<SearchOutlined />
+						Search
+						</button>
+						</div>
+
+						{/* </form> */}
+						</>
+						)}
+
 										</div>
 
 					<motion.section
@@ -241,7 +252,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
 													{/* {`Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG`} */}
-													{`Disbursement to SHG`}
+													{`Disbursement to SHG `}
 												</motion.h2>
 											{/* </div> */}
 										</div>
