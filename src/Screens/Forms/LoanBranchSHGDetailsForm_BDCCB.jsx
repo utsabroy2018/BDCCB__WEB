@@ -26,7 +26,7 @@ import DialogBox from "../../Components/DialogBox"
 // import { disableInputArray } from "./disableInputArray"
 import { disableCondition } from "./disableCondition"
 import { getOrdinalSuffix } from "../../Utils/ordinalSuffix"
-import { txnDetailsHeader, txnDetailsHeader_Member } from "../../Utils/Reports/headerMap"
+import { txnDetailsHeader } from "../../Utils/Reports/headerMap"
 import { exportToExcel } from "../../Utils/exportToExcel"
 import { printTableReport } from "../../Utils/printTableReport"
 import moment from "moment"
@@ -34,14 +34,11 @@ import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { routePaths } from "../../Assets/Data/Routes"
 import { saveMasterData } from "../../services/masterService"
 
-function MemberLoanDetailsForm_BDCCB() {
+function LoanBranchSHGDetailsForm_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
 	const loanAppData  = location.state || {}
-	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
-	const navigate = useNavigate()
-	const [memberList, setMemberList] = useState(() => [])
 
 
 
@@ -73,60 +70,11 @@ function MemberLoanDetailsForm_BDCCB() {
 	// 	return userDetails?.id === 4
 	// }
 
-	const fetchSearchedGroups = async () => {
-		setLoading(true)
-		const creds = {
-			// branch_code: userDetails[0]?.brn_code,
-			ccb_loan_id: loanAppData?.ccb_loan_id,
-			tenant_id: userDetails[0]?.tenant_id,
-			loan_id: loanAppData?.loan_id,
-		}
+	const dataToExport = loanAppData
 
-		// {
-		// "ccb_loan_id" : "",
-		// "tenant_id" : "",
-		// "loan_id" : ""
-		// }
+	const headersToExport = txnDetailsHeader
 
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		await axios
-			.post(`${url_bdccb}/recov/fetch_indivitual_member_loan`, creds, {
-				headers: {
-					Authorization: `${tokenValue?.token}`, // example header
-					"Content-Type": "application/json", // optional
-				},
-			})
-			.then((res) => {
-
-
-				if(res?.data?.success){
-				console.log(res?.data?.data, 'loanAppDataloanAppDataloanAppDataloanAppData', 'api');
-				setMemberList(res?.data?.data)
-				// setCopyLoanApplications(res?.data?.data)
-
-				} else {
-				// navigate(routePaths.LANDING)
-				// localStorage.clear()
-				}
-				
-			})
-			.catch((err) => {
-				Message("error", "Some error occurred while searching...")
-				console.log("ERR", err)
-			})
-		setLoading(false)
-	}
-
-	useEffect(()=>{
-		fetchSearchedGroups()
-	}, [])
-
-	const dataToExport = memberList
-
-	const headersToExport = txnDetailsHeader_Member
-
-	const fileName = `Loan_Member_Details_${new Date().toLocaleString("en-GB")}.xlsx`
+	const fileName = `Loan_Details_${new Date().toLocaleString("en-GB")}.xlsx`
 
 
 
@@ -157,7 +105,7 @@ function MemberLoanDetailsForm_BDCCB() {
 								<div
 									className={`relative overflow-x-auto shadow-md sm:rounded-lg`}
 								>
-									{/* {JSON.stringify(memberList, 2)} */}
+									{/* {JSON.stringify(loanAppData[0], 2)} */}
 										{/* ////
 									{JSON.stringify(dataToExport, 2)} */}
 
@@ -170,15 +118,6 @@ function MemberLoanDetailsForm_BDCCB() {
 												<th scope="col" className="px-6 py-3 font-semibold">
 													Loan Id
 												</th>
-
-												<th scope="col" className="px-6 py-3 font-semibold">
-													Loan A/C Number
-												</th>
-												<th scope="col" className="px-6 py-3 font-semibold">
-													CCB Loan ID
-												</th>
-
-
 												<th scope="col" className="px-6 py-3 font-semibold">
 													Transaction ID
 												</th>
@@ -217,11 +156,13 @@ function MemberLoanDetailsForm_BDCCB() {
 
 											
 
-											{memberList?.map((item, i) => {
+											{loanAppData?.map((item, i) => {
 												totalCredit += item?.credit
 												totalDebit += item?.debit
 
-												
+												// if (item?.tr_type === "I" && userDetails?.id !== 4) {
+												// 	return null
+												// }
 
 												return (
 													<>
@@ -236,12 +177,8 @@ function MemberLoanDetailsForm_BDCCB() {
 																{i + 1}
 															</td>
 															<td className="px-6 py-4">{item?.loan_id} </td>
-
-															<td className="px-6 py-4">{item?.loan_acc_no} </td>
-															<td className="px-6 py-4">{item?.ccb_loan_id} </td>
-
 															<td className="px-6 py-4">{item?.trans_id}</td>
-															<td className="px-6 py-4">{item?.trans_date ? moment(item.trans_date).format("DD-MM-YYYY") : "--"}</td>
+															<td className="px-6 py-4">{item?.trans_dt ? moment(item.trans_dt).format("DD-MM-YYYY") : "--"}</td>
 															<td className="px-6 py-4">{item?.trans_type == 'D' ? 'Disbursement' : item?.trans_type == 'I' ? 'Interest' : item?.trans_type == 'R' ? 'Recovery' : null}</td>
 															<td className="px-6 py-4">{item?.dr_amt || 0}/-</td>
 															<td className="px-6 py-4">{item?.cr_amt || 0}/-</td>
@@ -249,7 +186,7 @@ function MemberLoanDetailsForm_BDCCB() {
 															<td className="px-6 py-4">{item?.approved_by || '--'}</td>
 															<td className="px-6 py-4">{item?.approved_dt || '--'}</td>
 															<td className="px-6 py-4">
-																
+																{/* {item?.approval_status} */}
 																{item.approval_status == "U" ? (
 																<div className="pending_dis_2"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />Unapproved </div>
 																) : item.approval_status == "A" ? (
@@ -384,4 +321,4 @@ function MemberLoanDetailsForm_BDCCB() {
 	)
 }
 
-export default MemberLoanDetailsForm_BDCCB
+export default LoanBranchSHGDetailsForm_BDCCB

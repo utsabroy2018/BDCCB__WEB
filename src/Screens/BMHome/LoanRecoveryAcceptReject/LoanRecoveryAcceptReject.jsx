@@ -13,6 +13,8 @@ import {
 	WalletOutlined,
 	SaveOutlined,
 	CloseCircleOutlined,
+	CheckCircleFilled,
+	SyncOutlined,
 } from "@ant-design/icons"
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../../Utils/formateDate"
@@ -380,9 +382,21 @@ function LoanRecoveryAcceptReject() {
 			const ip = await getClientIP()
 
 			const member_list = formik.values.members.map(item => ({	
+			// loan_id: item.loan_id,
+			// trans_date: item.trans_date,
+			// trans_id: item.trans_id,
+
 			loan_id: item.loan_id,
+			member_code: item.member_code,
+			member_name: item.member_name,
 			trans_date: item.trans_date,
 			trans_id: item.trans_id,
+			trans_type: item.trans_type,
+			credit_amount: item.credit_amount,
+			principal_recovery: item.principal_recovery,
+			interest_recovery: item.interest_recovery,
+			loan_outstanding: item.loan_outstanding,
+			calculated_interest: item.calculated_interest,
 			}));
 
 			const creds = {
@@ -391,10 +405,10 @@ function LoanRecoveryAcceptReject() {
 			trans_dt : data_Receive?.trans_dt,
 			transaction_id : data_Receive?.transaction_id,
 			group_code : data_Receive?.group_code,
-			created_by: userDetails[0]?.emp_id,
-			ip_address : ip,
 			reject_remarks: rej_res,
 			reject_recovery :  member_list,
+			created_by: userDetails[0]?.emp_id,
+			ip_address : ip,
 
 			}
 
@@ -404,7 +418,7 @@ function LoanRecoveryAcceptReject() {
 
 
 			await saveMasterData({
-			endpoint: "recov/reject_society_recov",
+			endpoint: "recov/reject_society_recov", // recov/reject_society_recov
 			creds,
 			navigate,
 			successMsg: "Reject Loan Recovery Successful.",
@@ -427,10 +441,18 @@ function LoanRecoveryAcceptReject() {
 
 					const member_list = formik.values.members.map(item => ({	
 					loan_id: item.loan_id,
-					credit_amount: item.credit_amount,
+					member_code: item.member_code,
+					member_name: item.member_name,
 					trans_date: item.trans_date,
 					trans_id: item.trans_id,
+					trans_type: item.trans_type,
+					credit_amount: item.credit_amount,
+					principal_recovery: item.principal_recovery,
+					interest_recovery: item.interest_recovery,
+					loan_outstanding: item.loan_outstanding,
+					calculated_interest: item.calculated_interest,
 					}));
+
 				
 					const creds = {
 					loan_id : data_Receive?.loan_id,
@@ -443,6 +465,8 @@ function LoanRecoveryAcceptReject() {
 					accept_recovery :  member_list,
 
 					}
+
+					
 
 					console.log(creds, 'credscredscredscreds');
 	
@@ -477,6 +501,47 @@ function LoanRecoveryAcceptReject() {
 		
 	}, [])
 
+	const totals_r = formik.values.members
+  .filter(item => item.trans_type === "R")
+  .reduce(
+    (acc, item) => {
+      acc.credit += Number(item.credit_amount || 0);
+      acc.loan += Number(item.loan_outstanding || 0);
+      acc.interest += Number(item.calculated_interest || 0);
+      acc.principalRec += Number(item.principal_recovery || 0);
+      acc.interestRec += Number(item.interest_recovery || 0);
+      return acc;
+    },
+    {
+      credit: 0,
+      loan: 0,
+      interest: 0,
+      principalRec: 0,
+      interestRec: 0,
+    }
+  );
+
+  	const totals_i = formik.values.members
+  .filter(item => item.trans_type === "I")
+  .reduce(
+    (acc, item) => {
+      acc.credit += Number(item.credit_amount || 0);
+      acc.loan += Number(item.loan_outstanding || 0);
+      acc.interest += Number(item.calculated_interest || 0);
+      acc.principalRec += Number(item.principal_recovery || 0);
+      acc.interestRec += Number(item.interest_recovery || 0);
+      return acc;
+    },
+    {
+      credit: 0,
+      loan: 0,
+      interest: 0,
+      principalRec: 0,
+      interestRec: 0,
+    }
+  );
+
+
 					
 
 	return (
@@ -500,6 +565,13 @@ function LoanRecoveryAcceptReject() {
 						</div>
 					</div> */}
 
+					{data_Receive?.approval_status == 'A' && (<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
+													Recovery Accepted </div>)}
+												{data_Receive?.approval_status == 'U' && (<div className="pending_dis"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />
+													Recovery Unapproved </div>)}
+												{data_Receive?.approval_status == 'R' && (<div className="pending_dis"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />
+													Recovery Rejected </div>)}
+
 					
 
 					<div className="grid grid-cols-3 gap-5 mt-0">
@@ -521,7 +593,7 @@ function LoanRecoveryAcceptReject() {
 						
 					</div>
 
-					{/* {JSON.stringify(data_Receive, null, 2)} */}
+					{/* {JSON.stringify(formik.values.members[0], null, 2)} */}
 
 		{/* {JSON.stringify(loanDetails[0], null, 2)} */}
 					{/* {JSON.stringify(data_Receive?.approval_status, null, 2)} ///////////////////
@@ -697,13 +769,175 @@ function LoanRecoveryAcceptReject() {
 						<>
 						{/* <div className="border-2 border-slate-500/50 bg-green-50 rounded-lg p-5 mt-5"> */}
 
+
 						<div className="text-[#DA4167] text-lg font-bold mb-0 mt-5">
-						Member Loan List
+						Member Loan Interest Calculation
 						</div>
 
 						{/* <div>{JSON.stringify(formik.values.members, null, 2)}</div> */}
 
-						<div className="grid grid-cols-7 gap-5 mt-2">
+						<div className="grid grid-cols-3 gap-5 mt-2">
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Loan ID</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Member Name</label>
+							</div>
+
+							{/* <div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Amount</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Outstanding Amount</label>
+							</div> */}
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Calculated Interest</label>
+							</div>
+
+							{/* <div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Principal Recovery</label>
+							</div>
+
+							<div>
+							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100">  Interest Recovery</label>
+							</div> */}
+
+
+						</div>
+
+						{formik.values.members
+						.filter(member => member.trans_type === "R")
+						.map((member, index) => (
+
+						<div key={index} className="grid grid-cols-3 gap-5 mt-0">
+
+						<div>
+						<TDInputTemplateBr
+						placeholder="Loan ID"
+						type="text"
+						// label="Loan ID"
+						name={`members.${index}.loan_id`}
+						formControlName={member.loan_id}
+						disabled={true}
+						mode={1}
+						/>
+						</div>
+
+						<div>
+						<TDInputTemplateBr
+						placeholder="Member Name"
+						type="text"
+						// label="Member Name"
+						name={`members.${index}.member_name`}
+						formControlName={member.member_name}
+						disabled={true}
+						mode={1}
+						/>
+						</div>
+
+						{/* <div>
+						<TDInputTemplateBr
+						placeholder="Amount"
+						type="number"
+						// label="Amount"
+						name={`members.${index}.cr_amt`}
+						// formControlName={formik.values.members[index].cr_amt}
+						formControlName={member.credit_amount}
+						// value={formik.values.members[index].cr_amt}
+						handleChange={formik.handleChange}
+						disabled={memberAmount}
+						mode={1}
+						/>
+
+						</div>
+
+						<div>
+						<TDInputTemplateBr
+						placeholder="Outstanding Amount"
+						type="number"
+						// label="Outstanding Amount"
+						name={`members.${index}.mem_outstanding`}
+						// formControlName={member.mem_outstanding}
+						formControlName={member?.loan_outstanding}
+						disabled={true}
+						mode={1}
+						/>
+						</div> */}
+
+						<div>
+						<TDInputTemplateBr
+						placeholder="Calculated Interest"
+						type="number"
+						// label="Calculated Interest"
+						name={`members.${index}.calc_interest`}
+						// formControlName={member.calc_interest}
+						formControlName={member?.calculated_interest}
+						disabled={true}
+						mode={1}
+						/>
+						</div>
+
+						{/* <div>
+						<TDInputTemplateBr
+						placeholder="Principal Recovery"
+						type="text"
+						// label="Principal Recovery"
+						name={`members.${index}.princAmt`}
+						// formControlName={member.princAmt}
+						formControlName={member?.principal_recovery}
+						disabled={true}
+						mode={1}
+						/>
+						</div>
+
+						<div>
+						<TDInputTemplateBr
+						placeholder=" Interest Recovery"
+						type="text"
+						// label=" Interest Recovery"
+						name={`members.${index}.intAmt`}
+						// formControlName={member.intAmt}
+						formControlName={member?.interest_recovery}
+						disabled={true}
+						mode={1}
+						/>
+						</div> */}
+
+						</div>
+
+						))}
+
+						<div className="grid grid-cols-3 gap-2 mt-2 bg-slate-200 p-2 rounded-lg">
+						<div className="text-black font-semibold text-base">Total</div>
+						<div></div>
+
+						{/* <div className="pl-3 text-base">{Math.round(totals_i.credit)}</div>
+						<div className="pl-3 text-base">{Math.round(totals_i.loan)}</div> */}
+						<div className="pl-3 text-base">{Math.round(totals_i.interest)}</div>
+						{/* <div className="pl-3 text-base">{Math.round(totals_i.principalRec)}</div>
+						<div className="pl-3 text-base">{Math.round(totals_i.interestRec)}</div> */}
+						</div>
+
+
+
+
+						<div className="text-[#DA4167] text-lg font-bold mb-0 mt-5">
+						Member Loan Recovery List
+						</div>
+
+						{/* <div>{JSON.stringify(formik.values.members, null, 2)}</div> */}
+
+						<div className="grid grid-cols-5 gap-5 mt-2">
 							<div>
 							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
 							dark:text-gray-100"> Loan ID</label>
@@ -719,7 +953,7 @@ function LoanRecoveryAcceptReject() {
 							dark:text-gray-100"> Amount</label>
 							</div>
 
-							<div>
+							{/* <div>
 							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
 							dark:text-gray-100">  Outstanding Amount</label>
 							</div>
@@ -727,7 +961,7 @@ function LoanRecoveryAcceptReject() {
 							<div>
 							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
 							dark:text-gray-100">  Calculated Interest</label>
-							</div>
+							</div> */}
 
 							<div>
 							<label for="members.0.loan_id" class="block mb-0 text-sm capitalize font-bold text-slate-800
@@ -742,9 +976,11 @@ function LoanRecoveryAcceptReject() {
 
 						</div>
 
-						{formik.values.members.map((member, index) => (
+						{formik.values.members
+						.filter(member => member.trans_type === "R")
+						.map((member, index) => (
 
-						<div key={index} className="grid grid-cols-7 gap-5 mt-0">
+						<div key={index} className="grid grid-cols-5 gap-5 mt-0">
 
 						<div>
 						<TDInputTemplateBr
@@ -786,7 +1022,7 @@ function LoanRecoveryAcceptReject() {
 
 						</div>
 
-						<div>
+						{/* <div>
 						<TDInputTemplateBr
 						placeholder="Outstanding Amount"
 						type="number"
@@ -810,7 +1046,7 @@ function LoanRecoveryAcceptReject() {
 						disabled={true}
 						mode={1}
 						/>
-						</div>
+						</div> */}
 
 						<div>
 						<TDInputTemplateBr
@@ -842,44 +1078,15 @@ function LoanRecoveryAcceptReject() {
 
 						))}
 
-						<div className="grid grid-cols-7 gap-2 mt-2 bg-slate-100 p-2 rounded-lg bg-slate-200">
-							<div className="text-black font-semibold text-base">Total</div>
-							<div></div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.credit_amount || 0),
-                            0
-                            )
-							)}
-							</div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.loan_outstanding || 0),
-                            0
-                            )
-							)}
-							</div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.calculated_interest || 0),
-                            0
-                            )
-							)}
-							</div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.principal_recovery || 0),
-                            0
-                            )
-							)}
-							</div>
-							<div className="pl-3 text-base">
-							{Math.round(formik.values.members.reduce(
-                            (sum, item) => sum + Number(item.interest_recovery || 0),
-                            0
-                            )
-							)}
-							</div>
+						<div className="grid grid-cols-5 gap-2 mt-2 bg-slate-200 p-2 rounded-lg">
+						<div className="text-black font-semibold text-base">Total</div>
+						<div></div>
+
+						<div className="pl-3 text-base">{Math.round(totals_r.credit)}</div>
+						{/* <div className="pl-3 text-base">{Math.round(totals_r.loan)}</div>
+						<div className="pl-3 text-base">{Math.round(totals_r.interest)}</div> */}
+						<div className="pl-3 text-base">{Math.round(totals_r.principalRec)}</div>
+						<div className="pl-3 text-base">{Math.round(totals_r.interestRec)}</div>
 						</div>
 
 						{/* </div> */}

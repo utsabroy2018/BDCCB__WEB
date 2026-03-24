@@ -91,27 +91,6 @@ const groupwiseOutstandingHeader = {
 }
 
 const disbursementDetailsHeader = {
-	// loan_id: "Loan ID",
-	// member_code: "Member Code",
-	// client_name: "Client Name",
-	// purpose: "Purpose",
-	// purpose_id: "Purpose Name",
-	// scheme_id: "Scheme ID",
-	// scheme_name: "Scheme Name",
-	// curr_roi: "Current ROI",
-	// period: "Period",
-	// period_mode: "Period Mode",
-	// fund_id: "Fund ID",
-	// fund_name: "Fund Name",
-	// applied_amt: "Applied Amt",
-	// disb_dt: "Disburse Date",
-	// disburse_amt: "Disburse Amt",
-	// tot_emi: "Total EMI",
-	// // week_no: "Recovery Day",
-	// recovery_day: "Recovery Day",
-	// week_no: "Week of Recovery",
-	// curr_outstanding: "Current Outstanding",
-	// loan_cycle:"Loan Cycle",
 	loan_acc_no: "Loan Acc No",
 	pacs_shg_name: 'PACKS Name',
 	sanction_dt: "Sanction Date",
@@ -122,6 +101,20 @@ const disbursementDetailsHeader = {
 	disb_dt: "Disbursement Date",
 	disb_amt: "Disbursement Amount",
 	tot_grp: "Group Total",
+}
+
+const disbursementDetailsHeader_SOCIE = {
+	loan_id: "Loan Id",
+	loan_acc_no: "Loan A/C Number",
+	period: "Period (In Month)",
+	curr_roi: "Current ROI",
+	penal_roi: "Ovd ROI",
+	disb_dt: "Disbursement Date",
+	disb_amt: "Disbursement Amount",
+	pay_mode: "Pay Mode",
+	rep_start_dt: "Start Date",
+	rep_end_dt: "End Date",
+	cuurent_loan_outstanding: "Cuurent Loan Outstanding",
 }
 
 const branchwiseOutstandingHeader = {
@@ -962,7 +955,24 @@ const txnDetailsHeader = {
 	trans_type: "Transaction Type",
 	dr_amt: "Debit Amount",
 	cr_amt: "Credit Amount",
-	curr_prn: "Outstanding Amount",
+	outstanding: "Outstanding Amount",
+	approved_by: "Approved By",
+	approved_dt: "Approved Date",
+	approval_status: "Approval Status",
+}
+
+const txnDetailsHeader_Member = {
+	loan_id: "Loan ID",
+	loan_acc_no: "Loan A/C Number",
+	ccb_loan_id: "CCB Loan ID",
+	trans_id: "Transaction ID",
+	trans_date: "Transaction Date",
+	trans_type: "Transaction Type",
+	dr_amt: "Debit Amount",
+	cr_amt: "Credit Amount",
+	outstanding: "Outstanding Amount",
+	approved_by: "Approved By",
+	approved_dt: "Approved Date",
 	approval_status: "Approval Status",
 }
 
@@ -1191,6 +1201,7 @@ export {
 	groupwiseOutstandingHeader,
 	memberwiseOutstandingHeader,
 	disbursementDetailsHeader,
+	disbursementDetailsHeader_SOCIE,
 	branchwiseOutstandingHeader,
 	branchwiseTxnReportHeader,
 	groupwiseDemandReportHeader,
@@ -1219,6 +1230,7 @@ export {
 	branchwiseDemandVsCollectionHeader,
 	fundwiseDemandVsCollectionHeader,
 	txnDetailsHeader,
+	txnDetailsHeader_Member,
 	portfolioReportHeaderGroupwise,
 	portfolioReportHeaderMemberwise,
 	portfolioReportHeaderFundwise,

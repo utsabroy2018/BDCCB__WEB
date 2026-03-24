@@ -15,8 +15,9 @@ import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 import axios from "axios"
 import { url } from "../../Address/BaseUrl"
 import MemberLoanDetailsForm from "../Forms/MemberLoanDetailsForm_BDCCB"
+import MemberBranchSHGLoanDetailsForm_BDCCB from "../Forms/MemberBranchSHGLoanDetailsForm_BDCCB"
 
-function MemberLoanDetailsBM_BDCCB() {
+function MemberBranchSHGLoanDetailsBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -49,7 +50,7 @@ function MemberLoanDetailsBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card border-2 p-5 mx-16 bg-white shadow-lg rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-							<MemberLoanDetailsForm />
+							<MemberBranchSHGLoanDetailsForm_BDCCB />
 						</div>
 					</Spin>
 				</div>
@@ -107,4 +108,4 @@ function MemberLoanDetailsBM_BDCCB() {
 	)
 }
 
-export default MemberLoanDetailsBM_BDCCB
+export default MemberBranchSHGLoanDetailsBM_BDCCB

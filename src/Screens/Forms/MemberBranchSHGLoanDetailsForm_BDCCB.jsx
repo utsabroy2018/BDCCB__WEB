@@ -34,7 +34,7 @@ import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { routePaths } from "../../Assets/Data/Routes"
 import { saveMasterData } from "../../services/masterService"
 
-function MemberLoanDetailsForm_BDCCB() {
+function MemberBranchSHGLoanDetailsForm_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -91,7 +91,7 @@ function MemberLoanDetailsForm_BDCCB() {
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_indivitual_member_loan`, creds, {
+			.post(`${url_bdccb}/recov/fetch_indivitual_shg_member_loan`, creds, {
 				headers: {
 					Authorization: `${tokenValue?.token}`, // example header
 					"Content-Type": "application/json", // optional
@@ -384,4 +384,4 @@ function MemberLoanDetailsForm_BDCCB() {
 	)
 }
 
-export default MemberLoanDetailsForm_BDCCB
+export default MemberBranchSHGLoanDetailsForm_BDCCB

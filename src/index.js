@@ -116,11 +116,24 @@ const LoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/LoanRecover
 const BranchSHGLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryAcceptReject/BranchSHGLoanRecoveryAcceptReject.jsx"))
 
 const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
-const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
+
 
 const LoanDetails_PACS_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_PACS_BDCCB.jsx"));
 const LoanDetails_Branch_SHG_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SHG_BDCCB.jsx"));
 const LoanDetails_Branch_SOCI_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SOCI_BDCCB.jsx"));
+
+
+
+const SearchSocietyViewLoanBM_BDCCB = lazy(() => import("./Screens/PACSHome/SearchSocietyViewLoanBM_BDCCB.jsx"))
+const EditViewSocietyLoanFormBM = lazy(() => import("./Screens/PACSHome/EditViewSocietyLoanFormBM.jsx"))
+const MemberLoanDetailsBM = lazy(() => import("./Screens/BMHome/MemberLoanDetailsBM_BDCCB.jsx"))
+const LoanDetailsBM_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetailsBM_BDCCB.jsx"))
+const SearchBranchLogSocietyViewLoanBM_BDCCB = lazy(() => import("./Screens/PACSHome/SearchBranchLogSocietyViewLoanBM_BDCCB.jsx"))
+
+const SearchBranchSHGViewLoanBM_BDCCB = lazy(() => import("./Screens/PACSHome/SearchBranchSHGViewLoanBM_BDCCB.jsx"))
+const EditViewBranchSHGLoanFormBM = lazy(() => import("./Screens/PACSHome/EditViewBranchSHGLoanFormBM.jsx"))
+const MemberBranchSHGLoanDetailsBM_BDCCB = lazy(() => import("./Screens/BMHome/MemberBranchSHGLoanDetailsBM_BDCCB.jsx"))
+const LoanBranchSHGDetailsBM_BDCCB = lazy(() => import("./Screens/BMHome/LoanBranchSHGDetailsBM_BDCCB.jsx"))
 
 //////////////// BDCCB PACS End ////////////////
 
@@ -633,11 +646,6 @@ const router = createBrowserRouter([
 								path: "viewloan/:id",
 								element: <EditViewLoanFormBM />,
 							},
-							
-							{
-								path: "memberloandetails/:id",
-								element: <MemberLoanDetailsBM />,
-							},
 							{
 								path: "loan-recovery",
 								element: <LoanDetails_PACS_BDCCB />,
@@ -651,6 +659,43 @@ const router = createBrowserRouter([
 								element: <SHGLoanRecoveryDetails />,
 							},
 							
+							{
+								path: "viewloan-society",
+								element: <SearchSocietyViewLoanBM_BDCCB />,
+							},
+							{
+								path: "viewloan-society/:id",
+								element: <EditViewSocietyLoanFormBM />,
+							},
+							{
+								path: "memberloandetails/:id",
+								element: <MemberLoanDetailsBM />,
+							},
+							{
+								path: "loandetails/:id",
+								element: <LoanDetailsBM_BDCCB />,
+							},
+							{
+								path: "viewloan-branch-society",
+								element: <SearchBranchLogSocietyViewLoanBM_BDCCB />,
+							},
+
+							{
+								path: "viewloan-branch-shg",
+								element: <SearchBranchSHGViewLoanBM_BDCCB />,
+							},
+							{
+								path: "viewloan-branch-shg/:id",
+								element: <EditViewBranchSHGLoanFormBM />,
+							},
+							{
+								path: "memberloandetails-branch-shg/:id",
+								element: <MemberBranchSHGLoanDetailsBM_BDCCB />,
+							},
+							{
+								path: "loandetails-branch-shg/:id",
+								element: <LoanBranchSHGDetailsBM_BDCCB />,
+							},
 							
 						],
 					},

@@ -259,7 +259,6 @@ function ViewLoanTableRecovery_BDCCB({
 									<div className="accept_dis_2"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />Accepted </div>
 									) : (
 									<div className="pending_dis_2"><CloseCircleOutlined style={{ color: "#fff", marginRight: 6 }} />Rejected </div>
-
 									)}
 
 									</td>

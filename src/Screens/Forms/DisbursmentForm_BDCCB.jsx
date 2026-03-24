@@ -286,14 +286,8 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 
 	useEffect(() => {
-		// console.log(loanAppData?.loan_to_name, 'loan_to_name', userDetails[0]?.user_type);
 		if (params.id > 0) {
-
-			// handleSearchPacsChange(loanAppData?.loan_to_name)
 			fetchDisburseDetails()
-			// handleSearchSHGChange(loanAppData?.loan_to_name, loanAppData?.loan_to_name)
-			// console.log(loanAppData?.loan_to_name, 'loan_to_name', userDetails[0]?.user_type);
-
 		}
 	}, [])
 
@@ -653,56 +647,6 @@ function DisbursmentForm_BDCCB({ flag }) {
 		setLoading(false)
 	};
 
-	// useEffect(() => {
-	// 	if(userDetails[0]?.user_type == 'P'){
-	// 		// remainingDisburseAmt()
-	// 	}
-
-	// }, [formik.values.loan_to])
-
-	
-
-
-	// useEffect(() => {
-	// fetchTotalGroupMember()
-	// }, [])
-
-	// const fetchTotalGroupMember = async ()=>{
-
-
-	// 	setLoading(true)
-	// 	const creds = {
-	// 	branch_code : userDetails[0]?.brn_code,
-	// 	tenant_id : userDetails[0]?.tenant_id,
-	// 	}
-
-	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	// 	await axios.post(`${url_bdccb}/loan/fetch_tot_grp_memb`, creds, {
-	// 	headers: {
-	// 	Authorization: `${tokenValue?.token}`, // example header
-	// 	"Content-Type": "application/json", // optional
-	// 	},
-	// 	})
-	// 	.then((res) => {
-
-	// 	if(res?.data?.success){
-	// 	setGroupMemberTotal(res?.data?.data)
-	// 	console.log(res?.data?.data, 'searchAmtsearchAmtsearchAmtsearchAmt');
-
-	// 	} else {
-	// 	// navigate(routePaths.LANDING)
-	// 	// localStorage.clear()
-	// 	}
-	// 	})
-	// 	.catch((err) => {
-	// 	Message("error", "Some error occurred while fetching group form")
-	// 	})
-
-	// 	setLoading(false)
-
-
-	// }
 
 	useEffect(() => {
 		if (Number(params?.id) > 0) {

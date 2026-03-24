@@ -15,12 +15,13 @@ import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 import axios from "axios"
 import { url } from "../../Address/BaseUrl"
 import MemberLoanDetailsForm from "../Forms/MemberLoanDetailsForm_BDCCB"
+import LoanDetailsForm_BDCCB from "../Forms/LoanDetailsForm_BDCCB"
 
-function MemberLoanDetailsBM_BDCCB() {
+function LoanDetailsBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
-	const { loanAppData } = location.state || {}
+	const loanAppData  = location.state || {}
 	const navigate = useNavigate()
 
 	return (
@@ -40,7 +41,7 @@ function MemberLoanDetailsBM_BDCCB() {
 						</div>
 					</div> */}
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text="Member Loan Details Form" mode={2} />
+						<FormHeader text="Loan Details Form" mode={2} />
 					</div>
 					<Spin
 						indicator={<LoadingOutlined spin />}
@@ -49,7 +50,8 @@ function MemberLoanDetailsBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card border-2 p-5 mx-16 bg-white shadow-lg rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-							<MemberLoanDetailsForm />
+							{/* {JSON.stringify(loanAppData, 2)} */}
+							<LoanDetailsForm_BDCCB />
 						</div>
 					</Spin>
 				</div>
@@ -107,4 +109,4 @@ function MemberLoanDetailsBM_BDCCB() {
 	)
 }
 
-export default MemberLoanDetailsBM_BDCCB
+export default LoanDetailsBM_BDCCB

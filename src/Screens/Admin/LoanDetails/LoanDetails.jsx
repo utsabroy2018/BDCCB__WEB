@@ -470,7 +470,7 @@ function LoanDetails() {
 					navigate,
 					successMsg: "Group details saved.",
 					// onSuccess: () => navigate(-1),
-					onSuccess: () => navigate('/homepacs/viewloan-recovery'),
+					onSuccess: () => navigate('/homepacs/recovery-shg-list'),
 				
 					// 🔥 fully dynamic failure handling
 					failureRedirect: routePaths.LANDING,

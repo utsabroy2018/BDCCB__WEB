@@ -16,7 +16,7 @@ import axios from "axios"
 import { url } from "../../Address/BaseUrl"
 import MemberLoanDetailsForm from "../Forms/MemberLoanDetailsForm_BDCCB"
 
-function MemberLoanDetailsBM_BDCCB() {
+function MemberBranchDSHGLoanDetailsBM_BDCCB() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -107,4 +107,4 @@ function MemberLoanDetailsBM_BDCCB() {
 	)
 }
 
-export default MemberLoanDetailsBM_BDCCB
+export default MemberBranchDSHGLoanDetailsBM_BDCCB

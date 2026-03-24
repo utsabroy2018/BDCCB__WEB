@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import "../LoanForm/LoanForm.css"
 import "./EditLoanFormBMStyles.css"
 import { useParams } from "react-router"
@@ -9,39 +9,45 @@ import FormHeader from "../../Components/FormHeader"
 import { useLocation } from "react-router"
 import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
-import DisbursmentForm from "../Forms/DisbursmentForm"
-import RecoveryForm from "../Forms/RecoveryForm"
-import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
-import axios from "axios"
-import { url } from "../../Address/BaseUrl"
-import MemberLoanDetailsForm from "../Forms/MemberLoanDetailsForm_BDCCB"
+import ViewLoanForm from "../Forms/ViewLoanForm"
+import ViewSocietyLoanForm from "../Forms/ViewSocietyLoanForm"
 
-function MemberLoanDetailsBM_BDCCB() {
+function EditViewSocietyLoanFormBM() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
-	const { loanAppData } = location.state || {}
+	// const loanAppData = location.state || {}
+	// const branch_id = location.branch_id || {}
 	const navigate = useNavigate()
+
+	// import { useLocation } from "react-router";
+
+// const location = useLocation();
+
+	const loanAppData = location.state?.item || {};
+	const branch_id = location.state?.branch_id || {};
+	
+	
 
 	return (
 		<>
 			<Sidebar mode={2} />
-			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
-				<div className="  p-5 w-full min-h-screen rounded-3xl">
-					{/* <div className="ml-14 mt-5 flex flex-col justify-start align-middle items-start gap-2">
-						<div className="text-sm text-wrap w-96 italic text-blue-800">
-							CO: {recoveryDetailsData?.b_coName || "Nil"}, AT:{" "}
-							{new Date(
-								recoveryDetailsData?.b_coCreatedAt || "Nil"
-							).toLocaleString("en-GB")}
-						</div>
-						<div className="text-sm text-wrap w-96 italic text-blue-800">
-							CO Location: {recoveryDetailsData?.b_coLocation || "Nil"}
-						</div>
-					</div> */}
+			<section className="dark:bg-[#001529] flex justify-center align-middle p-5">
+				{/* {params.id>0 && data && <PrintComp toPrint={data} title={'Department'}/>} */}
+				{/* <HeadingTemplate
+				text={params.id > 0 ? "Update vendor" : "Add vendor"}
+				mode={params.id > 0 ? 1 : 0}
+				title={"Vendor"}
+				data={params.id && data ? data : ""}
+			/> */}
+				 
+				<div className=" p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text="Member Loan Details Form" mode={2} />
+						<FormHeader text={`View Group Loan Details`} mode={2} />
 					</div>
+					{/* {JSON.stringify(loanAppData)} 
+
+				 {JSON.stringify(branch_id)}  */}
 					<Spin
 						indicator={<LoadingOutlined spin />}
 						size="large"
@@ -49,7 +55,9 @@ function MemberLoanDetailsBM_BDCCB() {
 						spinning={loading}
 					>
 						<div className="card border-2 p-5 mx-16 bg-white shadow-lg rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
-							<MemberLoanDetailsForm />
+							<ViewSocietyLoanForm
+							// groupDataArr={loanAppData}
+							/>
 						</div>
 					</Spin>
 				</div>
@@ -107,4 +115,4 @@ function MemberLoanDetailsBM_BDCCB() {
 	)
 }
 
-export default MemberLoanDetailsBM_BDCCB
+export default EditViewSocietyLoanFormBM
