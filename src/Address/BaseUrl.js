@@ -15,4 +15,3 @@
 
 export const url = "https://bdccbshg.opentech4u.co.in/v1" //UAT
 export const url_bdccb = "https://bdccbshg.opentech4u.co.in/v1" //UAT
-

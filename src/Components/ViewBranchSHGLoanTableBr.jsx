@@ -123,7 +123,7 @@ function ViewBranchSHGLoanTableBr({
 								#
 							</th> */}
 							<th scope="col" className="p-4">
-								Society A/C Number
+								Loan A/C Number
 							</th>
 							<th scope="col" className="p-4">
 								Group Code
@@ -155,7 +155,7 @@ function ViewBranchSHGLoanTableBr({
 										{item.sl_no}
 									</th> */}
 									<td className="px-6 py-3 text-slate-700">
-										{item.society_acc_no || "-----"}
+										{item.loan_acc_no || "-----"}
 									</td>
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>

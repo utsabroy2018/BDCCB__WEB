@@ -47,27 +47,31 @@ export default function DashboardCard({
 					</Spin>
 				</div>
 
-				{/* Divider */}
-				<div className="col-span-3 h-[2px] w-full rounded bg-slate-200" />
+				{left2Data && right2Data && (
+  <>
+    {/* Divider */}
+    <div className="col-span-3 h-[2px] w-full rounded bg-slate-200" />
 
-				{/* --- Row 2 --- */}
-				<div className="w-full text-left">
-					<Spin spinning={loading}>
-						<p className="text-sm">{left2Data.label}</p>
-						<p className="text-2xl font-bold" style={{ color: leftColor }}>
-							{left2Data.value}
-						</p>
-					</Spin>
-				</div>
-				<div className="h-full w-[2px] rounded bg-slate-200" />
-				<div className="w-full text-right">
-					<Spin spinning={loading}>
-						<p className="text-sm">{right2Data.label}</p>
-						<p className="text-2xl font-semibold" style={{ color: rightColor }}>
-							{right2Data.value}
-						</p>
-					</Spin>
-				</div>
+    {/* Row 2 */}
+    <div className="w-full text-left">
+      <Spin spinning={loading}>
+        <p className="text-sm">{left2Data.label}</p>
+        <p className="text-2xl font-bold" style={{ color: leftColor }}>
+          {left2Data.value}
+        </p>
+      </Spin>
+    </div>
+    <div className="h-full w-[2px] rounded bg-slate-200" />
+    <div className="w-full text-right">
+      <Spin spinning={loading}>
+        <p className="text-sm">{right2Data.label}</p>
+        <p className="text-2xl font-semibold" style={{ color: rightColor }}>
+          {right2Data.value}
+        </p>
+      </Spin>
+    </div>
+  </>
+)}
 
 				{/* Divider */}
 				<div className="col-span-3 h-[2px] w-full rounded bg-slate-200" />
