@@ -23,7 +23,7 @@ import messaging from '@react-native-firebase/messaging'
 const LoginScreen = () => {
     const theme = usePaperColorScheme()
     // const appVersion = DeviceInfo.getVersion()
-    const [isPasswordVisible,setPasswordVisibility] = useState(false);
+    const [isPasswordVisible,setPasswordVisibility] = useState(true);
     const {
         handleLogin,
         isLoading,
@@ -296,7 +296,7 @@ const LoginScreen = () => {
                         rightNode={
                                <TextInput.Icon onPress={() =>{
                                     setPasswordVisibility(prev => !prev)
-                               }} icon={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'} />
+                               }} icon={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'} />
                         }
                         />
                          {/* {userId == 2 && <DropDownPicker

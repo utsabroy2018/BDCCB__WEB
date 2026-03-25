@@ -17,9 +17,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.ssvwsloan"
+    namespace "com.bdccbApp"
     defaultConfig {
-        applicationId "com.ssvwsloan"
+        applicationId "com.bdccbApp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 4
