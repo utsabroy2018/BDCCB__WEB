@@ -3,7 +3,9 @@ import "../../Screens/BMHome/Dashboard/Dashboard.css";
 
 export default function DashboardCard({
 	titleLeft,
+	titleLeftClass,
 	titleRight = "",
+	titleRightClass,
 	left1Data,
 	left2Data,
 	left3Data,
@@ -19,10 +21,10 @@ export default function DashboardCard({
 			{/* Header Section */}
 			<div className="flex justify-between">
 				{titleLeft && (
-					<h2 className="text-xl font-medium text-slate-700">{titleLeft}</h2>
+					<h2 className={`font-medium text-slate-700 ${titleLeftClass || "text-xl"}`}>{titleLeft}</h2>
 				)}
 				{titleRight && (
-					<h2 className="text-xl font-medium text-slate-700">{titleRight}</h2>
+					<h2 className={`font-medium text-slate-700 ${titleRightClass || "text-xl"}`}>{titleRight}</h2>
 				)}
 			</div>
 

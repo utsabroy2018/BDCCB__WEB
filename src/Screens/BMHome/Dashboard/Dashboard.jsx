@@ -87,36 +87,39 @@ const formatNumber = (num) => new Intl.NumberFormat("en-IN").format(num || 0)
 
 
 export default function Dashboard() {
-	const userDetails = JSON.parse(localStorage.getItem("user_details")) || {}
-	// const branchId = userDetails?.brn_code
+const userDetails = JSON.parse(localStorage.getItem("user_details")) || {}
 
-	const navigate = useNavigate()
+const navigate = useNavigate()
 
-	// const [loadingDmd_m_d_w, setLoadingDmd_m_d_w] = useState(() => false)
-	
-	const [branches, setBranches] = useState(() => [
-		{ code: "101", name: "Branch (101)" },
-		{ code: "102", name: "Branch (102)" },
-		{ code: "103", name: "Branch (103)" },
-	])
-	const [choosenBranch, setChoosenBranch] = useState({})
+const [branches, setBranches] = useState(() => [
+	{ code: "101", name: "Branch (101)" },
+	{ code: "102", name: "Branch (102)" },
+	{ code: "103", name: "Branch (103)" },
+])
+const [choosenBranch, setChoosenBranch] = useState({})
 
 const [dateOfOperation, setDateOfOperation] = useState(moment().format("DD-MM-YYYY"))
 
-const [unapprovedTxnsDetailCountsTotal, setUnapprovedTxnsDetailCountsTotal] =	useState({data: 130000.00, noOfGroups: 25})
+// const [unapprovedTxnsDetailCountsTotal, setUnapprovedTxnsDetailCountsTotal] =	useState({data: 130000.00, noOfGroups: 25})
 
 // const [grtPeriodDisbursed, setGrtPeriodDisbursed] = useState("Today")
-const [grtPeriodDisbursed, setGrtPeriodDisbursed] = useState("Today")
+
 // const activeGrtData = grtPeriodDisbursed === "Today" ? todayDisburse : thisMonthDisburse;
 
-const [loanCollection, setLoanCollection] = useState("Today")
-const activeLoanColect = loanCollection === "Today" ? todayLoanCollect : thisMonthLoanCollect;
+
+// const activeLoanColect = loanCollection === "Today" ? todayLoanCollect : thisMonthLoanCollect;
 
 const [activeUsersCount, setActiveUsersCount] = useState('')
 const [activeUsers, setActiveUsers] = useState([])
 const [loading, setLoading] = useState(false)
+const [loading_Outstan, setLoading_Outstan] = useState(false)
+const [loading_Unapprov, setLoading_Unapprov] = useState(false)
 const [groupList, setGroupList] = useState([]);
 const [loanDisburse, setLoanDisburse] = useState([]);
+const [loanCollect, setLoanCollect] = useState([]);
+const [unapprovedCount, setUnapprovedCount] =	useState({})
+const [grtPeriodDisbursed, setGrtPeriodDisbursed] = useState("Today")
+const [loanCollection, setLoanCollection] = useState("Today")
 
 
 
@@ -146,8 +149,8 @@ const transformGroupData = (data) => {
 
 const transformGroupDataDisburse = (data) => {
   const mapping = [
-    { key: "society_disbursed", label: "Society", color: "bg-orange-300" },
-    { key: "shg_disbursed", label: "SHG", color: "bg-blue-300" },
+    { key: "society_disbursed", label: "Society", color: "bg-gray-300" },
+    { key: "shg_disbursed", label: "SHG", color: "bg-gray-300" },
     // { key: "with_loan", label: "With Loan", color: "bg-green-300" },
     // { key: "without_loan", label: "Without Loan", color: "bg-red-300" },
   ];
@@ -163,10 +166,10 @@ const transformGroupDataDisburse = (data) => {
 
 const transformLoanCollect= (data) => {
   const mapping = [
-    { key: "society_disbursed", label: "Deposited at CCB", color: "bg-orange-300" },
-    { key: "shg_disbursed", label: "Deposited at Society", color: "bg-blue-300" },
-    { key: "with_loan", label: "Deposited at SHG", color: "bg-green-300" },
-    { key: "without_loan", label: "Collected But Not Deposited", color: "bg-red-300" },
+    { key: "deposited_ccb", label: "Deposited at CCB", color: "bg-gray-300" },
+    { key: "deposited_soc", label: "Deposited at Society", color: "bg-gray-300" },
+    { key: "deposited_shg", label: "Deposited at SHG", color: "bg-gray-300" },
+    { key: "collected_nt_deposit", label: "Collected But Not Deposited", color: "bg-gray-300" },
   ];
 
   return mapping
@@ -227,7 +230,7 @@ const getGroupList = async () => {
 	}
 
 const getTotalOutstanding = async () => {
-		setLoading(true)
+		setLoading_Outstan(true)
 
     // setGroupList(totalGroup)
 
@@ -267,7 +270,7 @@ const getTotalOutstanding = async () => {
     Message("error", "Some error occurred while fetching group form")
     })
 		
-		setLoading(false)
+		setLoading_Outstan(false)
 	}
 
 const getLoanDisbursed = async () => {
@@ -331,7 +334,7 @@ const getLoanCollect = async () => {
 		const creds = {
 		branch_code : userDetails[0]?.brn_code,
 		user_type : userDetails[0]?.user_type,
-    flag : grtPeriodDisbursed,
+    	flag : loanCollection,
 		}
 
     // {
@@ -341,21 +344,21 @@ const getLoanCollect = async () => {
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-    await axios.post(`${url_bdccb}/dashboard/tot_loan_disb`, creds, {
+    await axios.post(`${url_bdccb}/dashboard/tot_loan_collected`, creds, {
     headers: {
     Authorization: `${tokenValue?.token}`, // example header
     "Content-Type": "application/json", // optional
     },
     })
     .then((res) => {
-        console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
+        console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'colected');
         if(res?.data?.success){
 
         const apiData = res?.data?.data || {};
 
       // 🔥 Transform here
         const formattedData = transformLoanCollect(apiData);
-        setLoanDisburse(formattedData);
+        setLoanCollect(formattedData);
 
         } else {
         navigate(routePaths.LANDING)
@@ -380,6 +383,47 @@ const getActiveUser = async () => {
 		setLoading(false)
 	}  
 
+const getUnapprovedTrans = async () => {
+setLoading_Unapprov(true)
+
+// setGroupList(totalGroup)
+
+// Here have function
+const ip = await getClientIP()
+
+const creds = {
+branch_code : userDetails[0]?.brn_code,
+user_type : userDetails[0]?.user_type,
+}
+
+const tokenValue = await getLocalStoreTokenDts(navigate);
+
+await axios.post(`${url_bdccb}/dashboard/dashboard_tot_loan_unapprove_dtls`, creds, {
+headers: {
+Authorization: `${tokenValue?.token}`, // example header
+"Content-Type": "application/json", // optional
+},
+})
+.then((res) => {
+console.log(res?.data?.data	, 'unapproveeeeeeeeeeeee', creds, 'lll');
+if(res?.data?.success){
+
+setUnapprovedCount(res?.data?.data)
+
+} else {
+navigate(routePaths.LANDING)
+localStorage.clear()
+}
+})
+.catch((err) => {
+Message("error", "Some error occurred while fetching group form")
+})
+
+setLoading_Unapprov(false)
+
+} 
+
+
   useEffect(() => {
   getLoanDisbursed()
 }, [grtPeriodDisbursed])
@@ -393,8 +437,9 @@ const getActiveUser = async () => {
     getGroupList()
     getActiveUser()
     getTotalOutstanding()
-    getLoanDisbursed()
-    getLoanCollect()
+    // getLoanDisbursed()
+    // getLoanCollect()
+	getUnapprovedTrans();
   }, [])
 
 	
@@ -432,20 +477,20 @@ const getActiveUser = async () => {
 			)} */}
 
 			<div className="flex flex-col md:flex-row justify-between items-center">
-				<h1 className="text-xl font-bold text-slate-700 uppercase pl-5">
+				<h1 className="text-lg font-bold text-slate-700 uppercase pl-5">
 					Welcome back,{" "}
-					<span className="text-slate-600 text-2xl font-thin">
+					<span className="text-slate-600 text-lg font-thin">
 						{userDetails[0]?.emp_name}
 					</span>{" "}
 					:{" "}
-					<span className="text-slate-600 text-2xl font-thin">
+					<span className="text-slate-600 text-lg font-thin">
 						{userDetails[0]?.branch_name}
 					</span>
 				</h1>
-				<h1 className="text-xl font-bold text-slate-700 uppercase">
+				<h1 className="text-lg font-bold text-slate-700 uppercase">
 					<Spin spinning={loading}>
 						Date of operation :{" "}
-						<span className="text-slate-600 text-xl font-thin">
+						<span className="text-slate-600 text-lg font-thin">
 							{dateOfOperation}
 						</span>
 					</Spin>
@@ -468,7 +513,7 @@ const getActiveUser = async () => {
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 				<div className="col-span-1 md:col-span-2 rounded-3xl bg-white shadow-md p-6 space-y-4 overflow-hidden">
 					<div className="flex justify-between items-center">
-						<h2 className="text-xl font-medium text-slate-700">Total Group</h2>
+						<h2 className="text-base font-medium text-slate-700">Total Group</h2>
 						{/* <div className="space-x-2">
 							{["Today", "This month"].map((option) => (
 								<button
@@ -491,9 +536,9 @@ const getActiveUser = async () => {
 							<span className="w-40 text-sm text-slate-600">
 								{item.label}
 							</span>
-							<div className="flex-1 bg-slate-100 h-4 rounded-full mx-4 overflow-hidden relative">
+							<div className="flex-1 bg-slate-100 h-2 rounded-full mx-4 overflow-hidden relative">
 								<motion.div
-									className={`${item.color} h-4`}
+									className={`${item.color} h-2`}
 									style={{ clipPath: "inset(0 round 999px)" }}
 									initial={{ width: 0 }}
 									animate={{ width: `${Math.min(item.value, 100)}%` }}
@@ -550,13 +595,13 @@ const getActiveUser = async () => {
 							className="inset-0 bg-white rounded-3xl shadow-md p-6 flex flex-col items-center justify-center"
 							style={{ backfaceVisibility: "hidden" }}
 						>
-							<h3 className="text-lg font-medium text-slate-700">
+							<h3 className="text-base font-medium text-slate-700">
 								Total Outstanding
 							</h3>
 							<div className="bg-purple-100 rounded-full p-4 my-4">
               <BankOutlined className="text-2xl text-purple-600" />
             </div>
-							<Spin spinning={loading}>
+							<Spin spinning={loading_Outstan}>
 								<span className="text-3xl font-bold text-slate-800">
 									{/* {new Intl.NumberFormat("en-IN").format(activeUsersCount || 0)} */}
                   {formatINR(activeUsersCount)}
@@ -623,7 +668,7 @@ const getActiveUser = async () => {
 
         <div className="col-span-1 md:col-span-2 rounded-3xl bg-white shadow-md p-6 space-y-4 overflow-hidden">
 					<div className="flex justify-between items-center">
-						<h2 className="text-xl font-medium text-slate-700">Total Loan Disbursed</h2>
+						<h2 className="text-base font-medium text-slate-700">Total Loan Disbursed</h2>
 						<div className="space-x-2">
 							{PERIOD_OPTIONS.map((option) => (
                 <button
@@ -651,12 +696,13 @@ const getActiveUser = async () => {
               <span className="text-slate-800 font-semibold text-sm">
 								{item.label}
 							</span>
-							<div className="flex-1 h-4 rounded-full mx-4 overflow-hidden relative">
+							<div className="flex-1 h-2 rounded-full mx-4 overflow-hidden relative">
 								<motion.div
-									className={`${item.color} h-4`}
+									className={`${item.color} h-2`}
 									style={{ clipPath: "inset(0 round 999px)" }}
 									initial={{ width: 0 }}
-									animate={{ width: `${Math.min((item.value / 1500) * 100, 100)}%` }}
+									// animate={{ width: `${Math.min((item.value / 1500) * 100, 100)}%` }}
+									animate={{ width: `100%` }}
 									transition={{
 										duration: 0.6,
 										ease: [0.7, 0.0, 0.3, 1.0],
@@ -674,7 +720,7 @@ const getActiveUser = async () => {
           
         <div className="col-span-1 md:col-span-2 rounded-3xl bg-white shadow-md p-6 space-y-4 overflow-hidden">
 					<div className="flex justify-between items-center">
-						<h2 className="text-xl font-medium text-slate-700">Loan Collected</h2>
+						<h2 className="text-base font-medium text-slate-700">Loan Collected</h2>
 						<div className="space-x-2">
 							{PERIOD_OPTIONSCollect.map((option) => (
                 <button
@@ -692,17 +738,18 @@ const getActiveUser = async () => {
 						</div>
 					</div>
 
-					{activeLoanColect.map((item) => (
+					{loanCollect.map((item) => (
 						<div key={item.label} className="flex items-center">
               <span className="text-slate-800 font-semibold text-sm">
 								{item.label}
 							</span>
-							<div className="flex-1 h-4 rounded-full mx-4 overflow-hidden relative">
+							<div className="flex-1 h-2 rounded-full mx-4 overflow-hidden relative">
                 <motion.div
-									className={`${item.color} h-4`}
+									className={`${item.color} h-2`}
 									style={{ clipPath: "inset(0 round 999px)" }}
 									initial={{ width: 0 }}
-									animate={{ width: `${Math.min((item.value / 1500) * 100, 100)}%` }}
+									// animate={{ width: `${Math.min((item.value / 1500) * 100, 100)}%` }}
+									animate={{ width: `100%` }}
 									transition={{
 										duration: 0.6,
 										ease: [0.7, 0.0, 0.3, 1.0],
@@ -765,19 +812,22 @@ const getActiveUser = async () => {
 				/> */}
 
         <DashboardCard
-        titleLeft="Unapproved Txns"
+        titleLeft="Unapproved Transaction"
+		titleLeftClass="text-base"
         left1Data={{
         label: "Unapproved",
-        value: formatINR(unapprovedTxnsDetailCountsTotal.data),
+        value: formatINR(unapprovedCount?.total_unapproved_amount),
         }}
-        titleRight="Unapproved Transfers"
+        // titleRight="Unapproved Transfers"
+		titleRight=""
+		titleRightClass="text-base"
         right1Data={{
         label: "No. of Groups",
-        value: formatNumber(unapprovedTxnsDetailCountsTotal.noOfGroups),
+        value: formatNumber(unapprovedCount?.total_unapproved_group),
         }}
         leftColor="#009966"
         rightColor="#334155"
-        loading={loading}
+        loading={loading_Unapprov}
         />
 
 				{/* <DashboardCard

@@ -158,7 +158,7 @@ function SHGLoanRecoveryDetails() {
 						intAmt: ""  // replace mem_amount with cr_amt
 					}))
 
-					console.log(res?.data?.data, 'resresresresresresres');
+					console.log(res?.data?.data, 'resresresresresresres', members);
 
 					setValues({
 						...formValues,
@@ -362,7 +362,7 @@ function SHGLoanRecoveryDetails() {
 		<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto my-4">
-						<FormHeader text={`Loan Recovery Of SHG Details 55`} mode={2} />
+						<FormHeader text={`Loan Recovery Of SHG Details`} mode={2} />
 					</div>
 			{/* <Sidebar mode={2} /> */}
 			<Spin
@@ -589,7 +589,7 @@ function SHGLoanRecoveryDetails() {
 
 						</div>
 						</div>
-							{/* <div>{JSON.stringify(formik.values.members, null, 2)}</div> */}
+							<div>{JSON.stringify(formik.values.members, null, 2)}</div>
 						{/* <div className="grid grid-cols-4 gap-5 mt-5"> */}
 
 						{formik.values.members?.length > 0 && (
@@ -643,7 +643,7 @@ function SHGLoanRecoveryDetails() {
 						</div>
 
 						{formik.values.members
-						.filter(member => member.trans_type === "R")
+						.filter(member => member.trans_type === "I")
 						.map((member, index) => (
 
 						<div key={index} className="grid grid-cols-3 gap-5 mt-0">
@@ -672,34 +672,7 @@ function SHGLoanRecoveryDetails() {
 						/>
 						</div>
 
-						{/* <div>
-						<TDInputTemplateBr
-						placeholder="Amount"
-						type="number"
-						// label="Amount"
-						name={`members.${index}.cr_amt`}
-						// formControlName={formik.values.members[index].cr_amt}
-						formControlName={member.credit_amount}
-						// value={formik.values.members[index].cr_amt}
-						handleChange={formik.handleChange}
-						disabled={memberAmount}
-						mode={1}
-						/>
-
-						</div>
-
-						<div>
-						<TDInputTemplateBr
-						placeholder="Outstanding Amount"
-						type="number"
-						// label="Outstanding Amount"
-						name={`members.${index}.mem_outstanding`}
-						// formControlName={member.mem_outstanding}
-						formControlName={member?.loan_outstanding}
-						disabled={true}
-						mode={1}
-						/>
-						</div> */}
+						
 
 						<div>
 						<TDInputTemplateBr

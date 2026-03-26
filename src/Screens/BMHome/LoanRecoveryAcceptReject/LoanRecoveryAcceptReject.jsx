@@ -816,7 +816,7 @@ function LoanRecoveryAcceptReject() {
 						</div>
 
 						{formik.values.members
-						.filter(member => member.trans_type === "R")
+						.filter(member => member.trans_type === "I")
 						.map((member, index) => (
 
 						<div key={index} className="grid grid-cols-3 gap-5 mt-0">

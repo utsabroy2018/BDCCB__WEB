@@ -65,7 +65,7 @@ const group_trans_process = [
 	}
 ]
 
-function GroupExtendedForm({ groupDataArr }) {
+function AddGroupExtendedForm_BDCCB({ groupDataArr }) {
 
 const containerStyle = {
   width: '100%',
@@ -114,6 +114,7 @@ const containerStyle = {
 		branch_id: "",
 		packs_id: "",
 		g_group_name: "",
+		saving_acc_no: "",
 		// g_group_type: "J",
 		g_address: "",
 		// group_leader_name: "",
@@ -165,6 +166,7 @@ const containerStyle = {
 		// 	otherwise: (schema) => schema.notRequired(),
 		// }),
 		g_group_name: Yup.string().required("Group name is required"),
+		saving_acc_no: Yup.string().required("Savings A/C Number is required"),
 		g_address: Yup.string().required("Address is required"),
 		sahayika_id: Yup.string().required("Sahayika name is required"),
 		dist_id: Yup.mixed().required("District is required"),
@@ -175,42 +177,42 @@ const containerStyle = {
 		village_id: Yup.mixed(),
 		g_phone1: Yup.mixed().required("Mobile No. is required"),
 
-		members: Yup.array()
-		.of(
-			Yup.object({
-			member_name: Yup.string().required("Member name required"),
+		// members: Yup.array()
+		// .of(
+		// 	Yup.object({
+		// 	member_name: Yup.string().required("Member name required"),
 
-			address: Yup.string().required("Address required"),
-			sb_acc_no: Yup.string().required("SB Acc No. required"),
-			aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
-			// aadhar_no: Yup.string(),
+		// 	address: Yup.string().required("Address required"),
+		// 	sb_acc_no: Yup.string().required("SB Acc No. required"),
+		// 	aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
+		// 	// aadhar_no: Yup.string(),
 
-			gp_leader_flag: Yup.string()
-				.oneOf(["Y", "N"])
-				.required(),
+		// 	gp_leader_flag: Yup.string()
+		// 		.oneOf(["Y", "N"])
+		// 		.required(),
 
-			asst_gp_leader_flag: Yup.string()
-				.oneOf(["Y", "N"])
-				.required(),
-			})
-		).min(1, "At least one member required")
+		// 	asst_gp_leader_flag: Yup.string()
+		// 		.oneOf(["Y", "N"])
+		// 		.required(),
+		// 	})
+		// ).min(1, "At least one member required")
 
-		// 🔐 ROLE VALIDATION
-		.test(
-			"leader-assistant-rule",
-			"Only one Group Leader and one Assistant Member allowed",
-			(members = []) => {
-			const leaderCount = members.filter(
-				(m) => m.gp_leader_flag === "Y"
-			).length;
+		// // 🔐 ROLE VALIDATION
+		// .test(
+		// 	"leader-assistant-rule",
+		// 	"Only one Group Leader and one Assistant Member allowed",
+		// 	(members = []) => {
+		// 	const leaderCount = members.filter(
+		// 		(m) => m.gp_leader_flag === "Y"
+		// 	).length;
 
-			const assistantCount = members.filter(
-				(m) => m.asst_gp_leader_flag === "Y"
-			).length;
+		// 	const assistantCount = members.filter(
+		// 		(m) => m.asst_gp_leader_flag === "Y"
+		// 	).length;
 
-			return leaderCount <= 1 && assistantCount <= 1;
-			}
-		)
+		// 	return leaderCount <= 1 && assistantCount <= 1;
+		// 	}
+		// )
 
 
 
@@ -499,18 +501,12 @@ const containerStyle = {
 				const ip = await getClientIP()
 			
 				const creds = {
-				// group_code: groupDataArr?.group_code,
-				// branch_code: masterData?.branch_code,
 				group_code: 0,
-				tenant_id: userDetails[0]?.tenant_id,
-				// branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
 				branch_code: formData?.branch_id,
-				// pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
-				pacs_id: formData?.packs_id || 0,
-				direct_indirect_flag: directIndirectStatus,
+				tenant_id: userDetails[0]?.tenant_id,
 				group_name: formData?.g_group_name,
 				phone1: formData?.g_phone1,
-				sahayika_id: formData?.sahayika_id, ///////////////
+				sahayika_id: formData?.sahayika_id,
 				group_addr: formData?.g_address,
 				dist_id: formData?.dist_id,
 				block_id: formData?.block_id,
@@ -519,11 +515,37 @@ const containerStyle = {
 				gp_id: formData?.gp_id,
 				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
-				// sb_ac_no: formData?.g_acc1,
-				members: formData?.members,
+				saving_acc_no: formData?.saving_acc_no,
+				pacs_id: formData?.packs_id || 0,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
+
+				
+				// direct_indirect_flag: directIndirectStatus,
+				// members: formData?.members,
+				
 				}
+
+				// {
+				// "group_code" : "0",
+				// "branch_code": "1",
+				// "tenant_id" : "1",
+				// "group_name" : "TO",
+				// "phone1" : "9632145555",
+				// "sahayika_id" : "8",
+				// "group_addr" : "KOLKATA",
+				// "dist_id" : "2",
+				// "block_id" : "2",
+				// "ps_id" : "2",
+				// "po_id" : "2",
+				// "gp_id" : "2",
+				// "village_id" : "2",
+				// "pin_no" : "712232",
+				// "saving_acc_no":"963566",
+				// "pacs_id":"10",
+				// "created_by": "Lokesh",
+				// "ip_address" : "12.23.23.23"
+				// }
 
 
 				console.log(creds, 'credscredscredscreds', formData);
@@ -532,7 +554,7 @@ const containerStyle = {
 				
 			
 				await saveMasterData({
-				endpoint: "group/save_group",
+				endpoint: "group/add_group",
 				creds,
 				navigate,
 				successMsg: "Group details saved.",
@@ -734,13 +756,6 @@ const containerStyle = {
 
 	const fetchPoliceStation = async (dist_id) => {
 		setLoading(true)
-
-		// const creds = {
-		// 	prov_grp_code: 0,
-		// 	user_type: userDetails?.id,
-		// 	branch_code: userDetails?.brn_code,
-		// }
-
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
@@ -755,15 +770,6 @@ const containerStyle = {
 		})
 			.then((res) => {
 
-			// if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			// } else {
-			// setLoanApplications(res?.data?.msg)
-			// setCopyLoanApplications(res?.data?.msg)
-			// }
-			// console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
 	
 			if(res?.data?.success){
 			// setPoliceStation(res?.data?.data)
@@ -866,11 +872,6 @@ const containerStyle = {
 	const fetchVillList = async (dist_id, block_id, gp_id) => {
 		
 		setLoading(true)
-
-
-		// console.log(dist_id, block_id, gp_id, 'vvvvvvvvvvvvvvvvvvv');
-
-		// return;
 		
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -909,12 +910,6 @@ const containerStyle = {
 	const fetchBranch = async (dist_id) => {
 		setLoading(true)
 
-		// const creds = {
-		// 	prov_grp_code: 0,
-		// 	user_type: userDetails?.id,
-		// 	branch_code: userDetails?.brn_code,
-		// }
-
 			const tokenValue = await getLocalStoreTokenDts(navigate);
 		
 			await axios
@@ -929,14 +924,6 @@ const containerStyle = {
 			})
 			.then((res) => {
 
-			// if(res?.data?.suc === 0){
-			// Message('error', res?.data?.msg)
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			// } else {
-			// setLoanApplications(res?.data?.msg)
-			// setCopyLoanApplications(res?.data?.msg)
-			// }
 			console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx');
 	
 			if(res?.data?.success){
@@ -1027,28 +1014,7 @@ const handleFormikMasterChange = async (e) => {
 };
 
 
-const handleGroupLeaderChange = (index) => {
-  const updated = formik.values.members.map((m, i) => ({
-	...m,
-	gp_leader_flag: i === index ? "Y" : "N",
-	asst_gp_leader_flag: i === index ? "N" : m.asst_gp_leader_flag,
-  }));
 
-  formik.setFieldValue("members", updated);
-};
-
-
-
-
-const handleAssistantChange = (index) => {
-  const updated = formik.values.members.map((m, i) => ({
-	...m,
-	asst_gp_leader_flag: i === index ? "Y" : "N",
-	gp_leader_flag: i === index ? "N" : m.gp_leader_flag,
-  }));
-
-  formik.setFieldValue("members", updated);
-};
 
 const checkMobileExists = async (mobile) => {
   try {
@@ -1099,44 +1065,6 @@ const checkAdharNoExists = async (aadhaarNo, index) => {
 };
 
 
-const handleAdharNoChange = (e, index) => {
-  let value = e.target.value.replace(/\D/g, "");
-
-  if (value.length > 12) return;
-
-  const members = [...formik.values.members];
-
-  // 🔴 DUPLICATE CHECK INSIDE FORM
-  const isDuplicate = members.some(
-	(m, i) => i !== index && m.aadhar_no === value
-  );
-
-  if (isDuplicate) {
-	// set error message for this row
-	setAdharStatus(prev => ({
-	  ...prev,
-	  [index]: {
-		user_status: 1,
-		msg: "Duplicate Aadhaar No.",
-	  },
-	}));
-  } else {
-	// clear duplicate message
-	setAdharStatus(prev => {
-	  const copy = { ...prev };
-	  delete copy[index];
-	  return copy;
-	});
-
-	// call API only if 12 digits and not duplicate
-	if (value.length === 12) {
-	  checkAdharNoExists(value, index);
-	}
-  }
-
-  members[index].aadhar_no = value;
-  formik.setFieldValue("members", members);
-};
 
 const checkSBAccNoExists = async (sbAcc, index) => {
 	try {
@@ -1154,47 +1082,7 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 };
 
 
-const handleSBAccNoChange = (e, index) => {
-  let value = e.target.value.replace(/\D/g, "");
 
-//   console.log(value, 'valuevaluevaluevalue');
-  
-
-//   if (value.length === 12) return;
-
-  const members = [...formik.values.members];
-
-  // 🔴 DUPLICATE CHECK INSIDE FORM
-  const isDuplicate = members.some(
-	(m, i) => i !== index && m.sb_acc_no === value
-  );
-
-  if (isDuplicate) {
-	// set error message for this row
-	setSBAccountStatus(prev => ({
-	  ...prev,
-	  [index]: {
-		user_status: 1,
-		msg: "Duplicate SB A/C No.",
-	  },
-	}));
-  } else {
-	// clear duplicate message
-	setSBAccountStatus(prev => {
-	  const copy = { ...prev };
-	  delete copy[index];
-	  return copy;
-	});
-
-	// call API only if 12 digits and not duplicate
-	// if (value.length > 0) {
-	  checkSBAccNoExists(value, index);
-	// }
-  }
-
-  members[index].sb_acc_no = value;
-  formik.setFieldValue("members", members);
-};
 	return (
 		<>
 		{/* {
@@ -1214,7 +1102,7 @@ const handleSBAccNoChange = (e, index) => {
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
-							{JSON.stringify(branchList, null, 2)}
+							{/* {JSON.stringify(branchList, null, 2)} */}
 					{/* <div className="sm:col-span-3 radioBtn_addgrp">
 						
 						{userDetails[0]?.user_type == 'B' ? 
@@ -1270,7 +1158,7 @@ const handleSBAccNoChange = (e, index) => {
 					</div>
 					{/* )} */}
 
-					{userDetails[0]?.user_type == "P" &&(
+					{userDetails[0]?.user_type == "P" ? (
 						<div className="sm:col-span-2">
 {/* {JSON.stringify(PACKSList, null, 2)} */}
 					<TDInputTemplateBr
@@ -1292,10 +1180,12 @@ const handleSBAccNoChange = (e, index) => {
 					) : null}
 					
 					</div>
+					) : (
+						<div className="sm:col-span-2"></div>
 					)}
 					
 
-							<div className="sm:col-span-4">
+							<div className="sm:col-span-2">
 								<TDInputTemplateBr
 									placeholder="Group Name"
 									type="text"
@@ -1308,6 +1198,22 @@ const handleSBAccNoChange = (e, index) => {
 								/>
 								{formik.errors.g_group_name && formik.touched.g_group_name ? (
 									<VError title={formik.errors.g_group_name} />
+								) : null}
+							</div>
+
+							<div className="sm:col-span-2">
+								<TDInputTemplateBr
+									placeholder="Savings A/C Number"
+									type="text"
+									label="Savings A/C Number"
+									name="saving_acc_no"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.saving_acc_no}
+									mode={1}
+								/>
+								{formik.errors.saving_acc_no && formik.touched.saving_acc_no ? (
+									<VError title={formik.errors.saving_acc_no} />
 								) : null}
 							</div>
 
@@ -1552,389 +1458,6 @@ const handleSBAccNoChange = (e, index) => {
 						</div>
 					</div>
 
-					{/* ================= ADD MEMBER SECTION ================= */}
-<div className="sm:col-span-3 mt-6">
-	{formik.values.members.length > 0 &&(
-		<Tag color="#2563eb" className="text-white mb-3 font-bold">
-			Add Group Members
-		</Tag>
-	)}
-<div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50" style={{position:'relative'}}>
-<div className="col-span-2 text-sm font-semibold">Member Name</div>
-<div className="col-span-2 text-sm font-semibold">SB A/C No.</div>
-<div className="col-span-3 text-sm font-semibold">Aadhaar No.</div>
-<div className="col-span-5 text-sm font-semibold">Address</div>
-</div>
-
-  {formik.values.members.map((member, index) => {
-	const isRowFilled =
-	  member.member_name &&
-	  member.address &&
-	  member.aadhar_no &&
-	  String(member.aadhar_no).length === 12 &&
-	  member.sb_acc_no;
-	//   String(member.sb_acc_no).length === 2;
-
-	return (
-	  <div
-		key={index}
-		className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{position:'relative'}}
-	  >
-	 
-
-{/* Designation */}
-<div className="col-span-12 flex flex-col gap-1" style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'start'}}>
-  {/* Group Leader */}
-  <label className="flex items-center gap-1 text-xs" style={{fontSize:11}}>
-	<input
-	  type="checkbox"
-	//   checked={member.gp_leader_flag}
-	checked={member.gp_leader_flag === "Y"}
-	  onChange={() => handleGroupLeaderChange(index)}
-	/>
-	Group Leader
-  </label>
-
-  {/* Assistant Member */}
-  <label className="flex items-center gap-1 text-xs" style={{fontSize:11}}>
-	<input
-	  type="checkbox"
-	//   checked={member.asst_gp_leader_flag}
-	checked={member.asst_gp_leader_flag === "Y"}
-	  onChange={() => handleAssistantChange(index)}
-	/>
-	Assistant Leader  
-  </label>
-</div>
-
-
-		{/* Name */}
-		<div className="col-span-2">
-		  <TDInputTemplateBr
-			placeholder="Member Name"
-			type="text"
-			name={`members[${index}].member_name`}
-			formControlName={member.member_name}
-			handleChange={formik.handleChange}
-			mode={1}
-		  />
-		</div>
-
-		
-
-		{/* SB ACC */}
-		<div className="col-span-2">
-		<TDInputTemplateBr
-			placeholder="SB A/C No."
-			type="text"   // ✅ MUST be text
-			name={`members[${index}].sb_acc_no`}
-			formControlName={member.sb_acc_no}
-			handleChange={(e) => handleSBAccNoChange(e, index)}
-			mode={1}
-			// disabled={params?.id > 0}
-		/>
-
-		{/* {JSON.stringify(SBAccountStatus[index], null, 2)} */}
-
-		{member.sb_acc_no?.length > 0 && SBAccountStatus[index] && (
-		SBAccountStatus[index]?.user_status == 1 ? (
-			<div style={{ fontSize: 12, color: "red" }}>
-			{SBAccountStatus[index]?.msg}
-			</div>
-		) : (
-			<>
-			{/* <div style={{ fontSize: 12, color: "green" }}>
-			{SBAccountStatus[index]?.msg}
-			</div> */}
-			</>
-		)
-		)}
-		  
-		</div>
-
-		{/* Aadhaar */}
-		<div className="col-span-3">
-		<TDInputTemplateBr
-			placeholder="Aadhaar No"
-			type="text"   // ✅ MUST be text
-			name={`members[${index}].aadhar_no`}
-			formControlName={member.aadhar_no}
-			handleChange={(e) => handleAdharNoChange(e, index)}
-			mode={1}
-		/>
-		{/* {JSON.stringify(adharStatus[index], null, 2)} */}
-		{member.aadhar_no?.length === 12 && adharStatus[index] && (
-		adharStatus[index].user_status == 1 ? (
-			<div style={{ fontSize: 12, color: "red" }}>
-			{adharStatus[index].msg}
-			</div>
-		) : (
-			<>
-			 {/* <div style={{ fontSize: 12, color: "green" }}>
-			 {adharStatus[index].msg}
-			 </div> */}
-			</>
-		)
-		)}
-		  
-		</div>
-
-		{/* Address */}
-		<div className="col-span-5">
-		  <TDInputTemplateBr
-			placeholder="Address"
-			type="text"
-			name={`members[${index}].address`}
-			formControlName={member.address}
-			handleChange={formik.handleChange}
-			mode={1}
-		  />
-		</div>
-
-		{/* Remove */}
-		<div className="col-span-1 text-center" style={{position:'absolute', right:10}}>
-		  {formik.values.members.length > 1 && (
-			<button
-			  type="button"
-			  onClick={() => {
-				const updated = [...formik.values.members];
-				updated.splice(index, 1);
-				formik.setFieldValue("members", updated);
-			  }}
-			  className="text-red-600 font-bold" style={{
-			background: "rgb(218 65 103 / var(--tw-bg-opacity))",
-			padding: "0 7px",
-			height: "25px",
-			color: "#fff",
-			lineHeight: "25px",
-			borderRadius: "5px",
-			marginTop: "13px",
-			fontSize: "13px",
-			}}
-			>
-			  ✕
-			</button>
-		  )}
-		</div>
-
-		{/* Add Button */}
-		{index === formik.values.members.length - 1 && (
-		  <div className="col-span-12 text-right">
-			<Button
-			  type="primary"
-			  disabled={!isRowFilled || adharStatus[index]?.user_status == 1 || SBAccountStatus[index]?.user_status == 1}
-			  onClick={() =>
-				formik.setFieldValue("members", [
-				  ...formik.values.members,
-				  {
-					member_id : 0,
-					member_name: "",
-					address: "",
-					aadhar_no: "",
-					gp_leader_flag: "N",
-					asst_gp_leader_flag: "N",
-				  },
-				])
-			  }
-			>
-			  + Add Member
-			</Button>
-		  </div>
-		)}
-	  </div>
-	);
-  })}
-</div>
-{/* ===================================================== */}
-
-
-					
-
-					{/* {params.id > 0 && (
-							<Divider
-								type="vertical"
-								style={{
-									height: 650,
-								}}
-							/>
-						)} */}
-					{params?.id == 'u' && (
-						<>
-							{/* {JSON.stringify(groupData, null, 2)} */}
-							<div className="sm:col-span-2 mt-5">
-								<div>
-									<Tag color="#DA4167" className="text-white mb-2 font-bold">
-										Assign Group Member
-									</Tag>
-
-									
-
-									<div className="relative overflow-x-auto">
-										<table className="w-full text-sm shadow-lg text-left rtl:text-right text-gray-500 dark:text-gray-400">
-											<thead className="text-xs text-white uppercase bg-slate-800 dark:text-gray-400">
-												<tr>
-													<th scope="col" className="px-6 py-3">
-														Name
-													</th>
-													<th scope="col" className="px-6 py-3">
-														Member Code
-													</th>
-													<th scope="col" className="px-6 py-3">
-														Group Leader
-													</th>
-													
-													<th scope="col" className="px-6 py-3">
-														Action
-													</th>
-												</tr>
-											</thead>
-											<tbody>
-												{groupData?.map((item, i) => (
-													<tr className="bg-white hover:bg-slate-100 ease-linear transition-all cursor-pointer dark:bg-gray-800 border-b-slate-200 border-2"
-													>
-														<th
-															scope="row"
-															className="px-6 py-3 font-bold whitespace-nowrap dark:text-white text-slate-800"
-														>
-															{item.member_name}
-														</th>
-														<th
-															scope="row"
-															className="px-6 py-3 font-bold whitespace-nowrap dark:text-white text-slate-800"
-														>
-															{item.member_code}
-														</th>
-														<th scope="row" className="px-6 py-3 font-bold whitespace-nowrap dark:text-white text-slate-800">
-															{item.gp_leader_flag == "Y" ? 'Yes' : 'No'}
-														</th>
-														
-														<td
-															className={`px-6 py-3`}
-															// onClick={
-															// 	userDetails?.id == 2
-															// 		? () =>
-															// 				navigate(
-															// 					`/homebm/editgrtform/${item?.form_no}`,
-															// 					{
-															// 						state: item,
-															// 					}
-															// 				)
-															// 		: () =>
-															// 				navigate(
-															// 					`/homeco/editgrtform/${item?.form_no}`,
-															// 					{
-															// 						state: item,
-															// 					}
-															// 				)
-															// }
-														>
-															{/* {item?.approval_status === "U" ||
-															(userDetails?.id == 3 &&
-																item?.approval_status === "S") ? (
-																<InfoOutlined className="text-teal-500" />
-															) : (
-																<InfoOutlined className="text-yellow-400" />
-															)} */}
-															<button
-															onClick={() => {
-															console.log("LLSKSIODFUISFH", item)
-															navigate(
-															`/homebm/editMemberGroupForm/${item?.member_code}`,
-															{
-															state: item,
-															}
-															)
-															}}
-															>
-															{/* <EditOutlined
-															className={`text-md ${
-															flag !== "BM" ? "text-slate-800" : "text-slate-800"
-															}`}
-															/> */}
-															<EditOutlined
-															className={`text-md text-slate-800`}
-															/>
-															</button>
-														</td>
-														{/* <td
-															className={`px-6 py-4 font-bold ${
-																item?.tot_outstanding > 0
-																	? "bg-slate-50"
-																	: "bg-red-50"
-															} text-center`}
-															
-														>
-															
-															
-														</td> */}
-													</tr>
-												))}
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-
-							
-							
-{/* 
-							{COMemList_s.length > 0 && (
-								<div className="sm:col-span-2 mt-5">
-									<div>
-										<label
-											className="block mb-2 text-sm capitalize font-bold text-slate-800
-							dark:text-gray-100"
-										>
-											{" "}
-											Assign Group Member
-											<span
-												style={{ color: "red" }}
-												className="ant-tag ml-2 ant-tag-error ant-tag-borderless text-[12.6px] my-2"
-											>
-												(You can Select Maxmimum 5 Member)
-											</span>
-										</label>
-
-										<Toast ref={toast} />
-										<DataTable
-											value={COMemList_s?.map((item, i) => [
-												{ ...item, id: i },
-											]).flat()}
-											selectionMode="checkbox"
-											selection={COMemList_select}
-											onSelectionChange={(e) =>
-												handleSelectionChange_approve(e)
-											}
-											tableStyle={{ minWidth: "50rem" }}
-											dataKey="id"
-											paginator
-											rows={rowsPerPage}
-											first={currentPage}
-											onPage={onPageChange}
-											rowsPerPageOptions={[5, 10, 20]} // Add options for number of rows per page
-											tableClassName="w-full text-sm text-left rtl:text-right shadow-lg text-green-900dark:text-gray-400 table_Custome table_Custome_1st" // Apply row classes
-										>
-											<Column
-												header="Sl No."
-												body={(rowData) => (
-													<span style={{ fontWeight: "bold" }}>
-														{rowData?.id + 1}
-													</span>
-												)}
-											></Column>
-											<Column
-												selectionMode="multiple"
-												headerStyle={{ pointerEvents: "none" }} // Disable "Select All"
-											></Column>
-											<Column field="client_name" header="Name "></Column>
-
-											<Column field="form_no" header="Form No."></Column>
-										</DataTable>
-									</div>
-								</div>
-							)} */}
-						</>
-					)}
 
 					
 
@@ -1950,11 +1473,12 @@ const handleSBAccNoChange = (e, index) => {
 				visible={visible}
 				 onPressYes={() => {
 	if (pendingValues) {
-		if(params?.id > 0) {
-			editGroup(pendingValues);
-		} else {
-			saveGroupData(pendingValues) 
-		}
+		// if(params?.id > 0) {
+		// 	editGroup(pendingValues);
+		// } else {
+		// 	saveGroupData(pendingValues) 
+		// }
+		saveGroupData(pendingValues) 
 		
 	  
 	 // 🔥 pass values here
@@ -2010,4 +1534,4 @@ const handleSBAccNoChange = (e, index) => {
 	)
 }
 
-export default GroupExtendedForm
+export default AddGroupExtendedForm_BDCCB

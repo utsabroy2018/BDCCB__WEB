@@ -73,6 +73,11 @@ const Dashboard = lazy(() => import("./Screens/BMHome/Dashboard/Dashboard"));
 const SearchGroupBM = lazy(() => import("./Screens/BMHome/SearchGroupBM"))
 const EditGroupFormBM = lazy(() => import("./Screens/BMHome/EditGroupFormBM.jsx"))
 
+const SearchMemberBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberBM_BDCCB"))
+const EditMemberFormBM = lazy(() => import("./Screens/BMHome/EditMemberFormBM.jsx"))
+
+const AddGroupFormBM_BDCCB = lazy(() => import("./Screens/BMHome/AddGroupFormBM_BDCCB.jsx"))
+
 // const SearchGroupMemberBM = lazy(() => import("./Screens/BMHome/SearchGroupMemberBM.jsx__BDCCB"))
 // const EditMemberGroupFormBM = lazy(() => import("./Screens/BMHome/EditMemberGroupFormBM.jsx__BDCCB"))
 
@@ -369,6 +374,19 @@ const router = createBrowserRouter([
 								path: "editgroupform/:id",
 								element: <EditGroupFormBM />,
 							},
+							{
+								path: "searchmember",
+								element: <SearchMemberBM_BDCCB />,
+							},
+							{
+								path: "editmemberform/:id",
+								element: <EditMemberFormBM />,
+							},
+							{
+								path: "addgroupform/:id",
+								element: <AddGroupFormBM_BDCCB />,
+							},
+							
 							// {
 							// 	path: "searchGroupMember",
 							// 	element: <SearchGroupMemberBM />,
