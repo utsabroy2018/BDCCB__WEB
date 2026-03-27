@@ -450,18 +450,17 @@ setLoading_Unapprov(false)
 	
 	return (
 		<div className="p-8 space-y-6 bg-slate-50 min-h-screen rounded-3xl">
-			{/* {odDtls && odDtls?.noOfGroups > 0 && (
-				<AlertComp
+			
+				{/* <AlertComp
 					msg={<p className="text-3xl font-normal">
-						<span className="text-lg ">Total OD as on {' ' + dateOfOperation + ' '} 
-						for {odDtls?.noOfGroups} group is </span>
-						{formatINR(odDtls?.data)}
+						<span className="text-lg ">Total OD as on 
+						for group is </span>
 					</p>}
-				/>
-			)} */}
+				/> */}
+		
 
-			{/* {getOpenDt_CloseDt && getOpenDt_CloseDt === 'Y' && (
-				<div className="bg-orange-100 border-t-4 border-orange-500 rounded-b text-orange-700 px-4 py-3 shadow-md" role="alert">
+			{/* {getOpenDt_CloseDt && getOpenDt_CloseDt === 'Y' && ( */}
+				{/* <div className="bg-orange-100 border-t-4 border-orange-500 rounded-b text-orange-700 px-4 py-3 shadow-md" role="alert">
 					<div className="flex">
 						<div className="py-1">
 							<svg className="fill-current h-6 w-6 text-orange-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -473,8 +472,8 @@ setLoading_Unapprov(false)
 							<p className="pb-3 pt-1">Pending Approvals</p>
 						</div>
 					</div>
-				</div>
-			)} */}
+				</div> */}
+			{/* )} */}
 
 			<div className="flex flex-col md:flex-row justify-between items-center">
 				<h1 className="text-lg font-bold text-slate-700 uppercase pl-5">

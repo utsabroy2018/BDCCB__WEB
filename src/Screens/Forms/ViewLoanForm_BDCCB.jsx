@@ -239,6 +239,38 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	}
 
 
+// 	{ 
+//   "tenant_id" : "1",
+//   "branch_id" : "7",
+//   "voucher_dt" : "2026-03-05",
+//   "voucher_id":"0",
+//   "trans_id":"70002",
+//   "voucher_type":"J",
+//   "acc_code":"23101",
+//   "trans_type":"C",
+//   "dr_amt":"500000.00",
+//   "cr_amt":"500000.00",
+//   "society_acc_no" : "458547HUJK",
+//   "created_by" : "test_123",
+//   "ip_address" : "11:12:28",
+//   "group_code" : "70035",
+//   "member_ids" : [
+//     {
+//         "loan_id" : 7007501,
+//         "member_code": "70075",
+//         "trans_id": "1772111858363",
+//         "disb_amt" : "300000.00"
+//     },
+//     {
+//         "loan_id" : 7007602,
+//         "member_code": 70076,
+//         "trans_id": "1772111858396",
+//         "disb_amt" : "200000.00"
+//     }
+//   ]
+// }
+
+
 	// console.log(creds, 'formDataformDataformDataformData', 'approve');
 	// return
 

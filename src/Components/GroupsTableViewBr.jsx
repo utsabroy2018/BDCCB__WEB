@@ -9,6 +9,7 @@ import {
 	CheckCircleOutlined,
 	ClockCircleOutlined,
 	EditOutlined,
+	EyeOutlined,
 	FileTextOutlined,
 	SyncOutlined,
 } from "@ant-design/icons"
@@ -28,6 +29,7 @@ function GroupsTableViewBr({
 
 	const [first, setFirst] = useState(0)
 	const [rows, setRows] = useState(10)
+	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 
 	const onPageChange = (event) => {
 		setFirst(event.first)
@@ -214,11 +216,30 @@ function GroupsTableViewBr({
 													)
 												}}
 											>
-												<EditOutlined
+												{userDetails[0]?.user_type == 'B' ? (
+												<>
+												{item.pacs_id == '111' ? (
+													<EditOutlined
 													className={`text-md ${
 														flag !== "BM" ? "text-slate-800" : "text-slate-800"
 													}`}
 												/>
+												) : (
+													<EyeOutlined
+													className={`text-md ${
+														flag !== "BM" ? "text-slate-800" : "text-slate-800"
+													}`}
+												/>
+												)}
+												</>
+												) : (
+													<EditOutlined
+													className={`text-md ${
+														flag !== "BM" ? "text-slate-800" : "text-slate-800"
+													}`}
+												/>
+												)}
+												
 											</button>
 										{/* )} */}
 									</td>

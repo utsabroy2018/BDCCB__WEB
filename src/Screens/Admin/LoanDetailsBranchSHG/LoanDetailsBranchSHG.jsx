@@ -298,6 +298,16 @@ function LoanDetailsBranchSHG() {
 	return data.ip
 	}
 
+	const totalMemberAmount = useMemo(() => {
+		return Math.round(
+			formik.values.members.reduce(
+				(sum, item) => sum + Number(item.cr_amt || 0),
+				0
+			)
+		)
+	}, [formik.values.members])
+
+
 	const calculatePrincIntarest = async () => {
 
 		setRecoveryBtnShowOff(false)
@@ -314,8 +324,17 @@ function LoanDetailsBranchSHG() {
 			return Message("error", "Principal amount or Interest amount cannot be empty")
 		}
 
+		// 🔥 NEW VALIDATION
+		
+		if (princAmt + intAmt !== totalMemberAmount) {
+			return Message(
+				"error",
+				"Sum Of Principal And Interest Must Match With Total Deposited Amount"
+			);
+		}
 
-		console.log(formik.values.members, 'member_listmember_list');
+
+		// console.log(formik.values.members, 'member_listmember_list');
 		
 
 		// const member_list = loanDetails[0]?.member_list.map(item => ({
@@ -871,13 +890,31 @@ function LoanDetailsBranchSHG() {
 						</div>
 
 						<div className="sm:col-span-2 mt-7">
-							<button
+							{/* <button
 							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-slate-600 border-slate-500 bg-slate-700 transition ease-in-out hover:bg-slate-600 duration-300 rounded-full dark:focus:ring-primary-900`}
 							onClick={() => {
 							calculatePrincIntarest()
 							}}
 							>
 							<SearchOutlined /> <span className={`ml-2`}>Calculate</span>
+							</button> */}
+
+							<button
+								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border 
+								${
+									Number(formik.values.principal_amount || 0) +
+										Number(formik.values.interest_amount || 0) !== totalMemberAmount
+										? "bg-gray-400 cursor-not-allowed"
+										: "border-slate-500 bg-slate-700 hover:bg-slate-600"
+								}
+								rounded-full`}
+								onClick={calculatePrincIntarest}
+								disabled={
+									Number(formik.values.principal_amount || 0) +
+										Number(formik.values.interest_amount || 0) !== totalMemberAmount
+								}
+							>
+								<SearchOutlined /> <span className="ml-2">Calculate</span>
 							</button>
 
 							<button
@@ -890,6 +927,18 @@ function LoanDetailsBranchSHG() {
 							<WalletOutlined /> <span className={`ml-2`}>Recovery</span>
 							</button>
 						</div>
+
+
+
+						{Number(formik.values?.principal_amount || 0) +
+						Number(formik.values?.interest_amount || 0) !== totalMemberAmount && (
+						<div className="sm:col-span-4">
+						<p className="bg-red-500 text-white text-sm px-4 py-2 rounded-md shadow-sm">
+						
+						Sum Of Principal And Interest Must Match With <u><b>Total Deposited Amount</b></u>
+						</p>
+						</div>
+						)}
 
 						</div>
 						</div>

@@ -166,7 +166,7 @@ const containerStyle = {
 		// 	otherwise: (schema) => schema.notRequired(),
 		// }),
 		g_group_name: Yup.string().required("Group name is required"),
-		saving_acc_no: Yup.string().required("Savings A/C Number is required"),
+		saving_acc_no: Yup.string().required("Group Savings A/C Number is required"),
 		g_address: Yup.string().required("Address is required"),
 		sahayika_id: Yup.string().required("Sahayika name is required"),
 		dist_id: Yup.mixed().required("District is required"),
@@ -516,7 +516,7 @@ const containerStyle = {
 				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
 				saving_acc_no: formData?.saving_acc_no,
-				pacs_id: formData?.packs_id || 0,
+				pacs_id: userDetails[0]?.user_type == 'B' ? '111' : formData?.packs_id,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 
@@ -526,27 +526,7 @@ const containerStyle = {
 				
 				}
 
-				// {
-				// "group_code" : "0",
-				// "branch_code": "1",
-				// "tenant_id" : "1",
-				// "group_name" : "TO",
-				// "phone1" : "9632145555",
-				// "sahayika_id" : "8",
-				// "group_addr" : "KOLKATA",
-				// "dist_id" : "2",
-				// "block_id" : "2",
-				// "ps_id" : "2",
-				// "po_id" : "2",
-				// "gp_id" : "2",
-				// "village_id" : "2",
-				// "pin_no" : "712232",
-				// "saving_acc_no":"963566",
-				// "pacs_id":"10",
-				// "created_by": "Lokesh",
-				// "ip_address" : "12.23.23.23"
-				// }
-
+				
 
 				console.log(creds, 'credscredscredscreds', formData);
 
@@ -1203,9 +1183,9 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 
 							<div className="sm:col-span-2">
 								<TDInputTemplateBr
-									placeholder="Savings A/C Number"
+									placeholder="Group Savings A/C Number"
 									type="text"
-									label="Savings A/C Number"
+									label="Group Savings A/C Number"
 									name="saving_acc_no"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}

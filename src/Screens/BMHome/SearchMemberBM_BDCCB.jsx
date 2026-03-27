@@ -48,29 +48,40 @@ function SearchMemberBM_BDCCB() {
 		branch_code: userDetails[0]?.brn_code,
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
-		await axios.post(`${url_bdccb}/group/fetch_group_details`, creds, {
+
+
+		await axios.get(`${url_bdccb}/group/get_group_memb_list`, {
+		params: {
+		branch_code: userDetails[0]?.brn_code
+		},
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
 		},
 		})
+
+
 		.then((res) => {
-// console.log(searchKeywords, 'search', res);
-	if(res?.data?.success){
-	setGroups(res?.data?.data)
-	} else {
-	navigate(routePaths.LANDING)
-	localStorage.clear()
-	}
 
-	})
-	.catch((err) => {
-	Message("error", "Some error occurred while searching...")
-	})
-	setLoading(false)
-	}
+		console.log(res?.data?.data, 'hhhhhhhhhhhhhhhhhhh');
+		
+		if(res?.data?.success){
+			
+			
+		setGroups(res?.data?.data)
+		} else {
+		navigate(routePaths.LANDING)
+		localStorage.clear()
+		}
 
-	const fetchSearchedGroups_ForPacs = async () => {
+		})
+		.catch((err) => {
+		Message("error", "Some error occurred while searching...")
+		})
+		setLoading(false)
+		}
+
+		const fetchSearchedGroups_ForPacs = async () => {
 
 		console.log(searchKeywords, 'search', userDetails[0]?.brn_code);
 		
@@ -80,14 +91,18 @@ function SearchMemberBM_BDCCB() {
 		branch_code: userDetails[0]?.brn_code,
 		}
 		const tokenValue = await getLocalStoreTokenDts(navigate);
-		await axios.post(`${url_bdccb}/group/fetch_pacs_group_details`, creds, {
+
+		await axios.get(`${url_bdccb}/group/get_group_memb_list`, {
+		params: {
+		branch_code: userDetails[0]?.brn_code
+		},
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
 		},
 		})
 		.then((res) => {
-console.log(res?.data?.data, 'searchsearchsearchsearch', res);
+	console.log(res?.data?.data, 'searchsearchsearchsearch', res);
 	if(res?.data?.success){
 	setGroups(res?.data?.data)
 	} else {
@@ -160,7 +175,7 @@ console.log(res?.data?.data, 'searchsearchsearchsearch', res);
 					<MemberTableViewBr_BDCCB
 						flag="BM"
 						loanAppData={groups}
-						title="Member"
+						title="Member List"
 						showSearch={false}
 					/>
 					

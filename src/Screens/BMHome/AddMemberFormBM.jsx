@@ -10,9 +10,9 @@ import FormHeader from "../../Components/FormHeader"
 import { useLocation } from "react-router"
 import Sidebar from "../../Components/Sidebar"
 import GroupExtendedForm from "../Forms/GroupExtendedForm"
-import MemberEditExtendedForm from "../Forms/MemberEditExtendedForm"
+import MemberExtendedForm_BDCCB from "../Forms/MemberExtendedForm_BDCCB"
 
-function EditMemberFormBM() {
+function AddMemberFormBM() {
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
@@ -29,7 +29,7 @@ function EditMemberFormBM() {
 				<div className=" p-5 w-full min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
 						<FormHeader
-							text={`${params?.id == 0 ? "Add Group" : "Edit/Preview Group"}`}
+							text={`${params?.id == 0 ? "Add Member" : "Edit/Preview Member"}`}
 							mode={2}
 						/>
 					</div>
@@ -41,7 +41,7 @@ function EditMemberFormBM() {
 					>
 						<div className="card bg-white border-2 p-5 mx-16 shadow-lg rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 							{/* {JSON.stringify(loanAppData, null, 2)} ccccccccccc */}
-							<MemberEditExtendedForm groupDataArr={loanAppData} />
+							<MemberExtendedForm_BDCCB groupDataArr={loanAppData} />
 						</div>
 					</Spin>
 				</div>
@@ -52,4 +52,4 @@ function EditMemberFormBM() {
 	)
 }
 
-export default EditMemberFormBM
+export default AddMemberFormBM

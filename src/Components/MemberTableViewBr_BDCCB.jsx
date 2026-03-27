@@ -207,7 +207,7 @@ function MemberTableViewBr_BDCCB({
 												onClick={() => {
 													console.log("LLSKSIODFUISFH", item)
 													navigate(
-														`/homebm/editgroupform/${item?.group_code}`,
+														`/homebm/editmemberform/${item?.group_code}`,
 														{
 															state: item,
 														}

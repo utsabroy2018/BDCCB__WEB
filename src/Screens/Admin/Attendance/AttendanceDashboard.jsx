@@ -54,8 +54,7 @@ function AttendanceDashboard() {
 	const handleFetchBranches = async () => {
 		setLoading(true)
 		const tokenValue = await getLocalStoreTokenDts(navigate);
-		await axios
-			.get(`${url}/fetch_all_branch_dt`, {
+		await axios.get(`${url}/fetch_all_branch_dt`, {
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional

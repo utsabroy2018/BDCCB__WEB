@@ -2602,26 +2602,32 @@ const items_bdccb = [
 					icon: <FileSearchOutlined />,
 					label: <Link to={"/homebm/searchSahayikaBM/"}>Edit Sahayika</Link>,
 				},
-				{
-					key: "sub3-3",
-					icon: <PlusCircleOutlined />,
-					label: <Link to={"/homebm/editmemberform/0"}>Add Member</Link>,
-				},
+				
 				// {
 				// 	key: "sub3-4",
 				// 	icon: <FileSearchOutlined />,
 				// 	label: <Link to={"/homebm/searchmember/"}>Edit Member</Link>,
 				// },
 				{
-					key: "sub3-4",
+					key: "sub3-3",
 					icon: <PlusCircleOutlined />,
 					label: <Link to={"/homebm/addgroupform/0"}>Add Group</Link>,
 				},
 				{
-					key: "sub3-5",
+					key: "sub3-4",
 					icon: <FileSearchOutlined />,
 					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
-				}
+				},
+				{
+					key: "sub3-5",
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/addmemberform/0"}>Add Member</Link>,
+				},
+				{
+					key: "sub3-6",
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/searchmember"}>Edit Member</Link>,
+				},
 			],
 		},
 
@@ -2745,21 +2751,32 @@ const items_bdccb_PACS = [
 			icon: <DeploymentUnitOutlined />,
 			label: "Groups",
 			children: [
+				
+				// {
+				// 	key: "sub3-3",
+				// 	icon: <PlusCircleOutlined />,
+				// 	label: <Link to={"/homebm/editgroupform/0"}>Add Group</Link>,
+				// },
 				{
-					key: "sub3-3",
+					key: "sub3-1",
 					icon: <PlusCircleOutlined />,
-					label: <Link to={"/homebm/editmemberform/0"}>Add Member</Link>,
+					label: <Link to={"/homebm/addgroupform/0"}>Add Group</Link>,
+				},
+				{
+					key: "sub3-2",
+					icon: <FileSearchOutlined />,
+					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
 				},
 				{
 					key: "sub3-3",
 					icon: <PlusCircleOutlined />,
-					label: <Link to={"/homebm/editgroupform/0"}>Add Group</Link>,
+					label: <Link to={"/homebm/addmemberform/0"}>Add Member</Link>,
 				},
 				{
 					key: "sub3-4",
-					icon: <FileSearchOutlined />,
-					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
-				}
+					icon: <PlusCircleOutlined />,
+					label: <Link to={"/homebm/searchmember"}>Edit Member</Link>,
+				},
 			],
 		},
 

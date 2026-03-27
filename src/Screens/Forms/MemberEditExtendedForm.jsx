@@ -66,32 +66,7 @@ const group_trans_process = [
 	}
 ]
 
-const genderOptions = [
-  { code: "M", name: "Male" },
-  { code: "F", name: "Female" },
-  { code: "O", name: "Other" },
-];
-
-const religionOptions = [
-  { code: "Hinduism", name: "Hinduism" },
-  { code: "Islam", name: "Islam" },
-  { code: "Christianity", name: "Christianity" },
-  { code: "Jainism", name: "Jainism" },
-  { code: "Buddhism", name: "Buddhism" },
-  { code: "Sikhism", name: "Sikhism" },
-  { code: "Others", name: "Others" },
-];
-
-
-const casteOptions = [
-  { code: "GEN", name: "General" },
-  { code: "SC", name: "SC" },
-  { code: "ST", name: "ST" },
-  { code: "OBCA", name: "OBC A" },
-  { code: "OBCB", name: "OBC B" },
-];
-
-function MemberExtendedForm_BDCCB({ groupDataArr }) {
+function MemberEditExtendedForm({ groupDataArr }) {
 
 	const containerStyle = {
 		width: '100%',
@@ -134,6 +109,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	const [branchList, setBranchList] = useState([]);
 	const [PACKSList, setPACKSList] = useState([]);
 	const [socityEditTimeBranch, setSocityEditTimeBranch] = useState([]);
+
 	const [groupsList, setGroupsList] = useState(() => [])
 	const [groupsDetails, setGroupsDetails] = useState(() => [])
 	const [groupDetailsModal, setGroupDetailsModal] = useState(false);
@@ -143,7 +119,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		branch_id: "",
 		packs_id: "",
 		g_group_name: "",
-		saving_acc_no: "",
 		// g_group_type: "J",
 		g_address: "",
 		// group_leader_name: "",
@@ -168,13 +143,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 				aadhar_no: "",
 				gp_leader_flag: "N",
 				asst_gp_leader_flag: "N",
-
-				husb_father: "",
-				ifsc_code: "",
-				mobile_no: "",
-				gender_field: "",
-				religion_field: "",
-				caste_field: "",
 			}
 		],
 	}
@@ -189,105 +157,99 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 	const validationSchema = Yup.object({
-		branch_id: Yup.string(),
-		g_group_name: Yup.string(),
-		saving_acc_no: Yup.string(),
-		g_address: Yup.string(),
-		sahayika_id: Yup.string(),
-		dist_id: Yup.mixed(),
-		ps_id: Yup.mixed(),
-		po_id: Yup.mixed(),
-		block_id: Yup.mixed(),
-		gp_id: Yup.mixed(),
+		branch_id: Yup.string().required("Branch name is required"),
+		// branch_id: Yup.string().when("directIndirectStatus", {
+		// is: "D",
+		// then: (schema) => schema.required("Branch name is required"),
+		// otherwise: (schema) => schema.notRequired(),
+		// }),
+
+		// packs_id: Yup.string().when("directIndirectStatus", {
+		// 	is: "I",
+		// 	then: (schema) => schema.required("PACKS name is required"),
+		// 	otherwise: (schema) => schema.notRequired(),
+		// }),
+		g_group_name: Yup.string().required("Group name is required"),
+		g_address: Yup.string().required("Address is required"),
+		sahayika_id: Yup.string().required("Sahayika name is required"),
+		dist_id: Yup.mixed().required("District is required"),
+		ps_id: Yup.mixed().required("Police Station is required"),
+		po_id: Yup.mixed().required("Post Office is required"),
+		block_id: Yup.mixed().required("Block is required"),
+		gp_id: Yup.mixed().required("GP Name is required"),
 		village_id: Yup.mixed(),
-		g_phone1: Yup.mixed(),
-
-		// members: Yup.array()
-		// 	.of(
-		// 		Yup.object({
-		// 			member_name: Yup.string().required("Member name required"),
-		// 			// member_name: Yup.string().required("Member name required"),
-
-		// 			address: Yup.string(),
-		// 			sb_acc_no: Yup.string().required("SB Acc No. required"),
-		// 			aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
-		// 			// aadhar_no: Yup.string(),
-
-		// 			gp_leader_flag: Yup.string()
-		// 				.oneOf(["Y", "N"])
-		// 				.required(),
-
-		// 			asst_gp_leader_flag: Yup.string()
-		// 				.oneOf(["Y", "N"])
-		// 				.required(),
-		// 		})
-		// 	).min(1, "At least one member required")
-
-		// 	// 🔐 ROLE VALIDATION
-		// 	.test(
-		// 		"leader-assistant-rule",
-		// 		"Only one Group Leader and one Assistant Member allowed",
-		// 		(members = []) => {
-		// 			const leaderCount = members.filter(
-		// 				(m) => m.gp_leader_flag === "Y"
-		// 			).length;
-
-		// 			const assistantCount = members.filter(
-		// 				(m) => m.asst_gp_leader_flag === "Y"
-		// 			).length;
-
-		// 			return leaderCount <= 1 && assistantCount <= 1;
-		// 		}
-		// 	)
+		g_phone1: Yup.mixed().required("Mobile No. is required"),
 
 		members: Yup.array()
-  .of(
-    Yup.object({
-      member_name: Yup.string().required("Member name required"),
+			.of(
+				Yup.object({
+					member_name: Yup.string().required("Member name required"),
 
-      sb_acc_no: Yup.string().required("SB A/C No. required"),
+					address: Yup.string().required("Address required"),
+					sb_acc_no: Yup.string().required("SB Acc No. required"),
+					aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
+					// aadhar_no: Yup.string(),
 
-      aadhar_no: Yup.string()
-        .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
-        .required("Aadhaar required (Aadhaar must be 12 digits)"),
+					gp_leader_flag: Yup.string()
+						.oneOf(["Y", "N"])
+						.required(),
 
-      mobile_no: Yup.string()
-        .matches(/^[0-9]{10}$/, "Mobile must be 10 digits")
-        .required("Mobile No. required (Mobile must be 10 digits)"),
+					asst_gp_leader_flag: Yup.string()
+						.oneOf(["Y", "N"])
+						.required(),
+				})
+			).min(1, "At least one member required")
 
-      gender_field: Yup.string().required("Gender required"),
+			// 🔐 ROLE VALIDATION
+			.test(
+				"leader-assistant-rule",
+				"Only one Group Leader and one Assistant Member allowed",
+				(members = []) => {
+					const leaderCount = members.filter(
+						(m) => m.gp_leader_flag === "Y"
+					).length;
 
-      gp_leader_flag: Yup.string()
-        .oneOf(["Y", "N"])
-        .required(),
+					const assistantCount = members.filter(
+						(m) => m.asst_gp_leader_flag === "Y"
+					).length;
 
-      asst_gp_leader_flag: Yup.string()
-        .oneOf(["Y", "N"])
-        .required(),
-    })
-  )
-  .min(1, "At least one member required")
-
-  // 🔐 ROLE VALIDATION
-  .test(
-    "leader-assistant-rule",
-    "Only one Group Leader and one Assistant Member allowed",
-    (members = []) => {
-      const leaderCount = members.filter(
-        (m) => m.gp_leader_flag === "Y"
-      ).length;
-
-      const assistantCount = members.filter(
-        (m) => m.asst_gp_leader_flag === "Y"
-      ).length;
-
-      return leaderCount <= 1 && assistantCount <= 1;
-    }
-  )
+					return leaderCount <= 1 && assistantCount <= 1;
+				}
+			)
 
 
 
 	})
+
+
+	useEffect(() => {
+		if (params?.id > 0) {
+			if (userDetails[0]?.user_type == 'B') {
+				fetchGroupDetails()
+			}
+
+			if (userDetails[0]?.user_type == 'P') {
+				fetchGroupDetails_ForPacs()
+			}
+
+		}
+		fetchSahayikaList()
+
+	}, [])
+
+	useEffect(() => {
+		// if(userDetails[0]?.user_type != "P"){
+		// fetchBranch_Group()
+		// }
+
+		if (userDetails[0]?.user_type === 'P' && params?.id > 0) {
+			return;
+		} else {
+			fetchBranch_Group()
+		}
+
+	}, [])
+
 
 
 	// wherever you open popup (e.g. on submit)
@@ -299,37 +261,19 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	};
 
 	const onSubmit = async (values) => {
-
-		// 🔥 Mark all fields as touched
-		const touchedMembers = values.members.map(() => ({
-		member_name: true,
-		sb_acc_no: true,
-		aadhar_no: true,
-		mobile_no: true,
-		gender_field: true,
-		}));
-
-		formik.setTouched({
-		members: touchedMembers,
-		});
-
-		// run validation manually
-		const errors = await formik.validateForm();
-
-		if (Object.keys(errors).length > 0) {
-		return; // ❌ stop submit
-		}
-
-		handleOpenConfirm(values);
-
-		// handleOpenConfirm(values)
+		// setVisible(true)
+		// if (params?.id > 0) {
+		// 	editGroup(values)
+		// }
+		// console.log(values, 'formDataformDataformDataformData');
+		handleOpenConfirm(values)
 
 	}
 
 
 
 	const formik = useFormik({
-		initialValues: formValues,
+		initialValues: +params.id > 0 ? formValues : initialValues,
 		onSubmit,
 		validationSchema,
 		validateOnChange: true,
@@ -347,140 +291,69 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	}
 
 
-
-	const fetchGroupsList = async () => {
-
-		// console.log(searchKeywords, 'search', userDetails[0]?.brn_code);
-		
-		setLoading(true)
-		// const creds = {
-		// group_name: '',
-		// type: userDetails[0]?.user_type,
-		// branch_code: userDetails[0]?.brn_code,
-		// }
-
-		// Query Param   branch_id, type    for Branch type == B for Pacs type == P
-
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		await axios.get(`${url_bdccb}/group/group_list_for_add`, {
-		params: {
-		type: userDetails[0]?.user_type, branch_id: userDetails[0]?.brn_code
-		},
-		headers: {
-		Authorization: `${tokenValue?.token}`, // example header
-		"Content-Type": "application/json", // optional
-		},
-		})
-
-		.then((res) => {
-		// console.log(res?.data?.data, 'searchsearchsearchsearchsearch', creds);
-		if(res?.data?.success){
-		// setGroupsList(res?.data?.data)
-		setGroupsList(res?.data?.data?.map((item, i) => ({
-		code: item?.group_code,
-		name: item?.group_name,
-		})))
-
-		} else {
-		navigate(routePaths.LANDING)
-		localStorage.clear()
-		}
-
-		})
-		.catch((err) => {
-		Message("error", "Some error occurred while searching...")
-		})
-		setLoading(false)
-
-		}
-
-	const fetchGroupDetails = async (groupCode) => {
+	const fetchGroupDetails = async () => {
 		const creds = {
-			// group_name: params?.id,
-			// branch_code: userDetails[0]?.brn_code,
-			group_code: groupCode,
+			group_name: params?.id,
+			branch_code: userDetails[0]?.brn_code,
 		}
-
-		setValues({
-						saving_acc_no: "",
-						branch_id: "",
-						g_address: "",
-						sahayika_id: "",
-						g_pin: "",
-						g_phone1: "",
-						dist_id: "",
-						ps_id: "",
-						po_id: "",
-						block_id: "",
-						gp_id: "",
-						village_id: "",
-						members: []
-
-					})
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		// await axios.post(`${url_bdccb}/group/fetch_grp_dtls_code`, creds, {
-		// 	headers: {
-		// 		Authorization: `${tokenValue?.token}`, // example header
-		// 		"Content-Type": "application/json", // optional
-		// 	},
-		// })
-
-			await axios.get(`${url_bdccb}/group/fetch_grp_dtls_code`, {
-			params: {group_code: groupCode},
+		await axios.post(`${url_bdccb}/group/fetch_group_details`, creds, {
 			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
 			},
-			})
+		})
 			.then((res) => {
 
-				console.log(res?.data?.data[0]?.sb_ac_no, 'groupCodegroupCodegroupCode', creds,);
 
 				if (res?.data?.success) {
-					// console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
-
-					// return;
+					console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
 
 
 					setValues({
-						group_code: res?.data?.data[0]?.group_code,
-						saving_acc_no: res?.data?.data[0]?.sb_ac_no,
-						branch_id: res?.data?.data[0]?.branch_name,
+
+						g_group_name: res?.data?.data[0]?.group_name,
+						branch_id: res?.data?.data[0]?.branch_code,
+						packs_id: res?.data?.data[0]?.pacs_id,
+						// g_group_type: "J",
 						g_address: res?.data?.data[0]?.group_addr,
-						sahayika_id: res?.data?.data[0]?.sahayika_name,
+						group_leader_name: res?.data?.data[0]?.group_leader_name,
+						sahayika_id: res?.data?.data[0]?.sahayika_id,
 						g_pin: res?.data?.data[0]?.pin_no,
 						g_phone1: res?.data?.data[0]?.phone1,
-						dist_id: res?.data?.data[0]?.dist_name,
-						ps_id: res?.data?.data[0]?.ps_name,
-						po_id: res?.data?.data[0]?.post_name,
-						block_id: res?.data?.data[0]?.block_name,
-						gp_id: res?.data?.data[0]?.gp_name,
-						village_id: res?.data?.data[0]?.vill_name,
-						members: [
-									{
-										member_id: 0,
-										member_name: "",
-										address: "",
-										sb_acc_no: "",
-										aadhar_no: "",
-										gp_leader_flag: "N",
-										asst_gp_leader_flag: "N",
-
-										husb_father: "",
-										ifsc_code: "",
-										mobile_no: "",
-										gender_field: "",
-										religion_field: "",
-										caste_field: "",
-									}
-								]
+						g_bank_branch: res?.data?.data[0]?.branch_name,
+						// g_acc1: res?.data?.data[0]?.sb_ac_no,
+						dist_id: res?.data?.data[0]?.dist_id,
+						ps_id: res?.data?.data[0]?.ps_id,
+						po_id: res?.data?.data[0]?.po_id,
+						block_id: res?.data?.data[0]?.block_id,
+						gp_id: res?.data?.data[0]?.gp_id,
+						village_id: res?.data?.data[0]?.village_id,
+						branch_code: res?.data?.data[0]?.branch_code,
+						members: res?.data?.data[0]?.memb_dt
 
 					})
 
-					setGroupsDetails(res?.data?.data[0])
+					setSocityEditTimeBranch([
+
+					])
+					setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
+					// fetchPacks_Group(res?.data?.data[0]?.branch_code)
+
+					fetchBlock(res?.data?.data[0]?.dist_id)
+					fetchPoliceStation(res?.data?.data[0]?.dist_id)
+					fetchPosOffice(res?.data?.data[0]?.dist_id)
+					fetchBranch(res?.data?.data[0]?.dist_id)
+
+					fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
+
+					// setDisCode(res?.data?.msg[0]?.disctrict)
+					console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
+
+					setGroupData(res?.data?.data[0]?.memb_dt);
 
 				} else {
 					navigate(routePaths.LANDING)
@@ -492,23 +365,83 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			})
 	}
 
+	const fetchGroupDetails_ForPacs = async () => {
+		const creds = {
+			group_name: params?.id,
+			branch_code: userDetails[0]?.brn_code,
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/group/fetch_pacs_group_details`, creds, {
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+			},
+		})
+			.then((res) => {
 
 
-	useEffect(() => {
+				if (res?.data?.success) {
+					console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
 
-	fetchGroupsList()
 
-	}, [])
+					setValues({
 
-	useEffect(() => {
+						g_group_name: res?.data?.data[0]?.group_name,
+						branch_id: res?.data?.data[0]?.branch_code,
+						packs_id: res?.data?.data[0]?.pacs_id,
+						// g_group_type: "J",
+						g_address: res?.data?.data[0]?.group_addr,
+						group_leader_name: res?.data?.data[0]?.group_leader_name,
+						sahayika_id: res?.data?.data[0]?.sahayika_id,
+						g_pin: res?.data?.data[0]?.pin_no,
+						g_phone1: res?.data?.data[0]?.phone1,
+						g_bank_branch: res?.data?.data[0]?.branch_name,
+						// g_acc1: res?.data?.data[0]?.sb_ac_no,
+						dist_id: res?.data?.data[0]?.dist_id,
+						ps_id: res?.data?.data[0]?.ps_id,
+						po_id: res?.data?.data[0]?.po_id,
+						block_id: res?.data?.data[0]?.block_id,
+						gp_id: res?.data?.data[0]?.gp_id,
+						village_id: res?.data?.data[0]?.village_id,
+						branch_code: res?.data?.data[0]?.branch_code,
+						members: res?.data?.data[0]?.memb_dt
 
-	if (userDetails[0]?.user_type === 'P' && params?.id > 0) {
-	return;
-	} else {
-	fetchBranch_Group()
+					})
+
+					setBranchList([
+						{
+							code: res?.data?.data[0]?.branch_code,
+							name: res?.data?.data[0]?.branch_name,
+						}]
+					)
+
+					setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
+					// fetchPacks_Group(res?.data?.data[0]?.branch_code)
+
+					fetchBlock(res?.data?.data[0]?.dist_id)
+					fetchPoliceStation(res?.data?.data[0]?.dist_id)
+					fetchPosOffice(res?.data?.data[0]?.dist_id)
+					fetchBranch(res?.data?.data[0]?.dist_id)
+
+					fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
+
+					// setDisCode(res?.data?.msg[0]?.disctrict)
+					// console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
+
+					setGroupData(res?.data?.data[0]?.memb_dt);
+
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
 	}
-
-	}, [])
 
 
 
@@ -520,10 +453,16 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		const creds = {
 			group_code: groupDataArr?.group_code,
 			tenant_id: userDetails[0]?.tenant_id,
+			// branch_code: masterData?.branch_code,
+			// branch_code: userDetails[0]?.brn_code,
+			// branch_code: directIndirectStatus == 'D' ? formData?.branch_id : formData?.packs_id,
+			// branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
 			branch_code: formData?.branch_id,
+			// pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
 			pacs_id: formData?.packs_id || 0,
 			direct_indirect_flag: directIndirectStatus,
 			group_name: formData?.g_group_name,
+			// gp_leader_id: 2, ///////////////
 			phone1: formData?.g_phone1,
 			sahayika_id: formData?.sahayika_id, ///////////////
 			group_addr: formData?.g_address,
@@ -534,6 +473,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			gp_id: formData?.gp_id,
 			village_id: formData?.village_id || 0,
 			pin_no: formData?.g_pin,
+			// sb_ac_no: formData?.g_acc1,
 			members: formData?.members,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
@@ -561,43 +501,35 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	const saveGroupData = async (formData) => {
 		setLoading(true)
 
-		const member_ids = formData?.members.map((item) => ({
-		id: "",   // if not available keep empty
-		member_id: item.member_id || "",
-		member_name: item.member_name || "",
-		father_hus_name: item.husb_father || "",
-		gender: item.gender_field || "",
-		religion: item.religion_field || "",
-		caste: item.caste_field || "",
-		phone_no: item.mobile_no ? String(item.mobile_no) : "",
-		aadhar_no: item.aadhar_no || "",
-		sb_acc_no: item.sb_acc_no || "",
-		ifsc: item.ifsc_code || "",
-		address: item.address || "",
-		gp_leader_flag: item.gp_leader_flag || "N",
-		asst_gp_leader_flag: item.asst_gp_leader_flag || "N",
-		}));
-
-
-
-
-		console.log(formData, 'formDataformDataformDataformData', groupsDetails);
-
-		// return;
-		
-
 		const ip = await getClientIP()
 
 		const creds = {
-			group_code: formData?.group_code,
-			branch_code: groupsDetails?.branch_code,
+			// group_code: groupDataArr?.group_code,
+			// branch_code: masterData?.branch_code,
+			group_code: 0,
 			tenant_id: userDetails[0]?.tenant_id,
-			pacs_id: groupsDetails?.pacs_id || 0,
+			// branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
+			branch_code: formData?.branch_id,
+			// pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
+			pacs_id: formData?.packs_id || 0,
+			direct_indirect_flag: directIndirectStatus,
+			group_name: formData?.g_group_name,
+			phone1: formData?.g_phone1,
+			sahayika_id: formData?.sahayika_id, ///////////////
+			group_addr: formData?.g_address,
+			dist_id: formData?.dist_id,
+			block_id: formData?.block_id,
+			ps_id: formData?.ps_id,
+			po_id: formData?.po_id,
+			gp_id: formData?.gp_id,
+			village_id: formData?.village_id || 0,
+			pin_no: formData?.g_pin,
+			// sb_ac_no: formData?.g_acc1,
+			members: formData?.members,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
-
-			members: member_ids,
 		}
+
 
 		console.log(creds, 'credscredscredscreds', formData);
 
@@ -605,16 +537,12 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 		await saveMasterData({
-			endpoint: "group/add_member",
+			endpoint: "group/save_group",
 			creds,
 			navigate,
 			successMsg: "Group details saved.",
 			// onSuccess: () => navigate(-1),
-			// onSuccess: () => navigate('/homebm/editmemberform/0'),
-			onSuccess: () => {
-			navigate('/homebm/addmemberform/0')
-			window.location.reload()
-			},
+			onSuccess: () => navigate('/homebm/searchgroup/'),
 
 			// 🔥 fully dynamic failure handling
 			failureRedirect: routePaths.LANDING,
@@ -628,6 +556,9 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		setSahayikaList([])
 		setLoading(true)
 
+		// const creds = {
+		// 	tenant_id: userDetails[0]?.tenant_id,
+		// }
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios.get(`${url_bdccb}/trans/sahayika_list`, {
@@ -661,7 +592,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 	useEffect(() => {
 
-		// fetchPacks_Group()
+		fetchPacks_Group()
 
 	}, [])
 
@@ -691,10 +622,22 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 				console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx_____________branch', 'branch');
 				if (res?.data?.success) {
+					// if(userDetails[0]?.user_type == "P"){
+
+					// setBranchList([
+					// 	{
+					// 	code: loanAppData?.branch_code,
+					// 	name: loanAppData?.branch_name,
+					// 	}]
+					// )
+
+					// } else {
 					setBranchList(res?.data?.data?.map((item, i) => ({
 						code: item?.branch_id,
 						name: item?.branch_name,
+						// tenant_id: item?.tenant_id,
 					})))
+					// }
 
 				} else {
 					Message('error', res?.data?.msg)
@@ -797,6 +740,12 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	const fetchPoliceStation = async (dist_id) => {
 		setLoading(true)
 
+		// const creds = {
+		// 	prov_grp_code: 0,
+		// 	user_type: userDetails?.id,
+		// 	branch_code: userDetails?.brn_code,
+		// }
+
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
@@ -880,6 +829,12 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	const fetchGPList = async (dist_id, block_id) => {
 		setLoading(true)
 
+		// const creds = {
+		// 	prov_grp_code: 0,
+		// 	user_type: userDetails?.id,
+		// 	branch_code: userDetails?.brn_code,
+		// }
+
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios.get(`${url_bdccb}/master/gp_list`, {
@@ -918,6 +873,9 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		setLoading(true)
 
 
+		// console.log(dist_id, block_id, gp_id, 'vvvvvvvvvvvvvvvvvvv');
+
+		// return;
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -955,6 +913,12 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 	const fetchBranch = async (dist_id) => {
 		setLoading(true)
+
+		// const creds = {
+		// 	prov_grp_code: 0,
+		// 	user_type: userDetails?.id,
+		// 	branch_code: userDetails?.brn_code,
+		// }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -1011,16 +975,16 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		// 2️⃣ District changed
 		if (name === "dist_id") {
 			if (value?.length > 0) {
-				// fetchBlock(value);
-				// fetchPoliceStation(value);
-				// fetchPosOffice(value);
-				// fetchBranch(value);
+				fetchBlock(value);
+				fetchPoliceStation(value);
+				fetchPosOffice(value);
+				fetchBranch(value);
 				console.log("load district");
 			} else {
-				// setBlocks([]);
-				// setPoliceStation([]);
-				// setPostOffice([]);
-				// setBranch([]);
+				setBlocks([]);
+				setPoliceStation([]);
+				setPostOffice([]);
+				setBranch([]);
 				console.log("reset district");
 			}
 
@@ -1040,7 +1004,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			const distId = formik.values.dist_id;
 
 			if (distId?.length > 0 && value?.length > 0) {
-				// fetchGPList(distId, value);
+				fetchGPList(distId, value);
 			} else {
 				setGpName([]);
 			}
@@ -1057,7 +1021,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			const blockId = formik.values.block_id;
 
 			if (distId?.length > 0 && blockId?.length > 0 && value?.length > 0) {
-				// fetchVillList(distId, blockId, value);
+				fetchVillList(distId, blockId, value);
 			} else {
 				setVillName([]);
 			}
@@ -1251,16 +1215,309 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			>
 				{/* {(userDetails.id == 4 || userDetails.id == 3 || userDetails.id == 2 || userDetails.id == 13) && 
 				<Button htmlType="button" type="primary" icon={<Map />} onClick={() => showModal()} className="my-3">View Distance</Button>} */}
-				{/* {JSON.stringify(groupsDetails, null, 2)} */}
 
 				<form onSubmit={formik.handleSubmit}>
-					<div className="flex justify-start gap-5">
+
+					{/* <div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
 							
+					
+					
+					<div className="sm:col-span-2">
+					<TDInputTemplateBr
+					placeholder="Select Branch"
+					type="text"
+					label="Select Branch *"
+					name="branch_id"
+					// disabled={userDetails[0]?.user_type == 'P' ? true : false}
+					disabled={userDetails[0]?.user_type === 'P' && params?.id > 0}
+					formControlName={formik.values.branch_id}
+					handleChange={(value) => { 
+						formik.setFieldValue("branch_id", value.target.value)
+						// fetchPacks_Group(value.target.value)
+					 }}
+					handleBlur={formik.handleBlur}
+					data={branchList}
+					mode={2}
+					/>
+
+					{formik.errors.branch_id && formik.touched.branch_id ? (
+					<VError title={formik.errors.branch_id} />
+					) : null}
+					
+					
+					</div>
+				
+
+					{userDetails[0]?.user_type == "P" &&(
+						<div className="sm:col-span-2">
+
+					<TDInputTemplateBr
+					placeholder="Select Society"
+					type="text"
+					label="Select Society *"
+					name="packs_id"
+					// disabled={userDetails[0]?.user_type == 'P' ? true : false}
+					disabled={userDetails[0]?.user_type === 'P' && params?.id > 0}
+					formControlName={formik.values.packs_id}
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					data={PACKSList}
+					mode={2}
+					/>		
+					
+					{formik.errors.packs_id && formik.touched.packs_id ? (
+					<VError title={formik.errors.packs_id} />
+					) : null}
+					
+					</div>
+					)}
+					
+
+							<div className="sm:col-span-4">
+								<TDInputTemplateBr
+									placeholder="Group Name"
+									type="text"
+									label="Group Name"
+									name="g_group_name"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.g_group_name}
+									mode={1}
+								/>
+								{formik.errors.g_group_name && formik.touched.g_group_name ? (
+									<VError title={formik.errors.g_group_name} />
+								) : null}
+							</div>
+
+							</div>
+							</div> */}
+
+
+					{/* <div className="flex justify-start gap-5 mb-3">
+							<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full"}>
+								<div className="sm:col-span-2">
+								<TDInputTemplateBr
+									placeholder="Type Address..."
+									type="text"
+									label={`Address`}
+									name="g_address"
+									formControlName={formik.values.g_address}
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									mode={3}
+								/>
+								{formik.errors.g_address && formik.touched.g_address ? (
+									<VError title={formik.errors.g_address} />
+								) : null}
+								</div>
+							</div>
+							</div> */}
+
+					{/* <div className="flex justify-start gap-5">
+							<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full"}>
+
 							
-							
-							<div className="sm:col-span-1">
+
+							<div>
 								
+								<TDInputTemplateBr
+									placeholder="Sahayika Name"
+									type="text"
+									label="Sahayika Name"
+									name="sahayika_id"
+									formControlName={formik.values.sahayika_id}
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									mode={2}
+									data={sahayikaList}
+									// setSahayikaList
+								/>
+								
+
+								{formik.errors.sahayika_id && formik.touched.sahayika_id ? (
+									<VError title={formik.errors.sahayika_id} />
+								) : null}
+							</div>
+
+							<div>
+								<TDInputTemplateBr
+									placeholder="PIN No."
+									type="number"
+									label="PIN No."
+									name="g_pin"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.g_pin}
+									mode={1}
+								/>
+								{formik.errors.g_pin && formik.touched.g_pin ? (
+									<VError title={formik.errors.g_pin} />
+								) : null}
+							</div>
+
+							<div>
+								<TDInputTemplateBr
+									placeholder="Mobile No. Of Group Leader"
+									type="number"
+									label="Mobile No. Of Group Leader"
+									name="g_phone1"
+									// handleChange={formik.handleChange}
+									handleChange={handleMobileChange} 
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.g_phone1}
+									mode={1}
+								/>
+								{mobileExists?.user_status == 1 ?(
+									<div style={{fontSize:12, color:'red'}}>{mobileExists?.msg}</div>
+								) : (
+									<>
+									
+									</>
+								)}
+								{formik.errors.g_phone1 && formik.touched.g_phone1 ? (
+									<VError title={formik.errors.g_phone1} />
+								) : null}
+							</div>
+
+							
+
+							<div>
+							<TDInputTemplateBr
+							placeholder="Select District..."
+							type="text"
+							label="District"
+							name="dist_id"
+							// formControlName={masterData.dist_id}
+							// handleChange={handleChangeMaster}
+							formControlName={formik.values.dist_id}
+							// handleChange={formik.handleChange}
+							handleChange={handleFormikMasterChange} 
+							handleBlur={formik.handleBlur}
+							data={districts}
+							mode={2}
+							/>
+							{formik.errors.dist_id && formik.touched.dist_id ? (
+									<VError title={formik.errors.dist_id} />
+								) : null}
+							</div>
+
+							
+
+						<div>
+						<TDInputTemplateBr
+						placeholder="Select Police Station..."
+						type="text"
+						label="Police Station"
+						name="ps_id"
+						// formControlName={masterData.ps_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.ps_id}
+						// handleChange={formik.handleChange}
+						handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={policeStation}
+						mode={2}
+						/>
+						{formik.errors.ps_id && formik.touched.ps_id ? (
+									<VError title={formik.errors.ps_id} />
+								) : null}
+					</div>
+
+					<div>
+						<TDInputTemplateBr
+						placeholder="Select Post Office..."
+						type="text"
+						label="Post Office"
+						name="po_id"
+						// formControlName={masterData.po_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.po_id}
+						// handleChange={formik.handleChange}
+						handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={postOffice}
+						mode={2}
+						/>
+						{formik.errors.po_id && formik.touched.po_id ? (
+									<VError title={formik.errors.po_id} />
+								) : null}
+					</div>
+
+							<div>
+								
+						<TDInputTemplateBr
+						placeholder="Select Block..."
+						type="text"
+						label="Block"
+						name="block_id"
+						// formControlName={masterData.block_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.block_id}
+						// handleChange={formik.handleChange}
+						handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={blocks}
+						mode={2}
+						/>
+						{formik.errors.block_id && formik.touched.block_id ? (
+									<VError title={formik.errors.block_id} />
+								) : null}
+					</div>
+
+					<div>
+						
+						<TDInputTemplateBr
+						placeholder="Select GP Name..."
+						type="text"
+						label="GP Name"
+						name="gp_id"
+						// formControlName={masterData.gp_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.gp_id}
+						// handleChange={formik.handleChange}
+						handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={gpName}
+						mode={2}
+						/>
+						{formik.errors.gp_id && formik.touched.gp_id ? (
+									<VError title={formik.errors.gp_id} />
+								) : null}
+					</div>
+
+					<div>
+						
+						<TDInputTemplateBr
+						placeholder="Select Village Name..."
+						type="text"
+						label="Village Name"
+						name="village_id"
+						// formControlName={masterData.village_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.village_id}
+						// handleChange={formik.handleChange}
+						handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={villName}
+						mode={2}
+						/>
+						{formik.errors.village_id && formik.touched.village_id ? (
+						<VError title={formik.errors.village_id} />
+						) : null}
+					</div>
+
+					
+						</div>
+					</div> */}
+
+					<div className="flex justify-start gap-5">
+						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
+
+
+
+							<div className="sm:col-span-1">
+
 
 								<TDInputTemplateBr
 									placeholder="Group Name"
@@ -1278,69 +1535,57 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 									mode={2}
 								/>
 
-								
+
 							</div>
 
 							<div className="sm:col-span-1 flex items-end">
-	<Button
-		type="primary"
-		onClick={() => setGroupDetailsModal(true)}
-		disabled={!groupsDetails?.group_code} // disable if no data
-	>
-		View Group Details
-	</Button>
-</div>
+								<Button
+									type="primary"
+									onClick={() => setGroupDetailsModal(true)}
+									disabled={!groupsDetails?.group_code} // disable if no data
+								>
+									View Group Details
+								</Button>
+							</div>
 
 
 						</div>
 					</div>
-					
 
-					{/* {JSON.stringify(formik.errors?.members, null, 2)} */}
-
+					{/* {JSON.stringify(formik.values.members, null, 2)} */}
 
 					{/* ================= ADD MEMBER SECTION ================= */}
 					<div className="sm:col-span-3 mt-6">
-						{formik.values?.members?.length > 0 && (
+						{formik.values.members.length > 0 && (
 							<Tag color="#2563eb" className="text-white mb-3 font-bold">
 								Add Group Members
 							</Tag>
 						)}
-
-						{/* <div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50" style={{ position: 'relative' }}>
+						<div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50" style={{ position: 'relative' }}>
 							<div className="col-span-2 text-sm font-semibold">Member Name</div>
 							<div className="col-span-2 text-sm font-semibold">SB A/C No.</div>
 							<div className="col-span-3 text-sm font-semibold">Aadhaar No.</div>
 							<div className="col-span-5 text-sm font-semibold">Address</div>
-						</div> */}
+						</div>
 
-						{formik.values?.members?.map((member, index) => {
+						{formik.values.members.map((member, index) => {
 							const isRowFilled =
 								member.member_name &&
-								// member.address &&
+								member.address &&
 								member.aadhar_no &&
-
-								// member.husb_father &&
-								// member.ifsc_code &&
-								member.mobile_no &&
-								member.gender_field &&
-								// member.religion_field &&
-								// member.caste_field &&
-
 								String(member.aadhar_no).length === 12 &&
 								member.sb_acc_no;
 							//   String(member.sb_acc_no).length === 2;
 
 							return (
-								<>
 								<div
 									key={index}
-									className="grid grid-cols-6 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{ position: 'relative' }}
+									className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{ position: 'relative' }}
 								>
 
 
 									{/* Designation */}
-									<div className="col-span-6 flex flex-col gap-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start' }}>
+									<div className="col-span-12 flex flex-col gap-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start' }}>
 										{/* Group Leader */}
 										<label className="flex items-center gap-1 text-xs" style={{ fontSize: 11 }}>
 											<input
@@ -1369,18 +1614,12 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 									<div className="col-span-2">
 										<TDInputTemplateBr
 											placeholder="Member Name"
-											label="Member Name *"
 											type="text"
 											name={`members[${index}].member_name`}
 											formControlName={member.member_name}
 											handleChange={formik.handleChange}
 											mode={1}
 										/>
-										{formik.errors?.members?.[index]?.member_name && (
-										<div className="text-red-500 text-xs">
-										{formik.errors.members[index].member_name}
-										</div>
-										)}
 									</div>
 
 
@@ -1389,7 +1628,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 									<div className="col-span-2">
 										<TDInputTemplateBr
 											placeholder="SB A/C No."
-											label="SB A/C No. *"
 											type="text"   // ✅ MUST be text
 											name={`members[${index}].sb_acc_no`}
 											formControlName={member.sb_acc_no}
@@ -1398,7 +1636,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 										// disabled={params?.id > 0}
 										/>
 
-										
+										{/* {JSON.stringify(SBAccountStatus[index], null, 2)} */}
 
 										{member.sb_acc_no?.length > 0 && SBAccountStatus[index] && (
 											SBAccountStatus[index]?.user_status == 1 ? (
@@ -1406,55 +1644,27 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 													{SBAccountStatus[index]?.msg}
 												</div>
 											) : (
-											<>
-											{/* <div style={{ fontSize: 12, color: "green" }}>
-											{SBAccountStatus[index]?.msg}
-											</div> */}
-											</>
+												<>
+													{/* <div style={{ fontSize: 12, color: "green" }}>
+			{SBAccountStatus[index]?.msg}
+			</div> */}
+												</>
 											)
 										)}
-
-										{formik.errors?.members?.[index]?.sb_acc_no && (
-										<div className="text-red-500 text-xs">
-											{formik.errors.members[index].sb_acc_no}
-										</div>
-										)}
-
-									</div>
-
-									{/* IFS Code*/}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-											placeholder="IFS Code"
-											label="IFS Code"
-											type="text"   // ✅ MUST be text
-											name={`members[${index}].ifsc_code`}
-											formControlName={member.ifsc_code}
-											handleChange={formik.handleChange}
-											mode={1}
-										// disabled={params?.id > 0}
-										/>
 
 									</div>
 
 									{/* Aadhaar */}
-									<div className="col-span-2">
+									<div className="col-span-3">
 										<TDInputTemplateBr
 											placeholder="Aadhaar No"
-											label="Aadhaar No *"
 											type="text"   // ✅ MUST be text
 											name={`members[${index}].aadhar_no`}
 											formControlName={member.aadhar_no}
 											handleChange={(e) => handleAdharNoChange(e, index)}
 											mode={1}
 										/>
-
-										{formik.errors?.members?.[index]?.aadhar_no && (
-										<div className="text-red-500 text-xs">
-											{formik.errors.members[index].aadhar_no}
-										</div>
-										)}
-
+										{/* {JSON.stringify(adharStatus[index], null, 2)} */}
 										{member.aadhar_no?.length === 12 && adharStatus[index] && (
 											adharStatus[index].user_status == 1 ? (
 												<div style={{ fontSize: 12, color: "red" }}>
@@ -1462,106 +1672,19 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 												</div>
 											) : (
 												<>
-												{/* <div style={{ fontSize: 12, color: "green" }}>
-												{adharStatus[index].msg}
-												</div> */}
+													{/* <div style={{ fontSize: 12, color: "green" }}>
+			 {adharStatus[index].msg}
+			 </div> */}
 												</>
 											)
 										)}
 
 									</div>
 
-									
-
-									{/* Husband's/Father's Name */}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-											placeholder="Husband's/Father's Name"
-											label="Husband's/Father's Name"
-											type="text"
-											name={`members[${index}].husb_father`}
-											formControlName={member.husb_father}
-											handleChange={formik.handleChange}
-											mode={1}
-										/>
-									</div>
-
-									{/* Mobile No. */}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-											placeholder="Mobile No"
-											label="Mobile No *"
-											type="number"
-											name={`members[${index}].mobile_no`}
-											formControlName={member.mobile_no}
-											handleChange={formik.handleChange}
-											mode={1}
-										/>
-
-										{formik.errors?.members?.[index]?.mobile_no && (
-										<div className="text-red-500 text-xs">
-											{formik.errors.members[index].mobile_no}
-										</div>
-										)}
-
-									</div>
-									
-									{/* Gender*/}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-										placeholder="Select Gender..."
-										label="Gender *"
-										type="text"
-										name={`members[${index}].gender_field`}
-										formControlName={formik.values.members[index]?.gender_field}
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										data={genderOptions}
-										mode={2}
-										/>
-
-										{formik.errors?.members?.[index]?.gender_field && (
-										<div className="text-red-500 text-xs">
-											{formik.errors.members[index].gender_field}
-										</div>
-										)}
-									</div>
-
-									{/* Religion*/}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-										placeholder="Select Religion..."
-										label="Religion"
-										type="text"
-										name={`members[${index}].religion_field`}
-										formControlName={formik.values.members[index]?.religion_field}
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										data={religionOptions}
-										mode={2}
-										/>
-									</div>
-
-									{/* Religion*/}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-										placeholder="Select Caste..."
-										label="Caste"
-										type="text"
-										name={`members[${index}].caste_field`}
-										formControlName={formik.values.members[index]?.caste_field}
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										data={casteOptions}
-										mode={2}
-										/>
-									</div>
-
 									{/* Address */}
-									<div className="col-span-6">
+									<div className="col-span-5">
 										<TDInputTemplateBr
 											placeholder="Address"
-											label="Address"
 											type="text"
 											name={`members[${index}].address`}
 											formControlName={member.address}
@@ -1569,7 +1692,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 											mode={1}
 										/>
 									</div>
-									
 
 									{/* Remove */}
 									<div className="col-span-1 text-center" style={{ position: 'absolute', right: 10 }}>
@@ -1597,10 +1719,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 										)}
 									</div>
 
-									</div>
-
-									<div className="grid grid-cols-12 gap-3 p-3">
-										
 									{/* Add Button */}
 									{index === formik.values.members.length - 1 && (
 										<div className="col-span-12 text-right">
@@ -1625,9 +1743,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 											</Button>
 										</div>
 									)}
-
 								</div>
-								</>
 							);
 						})}
 					</div>
@@ -1761,6 +1877,64 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 								</div>
 							</div>
 
+
+
+							{/* 
+							{COMemList_s.length > 0 && (
+								<div className="sm:col-span-2 mt-5">
+									<div>
+										<label
+											className="block mb-2 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"
+										>
+											{" "}
+											Assign Group Member
+											<span
+												style={{ color: "red" }}
+												className="ant-tag ml-2 ant-tag-error ant-tag-borderless text-[12.6px] my-2"
+											>
+												(You can Select Maxmimum 5 Member)
+											</span>
+										</label>
+
+										<Toast ref={toast} />
+										<DataTable
+											value={COMemList_s?.map((item, i) => [
+												{ ...item, id: i },
+											]).flat()}
+											selectionMode="checkbox"
+											selection={COMemList_select}
+											onSelectionChange={(e) =>
+												handleSelectionChange_approve(e)
+											}
+											tableStyle={{ minWidth: "50rem" }}
+											dataKey="id"
+											paginator
+											rows={rowsPerPage}
+											first={currentPage}
+											onPage={onPageChange}
+											rowsPerPageOptions={[5, 10, 20]} // Add options for number of rows per page
+											tableClassName="w-full text-sm text-left rtl:text-right shadow-lg text-green-900dark:text-gray-400 table_Custome table_Custome_1st" // Apply row classes
+										>
+											<Column
+												header="Sl No."
+												body={(rowData) => (
+													<span style={{ fontWeight: "bold" }}>
+														{rowData?.id + 1}
+													</span>
+												)}
+											></Column>
+											<Column
+												selectionMode="multiple"
+												headerStyle={{ pointerEvents: "none" }} // Disable "Select All"
+											></Column>
+											<Column field="client_name" header="Name "></Column>
+
+											<Column field="form_no" header="Form No."></Column>
+										</DataTable>
+									</div>
+								</div>
+							)} */}
 						</>
 					)}
 
@@ -1778,12 +1952,11 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 				visible={visible}
 				onPressYes={() => {
 					if (pendingValues) {
-						// if (params?.id > 0) {
-						// 	editGroup(pendingValues);
-						// } else {
-						// 	saveGroupData(pendingValues)
-						// }
-						saveGroupData(pendingValues)
+						if (params?.id > 0) {
+							editGroup(pendingValues);
+						} else {
+							saveGroupData(pendingValues)
+						}
 
 
 						// 🔥 pass values here
@@ -1793,38 +1966,78 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 				onPressNo={() => setVisible(!visible)}
 			/>
 
-
 			<Modal
-	title={<span className="text-lg font-semibold text-[#DA4167]">Group Details</span>}
-	open={groupDetailsModal}
-	onCancel={() => setGroupDetailsModal(false)}
-	footer={null}
-	width={900}
->
-	{groupsDetails ? (
-		<Descriptions bordered column={1} size="small">
-	<Descriptions.Item label="Group Code">{groupsDetails.group_code}</Descriptions.Item>
-	<Descriptions.Item label="Group Name">{groupsDetails.group_name}</Descriptions.Item>
-	<Descriptions.Item label="Branch">{groupsDetails.branch_name}</Descriptions.Item>
-	<Descriptions.Item label="Sahayika">{groupsDetails.sahayika_name}</Descriptions.Item>
-	<Descriptions.Item label="Phone">{groupsDetails.phone1}</Descriptions.Item>
-	<Descriptions.Item label="District">{groupsDetails.dist_name}</Descriptions.Item>
-	<Descriptions.Item label="Block">{groupsDetails.block_name}</Descriptions.Item>
-	<Descriptions.Item label="Police Station">{groupsDetails.ps_name}</Descriptions.Item>
-	<Descriptions.Item label="Post Office">{groupsDetails.post_name}</Descriptions.Item>
-	<Descriptions.Item label="GP">{groupsDetails.gp_name}</Descriptions.Item>
-	<Descriptions.Item label="Village">{groupsDetails.vill_name}</Descriptions.Item>
-	<Descriptions.Item label="Address">{groupsDetails.group_addr}</Descriptions.Item>
-	<Descriptions.Item label="Savings A/C">{groupsDetails.sb_ac_no}</Descriptions.Item>
-</Descriptions>
-	) : (
-		<p>No data available</p>
-	)}
-</Modal>
+				title={<span className="text-lg font-semibold text-[#DA4167]">Group Details</span>}
+				open={groupDetailsModal}
+				onCancel={() => setGroupDetailsModal(false)}
+				footer={null}
+				width={900}
+			>
+				{groupsDetails ? (
+					<Descriptions bordered column={1} size="small">
+				<Descriptions.Item label="Group Code">{groupsDetails.group_code}</Descriptions.Item>
+				<Descriptions.Item label="Group Name">{groupsDetails.group_name}</Descriptions.Item>
+				<Descriptions.Item label="Branch">{groupsDetails.branch_name}</Descriptions.Item>
+				<Descriptions.Item label="Sahayika">{groupsDetails.sahayika_name}</Descriptions.Item>
+				<Descriptions.Item label="Phone">{groupsDetails.phone1}</Descriptions.Item>
+				<Descriptions.Item label="District">{groupsDetails.dist_name}</Descriptions.Item>
+				<Descriptions.Item label="Block">{groupsDetails.block_name}</Descriptions.Item>
+				<Descriptions.Item label="Police Station">{groupsDetails.ps_name}</Descriptions.Item>
+				<Descriptions.Item label="Post Office">{groupsDetails.post_name}</Descriptions.Item>
+				<Descriptions.Item label="GP">{groupsDetails.gp_name}</Descriptions.Item>
+				<Descriptions.Item label="Village">{groupsDetails.vill_name}</Descriptions.Item>
+				<Descriptions.Item label="Address">{groupsDetails.group_addr}</Descriptions.Item>
+				<Descriptions.Item label="Savings A/C">{groupsDetails.sb_ac_no}</Descriptions.Item>
+			</Descriptions>
+				) : (
+					<p>No data available</p>
+				)}
+			</Modal>
+
+			{/* <DialogBox
+  onPress={() => setVisible(!visible)}
+  visible={visible}
+  onPressYes={() => {
+	if (pendingValues) {
+	  editGroup(pendingValues);   // 🔥 pass values here
+	}
+	setVisible(false);
+  }}
+  onPressNo={() => setVisible(false)}
+/> */}
+
+			{/* <DialogBox
+				// flag={flag}
+				// data={flag == 5 ? group_code : ""}
+				onPress={() => setVisible(!visible)}
+				visible={visible}
+				onPressYes={() => {
+					// console.log(flag,'oooooooooooooooooooooo');
+					
+					// if (flag == 4) {
+						editGroup()
+					// } else {
+					// 	if (params?.id < 1) {
+					// 		navigate(`/homebm/searchgroup/`)
+					// 	}
+
+					// 	if (params?.id > 0) {
+					// 		// editGroup()
+					// 		navigate(`/homebm/searchgroup/`)
+					// 	}
+					// }
+					setVisible(!visible)
+				}}
+				onPressNo={() => setVisible(!visible)}
+			/> */}
+
+
+
+
 
 
 		</>
 	)
 }
 
-export default MemberExtendedForm_BDCCB
+export default MemberEditExtendedForm

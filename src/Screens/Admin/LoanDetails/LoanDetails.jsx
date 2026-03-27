@@ -241,11 +241,11 @@ function LoanDetails() {
 		}
 
 		// 🔥 NEW VALIDATION
-		if (princAmt + intAmt > totalMemberAmount) {
+		if (princAmt + intAmt !== totalMemberAmount) {
 			return Message(
 				"error",
-				"Principal + Interest cannot be greater than total member amount"
-			)
+				"Sum Of Principal And Interest Must Match With Total Deposited Amount"
+			);
 		}
 
 
@@ -723,19 +723,21 @@ function LoanDetails() {
 							</button> */}
 
 							<button
-								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border 
-								${(Number(formik.values.principal_amount || 0) + Number(formik.values.interest_amount || 0) > totalMemberAmount)
-									? "bg-gray-400 cursor-not-allowed"
-									: "border-slate-500 bg-slate-700 hover:bg-slate-600"}
-								rounded-full`}
-								onClick={calculatePrincIntarest}
-								disabled={
-									Number(formik.values.principal_amount || 0) +
-										Number(formik.values.interest_amount || 0) >
-									totalMemberAmount
-								}
+							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border 
+							${
+							Number(formik.values.principal_amount || 0) +
+							Number(formik.values.interest_amount || 0) !== totalMemberAmount
+							? "bg-gray-400 cursor-not-allowed"
+							: "border-slate-500 bg-slate-700 hover:bg-slate-600"
+							}
+							rounded-full`}
+							onClick={calculatePrincIntarest}
+							disabled={
+							Number(formik.values.principal_amount || 0) +
+							Number(formik.values.interest_amount || 0) !== totalMemberAmount
+							}
 							>
-								<SearchOutlined /> <span className="ml-2">Calculate</span>
+							<SearchOutlined /> <span className="ml-2">Calculate</span>
 							</button>
 
 							<button
@@ -750,12 +752,12 @@ function LoanDetails() {
 						</div>
 
 						
-						{Number(formik.values.principal_amount || 0) +
-						Number(formik.values.interest_amount || 0) >
-						totalMemberAmount && (
+						{Number(formik.values?.principal_amount || 0) +
+						Number(formik.values?.interest_amount || 0) !== totalMemberAmount && (
 						<div className="sm:col-span-4">
 						<p className="bg-red-500 text-white text-sm px-4 py-2 rounded-md shadow-sm">
-						Principal + Interest exceeds total member amount
+						
+						Sum Of Principal And Interest Must Match With <u><b>Total Deposited Amount</b></u>
 						</p>
 						</div>
 						)}

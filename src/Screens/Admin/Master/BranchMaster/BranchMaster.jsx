@@ -82,8 +82,7 @@ function BranchMaster() {
 			const tokenValue = await getLocalStoreTokenDts(navigate);
 		console.log({dist_id: dist_id, tenant_id: userDetails[0]?.tenant_id , branch_id: 0}, 'userDetailsuserDetailsuserDetails');
 		
-			await axios
-				.get(`${url_bdccb}/master/branch_list`, {
+			await axios.get(`${url_bdccb}/master/branch_list`, {
 					params: {
 					dist_id: dist_id, tenant_id: userDetails[0]?.tenant_id ,branch_id: 0
 					},

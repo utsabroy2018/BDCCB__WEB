@@ -74,6 +74,7 @@ const SearchGroupBM = lazy(() => import("./Screens/BMHome/SearchGroupBM"))
 const EditGroupFormBM = lazy(() => import("./Screens/BMHome/EditGroupFormBM.jsx"))
 
 const SearchMemberBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberBM_BDCCB"))
+const AddMemberFormBM = lazy(() => import("./Screens/BMHome/AddMemberFormBM.jsx"))
 const EditMemberFormBM = lazy(() => import("./Screens/BMHome/EditMemberFormBM.jsx"))
 
 const AddGroupFormBM_BDCCB = lazy(() => import("./Screens/BMHome/AddGroupFormBM_BDCCB.jsx"))
@@ -381,6 +382,10 @@ const router = createBrowserRouter([
 							{
 								path: "editmemberform/:id",
 								element: <EditMemberFormBM />,
+							},
+							{
+								path: "addmemberform/:id",
+								element: <AddMemberFormBM />,
 							},
 							{
 								path: "addgroupform/:id",
