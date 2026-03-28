@@ -130,7 +130,7 @@ function MemberTableViewBr_BDCCB({
 								Group Name
 							</th>
 							<th scope="col" className="p-4">
-								Group Type
+								Total Member
 							</th>
 							{/* <th scope="col" className="p-4">
 								Member Code
@@ -173,7 +173,7 @@ function MemberTableViewBr_BDCCB({
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
 									<td className="px-6 py-3 text-slate-700">
-										{item.group_type === "J" ? "JLG" : "SHG"}
+										{item.total_members}
 									</td>
 									<td className="px-6 py-3 text-slate-700">
 										{/* {flag !== "BM" ? (

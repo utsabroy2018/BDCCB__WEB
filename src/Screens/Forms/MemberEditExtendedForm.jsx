@@ -66,6 +66,31 @@ const group_trans_process = [
 	}
 ]
 
+const genderOptions = [
+  { code: "M", name: "Male" },
+  { code: "F", name: "Female" },
+  { code: "O", name: "Other" },
+];
+
+const religionOptions = [
+  { code: "Hinduism", name: "Hinduism" },
+  { code: "Islam", name: "Islam" },
+  { code: "Christianity", name: "Christianity" },
+  { code: "Jainism", name: "Jainism" },
+  { code: "Buddhism", name: "Buddhism" },
+  { code: "Sikhism", name: "Sikhism" },
+  { code: "Others", name: "Others" },
+];
+
+
+const casteOptions = [
+  { code: "GEN", name: "General" },
+  { code: "SC", name: "SC" },
+  { code: "ST", name: "ST" },
+  { code: "OBCA", name: "OBC A" },
+  { code: "OBCB", name: "OBC B" },
+];
+
 function MemberEditExtendedForm({ groupDataArr }) {
 
 	const containerStyle = {
@@ -136,13 +161,20 @@ function MemberEditExtendedForm({ groupDataArr }) {
 		branch_code: "",
 		members: [
 			{
-				member_id: 0,
+				member_code: 0,
 				member_name: "",
 				address: "",
 				sb_acc_no: "",
 				aadhar_no: "",
 				gp_leader_flag: "N",
 				asst_gp_leader_flag: "N",
+
+				husb_father: "",
+				ifsc_code: "",
+				mobile_no: "",
+				gender_field: "",
+				religion_field: "",
+				caste_field: "",
 			}
 		],
 	}
@@ -157,99 +189,103 @@ function MemberEditExtendedForm({ groupDataArr }) {
 
 
 	const validationSchema = Yup.object({
-		branch_id: Yup.string().required("Branch name is required"),
-		// branch_id: Yup.string().when("directIndirectStatus", {
-		// is: "D",
-		// then: (schema) => schema.required("Branch name is required"),
-		// otherwise: (schema) => schema.notRequired(),
-		// }),
+		// branch_id: Yup.string().required("Branch name is required"),
+		// g_group_name: Yup.string().required("Group name is required"),
+		// g_address: Yup.string().required("Address is required"),
+		// sahayika_id: Yup.string().required("Sahayika name is required"),
+		// dist_id: Yup.mixed().required("District is required"),
+		// ps_id: Yup.mixed().required("Police Station is required"),
+		// po_id: Yup.mixed().required("Post Office is required"),
+		// block_id: Yup.mixed().required("Block is required"),
+		// gp_id: Yup.mixed().required("GP Name is required"),
+		// village_id: Yup.mixed(),
+		// g_phone1: Yup.mixed().required("Mobile No. is required"),
 
-		// packs_id: Yup.string().when("directIndirectStatus", {
-		// 	is: "I",
-		// 	then: (schema) => schema.required("PACKS name is required"),
-		// 	otherwise: (schema) => schema.notRequired(),
-		// }),
-		g_group_name: Yup.string().required("Group name is required"),
-		g_address: Yup.string().required("Address is required"),
-		sahayika_id: Yup.string().required("Sahayika name is required"),
-		dist_id: Yup.mixed().required("District is required"),
-		ps_id: Yup.mixed().required("Police Station is required"),
-		po_id: Yup.mixed().required("Post Office is required"),
-		block_id: Yup.mixed().required("Block is required"),
-		gp_id: Yup.mixed().required("GP Name is required"),
-		village_id: Yup.mixed(),
-		g_phone1: Yup.mixed().required("Mobile No. is required"),
+		// members: Yup.array()
+		// 	.of(
+		// 		Yup.object({
+		// 			member_name: Yup.string().required("Member name required"),
+
+		// 			address: Yup.string().required("Address required"),
+		// 			sb_acc_no: Yup.string().required("SB Acc No. required"),
+		// 			aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
+		// 			// aadhar_no: Yup.string(),
+
+		// 			gp_leader_flag: Yup.string()
+		// 				.oneOf(["Y", "N"])
+		// 				.required(),
+
+		// 			asst_gp_leader_flag: Yup.string()
+		// 				.oneOf(["Y", "N"])
+		// 				.required(),
+		// 		})
+		// 	).min(1, "At least one member required")
+
+		// 	// 🔐 ROLE VALIDATION
+		// 	.test(
+		// 		"leader-assistant-rule",
+		// 		"Only one Group Leader and one Assistant Member allowed",
+		// 		(members = []) => {
+		// 			const leaderCount = members.filter(
+		// 				(m) => m.gp_leader_flag === "Y"
+		// 			).length;
+
+		// 			const assistantCount = members.filter(
+		// 				(m) => m.asst_gp_leader_flag === "Y"
+		// 			).length;
+
+		// 			return leaderCount <= 1 && assistantCount <= 1;
+		// 		}
+		// 	)
 
 		members: Yup.array()
-			.of(
-				Yup.object({
-					member_name: Yup.string().required("Member name required"),
-
-					address: Yup.string().required("Address required"),
-					sb_acc_no: Yup.string().required("SB Acc No. required"),
-					aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
-					// aadhar_no: Yup.string(),
-
-					gp_leader_flag: Yup.string()
-						.oneOf(["Y", "N"])
-						.required(),
-
-					asst_gp_leader_flag: Yup.string()
-						.oneOf(["Y", "N"])
-						.required(),
-				})
-			).min(1, "At least one member required")
-
-			// 🔐 ROLE VALIDATION
-			.test(
-				"leader-assistant-rule",
-				"Only one Group Leader and one Assistant Member allowed",
-				(members = []) => {
-					const leaderCount = members.filter(
-						(m) => m.gp_leader_flag === "Y"
-					).length;
-
-					const assistantCount = members.filter(
-						(m) => m.asst_gp_leader_flag === "Y"
-					).length;
-
-					return leaderCount <= 1 && assistantCount <= 1;
-				}
-			)
+		  .of(
+			Yup.object({
+			  member_name: Yup.string().required("Member name required"),
+		
+			  sb_acc_no: Yup.string().required("SB A/C No. required"),
+		
+			  aadhar_no: Yup.string()
+				.matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
+				.required("Aadhaar required (Aadhaar must be 12 digits)"),
+		
+			  mobile_no: Yup.string()
+				.matches(/^[0-9]{10}$/, "Mobile must be 10 digits")
+				.required("Mobile No. required (Mobile must be 10 digits)"),
+		
+			  gender_field: Yup.string().required("Gender required"),
+		
+			  gp_leader_flag: Yup.string()
+				.oneOf(["Y", "N"])
+				.required(),
+		
+			  asst_gp_leader_flag: Yup.string()
+				.oneOf(["Y", "N"])
+				.required(),
+			})
+		  )
+		  .min(1, "At least one member required")
+		
+		  // 🔐 ROLE VALIDATION
+		  .test(
+			"leader-assistant-rule",
+			"Only one Group Leader and one Assistant Member allowed",
+			(members = []) => {
+			  const leaderCount = members.filter(
+				(m) => m.gp_leader_flag === "Y"
+			  ).length;
+		
+			  const assistantCount = members.filter(
+				(m) => m.asst_gp_leader_flag === "Y"
+			  ).length;
+		
+			  return leaderCount <= 1 && assistantCount <= 1;
+			}
+		  )
 
 
 
 	})
-
-
-	useEffect(() => {
-		if (params?.id > 0) {
-			if (userDetails[0]?.user_type == 'B') {
-				fetchGroupDetails()
-			}
-
-			if (userDetails[0]?.user_type == 'P') {
-				fetchGroupDetails_ForPacs()
-			}
-
-		}
-		fetchSahayikaList()
-
-	}, [])
-
-	useEffect(() => {
-		// if(userDetails[0]?.user_type != "P"){
-		// fetchBranch_Group()
-		// }
-
-		if (userDetails[0]?.user_type === 'P' && params?.id > 0) {
-			return;
-		} else {
-			fetchBranch_Group()
-		}
-
-	}, [])
-
 
 
 	// wherever you open popup (e.g. on submit)
@@ -265,7 +301,7 @@ function MemberEditExtendedForm({ groupDataArr }) {
 		// if (params?.id > 0) {
 		// 	editGroup(values)
 		// }
-		// console.log(values, 'formDataformDataformDataformData');
+		console.log(values, 'formDataformDataformDataformData');
 		handleOpenConfirm(values)
 
 	}
@@ -299,61 +335,84 @@ function MemberEditExtendedForm({ groupDataArr }) {
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/group/fetch_group_details`, creds, {
-			headers: {
-				Authorization: `${tokenValue?.token}`, // example header
-				"Content-Type": "application/json", // optional
-			},
+		// await axios.post(`${url_bdccb}/group/fetch_group_details`, creds, {
+		// 	headers: {
+		// 		Authorization: `${tokenValue?.token}`, // example header
+		// 		"Content-Type": "application/json", // optional
+		// 	},
+		// })
+
+		await axios.get(`${url_bdccb}/group/fetch_member_dtls`, {
+		params: {
+		group_code: params?.id
+		},
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		}
 		})
-			.then((res) => {
+		.then((res) => {
 
 
 				if (res?.data?.success) {
 					console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
 
 
+					setGroupsDetails(res?.data?.data?.groupDetails)
 					setValues({
 
-						g_group_name: res?.data?.data[0]?.group_name,
-						branch_id: res?.data?.data[0]?.branch_code,
-						packs_id: res?.data?.data[0]?.pacs_id,
-						// g_group_type: "J",
-						g_address: res?.data?.data[0]?.group_addr,
-						group_leader_name: res?.data?.data[0]?.group_leader_name,
-						sahayika_id: res?.data?.data[0]?.sahayika_id,
-						g_pin: res?.data?.data[0]?.pin_no,
-						g_phone1: res?.data?.data[0]?.phone1,
-						g_bank_branch: res?.data?.data[0]?.branch_name,
-						// g_acc1: res?.data?.data[0]?.sb_ac_no,
-						dist_id: res?.data?.data[0]?.dist_id,
-						ps_id: res?.data?.data[0]?.ps_id,
-						po_id: res?.data?.data[0]?.po_id,
-						block_id: res?.data?.data[0]?.block_id,
-						gp_id: res?.data?.data[0]?.gp_id,
-						village_id: res?.data?.data[0]?.village_id,
-						branch_code: res?.data?.data[0]?.branch_code,
-						members: res?.data?.data[0]?.memb_dt
+						// g_group_name: res?.data?.data[0]?.group_name,
+						// branch_id: res?.data?.data[0]?.branch_code,
+						// packs_id: res?.data?.data[0]?.pacs_id,
+						// // g_group_type: "J",
+						// g_address: res?.data?.data[0]?.group_addr,
+						// group_leader_name: res?.data?.data[0]?.group_leader_name,
+						// sahayika_id: res?.data?.data[0]?.sahayika_id,
+						// g_pin: res?.data?.data[0]?.pin_no,
+						// g_phone1: res?.data?.data[0]?.phone1,
+						// g_bank_branch: res?.data?.data[0]?.branch_name,
+						// // g_acc1: res?.data?.data[0]?.sb_ac_no,
+						// dist_id: res?.data?.data[0]?.dist_id,
+						// ps_id: res?.data?.data[0]?.ps_id,
+						// po_id: res?.data?.data[0]?.po_id,
+						// block_id: res?.data?.data[0]?.block_id,
+						// gp_id: res?.data?.data[0]?.gp_id,
+						// village_id: res?.data?.data[0]?.village_id,
+						// branch_code: res?.data?.data[0]?.branch_code,
+						// members: res?.data?.data[0]?.memb_dt
+						// members: res?.data?.data?.memberDetails || []
+						members: (res?.data?.data?.memberDetails || []).map((item) => ({
+						...item,
+
+						// 🔥 IMPORTANT MAPPING
+						gender_field: item.gender || "",
+						religion_field: item.religion || "",
+						caste_field: item.caste || "",
+
+						// also map your form field names correctly
+						husb_father: item.gurdian_name || "",
+						mobile_no: item.phone_no || "",
+						sb_acc_no: item.member_account_no || "",
+						ifsc_code: item.ifsc || "",
+						}))
 
 					})
 
-					setSocityEditTimeBranch([
+					// setSocityEditTimeBranch([
 
-					])
-					setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
-					// fetchPacks_Group(res?.data?.data[0]?.branch_code)
+					// ])
+					// setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
 
-					fetchBlock(res?.data?.data[0]?.dist_id)
-					fetchPoliceStation(res?.data?.data[0]?.dist_id)
-					fetchPosOffice(res?.data?.data[0]?.dist_id)
-					fetchBranch(res?.data?.data[0]?.dist_id)
+					// fetchBlock(res?.data?.data[0]?.dist_id)
+					// fetchPoliceStation(res?.data?.data[0]?.dist_id)
+					// fetchPosOffice(res?.data?.data[0]?.dist_id)
+					// fetchBranch(res?.data?.data[0]?.dist_id)
 
-					fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
-					fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
+					// fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					// fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
 
-					// setDisCode(res?.data?.msg[0]?.disctrict)
-					console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
 
-					setGroupData(res?.data?.data[0]?.memb_dt);
+					setGroupData(res?.data?.data?.memberDetails);
 
 				} else {
 					navigate(routePaths.LANDING)
@@ -373,11 +432,14 @@ function MemberEditExtendedForm({ groupDataArr }) {
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/group/fetch_pacs_group_details`, creds, {
-			headers: {
-				Authorization: `${tokenValue?.token}`, // example header
-				"Content-Type": "application/json", // optional
-			},
+		await axios.get(`${url_bdccb}/group/fetch_member_dtls`, {
+		params: {
+		group_code: params?.id
+		},
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		}
 		})
 			.then((res) => {
 
@@ -385,53 +447,67 @@ function MemberEditExtendedForm({ groupDataArr }) {
 				if (res?.data?.success) {
 					console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
 
+					setGroupsDetails(res?.data?.data?.groupDetails)
 
 					setValues({
+						// g_group_name: res?.data?.data[0]?.group_name,
+						// branch_id: res?.data?.data[0]?.branch_code,
+						// packs_id: res?.data?.data[0]?.pacs_id,
+						// // g_group_type: "J",
+						// g_address: res?.data?.data[0]?.group_addr,
+						// group_leader_name: res?.data?.data[0]?.group_leader_name,
+						// sahayika_id: res?.data?.data[0]?.sahayika_id,
+						// g_pin: res?.data?.data[0]?.pin_no,
+						// g_phone1: res?.data?.data[0]?.phone1,
+						// g_bank_branch: res?.data?.data[0]?.branch_name,
+						// // g_acc1: res?.data?.data[0]?.sb_ac_no,
+						// dist_id: res?.data?.data[0]?.dist_id,
+						// ps_id: res?.data?.data[0]?.ps_id,
+						// po_id: res?.data?.data[0]?.po_id,
+						// block_id: res?.data?.data[0]?.block_id,
+						// gp_id: res?.data?.data[0]?.gp_id,
+						// village_id: res?.data?.data[0]?.village_id,
+						// branch_code: res?.data?.data[0]?.branch_code,
+						// members: res?.data?.data[0]?.memb_dt
 
-						g_group_name: res?.data?.data[0]?.group_name,
-						branch_id: res?.data?.data[0]?.branch_code,
-						packs_id: res?.data?.data[0]?.pacs_id,
-						// g_group_type: "J",
-						g_address: res?.data?.data[0]?.group_addr,
-						group_leader_name: res?.data?.data[0]?.group_leader_name,
-						sahayika_id: res?.data?.data[0]?.sahayika_id,
-						g_pin: res?.data?.data[0]?.pin_no,
-						g_phone1: res?.data?.data[0]?.phone1,
-						g_bank_branch: res?.data?.data[0]?.branch_name,
-						// g_acc1: res?.data?.data[0]?.sb_ac_no,
-						dist_id: res?.data?.data[0]?.dist_id,
-						ps_id: res?.data?.data[0]?.ps_id,
-						po_id: res?.data?.data[0]?.po_id,
-						block_id: res?.data?.data[0]?.block_id,
-						gp_id: res?.data?.data[0]?.gp_id,
-						village_id: res?.data?.data[0]?.village_id,
-						branch_code: res?.data?.data[0]?.branch_code,
-						members: res?.data?.data[0]?.memb_dt
+						// members: res?.data?.data?.memberDetails || []
+
+						members: (res?.data?.data?.memberDetails || []).map((item) => ({
+						...item,
+
+						// 🔥 IMPORTANT MAPPING
+						gender_field: item.gender || "",
+						religion_field: item.religion || "",
+						caste_field: item.caste || "",
+
+						// also map your form field names correctly
+						husb_father: item.gurdian_name || "",
+						mobile_no: item.phone_no || "",
+						sb_acc_no: item.member_account_no || "",
+						ifsc_code: item.ifsc || "",
+						}))
 
 					})
 
-					setBranchList([
-						{
-							code: res?.data?.data[0]?.branch_code,
-							name: res?.data?.data[0]?.branch_name,
-						}]
-					)
+					// setBranchList([
+					// 	{
+					// 		code: res?.data?.data[0]?.branch_code,
+					// 		name: res?.data?.data[0]?.branch_name,
+					// 	}]
+					// )
 
-					setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
-					// fetchPacks_Group(res?.data?.data[0]?.branch_code)
+					// setDirectIndirectStatus(res?.data?.data[0]?.direct_indirect_flag)
 
-					fetchBlock(res?.data?.data[0]?.dist_id)
-					fetchPoliceStation(res?.data?.data[0]?.dist_id)
-					fetchPosOffice(res?.data?.data[0]?.dist_id)
-					fetchBranch(res?.data?.data[0]?.dist_id)
+					// fetchBlock(res?.data?.data[0]?.dist_id)
+					// fetchPoliceStation(res?.data?.data[0]?.dist_id)
+					// fetchPosOffice(res?.data?.data[0]?.dist_id)
+					// fetchBranch(res?.data?.data[0]?.dist_id)
 
-					fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
-					fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
+					// fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					// fetchVillList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id);
 
-					// setDisCode(res?.data?.msg[0]?.disctrict)
-					// console.log(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id, res?.data?.data[0]?.gp_id, 'branchbranchbranchbranchbranchfffffffff', loanAppData?.dist_id);
 
-					setGroupData(res?.data?.data[0]?.memb_dt);
+					setGroupData(res?.data?.data?.memberDetails);
 
 				} else {
 					// navigate(routePaths.LANDING)
@@ -443,6 +519,30 @@ function MemberEditExtendedForm({ groupDataArr }) {
 			})
 	}
 
+	useEffect(() => {
+		if (params?.id > 0) {
+			if (userDetails[0]?.user_type == 'B') {
+				fetchGroupDetails()
+			}
+
+			if (userDetails[0]?.user_type == 'P') {
+				fetchGroupDetails_ForPacs()
+			}
+
+		}
+		fetchSahayikaList()
+
+	}, [])
+
+	useEffect(() => {
+		if (userDetails[0]?.user_type === 'P' && params?.id > 0) {
+			return;
+		} else {
+			fetchBranch_Group()
+		}
+
+	}, [])
+
 
 
 	const editGroup = async (formData) => {
@@ -450,41 +550,71 @@ function MemberEditExtendedForm({ groupDataArr }) {
 
 		const ip = await getClientIP()
 
+		const member_list = formik.values.members.map(item => ({	
+		member_id : item.member_code,
+		member_name: item.member_name,
+		father_hus_name: item.husb_father,
+		gender: item.gender_field,
+		religion: item.religion_field,
+		caste: item.caste_field,
+		phone_no: item.mobile_no,
+		aadhar_no : item.aadhar_no,
+		sb_acc_no: item.sb_acc_no,
+		ifsc: item.ifsc_code,
+		address : item.address,
+		gp_leader_flag: item.gp_leader_flag,
+		asst_gp_leader_flag : item.asst_gp_leader_flag,
+
+		}));
+
+
+
+
 		const creds = {
-			group_code: groupDataArr?.group_code,
+
+			// groupsDetails?.group_code
+			
+			// group_code: groupDataArr?.group_code,
+			// tenant_id: userDetails[0]?.tenant_id,
+			// branch_code: formData?.branch_id,
+			// pacs_id: formData?.packs_id || 0,
+			// direct_indirect_flag: directIndirectStatus,
+			// group_name: formData?.g_group_name,
+			// phone1: formData?.g_phone1,
+			// sahayika_id: formData?.sahayika_id, ///////////////
+			// group_addr: formData?.g_address,
+			// dist_id: formData?.dist_id,
+			// block_id: formData?.block_id,
+			// ps_id: formData?.ps_id,
+			// po_id: formData?.po_id,
+			// gp_id: formData?.gp_id,
+			// village_id: formData?.village_id || 0,
+			// pin_no: formData?.g_pin,
+			// members: member_list,
+			// created_by: userDetails[0]?.emp_id,
+			// ip_address: ip,
+
+			group_code: groupsDetails?.group_code,
+			branch_code: userDetails[0]?.brn_code,
 			tenant_id: userDetails[0]?.tenant_id,
-			// branch_code: masterData?.branch_code,
-			// branch_code: userDetails[0]?.brn_code,
-			// branch_code: directIndirectStatus == 'D' ? formData?.branch_id : formData?.packs_id,
-			// branch_code: directIndirectStatus == 'I' ? userDetails[0]?.brn_code : formData?.branch_id,
-			branch_code: formData?.branch_id,
-			// pacs_id: directIndirectStatus == 'I' ? formData?.packs_id : 0,
-			pacs_id: formData?.packs_id || 0,
-			direct_indirect_flag: directIndirectStatus,
-			group_name: formData?.g_group_name,
-			// gp_leader_id: 2, ///////////////
-			phone1: formData?.g_phone1,
-			sahayika_id: formData?.sahayika_id, ///////////////
-			group_addr: formData?.g_address,
-			dist_id: formData?.dist_id,
-			block_id: formData?.block_id,
-			ps_id: formData?.ps_id,
-			po_id: formData?.po_id,
-			gp_id: formData?.gp_id,
-			village_id: formData?.village_id || 0,
-			pin_no: formData?.g_pin,
-			// sb_ac_no: formData?.g_acc1,
-			members: formData?.members,
+			pacs_id: userDetails[0]?.user_type == 'B' ? '0' : userDetails[0]?.brn_code,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
+			members: member_list
 		}
+
+		
+		
+		
 
 
 		console.log(creds, 'credscredscredscreds', userDetails[0]);
 
+		// return;
+
 
 		await saveMasterData({
-			endpoint: "group/save_group",
+			endpoint: "group/add_member",
 			creds,
 			navigate,
 			successMsg: "Group details saved.",
@@ -1215,301 +1345,15 @@ function MemberEditExtendedForm({ groupDataArr }) {
 			>
 				{/* {(userDetails.id == 4 || userDetails.id == 3 || userDetails.id == 2 || userDetails.id == 13) && 
 				<Button htmlType="button" type="primary" icon={<Map />} onClick={() => showModal()} className="my-3">View Distance</Button>} */}
+		
+		{/* {JSON.stringify(formik.values?.members, null, 2)}xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+{JSON.stringify(groupsDetails, null, 2)} gggggggggggggggggg
+{JSON.stringify(userDetails[0]?.brn_code, null, 2)} */}
+		
 
 				<form onSubmit={formik.handleSubmit}>
 
-					{/* <div className="flex justify-start gap-5">
-						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
-							
 					
-					
-					<div className="sm:col-span-2">
-					<TDInputTemplateBr
-					placeholder="Select Branch"
-					type="text"
-					label="Select Branch *"
-					name="branch_id"
-					// disabled={userDetails[0]?.user_type == 'P' ? true : false}
-					disabled={userDetails[0]?.user_type === 'P' && params?.id > 0}
-					formControlName={formik.values.branch_id}
-					handleChange={(value) => { 
-						formik.setFieldValue("branch_id", value.target.value)
-						// fetchPacks_Group(value.target.value)
-					 }}
-					handleBlur={formik.handleBlur}
-					data={branchList}
-					mode={2}
-					/>
-
-					{formik.errors.branch_id && formik.touched.branch_id ? (
-					<VError title={formik.errors.branch_id} />
-					) : null}
-					
-					
-					</div>
-				
-
-					{userDetails[0]?.user_type == "P" &&(
-						<div className="sm:col-span-2">
-
-					<TDInputTemplateBr
-					placeholder="Select Society"
-					type="text"
-					label="Select Society *"
-					name="packs_id"
-					// disabled={userDetails[0]?.user_type == 'P' ? true : false}
-					disabled={userDetails[0]?.user_type === 'P' && params?.id > 0}
-					formControlName={formik.values.packs_id}
-					handleChange={formik.handleChange}
-					handleBlur={formik.handleBlur}
-					data={PACKSList}
-					mode={2}
-					/>		
-					
-					{formik.errors.packs_id && formik.touched.packs_id ? (
-					<VError title={formik.errors.packs_id} />
-					) : null}
-					
-					</div>
-					)}
-					
-
-							<div className="sm:col-span-4">
-								<TDInputTemplateBr
-									placeholder="Group Name"
-									type="text"
-									label="Group Name"
-									name="g_group_name"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_group_name}
-									mode={1}
-								/>
-								{formik.errors.g_group_name && formik.touched.g_group_name ? (
-									<VError title={formik.errors.g_group_name} />
-								) : null}
-							</div>
-
-							</div>
-							</div> */}
-
-
-					{/* <div className="flex justify-start gap-5 mb-3">
-							<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full"}>
-								<div className="sm:col-span-2">
-								<TDInputTemplateBr
-									placeholder="Type Address..."
-									type="text"
-									label={`Address`}
-									name="g_address"
-									formControlName={formik.values.g_address}
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									mode={3}
-								/>
-								{formik.errors.g_address && formik.touched.g_address ? (
-									<VError title={formik.errors.g_address} />
-								) : null}
-								</div>
-							</div>
-							</div> */}
-
-					{/* <div className="flex justify-start gap-5">
-							<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full"}>
-
-							
-
-							<div>
-								
-								<TDInputTemplateBr
-									placeholder="Sahayika Name"
-									type="text"
-									label="Sahayika Name"
-									name="sahayika_id"
-									formControlName={formik.values.sahayika_id}
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									mode={2}
-									data={sahayikaList}
-									// setSahayikaList
-								/>
-								
-
-								{formik.errors.sahayika_id && formik.touched.sahayika_id ? (
-									<VError title={formik.errors.sahayika_id} />
-								) : null}
-							</div>
-
-							<div>
-								<TDInputTemplateBr
-									placeholder="PIN No."
-									type="number"
-									label="PIN No."
-									name="g_pin"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_pin}
-									mode={1}
-								/>
-								{formik.errors.g_pin && formik.touched.g_pin ? (
-									<VError title={formik.errors.g_pin} />
-								) : null}
-							</div>
-
-							<div>
-								<TDInputTemplateBr
-									placeholder="Mobile No. Of Group Leader"
-									type="number"
-									label="Mobile No. Of Group Leader"
-									name="g_phone1"
-									// handleChange={formik.handleChange}
-									handleChange={handleMobileChange} 
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_phone1}
-									mode={1}
-								/>
-								{mobileExists?.user_status == 1 ?(
-									<div style={{fontSize:12, color:'red'}}>{mobileExists?.msg}</div>
-								) : (
-									<>
-									
-									</>
-								)}
-								{formik.errors.g_phone1 && formik.touched.g_phone1 ? (
-									<VError title={formik.errors.g_phone1} />
-								) : null}
-							</div>
-
-							
-
-							<div>
-							<TDInputTemplateBr
-							placeholder="Select District..."
-							type="text"
-							label="District"
-							name="dist_id"
-							// formControlName={masterData.dist_id}
-							// handleChange={handleChangeMaster}
-							formControlName={formik.values.dist_id}
-							// handleChange={formik.handleChange}
-							handleChange={handleFormikMasterChange} 
-							handleBlur={formik.handleBlur}
-							data={districts}
-							mode={2}
-							/>
-							{formik.errors.dist_id && formik.touched.dist_id ? (
-									<VError title={formik.errors.dist_id} />
-								) : null}
-							</div>
-
-							
-
-						<div>
-						<TDInputTemplateBr
-						placeholder="Select Police Station..."
-						type="text"
-						label="Police Station"
-						name="ps_id"
-						// formControlName={masterData.ps_id}
-						// handleChange={handleChangeMaster}
-						formControlName={formik.values.ps_id}
-						// handleChange={formik.handleChange}
-						handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						data={policeStation}
-						mode={2}
-						/>
-						{formik.errors.ps_id && formik.touched.ps_id ? (
-									<VError title={formik.errors.ps_id} />
-								) : null}
-					</div>
-
-					<div>
-						<TDInputTemplateBr
-						placeholder="Select Post Office..."
-						type="text"
-						label="Post Office"
-						name="po_id"
-						// formControlName={masterData.po_id}
-						// handleChange={handleChangeMaster}
-						formControlName={formik.values.po_id}
-						// handleChange={formik.handleChange}
-						handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						data={postOffice}
-						mode={2}
-						/>
-						{formik.errors.po_id && formik.touched.po_id ? (
-									<VError title={formik.errors.po_id} />
-								) : null}
-					</div>
-
-							<div>
-								
-						<TDInputTemplateBr
-						placeholder="Select Block..."
-						type="text"
-						label="Block"
-						name="block_id"
-						// formControlName={masterData.block_id}
-						// handleChange={handleChangeMaster}
-						formControlName={formik.values.block_id}
-						// handleChange={formik.handleChange}
-						handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						data={blocks}
-						mode={2}
-						/>
-						{formik.errors.block_id && formik.touched.block_id ? (
-									<VError title={formik.errors.block_id} />
-								) : null}
-					</div>
-
-					<div>
-						
-						<TDInputTemplateBr
-						placeholder="Select GP Name..."
-						type="text"
-						label="GP Name"
-						name="gp_id"
-						// formControlName={masterData.gp_id}
-						// handleChange={handleChangeMaster}
-						formControlName={formik.values.gp_id}
-						// handleChange={formik.handleChange}
-						handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						data={gpName}
-						mode={2}
-						/>
-						{formik.errors.gp_id && formik.touched.gp_id ? (
-									<VError title={formik.errors.gp_id} />
-								) : null}
-					</div>
-
-					<div>
-						
-						<TDInputTemplateBr
-						placeholder="Select Village Name..."
-						type="text"
-						label="Village Name"
-						name="village_id"
-						// formControlName={masterData.village_id}
-						// handleChange={handleChangeMaster}
-						formControlName={formik.values.village_id}
-						// handleChange={formik.handleChange}
-						handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						data={villName}
-						mode={2}
-						/>
-						{formik.errors.village_id && formik.touched.village_id ? (
-						<VError title={formik.errors.village_id} />
-						) : null}
-					</div>
-
-					
-						</div>
-					</div> */}
 
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
@@ -1524,15 +1368,15 @@ function MemberEditExtendedForm({ groupDataArr }) {
 									type="text"
 									label="Group Name"
 									name="g_group_name"
-									formControlName={formik.values.g_group_name}
-									handleChange={(value) => {
-										formik.setFieldValue("g_group_name", value.target.value)
-										// fetchPacks_Group(value.target.value)
-										fetchGroupDetails(value.target.value)
-									}}
+									formControlName={groupsDetails?.group_name}
+									// handleChange={(value) => {
+									// 	formik.setFieldValue("g_group_name", value.target.value)
+									// 	// fetchPacks_Group(value.target.value)
+									// 	fetchGroupDetails(value.target.value)
+									// }}
 									handleBlur={formik.handleBlur}
-									data={groupsList}
-									mode={2}
+									// data={groupsList}
+									mode={1}
 								/>
 
 
@@ -1552,7 +1396,7 @@ function MemberEditExtendedForm({ groupDataArr }) {
 						</div>
 					</div>
 
-					{/* {JSON.stringify(formik.values.members, null, 2)} */}
+					{/* {JSON.stringify(formik.errors, null, 2)} */}
 
 					{/* ================= ADD MEMBER SECTION ================= */}
 					<div className="sm:col-span-3 mt-6">
@@ -1561,191 +1405,329 @@ function MemberEditExtendedForm({ groupDataArr }) {
 								Add Group Members
 							</Tag>
 						)}
-						<div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50" style={{ position: 'relative' }}>
+						{/* <div className="grid grid-cols-12 gap-3 mb-0 p-3 rounded-md bg-slate-50" style={{ position: 'relative' }}>
 							<div className="col-span-2 text-sm font-semibold">Member Name</div>
 							<div className="col-span-2 text-sm font-semibold">SB A/C No.</div>
 							<div className="col-span-3 text-sm font-semibold">Aadhaar No.</div>
 							<div className="col-span-5 text-sm font-semibold">Address</div>
-						</div>
+						</div> */}
 
-						{formik.values.members.map((member, index) => {
-							const isRowFilled =
-								member.member_name &&
-								member.address &&
-								member.aadhar_no &&
-								String(member.aadhar_no).length === 12 &&
-								member.sb_acc_no;
-							//   String(member.sb_acc_no).length === 2;
-
-							return (
-								<div
-									key={index}
-									className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{ position: 'relative' }}
-								>
-
-
-									{/* Designation */}
-									<div className="col-span-12 flex flex-col gap-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start' }}>
-										{/* Group Leader */}
-										<label className="flex items-center gap-1 text-xs" style={{ fontSize: 11 }}>
-											<input
-												type="checkbox"
-												//   checked={member.gp_leader_flag}
-												checked={member.gp_leader_flag === "Y"}
-												onChange={() => handleGroupLeaderChange(index)}
-											/>
-											Group Leader
-										</label>
-
-										{/* Assistant Member */}
-										<label className="flex items-center gap-1 text-xs" style={{ fontSize: 11 }}>
-											<input
-												type="checkbox"
-												//   checked={member.asst_gp_leader_flag}
-												checked={member.asst_gp_leader_flag === "Y"}
-												onChange={() => handleAssistantChange(index)}
-											/>
-											Assistant Leader
-										</label>
-									</div>
-
-
-									{/* Name */}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-											placeholder="Member Name"
-											type="text"
-											name={`members[${index}].member_name`}
-											formControlName={member.member_name}
-											handleChange={formik.handleChange}
-											mode={1}
-										/>
-									</div>
-
-
-
-									{/* SB ACC */}
-									<div className="col-span-2">
-										<TDInputTemplateBr
-											placeholder="SB A/C No."
-											type="text"   // ✅ MUST be text
-											name={`members[${index}].sb_acc_no`}
-											formControlName={member.sb_acc_no}
-											handleChange={(e) => handleSBAccNoChange(e, index)}
-											mode={1}
-										// disabled={params?.id > 0}
-										/>
-
-										{/* {JSON.stringify(SBAccountStatus[index], null, 2)} */}
-
-										{member.sb_acc_no?.length > 0 && SBAccountStatus[index] && (
-											SBAccountStatus[index]?.user_status == 1 ? (
-												<div style={{ fontSize: 12, color: "red" }}>
-													{SBAccountStatus[index]?.msg}
-												</div>
-											) : (
-												<>
-													{/* <div style={{ fontSize: 12, color: "green" }}>
-			{SBAccountStatus[index]?.msg}
-			</div> */}
-												</>
-											)
-										)}
-
-									</div>
-
-									{/* Aadhaar */}
-									<div className="col-span-3">
-										<TDInputTemplateBr
-											placeholder="Aadhaar No"
-											type="text"   // ✅ MUST be text
-											name={`members[${index}].aadhar_no`}
-											formControlName={member.aadhar_no}
-											handleChange={(e) => handleAdharNoChange(e, index)}
-											mode={1}
-										/>
-										{/* {JSON.stringify(adharStatus[index], null, 2)} */}
-										{member.aadhar_no?.length === 12 && adharStatus[index] && (
-											adharStatus[index].user_status == 1 ? (
-												<div style={{ fontSize: 12, color: "red" }}>
-													{adharStatus[index].msg}
-												</div>
-											) : (
-												<>
-													{/* <div style={{ fontSize: 12, color: "green" }}>
-			 {adharStatus[index].msg}
-			 </div> */}
-												</>
-											)
-										)}
-
-									</div>
-
-									{/* Address */}
-									<div className="col-span-5">
-										<TDInputTemplateBr
-											placeholder="Address"
-											type="text"
-											name={`members[${index}].address`}
-											formControlName={member.address}
-											handleChange={formik.handleChange}
-											mode={1}
-										/>
-									</div>
-
-									{/* Remove */}
-									<div className="col-span-1 text-center" style={{ position: 'absolute', right: 10 }}>
-										{formik.values.members.length > 1 && (
-											<button
-												type="button"
-												onClick={() => {
-													const updated = [...formik.values.members];
-													updated.splice(index, 1);
-													formik.setFieldValue("members", updated);
-												}}
-												className="text-red-600 font-bold" style={{
-													background: "rgb(218 65 103 / var(--tw-bg-opacity))",
-													padding: "0 7px",
-													height: "25px",
-													color: "#fff",
-													lineHeight: "25px",
-													borderRadius: "5px",
-													marginTop: "13px",
-													fontSize: "13px",
-												}}
-											>
-												✕
-											</button>
-										)}
-									</div>
-
-									{/* Add Button */}
-									{index === formik.values.members.length - 1 && (
-										<div className="col-span-12 text-right">
-											<Button
-												type="primary"
-												disabled={!isRowFilled || adharStatus[index]?.user_status == 1 || SBAccountStatus[index]?.user_status == 1}
-												onClick={() =>
-													formik.setFieldValue("members", [
-														...formik.values.members,
-														{
-															member_id: 0,
-															member_name: "",
-															address: "",
-															aadhar_no: "",
-															gp_leader_flag: "N",
-															asst_gp_leader_flag: "N",
-														},
-													])
-												}
-											>
-												+ Add Member
-											</Button>
-										</div>
-									)}
-								</div>
-							);
-						})}
+						{formik.values?.members?.map((member, index) => {
+													const isRowFilled =
+														member.member_name &&
+														// member.address &&
+														member.aadhar_no &&
+						
+														// member.husb_father &&
+														// member.ifsc_code &&
+														member.mobile_no &&
+														member.gender_field &&
+														// member.religion_field &&
+														// member.caste_field &&
+						
+														String(member.aadhar_no).length === 12 &&
+														member.sb_acc_no;
+													//   String(member.sb_acc_no).length === 2;
+						
+													return (
+														<>
+														<div
+															key={index}
+															className="grid grid-cols-6 gap-3 mb-3 p-3 border rounded-md bg-slate-50" style={{ position: 'relative' }}
+														>
+						
+						
+															{/* Designation */}
+															<div className="col-span-6 flex flex-col gap-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start' }}>
+																{/* Group Leader */}
+																<label className="flex items-center gap-1 text-xs" style={{ fontSize: 11 }}>
+																	<input
+																		type="checkbox"
+																		//   checked={member.gp_leader_flag}
+																		checked={member.gp_leader_flag === "Y"}
+																		onChange={() => handleGroupLeaderChange(index)}
+																	/>
+																	Group Leader
+																</label>
+						
+																{/* Assistant Member */}
+																<label className="flex items-center gap-1 text-xs" style={{ fontSize: 11 }}>
+																	<input
+																		type="checkbox"
+																		//   checked={member.asst_gp_leader_flag}
+																		checked={member.asst_gp_leader_flag === "Y"}
+																		onChange={() => handleAssistantChange(index)}
+																	/>
+																	Assistant Leader
+																</label>
+															</div>
+						
+						
+															{/* Name */}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																	placeholder="Member Name"
+																	label="Member Name *"
+																	type="text"
+																	name={`members[${index}].member_name`}
+																	formControlName={member.member_name}
+																	handleChange={formik.handleChange}
+																	mode={1}
+																/>
+																{formik.errors?.members?.[index]?.member_name && (
+																<div className="text-red-500 text-xs">
+																{formik.errors.members[index].member_name}
+																</div>
+																)}
+															</div>
+						
+						
+						
+															{/* SB ACC */}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																	placeholder="SB A/C No."
+																	label="SB A/C No. *"
+																	type="text"   // ✅ MUST be text
+																	name={`members[${index}].sb_acc_no`}
+																	formControlName={member.sb_acc_no}
+																	handleChange={(e) => handleSBAccNoChange(e, index)}
+																	mode={1}
+																// disabled={params?.id > 0}
+																/>
+						
+																
+						
+																{member.sb_acc_no?.length > 0 && SBAccountStatus[index] && (
+																	SBAccountStatus[index]?.user_status == 1 ? (
+																		<div style={{ fontSize: 12, color: "red" }}>
+																			{SBAccountStatus[index]?.msg}
+																		</div>
+																	) : (
+																	<>
+																	{/* <div style={{ fontSize: 12, color: "green" }}>
+																	{SBAccountStatus[index]?.msg}
+																	</div> */}
+																	</>
+																	)
+																)}
+						
+																{formik.errors?.members?.[index]?.sb_acc_no && (
+																<div className="text-red-500 text-xs">
+																	{formik.errors.members[index].sb_acc_no}
+																</div>
+																)}
+						
+															</div>
+						
+															{/* IFS Code*/}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																	placeholder="IFS Code"
+																	label="IFS Code"
+																	type="text"   // ✅ MUST be text
+																	name={`members[${index}].ifsc_code`}
+																	formControlName={member.ifsc_code}
+																	handleChange={formik.handleChange}
+																	mode={1}
+																// disabled={params?.id > 0}
+																/>
+						
+															</div>
+						
+															{/* Aadhaar */}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																	placeholder="Aadhaar No"
+																	label="Aadhaar No *"
+																	type="text"   // ✅ MUST be text
+																	name={`members[${index}].aadhar_no`}
+																	formControlName={member.aadhar_no}
+																	handleChange={(e) => handleAdharNoChange(e, index)}
+																	mode={1}
+																/>
+						
+																{formik.errors?.members?.[index]?.aadhar_no && (
+																<div className="text-red-500 text-xs">
+																	{formik.errors.members[index].aadhar_no}
+																</div>
+																)}
+						
+																{member.aadhar_no?.length === 12 && adharStatus[index] && (
+																	adharStatus[index].user_status == 1 ? (
+																		<div style={{ fontSize: 12, color: "red" }}>
+																			{adharStatus[index].msg}
+																		</div>
+																	) : (
+																		<>
+																		{/* <div style={{ fontSize: 12, color: "green" }}>
+																		{adharStatus[index].msg}
+																		</div> */}
+																		</>
+																	)
+																)}
+						
+															</div>
+						
+															
+						
+															{/* Husband's/Father's Name */}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																	placeholder="Husband's/Father's Name"
+																	label="Husband's/Father's Name"
+																	type="text"
+																	name={`members[${index}].husb_father`}
+																	formControlName={member.husb_father}
+																	handleChange={formik.handleChange}
+																	mode={1}
+																/>
+															</div>
+						
+															{/* Mobile No. */}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																	placeholder="Mobile No"
+																	label="Mobile No *"
+																	type="number"
+																	name={`members[${index}].mobile_no`}
+																	formControlName={member.mobile_no}
+																	handleChange={formik.handleChange}
+																	mode={1}
+																/>
+						
+																{formik.errors?.members?.[index]?.mobile_no && (
+																<div className="text-red-500 text-xs">
+																	{formik.errors.members[index].mobile_no}
+																</div>
+																)}
+						
+															</div>
+															
+															{/* Gender*/}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																placeholder="Select Gender..."
+																label="Gender *"
+																type="text"
+																name={`members[${index}].gender_field`}
+																formControlName={formik.values.members[index]?.gender_field}
+																handleChange={formik.handleChange}
+																handleBlur={formik.handleBlur}
+																data={genderOptions}
+																mode={2}
+																/>
+						
+																{formik.errors?.members?.[index]?.gender_field && (
+																<div className="text-red-500 text-xs">
+																	{formik.errors.members[index].gender_field}
+																</div>
+																)}
+															</div>
+						
+															{/* Religion*/}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																placeholder="Select Religion..."
+																label="Religion"
+																type="text"
+																name={`members[${index}].religion_field`}
+																formControlName={formik.values.members[index]?.religion_field}
+																handleChange={formik.handleChange}
+																handleBlur={formik.handleBlur}
+																data={religionOptions}
+																mode={2}
+																/>
+															</div>
+						
+															{/* Religion*/}
+															<div className="col-span-2">
+																<TDInputTemplateBr
+																placeholder="Select Caste..."
+																label="Caste"
+																type="text"
+																name={`members[${index}].caste_field`}
+																formControlName={formik.values.members[index]?.caste_field}
+																handleChange={formik.handleChange}
+																handleBlur={formik.handleBlur}
+																data={casteOptions}
+																mode={2}
+																/>
+															</div>
+						
+															{/* Address */}
+															<div className="col-span-6">
+																<TDInputTemplateBr
+																	placeholder="Address"
+																	label="Address"
+																	type="text"
+																	name={`members[${index}].address`}
+																	formControlName={member.address}
+																	handleChange={formik.handleChange}
+																	mode={1}
+																/>
+															</div>
+															
+						
+															{/* Remove */}
+															<div className="col-span-1 text-center" style={{ position: 'absolute', right: 10 }}>
+																{formik.values.members.length > 1 && (
+																	<button
+																		type="button"
+																		onClick={() => {
+																			const updated = [...formik.values.members];
+																			updated.splice(index, 1);
+																			formik.setFieldValue("members", updated);
+																		}}
+																		className="text-red-600 font-bold" style={{
+																			background: "rgb(218 65 103 / var(--tw-bg-opacity))",
+																			padding: "0 7px",
+																			height: "25px",
+																			color: "#fff",
+																			lineHeight: "25px",
+																			borderRadius: "5px",
+																			marginTop: "13px",
+																			fontSize: "13px",
+																		}}
+																	>
+																		✕
+																	</button>
+																)}
+															</div>
+						
+															</div>
+						
+															<div className="grid grid-cols-12 gap-3 p-3">
+																
+															{/* Add Button */}
+															{index === formik.values.members.length - 1 && (
+																<div className="col-span-12 text-right">
+																	<Button
+																		type="primary"
+																		disabled={!isRowFilled || adharStatus[index]?.user_status == 1 || SBAccountStatus[index]?.user_status == 1}
+																		onClick={() =>
+																			formik.setFieldValue("members", [
+																				...formik.values.members,
+																				{
+																					member_code: 0,
+																					member_name: "",
+																					address: "",
+																					aadhar_no: "",
+																					gp_leader_flag: "N",
+																					asst_gp_leader_flag: "N",
+																				},
+																			])
+																		}
+																	>
+																		+ Add Member
+																	</Button>
+																</div>
+															)}
+						
+														</div>
+														</>
+													);
+												})}
 					</div>
 					{/* ===================================================== */}
 

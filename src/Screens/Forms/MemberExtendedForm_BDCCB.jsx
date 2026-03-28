@@ -137,6 +137,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	const [groupsList, setGroupsList] = useState(() => [])
 	const [groupsDetails, setGroupsDetails] = useState(() => [])
 	const [groupDetailsModal, setGroupDetailsModal] = useState(false);
+	const [groupValue, setGroupValue] = useState('');
 
 
 	const initialValues = {
@@ -189,18 +190,19 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 	const validationSchema = Yup.object({
-		branch_id: Yup.string(),
-		g_group_name: Yup.string(),
-		saving_acc_no: Yup.string(),
-		g_address: Yup.string(),
-		sahayika_id: Yup.string(),
-		dist_id: Yup.mixed(),
-		ps_id: Yup.mixed(),
-		po_id: Yup.mixed(),
-		block_id: Yup.mixed(),
-		gp_id: Yup.mixed(),
-		village_id: Yup.mixed(),
-		g_phone1: Yup.mixed(),
+		// branch_id: Yup.string(),
+		g_group_name: Yup.mixed(),
+		// g_group_name: Yup.string().required("Group Name required"),
+		// saving_acc_no: Yup.string(),
+		// g_address: Yup.string(),
+		// sahayika_id: Yup.string(),
+		// dist_id: Yup.mixed(),
+		// ps_id: Yup.mixed(),
+		// po_id: Yup.mixed(),
+		// block_id: Yup.mixed(),
+		// gp_id: Yup.mixed(),
+		// village_id: Yup.mixed(),
+		// g_phone1: Yup.mixed(),
 
 		// members: Yup.array()
 		// 	.of(
@@ -300,6 +302,13 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 	const onSubmit = async (values) => {
 
+		console.log(groupValue, 'ggggggggggggggggggg', formik.values.g_group_name);
+		
+		if (!groupValue) {
+		Message("error", "Please select Group Name");
+		return; // ⛔ stop submit
+		}
+
 		// 🔥 Mark all fields as touched
 		const touchedMembers = values.members.map(() => ({
 		member_name: true,
@@ -374,7 +383,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		})
 
 		.then((res) => {
-		// console.log(res?.data?.data, 'searchsearchsearchsearchsearch', creds);
+		console.log(res?.data?.data, 'searchsearchsearchsearchsearch', 'creds');
 		if(res?.data?.success){
 		// setGroupsList(res?.data?.data)
 		setGroupsList(res?.data?.data?.map((item, i) => ({
@@ -402,22 +411,22 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			group_code: groupCode,
 		}
 
-		setValues({
-						saving_acc_no: "",
-						branch_id: "",
-						g_address: "",
-						sahayika_id: "",
-						g_pin: "",
-						g_phone1: "",
-						dist_id: "",
-						ps_id: "",
-						po_id: "",
-						block_id: "",
-						gp_id: "",
-						village_id: "",
-						members: []
+		// setValues({
+		// 				saving_acc_no: "",
+		// 				branch_id: "",
+		// 				g_address: "",
+		// 				sahayika_id: "",
+		// 				g_pin: "",
+		// 				g_phone1: "",
+		// 				dist_id: "",
+		// 				ps_id: "",
+		// 				po_id: "",
+		// 				block_id: "",
+		// 				gp_id: "",
+		// 				village_id: "",
+		// 				members: []
 
-					})
+		// 			})
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -446,19 +455,19 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 					setValues({
-						group_code: res?.data?.data[0]?.group_code,
-						saving_acc_no: res?.data?.data[0]?.sb_ac_no,
-						branch_id: res?.data?.data[0]?.branch_name,
-						g_address: res?.data?.data[0]?.group_addr,
-						sahayika_id: res?.data?.data[0]?.sahayika_name,
-						g_pin: res?.data?.data[0]?.pin_no,
-						g_phone1: res?.data?.data[0]?.phone1,
-						dist_id: res?.data?.data[0]?.dist_name,
-						ps_id: res?.data?.data[0]?.ps_name,
-						po_id: res?.data?.data[0]?.post_name,
-						block_id: res?.data?.data[0]?.block_name,
-						gp_id: res?.data?.data[0]?.gp_name,
-						village_id: res?.data?.data[0]?.vill_name,
+						// group_code: res?.data?.data[0]?.group_code,
+						// saving_acc_no: res?.data?.data[0]?.sb_ac_no,
+						// branch_id: res?.data?.data[0]?.branch_name,
+						// g_address: res?.data?.data[0]?.group_addr,
+						// sahayika_id: res?.data?.data[0]?.sahayika_name,
+						// g_pin: res?.data?.data[0]?.pin_no,
+						// g_phone1: res?.data?.data[0]?.phone1,
+						// dist_id: res?.data?.data[0]?.dist_name,
+						// ps_id: res?.data?.data[0]?.ps_name,
+						// po_id: res?.data?.data[0]?.post_name,
+						// block_id: res?.data?.data[0]?.block_name,
+						// gp_id: res?.data?.data[0]?.gp_name,
+						// village_id: res?.data?.data[0]?.vill_name,
 						members: [
 									{
 										member_id: 0,
@@ -581,6 +590,8 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 
+
+
 		console.log(formData, 'formDataformDataformDataformData', groupsDetails);
 
 		// return;
@@ -610,11 +621,11 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			navigate,
 			successMsg: "Group details saved.",
 			// onSuccess: () => navigate(-1),
-			// onSuccess: () => navigate('/homebm/editmemberform/0'),
-			onSuccess: () => {
-			navigate('/homebm/addmemberform/0')
-			window.location.reload()
-			},
+			onSuccess: () => navigate('/homebm/searchmember'),
+			// onSuccess: () => {
+			// navigate('/homebm/addmemberform/0')
+			// // window.location.reload()
+			// },
 
 			// 🔥 fully dynamic failure handling
 			failureRedirect: routePaths.LANDING,
@@ -659,11 +670,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		setLoading(false)
 	}
 
-	useEffect(() => {
-
-		// fetchPacks_Group()
-
-	}, [])
 
 
 
@@ -1251,7 +1257,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			>
 				{/* {(userDetails.id == 4 || userDetails.id == 3 || userDetails.id == 2 || userDetails.id == 13) && 
 				<Button htmlType="button" type="primary" icon={<Map />} onClick={() => showModal()} className="my-3">View Distance</Button>} */}
-				{/* {JSON.stringify(groupsDetails, null, 2)} */}
+				{/* {JSON.stringify(formik.errors, null, 2)} */}
 
 				<form onSubmit={formik.handleSubmit}>
 					<div className="flex justify-start gap-5">
@@ -1269,6 +1275,11 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 									name="g_group_name"
 									formControlName={formik.values.g_group_name}
 									handleChange={(value) => {
+										setGroupValue('')
+										
+										setGroupValue(value.target.value)
+										console.log(value.target.value, 'ggggggggggggggggggg');
+										
 										formik.setFieldValue("g_group_name", value.target.value)
 										// fetchPacks_Group(value.target.value)
 										fetchGroupDetails(value.target.value)
@@ -1279,10 +1290,16 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 								/>
 
 								
+
+								{/* {formik.errors.g_group_name && formik.touched.g_group_name ? (
+								<VError title={formik.errors.g_group_name} />
+								) : null} */}
+
+								
 							</div>
 
 							<div className="sm:col-span-1 flex items-end">
-	<Button
+	<Button 
 		type="primary"
 		onClick={() => setGroupDetailsModal(true)}
 		disabled={!groupsDetails?.group_code} // disable if no data
