@@ -220,16 +220,16 @@ const containerStyle = {
 
 
 	useEffect(() => {
-		if (params?.id > 0) {
-			if(userDetails[0]?.user_type == 'B'){
-			fetchGroupDetails()
-			}
+		// if (params?.id > 0) {
+		// 	if(userDetails[0]?.user_type == 'B'){
+		// 	fetchGroupDetails()
+		// 	}
 
-			if(userDetails[0]?.user_type == 'P'){
-			fetchGroupDetails_ForPacs()
-			}
+		// 	if(userDetails[0]?.user_type == 'P'){
+		// 	fetchGroupDetails_ForPacs()
+		// 	}
 			
-		}
+		// }
 		fetchSahayikaList()
 
 	}, [])
@@ -238,6 +238,9 @@ const containerStyle = {
 		// if(userDetails[0]?.user_type != "P"){
 		// fetchBranch_Group()
 		// }
+
+		console.log(userDetails[0], 'jjjjjjjjjjjjjjjjjjjjjjjjjj');
+		
 
 		if(userDetails[0]?.user_type === 'P' && params?.id > 0){
 			return;
@@ -501,7 +504,7 @@ const containerStyle = {
 				const ip = await getClientIP()
 			
 				const creds = {
-				group_code: 0,
+				group_code: '0',
 				branch_code: formData?.branch_id,
 				tenant_id: userDetails[0]?.tenant_id,
 				group_name: formData?.g_group_name,
@@ -516,15 +519,33 @@ const containerStyle = {
 				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
 				saving_acc_no: formData?.saving_acc_no,
-				pacs_id: userDetails[0]?.user_type == 'B' ? '111' : formData?.packs_id,
+				pacs_id: userDetails[0]?.user_type == 'B' ? '10' : formData?.packs_id,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
-
-				
 				// direct_indirect_flag: directIndirectStatus,
 				// members: formData?.members,
-				
 				}
+
+				// {
+				// 	"group_code" : "0",
+				// 	"branch_code": "1",
+				// 	"tenant_id" : "1",
+				// 	"group_name" : "TO",
+				// 	"phone1" : "9632145555",
+				// 	"sahayika_id" : "8",
+				// 	"group_addr" : "KOLKATA",
+				// 	"dist_id" : "2",
+				// 	"block_id" : "2",
+				// 	"ps_id" : "2",
+				// 	"po_id" : "2",
+				// 	"gp_id" : "2",
+				// 	"village_id" : "2",
+				// 	"pin_no" : "712232",
+				// 	"saving_acc_no":"963566",
+				// 	"pacs_id":"10",
+				// 	"created_by": "Lokesh",
+				// 	"ip_address" : "12.23.23.23"
+				// }
 
 				
 

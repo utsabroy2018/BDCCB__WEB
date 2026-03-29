@@ -302,7 +302,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 	const onSubmit = async (values) => {
 
-		console.log(groupValue, 'ggggggggggggggggggg', formik.values.g_group_name);
+		// console.log(groupValue, 'ggggggggggggggggggg', formik.values.g_group_name);
 		
 		if (!groupValue) {
 		Message("error", "Please select Group Name");
@@ -446,7 +446,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			})
 			.then((res) => {
 
-				console.log(res?.data?.data[0]?.sb_ac_no, 'groupCodegroupCodegroupCode', creds,);
+				console.log(res?.data?.data[0], 'groupCodegroupCodegroupCode', creds,);
 
 				if (res?.data?.success) {
 					// console.log(res?.data?.data, 'resresresresresresres', creds, 'll', params?.id, res?.data?.data);
@@ -588,10 +588,6 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		}));
 
 
-
-
-
-
 		console.log(formData, 'formDataformDataformDataformData', groupsDetails);
 
 		// return;
@@ -600,14 +596,24 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		const ip = await getClientIP()
 
 		const creds = {
-			group_code: formData?.group_code,
+			// group_code: formData?.group_code,
+			group_code: groupValue,
 			branch_code: groupsDetails?.branch_code,
 			tenant_id: userDetails[0]?.tenant_id,
-			pacs_id: groupsDetails?.pacs_id || 0,
+			pacs_id: userDetails[0]?.user_type == 'B' ? '0' : groupsDetails?.pacs_id || 0,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
 
 			members: member_ids,
+
+
+			// "group_code" : "70097",
+			// "branch_code": "7",
+			// "tenant_id":"2",
+			// "pacs_id":"0",
+			// "created_by": "Lokesh",
+			// "ip_address" : "12.23.23.23",
+
 		}
 
 		console.log(creds, 'credscredscredscreds', formData);
