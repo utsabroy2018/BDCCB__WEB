@@ -40,6 +40,53 @@ const LoginScreen = () => {
     const [branch, setBranch] = useState([]);
     const [branchLoadPending, setBranchLoadPending] = useState(false);
 
+
+    const sampleBlocks = [
+  { code: "B1", name: "Block A" },
+  { code: "B2", name: "Block B" },
+];
+
+const sampleSocieties = {
+  B1: [
+    { code: "S1", name: "Society A1" },
+    { code: "S2", name: "Society A2" },
+  ],
+  B2: [
+    { code: "S3", name: "Society B1" },
+    { code: "S4", name: "Society B2" },
+  ],
+};
+
+const sampleGroups = {
+  S1: [
+    { code: "G1", name: "Group A1-1" },
+    { code: "G2", name: "Group A1-2" },
+  ],
+  S2: [
+    { code: "G3", name: "Group A2-1" },
+  ],
+  S3: [
+    { code: "G4", name: "Group B1-1" },
+  ],
+  S4: [
+    { code: "G5", name: "Group B2-1" },
+  ],
+};
+
+    const [blockList, setBlockList] = useState([]);
+    const [societyList, setSocietyList] = useState([]);
+    const [groupList, setGroupList] = useState([]);
+
+    const [selectedBlock, setSelectedBlock] = useState(null);
+    const [selectedSociety, setSelectedSociety] = useState(null);
+    const [selectedGroup, setSelectedGroup] = useState(null);
+
+    const [openBlock, setOpenBlock] = useState(false);
+    const [openSociety, setOpenSociety] = useState(false);
+    const [openGroup, setOpenGroup] = useState(false);
+
+    const [activeDropdown, setActiveDropdown] = useState(null);
+
     
     const requestBluetoothPermissions = async () => {
         if (Platform.OS === 'android') {
@@ -217,20 +264,42 @@ const LoginScreen = () => {
         }
     }
 
-//   useEffect(() => {
-//     const fetchLocations = async () => {
-//       try {
-//         const data = await getAllLocations();
-//         console.log(data, 'All stored locations'); // ✅ will display all locations
-//         setLocations(data);
-//       } catch (error) {
-//         console.log('Error fetching locations:', error);
-//       }
-//     };
 
-//     fetchLocations();
-//   }, []);
+const fetchBlocks = async () => {
+  try {
+    const res = await axios.get(`${'ADDRESSES.FETCH_BLOCKS'}`);
+    if (res?.data?.suc === 1) {
+      setBlockList(res.data.msg);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
 
+const fetchSocieties = (blockCode) => {
+  setSocietyList(sampleSocieties[blockCode] || []);
+};
+
+const fetchGroups = (societyCode) => {
+  setGroupList(sampleGroups[societyCode] || []);
+};
+
+useEffect(() => {
+  fetchBlocks();
+}, []);
+
+useEffect(() => {
+  setBlockList(sampleBlocks);
+}, []);
+
+const handleOpen = (name) => {
+  setActiveDropdown(name);
+
+  // close others
+  setOpenBlock(name === "block");
+  setOpenSociety(name === "society");
+  setOpenGroup(name === "group");
+};
   
 
     return (
@@ -276,6 +345,109 @@ const LoginScreen = () => {
                                 color: theme.colors.primary
                             }}>Login</Text>
                         </View>
+
+                        <View style={{ zIndex: activeDropdown === "block" ? 65000 : 35000, elevation: activeDropdown === "block" ? 65000 : 35000 }}>
+                        <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: "600", 
+                        marginBottom: 5 
+                        }}>
+                        Select Block
+                        </Text>
+                        <DropDownPicker
+                        placeholder="Select Block"
+                        open={openBlock}
+                        onOpen={() => handleOpen("block")}
+                        value={selectedBlock}
+                        items={blockList}
+                        setOpen={setOpenBlock}
+                        setValue={setSelectedBlock}
+                        schema={{ label: 'name', value: 'code' }}
+
+                        // ❌ remove MODAL
+                        // listMode="MODAL"
+
+                        style={{ zIndex: activeDropdown === "block" ? 65000 : 35000 }}
+                        dropDownContainerStyle={{ zIndex: activeDropdown === "block" ? 65000 : 35000 }}
+
+                        onSelectItem={(item) => {
+                            setSelectedBlock(item.code);
+
+                            setSelectedSociety(null);
+                            setSelectedGroup(null);
+                            setSocietyList([]);
+                            setGroupList([]);
+
+                            fetchSocieties(item.code);
+                        }}
+                        />
+                        </View>
+
+                        <View style={{ zIndex: activeDropdown === "society" ? 65000 : 35000, elevation: activeDropdown === "society" ? 65000 : 35000 }}>
+                        <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: "600", 
+                        marginBottom: 5 
+                        }}>
+                        Select Society
+                        </Text>
+                        <DropDownPicker
+                        placeholder="Select Society"
+                        open={openSociety}
+                        onOpen={() => handleOpen("society")}
+                        value={selectedSociety}
+                        items={societyList}
+                        setOpen={setOpenSociety}
+                        setValue={setSelectedSociety}
+                        schema={{ label: 'name', value: 'code' }}
+                        // listMode="MODAL"
+                        
+                        style={{ zIndex: activeDropdown === "society" ? 65000 : 35000 }}
+                        dropDownContainerStyle={{ zIndex: activeDropdown === "society" ? 65000 : 35000 }}
+
+                        disabled={!selectedBlock}
+                        onSelectItem={(item) => {
+                            setSelectedSociety(item.code);
+
+                            // reset group
+                            setSelectedGroup(null);
+                            setGroupList([]);
+
+                            fetchGroups(item.code);
+                        }}
+                        />
+                        </View>
+
+                        <View style={{ zIndex: activeDropdown === "group" ? 65000 : 35000, elevation: activeDropdown === "group" ? 65000 : 35000 }}>
+                        <Text style={{ 
+                        fontSize: 14, 
+                        fontWeight: "600", 
+                        marginBottom: 5 
+                        }}>
+                        Select Group
+                        </Text>
+                        <DropDownPicker
+                        placeholder="Select Group"
+                        open={openGroup}
+                        onOpen={() => handleOpen("group")}
+                        value={selectedGroup}
+                        items={groupList}
+                        setOpen={setOpenGroup}
+                        setValue={setSelectedGroup}
+                        schema={{ label: 'name', value: 'code' }}
+                        // listMode="MODAL"
+                        // style={{ zIndex: 3000 }}
+                        // dropDownContainerStyle={{ zIndex: 3000 }}
+                        style={{ zIndex: activeDropdown === "group" ? 65000 : 35000 }}
+                        dropDownContainerStyle={{ zIndex: activeDropdown === "group" ? 65000 : 35000 }}
+                        
+                        disabled={!selectedSociety}
+                        onSelectItem={(item) => {
+                            setSelectedGroup(item.code);
+                        }}
+                        />
+                        </View>
+                        
                         <InputPaper keyboardType="phone-pad" label='Employee ID' onChangeText={(e: string) => {
                             setUsername(e);
                             // 
@@ -287,6 +459,9 @@ const LoginScreen = () => {
                         value={username} customStyle={{
                             backgroundColor: theme.colors.background
                         }} />
+
+                        
+
                         <InputPaper label='Password'
                         isInputFieldInUppercase={false}
                          onChangeText={(e: string) => setPassword(e)} 
