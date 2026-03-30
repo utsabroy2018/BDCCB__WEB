@@ -550,21 +550,38 @@ function MemberEditExtendedForm({ groupDataArr }) {
 
 		const ip = await getClientIP()
 
-		const member_list = formik.values.members.map(item => ({	
-		member_id : item.member_code,
-		member_name: item.member_name,
-		father_hus_name: item.husb_father,
-		gender: item.gender_field,
-		religion: item.religion_field,
-		caste: item.caste_field,
-		phone_no: item.mobile_no,
-		aadhar_no : item.aadhar_no,
-		sb_acc_no: item.sb_acc_no,
-		ifsc: item.ifsc_code,
-		address : item.address,
-		gp_leader_flag: item.gp_leader_flag,
-		asst_gp_leader_flag : item.asst_gp_leader_flag,
+		// const member_list = formik.values.members.map(item => ({	
+		// member_id : item.member_code,
+		// member_name: item.member_name,
+		// father_hus_name: item.husb_father,
+		// gender: item.gender_field,
+		// religion: item.religion_field,
+		// caste: item.caste_field,
+		// phone_no: item.mobile_no,
+		// aadhar_no : item.aadhar_no,
+		// sb_acc_no: item.sb_acc_no,
+		// ifsc: item.ifsc_code,
+		// address : item.address,
+		// gp_leader_flag: item.gp_leader_flag,
+		// asst_gp_leader_flag : item.asst_gp_leader_flag,
 
+		// }));
+
+		const member_list = formData?.members.map((item) => ({
+		id: "",   // if not available keep empty
+		member_id: item.member_id || "",
+		member_name: item.member_name || "",
+		father_hus_name: item.husb_father || "",
+		gender: item.gender_field || "",
+		religion: item.religion_field || "",
+		caste: item.caste_field || "",
+		phone_no: item.mobile_no ? String(item.mobile_no) : "",
+		aadhar_no: item.aadhar_no || "",
+		sb_acc_no: item.sb_acc_no || "",
+		ifsc: item.ifsc_code || "",
+		address: item.address || "",
+		gp_leader_flag: item.gp_leader_flag || "N",
+		asst_gp_leader_flag: item.asst_gp_leader_flag || "N",
 		}));
 
 

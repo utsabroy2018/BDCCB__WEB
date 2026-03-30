@@ -143,6 +143,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 	const [memberOptions, setMemberOptions] = useState({});
 	const [checkDuplicateGroup, setCheckDuplicateGroup] = useState({})
 	const [checkDuplicateMember, setCheckDuplicateMember] = useState({})
+	const [groupOptions, setGroupOptions] = useState({});
 
 	const initialValues = {
 		// loan_id: "",
@@ -494,12 +495,6 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		}
 	}, [formik.values.curr_roi]);
 
-	useEffect(() => {
-	handleSearchPacsChange()
-	handleSearchSHGChange()
-	}, []);
-
-
 
 	const handleSearchPacsChange = async (value) => {
 		
@@ -620,6 +615,9 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 					// })))
 					// }
 
+					console.log(res?.data?.data, 'shggggggggggggggggggggggggg');
+					
+
 					// if(userDetails[0]?.user_type == 'P'){
 					setSHGList(res?.data?.data?.map((item, i) => ({
 						code: item?.group_code,
@@ -647,6 +645,75 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		setLoading(false)
 	};
 
+
+	
+	useEffect(() => {
+	handleSearchPacsChange()
+	// handleSearchSHGChange()
+	}, []);
+
+	
+	const fetchGroupBySB = async (sb_acc_no, index) => {
+		
+//   try {
+    // const res = await axios.get(`/your-api?sb_acc_no=${sb_acc_no}`);
+	
+	const tokenValue = await getLocalStoreTokenDts(navigate);
+
+	await axios.get(`${url_bdccb}/group/fetch_grp_dtls_memb_acc`, {
+		params: {
+		member_account_no: sb_acc_no, branch_code: userDetails[0]?.brn_code, org_type: 'B'},
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		}
+		}).then((res) => {
+
+		if(res?.data?.success){
+
+		const groupList = res.data.data;
+
+		console.log(res.data.data, 'hhhhhhhhhhhhhhhh');
+		
+
+		// 👉 map API response to dropdown format
+		const formattedGroups = groupList.map((item) => ({
+		// code: item.group_code,
+		// name: item.group_name,
+		// branch_name: item.branch_name,
+		// member_name: item.member_name
+		code: item?.group_code,
+		name: item?.group_name,
+		branch_code: item?.branch_code,
+		}));
+
+		// 👉 store groups for this row
+		// setSHGList((prev) => ({
+		// ...prev,
+		// [index]: formattedGroups,
+		// }));
+
+	setSHGList(res?.data?.data?.map((item, i) => ({
+	code: item?.group_code,
+	name: item?.group_name,
+	branch_code: item?.branch_code,
+	})))
+
+
+
+		} else {
+		Message('error', res?.data?.msg)
+		navigate(routePaths.LANDING)
+		localStorage.clear()
+		}
+
+		})
+		.catch((err) => {
+			Message("error", "Some error occurred while fetching data!")
+			console.log("ERRR", err)
+		})
+
+};
 	
 
 	useEffect(() => {
@@ -660,8 +727,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 	}, [formik.values.rows]);
 
 
-	const fetchGroupData = async (value, rowIndex, branch_code) => {
-		// console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
+	const fetchGroupData = async (value, rowIndex, branch_code, sb_acc_no) => {
+		console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee', sb_acc_no);
 
 		 const groups = [...formik.values.rows];
 
@@ -699,6 +766,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			branch_code: branch_code,
 			group_code: value,
 			tenant_id: userDetails[0]?.tenant_id,
+			member_account_no: sb_acc_no
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -769,10 +837,6 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			return copy;
 			});
 
-			// call API only if 12 digits and not duplicate
-			// if (value.length > 0) {
-			//   checkSBAccNoExists(value, index);
-			// }
 		}
 
 	};
@@ -1149,6 +1213,48 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												className="grid grid-cols-12 gap-3 mb-3 p-3 border rounded-md bg-slate-50 relative"
 											>
 
+												{/* Account Number */}
+												<div className="col-span-2">
+
+													{/* <TDInputTemplateBr
+														placeholder="SB Account No."
+														type="text"
+														label="SB Acc No."
+														name={`rows[${index}].sb_acc_no`}
+														formControlName={formik.values.rows[index].sb_acc_no}
+														handleChange={formik.handleChange}
+														handleBlur={formik.handleBlur}
+														mode={1}
+														// disabled={true}   // 👈 auto-filled only
+													/> */}
+
+													<TDInputTemplateBr
+													placeholder="SB Account No."
+													type="text"
+													label="SB Acc No."
+													name={`rows[${index}].sb_acc_no`}
+													formControlName={formik.values.rows[index].sb_acc_no}
+													handleChange={(e) => {
+														const value = e.target.value;
+
+														formik.setFieldValue(`rows[${index}].sb_acc_no`, value);
+
+														// 👉 Call API when length is enough (avoid too many calls)
+														if (value.length >= 5) {
+														fetchGroupBySB(value, index);
+														}
+													}}
+													handleBlur={formik.handleBlur}
+													mode={1}
+													/>
+
+													{formik.touched.rows?.[index]?.sb_acc_no &&
+														formik.errors.rows?.[index]?.sb_acc_no && (
+															<VError title={formik.errors.rows[index].sb_acc_no} />
+														)}
+
+												</div>
+
 												{/* SHG / PACS */}
 												<div className="col-span-3">
 												{/* {JSON.stringify(SHGList, 2)} */}
@@ -1191,7 +1297,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 															const selectedGroup = SHGList.find(item => item.code === value);
 															const branch_code = selectedGroup?.branch_code;
 															
-															fetchGroupData(value, index, branch_code);
+															fetchGroupData(value, index, branch_code, formik.values.rows[index].sb_acc_no);
 														}}
 
 														onBlur={() =>
@@ -1220,25 +1326,13 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												</>
 											)}
 												
-											{/* {checkDuplicateGroup[index] && (
-											checkDuplicateGroup[index]?.user_status == 1 ? (
-												<div style={{ fontSize: 12, color: "red" }}>
-												{checkDuplicateGroup[index]?.msg}
-												</div>
-											) : (
-												<>
-												<div style={{ fontSize: 12, color: "green" }}>
-												{SBAccountStatus[index]?.msg}
-												</div>
-												</>
-											)
-											)} */}
+											
 
 
-													{formik.touched.rows?.[index]?.shg_id &&
-														formik.errors.rows?.[index]?.shg_id && (
-															<VError title={formik.errors.rows[index].shg_id} />
-														)}
+											{formik.touched.rows?.[index]?.shg_id &&
+												formik.errors.rows?.[index]?.shg_id && (
+													<VError title={formik.errors.rows[index].shg_id} />
+												)}
 
 
 												</div>
@@ -1329,24 +1423,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 												</div>
 
-												{/* Account Number */}
-												<div className="col-span-2">
-
-													<TDInputTemplateBr
-														placeholder="SB Account No."
-														type="text"
-														label="SB Acc No."
-														name={`rows[${index}].sb_acc_no`}
-														formControlName={formik.values.rows[index].sb_acc_no}
-														mode={1}
-														disabled={true}   // 👈 auto-filled only
-													/>
-													{formik.touched.rows?.[index]?.sb_acc_no &&
-														formik.errors.rows?.[index]?.sb_acc_no && (
-															<VError title={formik.errors.rows[index].sb_acc_no} />
-														)}
-
-												</div>
+												
 
 												
 

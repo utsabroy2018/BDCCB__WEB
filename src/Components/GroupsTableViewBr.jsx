@@ -131,27 +131,12 @@ function GroupsTableViewBr({
 							<th scope="col" className="p-4">
 								Group Name
 							</th>
+							{userDetails[0]?.user_type == 'P' && (
 							<th scope="col" className="p-4">
-								Group Type
+								Branch Name
 							</th>
-							{/* <th scope="col" className="p-4">
-								Member Code
-							</th>
-							<th scope="col" className="p-4">
-								GRT Date
-							</th> */}
-							{/* <th scope="col" className="p-4">
-								Status
-							</th> */}
-							{/* <th scope="col" className="p-4">
-								Branch
-							</th>
-							<th scope="col" className="p-4">
-								Loan Type
-							</th> */}
-							{/* <th scope="col" className="p-4">
-								Created By
-							</th> */}
+							)}
+							
 							<th scope="col" className="p-4">
 								Action
 							</th>
@@ -174,9 +159,11 @@ function GroupsTableViewBr({
 									</th> */}
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
+									{userDetails[0]?.user_type == 'P' && (
 									<td className="px-6 py-3 text-slate-700">
-										{item.group_type === "J" ? "JLG" : "SHG"}
+										{item.branch_name}
 									</td>
+									)}
 									<td className="px-6 py-3 text-slate-700">
 										{/* {flag !== "BM" ? (
 											// <Link

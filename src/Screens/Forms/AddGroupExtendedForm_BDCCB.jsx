@@ -519,7 +519,7 @@ const containerStyle = {
 				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
 				saving_acc_no: formData?.saving_acc_no,
-				pacs_id: userDetails[0]?.user_type == 'B' ? '10' : formData?.packs_id,
+				pacs_id: userDetails[0]?.user_type == 'B' ? '111' : formData?.packs_id,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
 				// direct_indirect_flag: directIndirectStatus,
