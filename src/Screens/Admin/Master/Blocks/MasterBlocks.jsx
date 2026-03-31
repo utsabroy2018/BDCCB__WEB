@@ -62,6 +62,8 @@ function MasterBlocks() {
 		const creds = {
 			dist_id: dist_id,
 		}
+		console.log(dist_id, 'dist_iddist_iddist_iddist_id');
+		
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios.get(`${url_bdccb}/master/block_list`, {

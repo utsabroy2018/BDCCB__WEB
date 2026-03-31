@@ -2647,6 +2647,7 @@ const items_bdccb = [
 							label: <Link to={"/homepacs/disburseloan"}>Society</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
+						
 						{
 							key: "sub4-1-1",
 							icon: <CheckCircleOutlined />,
@@ -2661,15 +2662,20 @@ const items_bdccb = [
 					icon: <CheckCircleOutlined />,
 					label: "Recovery",
 					children: [
+						// {
+						// 	key: "sub4-2-1",
+						// 	icon: <CheckCircleOutlined />,
+						// 	label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
+						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+						// },
 						{
 							key: "sub4-2-1",
 							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
+							label: <Link to={"/homebm/loan-recovery-society-list"}>Society</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
-
 						{
-							key: "sub4-2-3",
+							key: "sub4-2-2",
 							icon: <CheckCircleOutlined />,
 							label: <Link to={"/homebm/loan-recovery-shg-list"}>SHG</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
@@ -2693,6 +2699,12 @@ const items_bdccb = [
 							label: <Link to={"/homebm/recovery-shg-list"}>Recovery SHG</Link>,
 							// hidden: data?.approve_transaction == "Y" ? false : true,
 						},
+						{
+							key: "sub4-3-3",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/recovery-society-list"}>Recovery Society</Link>,
+							// hidden: data?.approve_transaction == "Y" ? false : true,
+						}
 						// {
 						// 	key: "sub4-2-3",
 						// 	icon: <CheckCircleOutlined />,

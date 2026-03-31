@@ -91,6 +91,11 @@ const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/Sear
 const SearchRecoverySHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchRecoverySHGBranchBM_BDCCB.jsx"))
 const RecoverySubmitStatusSHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBranchBM_BDCCB.jsx"))
 const BranchSHGLoanRecoveryDetails = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryDetails/BranchSHGLoanRecoveryDetails.jsx"))
+const BranchSOCI_LoanRecoveryDetails = lazy(() => import("./Screens/BMHome/BranchSOCI_LoanRecoveryDetails/BranchSOCI_LoanRecoveryDetails.jsx"))
+
+const SearchRecoverySocietyBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchRecoverySocietyBranchBM_BDCCB.jsx"))
+
+const RecoveryListSocietyBranch_BDCCB = lazy(() => import("./Screens/BMHome/RecoveryListSocietyBranch_BDCCB.jsx"))
 
 
 const RecoverySubmitStatusSHGBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBM_BDCCB.jsx"))
@@ -120,6 +125,7 @@ const SearchViewLoanRecoveryBM_BDCCB = lazy(() => import("./Screens/BMHome/Searc
 const LoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/LoanRecoveryAcceptReject/LoanRecoveryAcceptReject.jsx"))
 
 const BranchSHGLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryAcceptReject/BranchSHGLoanRecoveryAcceptReject.jsx"))
+const BranchSocietyLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/BranchSocietyLoanRecoveryAcceptReject/BranchSocietyLoanRecoveryAcceptReject.jsx"))
 
 const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
 
@@ -417,8 +423,21 @@ const router = createBrowserRouter([
 								element: <SearchRecoverySHGBranchBM_BDCCB />,
 							},
 							{
+								path: "recovery-society-list",
+								element: <SearchRecoverySocietyBranchBM_BDCCB />,
+							},
+							{
+								path: "viewloan-society-recovery/:id",
+								element: <BranchSocietyLoanRecoveryAcceptReject />,
+							},
+							{
 								path: "loan-recovery-shg-list",
 								element: <RecoverySubmitStatusSHGBranchBM_BDCCB />,
+							},
+							,
+							{
+								path: "loan-recovery-society-list",
+								element: <RecoveryListSocietyBranch_BDCCB />,
 							},
 							{
 								path: "disburseloan/:id",
@@ -469,6 +488,11 @@ const router = createBrowserRouter([
 							{
 								path: "loan_branch_soi-recovery",
 								element: <LoanDetails_Branch_SOCI_BDCCB />,
+							},
+							
+							{
+								path: "loan_branch_soi-recovery-details/:id",
+								element: <BranchSOCI_LoanRecoveryDetails />,
 							}
 
 							// {

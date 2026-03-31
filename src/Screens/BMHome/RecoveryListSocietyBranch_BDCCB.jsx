@@ -14,6 +14,9 @@ import ViewLoanTableRecovery_BDCCB from "../../Components/ViewLoanTableRecovery_
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import RecoverySHGListTable_BDCCB from "../../Components/RecoverySHGListTable_BDCCB"
 import Radiobtn from "../../Components/Radiobtn"
+import LoanRecoverySubmitSHGListTable_BDCCB from "../../Components/LoanRecoverySubmitSHGListTable_BDCCB"
+import { motion } from "framer-motion"
+import LoanRecoveryBranchSociListTable_BDCCB from "../../Components/LoanRecoveryBranchSociListTable_BDCCB"
 
 const option_recovery = [
 	{
@@ -30,7 +33,7 @@ const option_recovery = [
 	// }
 ]
 
-function SearchRecoverySHGBranchBM_BDCCB() {
+function RecoveryListSocietyBranch_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -71,16 +74,25 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
-			from_dt: '',
-			to_dt: '',
+			// from_dt: fromDate,
+			from_dt: recoveryStatus == 'A' ? fromDate : '',
+			// to_dt: toDate,
+			to_dt:  recoveryStatus == 'A' ? toDate : '',
 			approval_status : recoveryStatus
 			// approval_status: loanType
 		}
 
+		// {
+		// "tenant_id" : "CCB-78945",
+		// "branch_id" : "7",
+		// "from_dt" : "1",
+		// "to_dt" : "70017"
+		// }
+
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_ccb_recov_dtls`, creds, {
+			.post(`${url_bdccb}/recov/fetch_soc_recov_dtls_ccb_level`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -143,7 +155,7 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
-					{/* <div className="flex flex-row gap-3 mt-20">
+					<div className="flex flex-row gap-3 mt-20">
 						
 					<Radiobtn
 					data={option_recovery}
@@ -152,7 +164,10 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 					onChange(value)
 					}}
 					/>
-						
+
+					{recoveryStatus == 'A' &&(
+					<>
+						{/* <form onSubmit={formik.handleSubmit}> */}
 					<div className="mt-1">
 					<TDInputTemplateBr
 					type="date"
@@ -185,11 +200,14 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 					</button>
 					</div>
 
-								
-					</div> */}
+					{/* </form> */}
+					</>
+					)}
+
+					</div>
 					
 
-					<div className="mt-5">
+					{/* <div className="mt-5">
 						<label
 							for="default-search"
 							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -230,8 +248,10 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 							>
 								Search
 							</button>
+
+							
 						</div>
-					</div>
+					</div> */}
 					{/* {JSON.stringify(fromDate, 2)} */}
 
 					{/* {JSON.stringify(toDate, 2)} */}
@@ -239,11 +259,85 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 					{/* {JSON.stringify(groups[0], 2)} */}
 
 
-					<RecoverySHGListTable_BDCCB
+					<motion.section
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									transition={{ delay: 0.5, type: "spring", stiffness: 30 }}
+								>
+									<div
+										className={`flex flex-col bg-slate-800
+										 rounded-lg my-3 dark:bg-slate-800
+										 md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-1.5`}
+									>
+										<div className="w-full flex flex-row-reverse justify-between items-center mx-4">
+											{/* <div className="flex items-center justify-between"> */}
+												
+												
+					
+												{/* <label htmlFor="simple-search" className="sr-only">
+													Search
+												</label> */}
+												<button
+												className="inline-flex items-center text-white ml-6 disabled:bg-[#ee7c98] bg-[#DA4167] hover:bg-[#DA4167] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+												onClick={() => {
+													navigate(`/homebm/loan_branch_soi-recovery`)
+												}}
+											>
+												{/* <PlusOutlined className="text-xl" /> */}
+												 Recovery
+											</button>
+												{/* {showSearch && ( */}
+													<div className="relative w-full">
+														<div className="absolute inset-y-0 left-0 flex items-center md:ml-4 pl-3 pointer-events-none">
+															<svg
+																aria-hidden="true"
+																className="w-5 h-5 text-gray-500 dark:text-gray-400"
+																fill="currentColor"
+																viewBox="0 0 20 20"
+																xmlns="http://www.w3.org/2000/svg"
+															>
+																<path
+																	fillRule="evenodd"
+																	d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+																	clipRule="evenodd"
+																/>
+															</svg>
+														</div>
+														<motion.input
+															type="text"
+															id="simple-search"
+															initial={{ opacity: 0, width: 0 }}
+															animate={{ opacity: 1, width: "95%" }}
+															transition={{ delay: 1.1, type: "just" }}
+															className={`bg-white border rounded-lg  border-slate-700 bg-slate-300"
+															 text-gray-800 block w-full h-12 pl-10 dark:bg-gray-800 md:ml-4 duration-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white text-lg `}
+															placeholder="Search Loans by Group Name / Code"
+															required=""
+															onChange={(text) => setSearch(text.target.value)}
+														/>
+													</div>
+												{/* )} */}
+					
+												<motion.h2
+													initial={{ opacity: 0, y: -50 }}
+													animate={{ opacity: 1, y: 0 }}
+													transition={{ delay: 1, type: "just" }}
+													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
+												>
+													{"Loan Recovery Of Society List"}
+												</motion.h2>
+											{/* </div> */}
+										</div>
+									</div>
+								</motion.section>
+
+					{/* {JSON.stringify(groups, null, 2)} */}
+					
+					<LoanRecoveryBranchSociListTable_BDCCB
 						flag="BM"
 						loanAppData={groups}
 						// title="Find Recovery Loans by Society"
-						title="Find Recovery SHG Loans List"
+						// title="Loan Recovery Of Society List"
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
 						refreshData={fetchSearchedGroups}
@@ -259,4 +353,4 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 	)
 }
 
-export default SearchRecoverySHGBranchBM_BDCCB
+export default RecoveryListSocietyBranch_BDCCB

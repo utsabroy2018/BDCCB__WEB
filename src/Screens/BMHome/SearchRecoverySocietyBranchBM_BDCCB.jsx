@@ -14,6 +14,7 @@ import ViewLoanTableRecovery_BDCCB from "../../Components/ViewLoanTableRecovery_
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import RecoverySHGListTable_BDCCB from "../../Components/RecoverySHGListTable_BDCCB"
 import Radiobtn from "../../Components/Radiobtn"
+import RecoverySocietyListTable_BDCCB from "../../Components/RecoverySocietyListTable_BDCCB"
 
 const option_recovery = [
 	{
@@ -30,7 +31,7 @@ const option_recovery = [
 	// }
 ]
 
-function SearchRecoverySHGBranchBM_BDCCB() {
+function SearchRecoverySocietyBranchBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -68,11 +69,22 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 
 	const fetchSearchedGroups = async () => {
 		setLoading(true)
+		// const creds = {
+		// 	branch_id: userDetails[0]?.brn_code ,
+		// 	tenant_id: userDetails[0]?.tenant_id,
+		// 	from_dt: '',
+		// 	to_dt: '',
+		// 	approval_status : recoveryStatus
+		// 	// approval_status: loanType
+		// }
+
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
+			// from_dt: fromDate,
 			from_dt: '',
-			to_dt: '',
+			// to_dt: toDate,
+			to_dt:  '',
 			approval_status : recoveryStatus
 			// approval_status: loanType
 		}
@@ -80,7 +92,7 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_ccb_recov_dtls`, creds, {
+			.post(`${url_bdccb}/recov/fetch_soc_recov_dtls_ccb_level`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -236,14 +248,14 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 
 					{/* {JSON.stringify(toDate, 2)} */}
 
-					{/* {JSON.stringify(groups[0], 2)} */}
+					{JSON.stringify(groups, 2)}
 
 
-					<RecoverySHGListTable_BDCCB
+					<RecoverySocietyListTable_BDCCB
 						flag="BM"
 						loanAppData={groups}
 						// title="Find Recovery Loans by Society"
-						title="Find Recovery SHG Loans List"
+						title="Find Recovery Society Loans List"
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
 						refreshData={fetchSearchedGroups}
@@ -259,4 +271,4 @@ function SearchRecoverySHGBranchBM_BDCCB() {
 	)
 }
 
-export default SearchRecoverySHGBranchBM_BDCCB
+export default SearchRecoverySocietyBranchBM_BDCCB
