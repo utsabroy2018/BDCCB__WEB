@@ -41,37 +41,37 @@ const LoginScreen = () => {
     const [branchLoadPending, setBranchLoadPending] = useState(false);
 
 
-    const sampleBlocks = [
-  { code: "B1", name: "Block A" },
-  { code: "B2", name: "Block B" },
-];
+//     const sampleBlocks = [
+//   { code: "B1", name: "Block A" },
+//   { code: "B2", name: "Block B" },
+// ];
 
-const sampleSocieties = {
-  B1: [
-    { code: "S1", name: "Society A1" },
-    { code: "S2", name: "Society A2" },
-  ],
-  B2: [
-    { code: "S3", name: "Society B1" },
-    { code: "S4", name: "Society B2" },
-  ],
-};
+// const sampleSocieties = {
+//   B1: [
+//     { code: "S1", name: "Society A1" },
+//     { code: "S2", name: "Society A2" },
+//   ],
+//   B2: [
+//     { code: "S3", name: "Society B1" },
+//     { code: "S4", name: "Society B2" },
+//   ],
+// };
 
-const sampleGroups = {
-  S1: [
-    { code: "G1", name: "Group A1-1" },
-    { code: "G2", name: "Group A1-2" },
-  ],
-  S2: [
-    { code: "G3", name: "Group A2-1" },
-  ],
-  S3: [
-    { code: "G4", name: "Group B1-1" },
-  ],
-  S4: [
-    { code: "G5", name: "Group B2-1" },
-  ],
-};
+// const sampleGroups = {
+//   S1: [
+//     { code: "G1", name: "Group A1-1" },
+//     { code: "G2", name: "Group A1-2" },
+//   ],
+//   S2: [
+//     { code: "G3", name: "Group A2-1" },
+//   ],
+//   S3: [
+//     { code: "G4", name: "Group B1-1" },
+//   ],
+//   S4: [
+//     { code: "G5", name: "Group B2-1" },
+//   ],
+// };
 
     const [blockList, setBlockList] = useState([]);
     const [societyList, setSocietyList] = useState([]);
@@ -153,7 +153,7 @@ const sampleGroups = {
     const login = () => {
         const branchName = branch.find(el => el.code === selectedBranch)?.name || "";
         // handleLogin(username, password, selectedBranch, userId, branchName, fcmToken)
-        handleLogin(username, password, selectedBranch, userId, branchName)
+        handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup+'-'+username, password, selectedBranch, userId, branchName)
     }
 
 
@@ -264,24 +264,114 @@ const sampleGroups = {
         }
     }
 
+   
+
 
 const fetchBlocks = async () => {
-  try {
-    const res = await axios.get(`${'ADDRESSES.FETCH_BLOCKS'}`);
-    if (res?.data?.suc === 1) {
-      setBlockList(res.data.msg);
+
+            try {
+            const res = await axios.get(`${ADDRESSES.BLOCK_LIST}`, {
+            params: {
+            dist_id: 2,
+            },
+            headers: {
+            Authorization: ``,
+            "Content-Type": "application/json",
+            },
+            });
+
+            // if (res?.request?.status === 200) {
+            if (res?.data?.success) {
+            // console.log(res?.data?.data, 'gggggggggggggggggggggggg');
+            // setBlockList(res?.data?.data);
+
+            const formattedBlocks = res?.data?.data?.map((item) => ({
+            code: item.block_id,
+            name: item.block_name,
+            }));
+
+            setBlockList(formattedBlocks);
+            
+            }
+            // }
+
+            } catch (err) {
+            // Message("error", "Some error occurred while fetching data!");
+            console.error("ERRR", err);
+            }
+};
+
+const fetchSocieties = async (blockCode) => {
+
+    try {
+    const res = await axios.get(`${ADDRESSES.BRANCH_LIST}`, {
+    params: {
+    dist_id: 2, tenant_id: 1 ,branch_id: 0, block_id: blockCode
+    },
+    headers: {
+    Authorization: ``,
+    "Content-Type": "application/json",
+    },
+    });
+
+    // if (res?.request?.status === 200) {
+    if (res?.data?.success) {
+    // console.log(res?.data?.data, 'sososososososososososo');
+    // setBlockList(res?.data?.data);
+
+    const formattedBlocks = res?.data?.data?.map((item) => ({
+    code: item.branch_id,
+    name: item.branch_name,
+    }));
+
+    setSocietyList(formattedBlocks);
+
     }
-  } catch (err) {
-    console.log(err);
-  }
+    // }
+
+    } catch (err) {
+    // Message("error", "Some error occurred while fetching data!");
+    console.error("ERRR", err);
+    }
+    
+//   setSocietyList(sampleSocieties[blockCode] || []);
 };
 
-const fetchSocieties = (blockCode) => {
-  setSocietyList(sampleSocieties[blockCode] || []);
-};
+const fetchGroups = async (societyCode) => {
+    // console.log(societyCode, 'fetchGroupsfetchGroupsfetchGroupsfetchGroups');
 
-const fetchGroups = (societyCode) => {
-  setGroupList(sampleGroups[societyCode] || []);
+    try {
+    const res = await axios.get(`${ADDRESSES.GROUP_LIST_FOR_LOGIN}`, {
+    params: {
+    branch_id: societyCode
+    },
+    headers: {
+    Authorization: ``,
+    "Content-Type": "application/json",
+    },
+    });
+
+    // if (res?.request?.status === 200) {
+    if (res?.data?.success) {
+    // console.log(res?.data?.data, 'fetchGroupsfetchGroupsfetchGroupsfetchGroups');
+    // setBlockList(res?.data?.data);
+
+    const formattedBlocks = res?.data?.data?.map((item) => ({
+    code: item.group_code,
+    name: item.group_name +' ('+item.group_code+')',
+    }));
+
+    setGroupList(formattedBlocks);
+
+    }
+    // }
+
+    } catch (err) {
+    // Message("error", "Some error occurred while fetching data!");
+    console.error("ERRR", err);
+    }
+
+//   setGroupList(sampleGroups[societyCode] || []);
 };
 
 useEffect(() => {
@@ -289,7 +379,7 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  setBlockList(sampleBlocks);
+//   setBlockList(sampleBlocks);
 }, []);
 
 const handleOpen = (name) => {
@@ -344,6 +434,7 @@ const handleOpen = (name) => {
                             <Text variant='displayMedium' style={{
                                 color: theme.colors.primary
                             }}>Login</Text>
+                            <Text>{selectedBlock} // {selectedSociety} /// {selectedGroup}</Text>
                         </View>
 
                         <View style={{ zIndex: activeDropdown === "block" ? 65000 : 35000, elevation: activeDropdown === "block" ? 65000 : 35000 }}>
@@ -365,7 +456,7 @@ const handleOpen = (name) => {
                         schema={{ label: 'name', value: 'code' }}
 
                         // ❌ remove MODAL
-                        // listMode="MODAL"
+                        listMode="MODAL"
 
                         style={{ zIndex: activeDropdown === "block" ? 65000 : 35000 }}
                         dropDownContainerStyle={{ zIndex: activeDropdown === "block" ? 65000 : 35000 }}
@@ -400,7 +491,7 @@ const handleOpen = (name) => {
                         setOpen={setOpenSociety}
                         setValue={setSelectedSociety}
                         schema={{ label: 'name', value: 'code' }}
-                        // listMode="MODAL"
+                        listMode="MODAL"
                         
                         style={{ zIndex: activeDropdown === "society" ? 65000 : 35000 }}
                         dropDownContainerStyle={{ zIndex: activeDropdown === "society" ? 65000 : 35000 }}
@@ -435,7 +526,7 @@ const handleOpen = (name) => {
                         setOpen={setOpenGroup}
                         setValue={setSelectedGroup}
                         schema={{ label: 'name', value: 'code' }}
-                        // listMode="MODAL"
+                        listMode="MODAL"
                         // style={{ zIndex: 3000 }}
                         // dropDownContainerStyle={{ zIndex: 3000 }}
                         style={{ zIndex: activeDropdown === "group" ? 65000 : 35000 }}
@@ -546,7 +637,7 @@ const handleOpen = (name) => {
                         {/* @ts-ignore */}
                         <ButtonPaper mode='elevated' onPress={login} icon="login" style={{
                             marginTop: normalize(20)
-                        }} loading={isLoading} disabled={isLoading || !username || !password || (userId == 2 && !selectedBranch)}>
+                        }} loading={isLoading} disabled={isLoading || !username || !password || (userId == 2 && !selectedBranch) || !selectedBlock || !selectedSociety || !selectedGroup}>
                             Login
                         </ButtonPaper>
                         <View>

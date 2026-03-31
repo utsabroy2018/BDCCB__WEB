@@ -35,11 +35,10 @@ const AppContext = ({ children }) => {
             // branch_code:branch,
         }
 
+        console.log(creds, 'credscredscredscreds');
+        
 
         await axios.post(`${ADDRESSES.LOGIN}`, creds).then(res => {
-
-            
-
             // if (res?.data?.suc === 1) {
             if (res?.data?.success) {    
                     ToastAndroid.show(`${res?.data?.msg}`, ToastAndroid.SHORT);

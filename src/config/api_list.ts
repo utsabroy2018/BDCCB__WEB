@@ -15,6 +15,9 @@ export const ADDRESSES = {
     FETCH_LOAN_DETAILS: `${BASE_URL_BDCCB}/recov/fetch_loan_details`,
     FETCH_MEMBER_OUTSTANDING_DTLS: `${BASE_URL_BDCCB}/dashboard/fetch_member_outstanding_dtls`,
     SAVE_GRP_RECOVERY: `${BASE_URL_BDCCB}/recov/save_grp_recovery`,
+    BLOCK_LIST: `${BASE_URL_BDCCB}/master/block_list`,
+    BRANCH_LIST: `${BASE_URL_BDCCB}/master/branch_list`,
+    GROUP_LIST_FOR_LOGIN: `${BASE_URL_BDCCB}/group/group_list_for_login`,
     // LOGOUT_APP:`${BASE_URL_BDCCB}/logout_app`,
     
     //////////////// BDCCB End ////////////////
