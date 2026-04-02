@@ -434,7 +434,7 @@ const handleOpen = (name) => {
                             <Text variant='displayMedium' style={{
                                 color: theme.colors.primary
                             }}>Login</Text>
-                            <Text>{selectedBlock} // {selectedSociety} /// {selectedGroup}</Text>
+                            {/* <Text>{selectedBlock} // {selectedSociety} /// {selectedGroup}</Text> */}
                         </View>
 
                         <View style={{ zIndex: activeDropdown === "block" ? 65000 : 35000, elevation: activeDropdown === "block" ? 65000 : 35000 }}>
