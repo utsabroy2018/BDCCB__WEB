@@ -153,7 +153,8 @@ const LoginScreen = () => {
     const login = () => {
         const branchName = branch.find(el => el.code === selectedBranch)?.name || "";
         // handleLogin(username, password, selectedBranch, userId, branchName, fcmToken)
-        handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup+'-'+username, password, selectedBranch, userId, branchName)
+        // handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup+'-'+username, password, selectedBranch, userId, branchName)
+        handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup, password, selectedBranch, userId, branchName)
     }
 
 
@@ -539,7 +540,7 @@ const handleOpen = (name) => {
                         />
                         </View>
                         
-                        <InputPaper keyboardType="phone-pad" label='Employee ID' onChangeText={(e: string) => {
+                        {/* <InputPaper keyboardType="phone-pad" label='Employee ID' onChangeText={(e: string) => {
                             setUsername(e);
                             // 
                         }} 
@@ -549,7 +550,7 @@ const handleOpen = (name) => {
                         }}
                         value={username} customStyle={{
                             backgroundColor: theme.colors.background
-                        }} />
+                        }} /> */}
 
                         
 
@@ -635,9 +636,14 @@ const handleOpen = (name) => {
                         {branchLoadPending &&   <ActivityIndicator size={'large'} />}
 
                         {/* @ts-ignore */}
-                        <ButtonPaper mode='elevated' onPress={login} icon="login" style={{
+                        {/* <ButtonPaper mode='elevated' onPress={login} icon="login" style={{
                             marginTop: normalize(20)
                         }} loading={isLoading} disabled={isLoading || !username || !password || (userId == 2 && !selectedBranch) || !selectedBlock || !selectedSociety || !selectedGroup}>
+                            Login
+                        </ButtonPaper> */}
+                        <ButtonPaper mode='elevated' onPress={login} icon="login" style={{
+                            marginTop: normalize(20)
+                        }} loading={isLoading} disabled={isLoading || !password || (userId == 2 && !selectedBranch) || !selectedBlock || !selectedSociety || !selectedGroup}>
                             Login
                         </ButtonPaper>
                         <View>
