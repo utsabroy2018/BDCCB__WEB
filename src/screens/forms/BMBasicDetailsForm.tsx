@@ -21,6 +21,9 @@ import { Camera, useCameraDevice, useCameraDevices, useCameraFormat, useCameraPe
 import ImageView from "react-native-image-viewing";
 import { BASE_URL } from '../../config/config'
 import { AppStore } from '../../context/AppContext'
+
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
+
 interface BMBasicDetailsFormProps {
     formNumber?: any
     branchCode?: any
@@ -149,7 +152,7 @@ const { handleLogout } = useContext<any>(AppStore)
 
     const fetchGeoLocaltionAddress = async () => {
         console.log("REVERSE GEO ENCODING API CALLING...")
-        await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyDdA5VPRPZXt3IiE3zP15pet1Nn200CRzg`).then(res => {
+        await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${GOOGLE_API_KEY}`).then(res => {
             setGeolocationFetchedAddress(res?.data?.results[0]?.formatted_address)
         })
         // let config = {
@@ -830,7 +833,7 @@ const { handleLogout } = useContext<any>(AppStore)
         );
         if (approvalStatus === "U") {
             // setLoading(true);
-            await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyDdA5VPRPZXt3IiE3zP15pet1Nn200CRzg`)
+            await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${GOOGLE_API_KEY}`)
                 .then((res) => {
 
                     // console.log('>>>>', creds, "REVERSE GEO ENCODING RES =============", res?.data?.results[0])
@@ -911,7 +914,7 @@ const { handleLogout } = useContext<any>(AppStore)
 
         setLoading(true)
         if (approvalStatus === "U") {
-            await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyDdA5VPRPZXt3IiE3zP15pet1Nn200CRzg`)
+            await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${GOOGLE_API_KEY}`)
                 .then(res => {
                     submitBasicDetails(res?.data?.results[0]?.formatted_address);
                 }).catch(err => {

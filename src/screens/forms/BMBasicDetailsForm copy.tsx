@@ -17,6 +17,8 @@ import { disableCondition } from "../../utils/disableCondition"
 // import { Dropdown } from 'react-native-element-dropdown'
 import { SCREEN_WIDTH } from 'react-native-normalize'
 
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
+
 interface BMBasicDetailsFormProps {
     formNumber?: any
     branchCode?: any
@@ -114,7 +116,7 @@ const BMBasicDetailsForm = forwardRef(({
 
     const fetchGeoLocaltionAddress = async () => {
         console.log("REVERSE GEO ENCODING API CALLING...")
-        await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyDdA5VPRPZXt3IiE3zP15pet1Nn200CRzg`).then(res => {
+        await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${GOOGLE_API_KEY}`).then(res => {
             setGeolocationFetchedAddress(res?.data?.results[0]?.formatted_address)
         })
             // let config = {

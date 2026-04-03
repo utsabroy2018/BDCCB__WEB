@@ -24,6 +24,8 @@ import useGeoLocation from '../hooks/useGeoLocation'
 import DeviceInfo from 'react-native-device-info'
 import { AppStore } from '../context/AppContext'
 
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY
+
 const HomeScreen = () => {
     const theme = usePaperColorScheme()
     const navigation = useNavigation()
@@ -106,7 +108,7 @@ const HomeScreen = () => {
 
     const fetchGeoLocaltionAddress = async () => {
         console.log("REVERSE GEO ENCODING API CALLING...")
-        await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyDdA5VPRPZXt3IiE3zP15pet1Nn200CRzg`).then(res => {
+        await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${GOOGLE_API_KEY}`).then(res => {
             console.log("REVERSE GEO ENCODING RES =============", res?.data?.results[0])
             setGeolocationFetchedAddress(res?.data?.results[0]?.formatted_address)
         })

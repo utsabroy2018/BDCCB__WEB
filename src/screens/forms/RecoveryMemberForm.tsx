@@ -96,38 +96,7 @@ const RecoveryMemberForm = ({ fetchedData, approvalStatus }) => {
     console.log("LOcAtion", location)
     console.log("LOcAtion ERRR", error)
 
-    const fetchGeoLocaltionAddress = async () => {
-        console.log("REVERSE GEO ENCODING API CALLING...")
-        // await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyDdA5VPRPZXt3IiE3zP15pet1Nn200CRzg`).then(res => {
-        //     setGeolocationFetchedAddress(res?.data?.results[0]?.formatted_address)
-        // })
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `https://api.olamaps.io/places/v1/reverse-geocode?latlng=${location?.latitude},${location?.longitude}&api_key=DYdFc2y563IaPHDz5VCisFGjsspC6rkeIVHzg96e`,
-            headers: {
-
-                'Content-Type': 'application/json',
-            }
-        };
-
-        await axios.request(config).then(res => {
-            console.log("REVERSE GEO ENCODING RES =============", res?.data?.results[0])
-            setGeolocationFetchedAddress(res?.data?.results[0]?.formatted_address)
-        }).catch(err => {
-            console.log("REVERSE GEO ENCODING ERR =============", JSON.stringify(err))
-            // ToastAndroid.show("Some error occurred while fetching geolocation address.", ToastAndroid.SHORT)
-        })
-        // await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=AIzaSyAhSuw5-ThQnJTZCGC4e_oBsL1iIUbJxts`).then(res => {
-        //     setGeolocationFetchedAddress(res?.data?.results[0]?.formatted_address)
-        // })
-    }
-
-    useEffect(() => {
-        // if (location?.latitude && location.longitude && approvalStatus === "A") {
-        //     fetchGeoLocaltionAddress()
-        // }
-    }, [location])
+    
 
     const requestBluetoothPermissions = async () => {
         if (Platform.OS === 'android') {
