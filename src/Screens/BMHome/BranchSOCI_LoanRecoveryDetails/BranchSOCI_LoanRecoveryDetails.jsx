@@ -65,7 +65,43 @@ function BranchSOCI_LoanRecoveryDetails() {
 
 	const navigate = useNavigate()
 
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+const handleExportMembers = (loans) => {
+			const flattenedData = [];
+			loans.forEach((loan) => {
+				flattenedData.push({
+					"Loan ID": loan.loan_id,
+					"Group Code": loan.group_code,
+					"Group Name": loan.group_name,
+					"Loan Account No": loan.loan_acc_no,
+					"Period": loan.period,
+					"Current ROI": loan.curr_roi,
+					"Penal ROI": loan.penal_roi,
+					"Disbursement Date": loan.disb_dt,
+					"Disbursement Amount": loan.disb_amt,
+					"Loan Outstanding": loan.loan_outstanding,
+					"Recovery Trans ID": loan.recovery_trans_id,
+					"Interest Trans ID": loan.interest_trans_id,
+					"Principal Amount": loan.principal_amount,
+					"Interest Amount": loan.interest_amount,
+				});
+			});
 
+			const wb = XLSX.utils.book_new();
+			const ws = XLSX.utils.json_to_sheet(flattenedData);
+			XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+			const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+			const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+			const fileName = `SocietyRecovery_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+			saveAs(blob, fileName);
+		};
 	const initialValues = {
 		principal_amount: "",
 		interest_amount: "",
@@ -394,7 +430,21 @@ function BranchSOCI_LoanRecoveryDetails() {
 						<VError title={formik.errors.interest_amount} />
 						) : null} */}
 						</div>
-
+{loanDetails?.length > 0 && <div className="flex justify-start gap-4 bg-white p-4">
+							<Tooltip title="Export to Excel">
+								<button
+									onClick={() => handleExportMembers(loanDetails)}
+									className="mt-5 justify-center items-center rounded-full text-green-900"
+								>
+									<FileExcelOutlined
+										style={{
+											fontSize: 30,
+										}}
+									/>
+								</button>
+							</Tooltip>
+	
+						</div>}
 						{/* <div className="sm:col-span-2 mt-7">
 							<button
 							className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-slate-600 border-slate-500 bg-slate-700 transition ease-in-out hover:bg-slate-600 duration-300 rounded-full dark:focus:ring-primary-900`}

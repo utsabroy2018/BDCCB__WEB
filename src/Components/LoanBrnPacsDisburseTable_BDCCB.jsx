@@ -198,7 +198,7 @@ function LoanBrnPacsDisburseTable_BDCCB({
 										onClick={() => {
 										console.log("ROW DATA:", rowData);
 										navigate(
-										`/homebm/disburseloan/${rowData?.loan_id.split(",")[0].trim()}`,
+										`/homebm/disburseloan/${rowData?.loan_id?.toString().split(",")[0].trim()}`,
 										{ state: rowData }
 										);
 										}}

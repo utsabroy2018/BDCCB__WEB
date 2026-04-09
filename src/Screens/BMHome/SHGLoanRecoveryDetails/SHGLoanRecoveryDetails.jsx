@@ -19,8 +19,8 @@ import {
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../../Utils/formateDate"
 
-import { saveAs } from "file-saver"
-import * as XLSX from "xlsx"
+// import { saveAs } from "file-saver"
+// import * as XLSX from "xlsx"
 import { printTableRegular } from "../../../Utils/printTableRegular"
 import { exportToExcel } from "../../../Utils/exportToExcel"
 import {
@@ -42,7 +42,8 @@ import { saveMasterData } from "../../../services/masterService"
 import DialogBox from "../../../Components/DialogBox"
 import { useParams } from "react-router"
 import FormHeader from "../../../Components/FormHeader"
-
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
 // const { RangePicker } = DatePicker
 // const dateFormat = "YYYY/MM/DD"
 
@@ -64,7 +65,68 @@ function SHGLoanRecoveryDetails() {
 	const data_Receive = location.state;
 
 	const navigate = useNavigate()
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+	const handleExportMembers = (loans) => {
+		console.log(loans, 'loansloansloans');
+		const flattenedData = [];
+		loans.forEach((loan) => {
+			console.log(loan.loan_outstanding)
+			if (loan.member_list && Array.isArray(loan.member_list)) {
+				loan.member_list.forEach((member) => {
+					flattenedData.push({
+						// Loan level fields (non-nested)
+						"Loan ID": loan.loan_id,
+						"Group Code": loan.group_code,
+						"Group Name": loan.group_name,
+						"Society Account No.":loan.society_acc_no,
+						"Period":loan.period,
+						"Loan Account No": loan.loan_acc_no,
+						"Current ROI": loan.curr_roi,
+						"Penal ROI": loan.penal_roi,
+						"Disbursement Date": loan.disb_dt,
+						"Disbursement Amount": loan.disb_amt,
+						"Interest Amount": loan.interest_amount,
+						"Penal ROI": loan.penal_roi,
+						"Loan Outstanding":loan.loan_outstanding,
+						"Principal Amount":loan.principal_amount,
+						"Interest Amount":loan.interest_amount,
+						// Member level fields
+						"Member Loan ID": member.loan_id,
+						"Member ID": member.member_code,
+						"Member Name": member.member_name,
+						"Transaction Date": member.trans_date,
+						"Transaction ID": member.trans_id,
+						"Transaction Type":member.trans_type === "R" ? "Recovery" : "Interest",
+						"Credit Amount": member.credit_amount,
+						"Principal Recovery": member.principal_recovery,
+						"Interest Recovery": member.interest_recovery,
+						"Member Loan Outstanding": member.loan_outstanding,
+						"Calculated Interest": member.calculated_interest,
+						
+						
+					});
+				});
+			} else {
+				// Fallback for loans without members
+				flattenedData.push({ ...loan });
+			}
+		});
 
+		const wb = XLSX.utils.book_new();
+		const ws = XLSX.utils.json_to_sheet(flattenedData);
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+		const fileName = `SocietyRecovery__Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		saveAs(blob, fileName);
+	};
 
 	const initialValues = {
 		principal_amount: "",
@@ -983,7 +1045,21 @@ function SHGLoanRecoveryDetails() {
 					</div>
 					)} */}
 
-					
+					 <div className="flex justify-start gap-4 bg-white p-4">
+																					<Tooltip title="Export to Excel">
+																						<button
+																							onClick={() => handleExportMembers(loanDetails)}
+																							className="mt-5 justify-center items-center rounded-full text-green-900"
+																						>
+																							<FileExcelOutlined
+																								style={{
+																									fontSize: 30,
+																								}}
+																							/>
+																						</button>
+																					</Tooltip>
+															
+																				</div>
 					
 					
 				</main>

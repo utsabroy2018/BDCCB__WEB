@@ -3,8 +3,8 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button } from "antd"
-import { LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import { Spin, Button, Tooltip } from "antd"
+import { FileExcelOutlined, LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import LoanApplicationsTableViewBr from "../../Components/LoanApplicationsTableViewBr.jsx__BDCCB"
 import Radiobtn from "../../Components/Radiobtn"
 import LoanApplicationsDisburseTable from "../../Components/LoanApplicationsDisburseTable"
@@ -16,6 +16,9 @@ import LoanApplicationsDisburseTable_BDCCB from "../../Components/LoanApplicatio
 import { motion } from "framer-motion"
 import LoanBrnPacsDisburseTable_BDCCB from "../../Components/LoanBrnPacsDisburseTable_BDCCB"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
+
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
 
 const options_Disburs = [
 	{
@@ -55,10 +58,75 @@ function SearchMemberForDisburseBM_BDCCB() {
 	}
 
 	useEffect(() => {
+		if(disbursementStatus != 'A'){
 		fetchApproveUapprove()
+		}
 	}, [disbursementStatus])
 
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+const handleExportMembers = (loans) => {
+  const flattenedData = [];
+  loans.forEach((loan) => {
+    if (loan.members && Array.isArray(loan.members)) {
+      loan.members.forEach((member) => {
+        flattenedData.push({
+          // Loan level fields (non-nested)
+          "Loan ID": loan.loan_id,
+          "Tenant ID": loan.tenant_id,
+          "Branch ID": loan.branch_id,
+          "Loan Account No": loan.loan_acc_no,
+          "Group Name": loan.group_name,
+          "Group Code": loan.group_code,
+          "Period": loan.period,
+          "Current ROI": loan.curr_roi,
+          "Penal ROI": loan.penal_roi,
+          "Disbursement Date": loan.disb_dt,
+          "Disbursement Amount": loan.disb_amt,
+          "Pay Mode": loan.pay_mode,
+          "Repayment Start Date": loan.rep_start_dt,
+          "Repayment End Date": loan.rep_end_dt,
+          "Sanction No": loan.sanction_no,
+          "Sanction Date": loan.sanction_dt,
+          "Principal Amount": loan.prn_amt,
+          "Interest Amount": loan.intt_amt,
+          "Overdue Principal Amount": loan.ovd_prn_amt,
+          "Overdue Interest Amount": loan.ovd_intt_amt,
+          "Total Group": loan.tot_grp,
+          "Transaction Type": loan.trans_type === "D" ? "Disbursement" : loan.trans_type === "R" ? "Recovery" : loan.trans_type,
+          "Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
+          
+          // Member level fields
+          "Member Loan ID": member.mem_loan_id,
+          "Transaction ID": member.tran_id,
+          "Member Group Code": member.group_code,
+          "Member Group Name": member.group_name,
+          "Member ID": member.member_id,
+          "Member Name": member.member_name,
+          "Disburse Amount": member.disburse_amt,
+          "SB Account No": member.sb_acc_no
+        });
+      });
+    } else {
+      // Fallback for loans without members
+      flattenedData.push({ ...loan });
+    }
+  });
 
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(flattenedData);
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+  const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+  const fileName = `SHGDisburse_${disbursementStatus}_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  saveAs(blob, fileName);
+};
 	const fetchApproveUapprove = async () => {
 		setLoading(true)
 		const creds = {
@@ -269,7 +337,21 @@ function SearchMemberForDisburseBM_BDCCB() {
 					disbursementStatus={disbursementStatus}
 					setSearch={(data) => setSearch(data)}
 					/>
-
+{loanApplications?.length>0 && <div className="flex justify-start gap-4 bg-white p-4">
+														<Tooltip title="Export to Excel">
+															<button
+																onClick={() => handleExportMembers(loanApplications)}
+																className="mt-5 justify-center items-center rounded-full text-green-900"
+															>
+																<FileExcelOutlined
+																	style={{
+																		fontSize: 30,
+																	}}
+																/>
+															</button>
+														</Tooltip>
+													
+													</div>}
 					{/* <DialogBox
 					visible={visible}
 					flag={flag}
@@ -277,6 +359,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 				/> */}
 				</main>
 			</Spin>
+			
 		</div>
 	)
 }

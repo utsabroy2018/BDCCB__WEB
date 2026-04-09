@@ -2717,23 +2717,54 @@ const items_bdccb = [
 				{
 					key: "sub4-4",
 					icon: <CheckCircleOutlined />,
-					label: "View Loan",
-					children: [
-						{
-							key: "sub4-4-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homepacs/viewloan-branch-society"}>Society</Link>,
-						},
-						{
-							key: "sub4-4-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homepacs/viewloan-branch-shg"}>SHG</Link>,
-						},
-					],
+					label: <Link to={"/homepacs/viewloan-branch-shg"}>View Loan</Link>,
+					// children: [
+					// 	{
+					// 		key: "sub4-4-1",
+					// 		icon: <CheckCircleOutlined />,
+					// 		label: <Link to={"/homepacs/viewloan-branch-society"}>Society</Link>,
+					// 	},
+					// 	{
+					// 		key: "sub4-4-1",
+					// 		icon: <CheckCircleOutlined />,
+					// 		label: <Link to={"/homepacs/viewloan-branch-shg"}>SHG</Link>,
+					// 	},
+					// ],
 				},
+				
 			],
 		},
-
+// {
+// 					key: "sub_rep",
+// 					icon: <CheckCircleOutlined />,
+// 					label: "Report",
+// 					children: [
+// 						// {
+// 						// 	key: "sub4-2-1",
+// 						// 	icon: <CheckCircleOutlined />,
+// 						// 	label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
+// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						// },
+// 						{
+// 							key: "sub4-rep-1",
+// 							icon: <CheckCircleOutlined />,
+// 							label: <Link to={"/homebm/disbtosociety"}>Disbursement to Society</Link>,
+// 							// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						},
+// 						{
+// 							key: "sub4-rep-3",
+// 							icon: <CheckCircleOutlined />,
+// 							label: <Link to={"/homebm/shgdisb"}>SHG Disbursement</Link>,
+// 							// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						},
+// 						// {
+// 						// 	key: "sub4-rep-2",
+// 						// 	icon: <CheckCircleOutlined />,
+// 						// 	label: <Link to={"/homebm/disbofsociety"}>Disbursement of Society</Link>,
+// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						// },
+// 					],
+// 				},
 		// {
 		// 	key: "sub5",
 		// 	icon: <ThunderboltOutlined />,
@@ -2854,7 +2885,37 @@ const items_bdccb_PACS = [
 				// },
 			],
 		},
-
+// {
+// 					key: "sub_rep",
+// 					icon: <CheckCircleOutlined />,
+// 					label: "Report",
+// 					children: [
+// 						// {
+// 						// 	key: "sub4-2-1",
+// 						// 	icon: <CheckCircleOutlined />,
+// 						// 	label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
+// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						// },
+// 						// {
+// 						// 	key: "sub4-rep-1",
+// 						// 	icon: <CheckCircleOutlined />,
+// 						// 	label: <Link to={"/homebm/disbtosociety"}>Disbursement to Society</Link>,
+// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						// },
+// 						// {
+// 						// 	key: "sub4-rep-3",
+// 						// 	icon: <CheckCircleOutlined />,
+// 						// 	label: <Link to={"/homebm/shgdisb"}>SHG Disbursement</Link>,
+// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						// },
+// 						{
+// 							key: "sub4-rep-2",
+// 							icon: <CheckCircleOutlined />,
+// 							label: <Link to={"/homebm/disbofsociety"}>Disbursement of Society</Link>,
+// 							// hidden: data?.approve_transaction == "Y" ? false : true,
+// 						},
+// 					],
+// 				},
 		// {
 		// 	key: "sub6",
 		// 	icon: <ThunderboltOutlined />,

@@ -12,6 +12,7 @@ import GroupExtendedForm from "../Forms/GroupExtendedForm"
 import ViewLoanForm from "../Forms/ViewLoanForm"
 import ViewSocietyLoanForm from "../Forms/ViewSocietyLoanForm"
 import ViewBranchSHGLoanForm from "../Forms/ViewBranchSHGLoanForm"
+import DialogBox from "../../Components/DialogBox"
 
 function EditViewBranchSHGLoanFormBM() {
 	const params = useParams()
@@ -20,6 +21,8 @@ function EditViewBranchSHGLoanFormBM() {
 	// const loanAppData = location.state || {}
 	// const branch_id = location.branch_id || {}
 	const navigate = useNavigate()
+	const [visible, setVisible] = useState(false)
+	const [memDetails,setMemDetails] = useState(() => [])
 
 	// import { useLocation } from "react-router";
 
@@ -62,6 +65,17 @@ function EditViewBranchSHGLoanFormBM() {
 						</div>
 					</Spin>
 				</div>
+				{/* <DialogBox
+				flag={7}
+				onPress={() => setVisible(!visible)}
+				visible={visible}
+				data={memDetails}
+				onPressYes={() => {
+					// editGroup()
+					setVisible(!visible)
+				}}
+				onPressNo={() => setVisible(!visible)}
+			/> */}
 			</section>
 
 			{/* <DialogBox

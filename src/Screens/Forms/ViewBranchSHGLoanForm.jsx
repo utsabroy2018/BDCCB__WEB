@@ -44,13 +44,14 @@ const formatINR = (num) =>
 		minimumFractionDigits: 2,
 	}).format(num || 0)
 function ViewBranchSHGLoanForm({ groupDataArr }) {
-	const [loanDtls,setLoanDtls] = useState([]);
+	const [loanDtls, setLoanDtls] = useState([]);
 	const [isOverdue, setIsOverdue] = useState('N');
 	const [overDueAmt, setOverDueAmt] = useState(0);
 	const params = useParams()
 	const [loading, setLoading] = useState(false)
 	const location = useLocation()
 	const loanAppData = location.state || {}
+	console.log("loanAppData in view branch shg loan form", loanAppData)
 	// const loanAppData = location.state?.item || {};
 	// const branch_id = location.state?.branch_id || {};
 	const navigate = useNavigate()
@@ -71,7 +72,8 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 	const [period_mode, setPeriodMode] = useState("")
 	const [period_mode_val, setPeriodModeVal] = useState(0)
 	const [weekOfRecovery, setWeekOfRecovery] = useState(0)
-
+	const [memDetails, setMemDetails] = useState(() => [])
+	const [ccbLoanDetails, setCcbLoanDetails] = useState(() => [])
 	const containerRef = useRef(null)
 
 	const [isHovered, setIsHovered] = useState(false)
@@ -166,9 +168,33 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 	// 	name: "Week (2-4)",
 	// }
 	// ]
+	const society_member_details = async () => {
+		const tokenValue = await getLocalStoreTokenDts(navigate);
 
+		const payload = {
+			"group_code": loanAppData?.group_code,
+
+		}
+		axios.post(`${url_bdccb}/recov/fetch_mem_details`, payload, {
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+			},
+		})
+			.then((res) => {
+				console.log(res?.data);
+				setMemDetails(res?.data?.data || [])
+			})
+			.catch((err) => {
+				setLoading(false);
+				console.log("Error occurred while calling API:", err);
+			});
+
+
+
+	}
 	const initialValues = {
-		
+
 		g_group_name: "",
 		g_branch_name: "",
 		pacs_name: "",
@@ -177,7 +203,7 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 		g_address: "",
 		dist_name: "",
 		g_group_block: "",
-		
+
 		ps_name: "",
 		post_name: "",
 		gp_name: "",
@@ -196,7 +222,7 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 		g_phone1: Yup.string(),
 	})
 
-	
+
 
 
 	const fetchLoanDetails = async () => {
@@ -206,34 +232,34 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_code: userDetails[0]?.brn_code,
 			group_code: loanAppData?.group_code,
-			loan_acc_no: loanAppData?.loan_acc_no
+			society_acc_no: loanAppData?.group_details[0]?.society_acc_no
 		}
 
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_ccb_loan_dtls`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
+			.post(`${url_bdccb}/recov/fetch_society_loan_dtls`, creds, {
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
 			})
 			.then((res) => {
 
-			console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
-			if(res?.data?.success){
-			
-			
-			// setGroups(res?.data?.data)
-			// setCopyLoanApplications(res?.data?.data)
-			setGroupData(res?.data?.data)
-			fetchLoanMemberDetails(res?.data?.data[0]?.loan_id)
+				console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				if (res?.data?.success) {
 
-			} else {
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			}
+
+					// setGroups(res?.data?.data)
+					// setCopyLoanApplications(res?.data?.data)
+					setGroupData(res?.data?.data)
+					fetchLoanMemberDetails(res?.data?.data[0]?.loan_id)
+
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
 
 			})
 			.catch((err) => {
@@ -267,22 +293,22 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 
 		await axios
 			.post(`${url_bdccb}/recov/fetch_indivitual_shg_member`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
 			})
 			.then((res) => {
 
-			console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
-			if(res?.data?.success){
-			// setGroupData(res?.data?.data)
-			setMemberData(res?.data?.data)
+				console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				if (res?.data?.success) {
+					// setGroupData(res?.data?.data)
+					setMemberData(res?.data?.data)
 
-			} else {
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			}
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
 
 			})
 			.catch((err) => {
@@ -293,46 +319,95 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 
 	const fetchGroupDetails = async () => {
 		setLoading(true)
-		
+
 		setValues({
-					// g_branch_name: res?.data?.msg[0]?.emp_name,
-					g_group_name: loanAppData?.group_details[0]?.group_name,
-					g_branch_name: loanAppData?.group_details[0]?.branch_name,
-					pacs_name: loanAppData?.group_details[0]?.pacs_name,
-					sahayika_name: loanAppData?.group_details[0]?.sahayika_name,
-					g_phone1: loanAppData?.group_details[0]?.phone1,
-					g_address: loanAppData?.group_details[0]?.group_addr,
-					dist_name: loanAppData?.group_details[0]?.dist_name,
-					g_group_block: loanAppData?.group_details[0]?.block_name,
-					ps_name: loanAppData?.group_details[0]?.ps_name,
-					post_name: loanAppData?.group_details[0]?.post_name,
-					gp_name: loanAppData?.group_details[0]?.gp_name,
-					vill_name: loanAppData?.group_details[0]?.vill_name,
-					pin_no: loanAppData?.group_details[0]?.pin_no,
-				})
-				// setGroupData(res?.data?.msg)
-				// setPeriodMode(res?.data?.msg[0].disb_details[0]?.period_mode)
-				// setPeriodModeVal(res?.data?.msg[0].disb_details[0]?.recovery_day)
-				// setWeekOfRecovery(res?.data?.msg[0].disb_details[0]?.week_no)
-				// setBranch(
-				// 	res?.data?.msg[0]?.disctrict + "," + res?.data?.msg[0]?.branch_code
-				// )
-				// setBlock(res?.data?.msg[0]?.block)
-				// setIsOverdue(res?.data?.msg[0]?.overdue_flag);
-				// setOverDueAmt(res?.data?.msg[0]?.overdue_amt);
-				
+			// g_branch_name: res?.data?.msg[0]?.emp_name,
+			g_group_name: loanAppData?.group_details[0]?.group_name,
+			g_branch_name: loanAppData?.group_details[0]?.branch_name,
+			pacs_name: loanAppData?.group_details[0]?.pacs_name,
+			sahayika_name: loanAppData?.group_details[0]?.sahayika_name,
+			g_phone1: loanAppData?.group_details[0]?.phone1,
+			g_address: loanAppData?.group_details[0]?.group_addr,
+			dist_name: loanAppData?.group_details[0]?.dist_name,
+			g_group_block: loanAppData?.group_details[0]?.block_name,
+			ps_name: loanAppData?.group_details[0]?.ps_name,
+			post_name: loanAppData?.group_details[0]?.post_name,
+			gp_name: loanAppData?.group_details[0]?.gp_name,
+			vill_name: loanAppData?.group_details[0]?.vill_name,
+			pin_no: loanAppData?.group_details[0]?.pin_no,
+		})
+		// setGroupData(res?.data?.msg)
+		// setPeriodMode(res?.data?.msg[0].disb_details[0]?.period_mode)
+		// setPeriodModeVal(res?.data?.msg[0].disb_details[0]?.recovery_day)
+		// setWeekOfRecovery(res?.data?.msg[0].disb_details[0]?.week_no)
+		// setBranch(
+		// 	res?.data?.msg[0]?.disctrict + "," + res?.data?.msg[0]?.branch_code
+		// )
+		// setBlock(res?.data?.msg[0]?.block)
+		// setIsOverdue(res?.data?.msg[0]?.overdue_flag);
+		// setOverDueAmt(res?.data?.msg[0]?.overdue_amt);
+
 		setLoading(false)
 	}
+    const ccbloandetails = async()=>{
+setLoading(true)
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+			branch_id: userDetails[0]?.brn_code,
+			group_code: loanAppData?.group_code,
+			pacs_id: loanAppData?.group_details[0]?.pacs_id,
+			loan_acc_no: loanAppData?.loan_acc_no
+		}
 
+
+		// {
+		// "loan_id" : "CCB_LOAN_ID",
+		// "tenant_id" : "",
+		// "branch_code" : "",
+		// "group_code" : "",
+		// "society_acc_no" : ""
+		// }
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios
+			.post(`${url_bdccb}/recov/fetch_ccb_loan_dtls`, creds, {
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
+			})
+			.then((res) => {
+
+				console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				if (res?.data?.success) {
+					setCcbLoanDetails(res?.data?.data)
+					fetchLoanMemberDetails(res?.data?.data[0]?.loan_id)
+
+					// setGroupData(res?.data?.data)
+					// setMemberData(res?.data?.data)
+
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+		setLoading(false)
+	}
 	useEffect(() => {
 		fetchGroupDetails()
 		fetchLoanDetails()
-
+		society_member_details()
+		ccbloandetails()
 		console.log(userDetails[0]?.user_type, 'gggggggggggggggggggg');
-		
+
 	}, [])
 
-	
+   
 
 	const onSubmit = async (values) => {
 		console.log("onsubmit called")
@@ -354,50 +429,50 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 		validateOnMount: true,
 	})
 
-	
 
-	const callAPi = async (item) =>{
-			// console.log(item);
-			setLoading(true);
-			setLoanDtls([]);
-			const tokenValue = await getLocalStoreTokenDts(navigate);
-			try{
-					const payload = {
-						branch_code: userDetails?.brn_code,
-						loan_id: item?.loan_id,
-					}
-					axios.post(`${url}/admin/look_overdue_details`,payload, {
-					headers: {
+
+	const callAPi = async (item) => {
+		// console.log(item);
+		setLoading(true);
+		setLoanDtls([]);
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+		try {
+			const payload = {
+				branch_code: userDetails?.brn_code,
+				loan_id: item?.loan_id,
+			}
+			axios.post(`${url}/admin/look_overdue_details`, payload, {
+				headers: {
 					Authorization: `${tokenValue?.token}`, // example header
 					"Content-Type": "application/json", // optional
-					},
-					})
-					.then((res) => {
-						// console.log(res?.data?.msg, 'testtttttttttt');
-						
-						if(res?.data?.suc === 0){
+				},
+			})
+				.then((res) => {
+					// console.log(res?.data?.msg, 'testtttttttttt');
+
+					if (res?.data?.suc === 0) {
 						// Message('error', res?.data?.msg)
 						// navigate(routePaths.LANDING)
 						// localStorage.clear()
-						} else {
+					} else {
 
 						// console.log("API response:", res.data);
 						setOpenModal(true);
 						setLoanDtls(res?.data?.msg || []);
 						setLoading(false);
 
-						}
+					}
 
-					})
-					.catch((err) => {
-						setLoading(false);
-						console.log("Error occurred while calling API:", err);
-					});
-			}
-			catch(err){
-				setLoading(false);
-				console.log("Error occurred while calling API:", err);
-			}
+				})
+				.catch((err) => {
+					setLoading(false);
+					console.log("Error occurred while calling API:", err);
+				});
+		}
+		catch (err) {
+			setLoading(false);
+			console.log("Error occurred while calling API:", err);
+		}
 	}
 
 
@@ -412,18 +487,18 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 	// };
 
 	const totalOutstanding = memberData?.reduce(
-	(sum, item) => sum + Number(item?.member_outstanding || 0),
-	0
-)
-	
+		(sum, item) => sum + Number(item?.member_outstanding || 0),
+		0
+	)
+
 
 	return (
 		<>
-		{
-					isOverdue === 'Y' && <AlertComp 
-					
+			{
+				isOverdue === 'Y' && <AlertComp
+
 					msg={<p className="text-2xl font-normal"><span className="text-lg ">Loan Overdue Amount is </span>{formatINR(overDueAmt)}</p>} />
-				}
+			}
 			<Spin
 				indicator={<LoadingOutlined spin />}
 				size="large"
@@ -464,7 +539,7 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 									<VError title={formik.errors.g_group_name} />
 								) : null} */}
 							</div>
-							
+
 
 							<div>
 								<TDInputTemplateBr
@@ -514,23 +589,23 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 								/>
 							</div>
 
-						
-								<div>
-									
-									<TDInputTemplateBr
-										placeholder="Sahayika Name"
-										type="text"
-										label="Sahayika Name"
-										name="sahayika_name"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.sahayika_name}
-										mode={1}
-										disabled
-									/>
-								</div>
 
-								<div>
+							<div>
+
+								<TDInputTemplateBr
+									placeholder="Sahayika Name"
+									type="text"
+									label="Sahayika Name"
+									name="sahayika_name"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.sahayika_name}
+									mode={1}
+									disabled
+								/>
+							</div>
+
+							<div>
 								<TDInputTemplateBr
 									placeholder="Mobile No. 1"
 									type="number"
@@ -560,7 +635,7 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 
 
 
-							
+
 
 							<div>
 								<TDInputTemplateBr
@@ -589,7 +664,7 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 									disabled
 								/>
 							</div>
-							
+
 							<div>
 								<TDInputTemplateBr
 									placeholder="Police Station"
@@ -659,8 +734,11 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 									disabled
 								/>
 							</div>
+							<div>
+								<button onClick={() => setVisible(true)} className=" disabled:bg-gray-400 disabled:dark:bg-gray-400 inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-teal-500 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300  rounded-full focus:ring-gray-600  dark:focus:ring-primary-900 dark:bg-[#22543d] dark:hover:bg-gray-600">View Member Details</button>
 
-							
+							</div>
+
 							{/* <div>
 								<TDInputTemplateBr
 									placeholder="Bank Name"
@@ -960,57 +1038,56 @@ Authorization: `${tokenValue?.token}`, // example header
 								</button>
 							</div>}
 						</div> */}
-						{/* purpose,scheme name,interest rate,period,period mode,fund name,total applied amount,total disbursement amount,disbursement date,current outstanding */}
-						<div className="text-[#DA4167] text-lg font-bold">Loan Details</div>
+						<div className="text-[#DA4167] text-lg font-bold">CCB Loan Details</div>
 
 						<div>
-							
+
 
 							<DynamicTailwindTable
-							data={
-							groupData?.length
-							? [
-							{
-							loan_id: groupData[0].loan_id,
-							loan_acc_no: groupData[0].loan_acc_no,
-							period: groupData[0].period,
-							curr_roi: groupData[0].curr_roi,
-							penal_roi: groupData[0].penal_roi,
-							disb_dt: groupData[0].disb_dt,
-							disb_amt: groupData[0].disb_amt,
-							pay_mode: groupData[0].pay_mode,
-							rep_start_dt: groupData[0].rep_start_dt,
-							rep_end_dt: groupData[0].rep_end_dt,
-							cuurent_loan_outstanding:
-							groupData[0].cuurent_loan_outstanding,
-							action: (
-							<button
-							onClick={() => {
-							// navigate(
-							// `/homepacs/loandetails/${groupData[0]?.loan_id}`
-							// );
-							navigate(`/homepacs/loandetails-branch-shg/${groupData[0]?.loan_id}`, {
-							state: groupData[0]?.trans_details,
-							})
-							}}
-							className="font-medium text-teal-500 hover:underline"
-							>
-							<EyeFilled />
-							</button>
-							),
-							},
-							]
-							: []
-							}
-							// pageSize={50}
-							// headersMap={disbursementDetailsHeader}
-							pageSize={50}
-							columnTotal={[6, 10]}
-							// headersMap={disbursementDetailsHeader}
-							headersMap={{
-								...disbursementDetailsHeader_SOCIE,
-								action: "Action", // ✅ only addition
-							}}
+								data={
+									ccbLoanDetails?.length
+										? [
+											{
+												loan_id: ccbLoanDetails[0].loan_id,
+												loan_acc_no: ccbLoanDetails[0].loan_acc_no,
+												period: ccbLoanDetails[0].period,
+												curr_roi: ccbLoanDetails[0].curr_roi,
+												penal_roi: ccbLoanDetails[0].penal_roi,
+												disb_dt: ccbLoanDetails[0].disb_dt,
+												disb_amt: ccbLoanDetails[0].disb_amt,
+												pay_mode: ccbLoanDetails[0].pay_mode,
+												rep_start_dt: ccbLoanDetails[0].rep_start_dt,
+												rep_end_dt: ccbLoanDetails[0].rep_end_dt,
+												cuurent_loan_outstanding:
+													ccbLoanDetails[0].cuurent_loan_outstanding,
+												action: (
+													<button
+														onClick={() => {
+															// navigate(
+															// `/homepacs/loandetails/${ccbLoanDetails[0]?.loan_id}`
+															// );
+															navigate(`/homepacs/loandetails-branch-shg/${ccbLoanDetails[0]?.loan_id}`, {
+																state: ccbLoanDetails[0]?.trans_details,
+															})
+														}}
+														className="font-medium text-teal-500 hover:underline"
+													>
+														<EyeFilled />
+													</button>
+												),
+											},
+										]
+										: []
+								}
+								// pageSize={50}
+								// headersMap={disbursementDetailsHeader}
+								pageSize={50}
+								columnTotal={[6, 10]}
+								// headersMap={disbursementDetailsHeader}
+								headersMap={{
+									...disbursementDetailsHeader_SOCIE,
+									action: "Action", // ✅ only addition
+								}}
 							// dateTimeExceptionCols={[16]}
 							// colRemove={[3, 5, 12]}
 							/>
@@ -1047,19 +1124,106 @@ Authorization: `${tokenValue?.token}`, // example header
 								colRemove={[3, 5, 12]}
 							/> */}
 						</div>
+						{/* purpose,scheme name,interest rate,period,period mode,fund name,total applied amount,total disbursement amount,disbursement date,current outstanding */}
+						{loanAppData?.group_details[0]?.pacs_id!=111 && <><div className="text-[#DA4167] text-lg font-bold">Society Loan Details</div>
 
-						
+						<div>
+
+
+							<DynamicTailwindTable
+								data={
+									groupData?.length
+										? [
+											{
+												loan_id: groupData[0].loan_id,
+												loan_acc_no: groupData[0].loan_acc_no,
+												period: groupData[0].period,
+												curr_roi: groupData[0].curr_roi,
+												penal_roi: groupData[0].penal_roi,
+												disb_dt: groupData[0].disb_dt,
+												disb_amt: groupData[0].disb_amt,
+												pay_mode: groupData[0].pay_mode,
+												rep_start_dt: groupData[0].rep_start_dt,
+												rep_end_dt: groupData[0].rep_end_dt,
+												cuurent_loan_outstanding:
+													groupData[0].cuurent_loan_outstanding,
+												action: (
+													<button
+														onClick={() => {
+															// navigate(
+															// `/homepacs/loandetails/${groupData[0]?.loan_id}`
+															// );
+															navigate(`/homepacs/loandetails-branch-shg/${groupData[0]?.loan_id}`, {
+																state: groupData[0]?.trans_details,
+															})
+														}}
+														className="font-medium text-teal-500 hover:underline"
+													>
+														<EyeFilled />
+													</button>
+												),
+											},
+										]
+										: []
+								}
+								// pageSize={50}
+								// headersMap={disbursementDetailsHeader}
+								pageSize={50}
+								columnTotal={[6, 10]}
+								// headersMap={disbursementDetailsHeader}
+								headersMap={{
+									...disbursementDetailsHeader_SOCIE,
+									action: "Action", // ✅ only addition
+								}}
+							// dateTimeExceptionCols={[16]}
+							// colRemove={[3, 5, 12]}
+							/>
+
+							{/* <DynamicTailwindTable
+								data={groupData[0]?.disb_details?.map((el) => {
+									//  console.log(el.loan_cycle, ' Loan Cycle');
+									 const loanCycle = 'Loan Cycle - '+ el.loan_cycle; 
+									 
+									//  el.loan_cycle = loanCycle;
+									//  console.log(el.week_no, ' Week No');
+									// let recoveryWeekNoText = el.week_no;
+									// if (+el.week_no === 1) {
+									// recoveryWeekNoText = "Week (1-3)";
+									// } else if (+el.week_no === 2) {
+									// recoveryWeekNoText = "Week (2-4)";
+									// }
+									const recoveryWeekNoText = getWeekOfRecoveryName(el.week_no);
+
+									const recoveryDayText = getFortnightDayName(el.recovery_day);
+									
+
+									 return {
+										...el,
+										// loan_cycle:loanCycle,
+										// week_no: recoveryWeekNoText,
+										// recovery_day: recoveryDayText,
+									 };
+								})}
+								pageSize={50}
+								columnTotal={[15, 17, 18]}
+								headersMap={disbursementDetailsHeader}
+								dateTimeExceptionCols={[16]}
+								colRemove={[3, 5, 12]}
+							/> */}
+						</div>
+</>}
+
 
 						{params?.id > 0 && (
 							<div className="gap-3">
 								<div className="w-full my-5 border-t-4 border-gray-400 border-dashed"></div>
 								<div>
 									<div className="text-[#DA4167] text-lg mb-2 font-bold">
-										Members in this Group
+										Group Member Loan Details
 									</div>
 
-{/* {JSON.stringify(memberData, 2)} */}
-									
+									{/* {JSON.stringify(memberData, 2)} */}
+
 
 									<Spin spinning={loading}>
 										<div
@@ -1108,7 +1272,7 @@ Authorization: `${tokenValue?.token}`, // example header
 																		// 	`/homepacs/memberloandetails/${item?.loan_id}`
 																		// )
 																		navigate(`/homepacs/memberloandetails-branch-shg/${item?.loan_id}`, {
-																		state: item,
+																			state: item,
 																		})
 																	}}
 																	className="font-medium text-teal-500 dark:text-blue-500 hover:underline"
@@ -1152,7 +1316,17 @@ Authorization: `${tokenValue?.token}`, // example header
 					/> */}
 				</form>
 			</Spin>
-
+ <DialogBox
+				flag={7}
+				onPress={() => setVisible(!visible)}
+				visible={visible}
+				data={memDetails}
+				onPressYes={() => {
+					// editGroup()
+					setVisible(!visible)
+				}}
+				onPressNo={() => setVisible(!visible)}
+			/>
 			{/* <DialogBox
 				flag={4}
 				onPress={() => setVisible(!visible)}

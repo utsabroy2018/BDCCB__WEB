@@ -126,6 +126,9 @@ function ViewSocietyLoanTableBr({
 								Society A/C Number
 							</th>
 							<th scope="col" className="p-4">
+								Society Name
+							</th>
+							<th scope="col" className="p-4">
 								Group Code
 							</th>
 							<th scope="col" className="p-4">
@@ -156,6 +159,9 @@ function ViewSocietyLoanTableBr({
 									</th> */}
 									<td className="px-6 py-3 text-slate-700">
 										{item.society_acc_no || "-----"}
+									</td>
+									<td className="px-6 py-3 text-slate-700">
+										{item.group_details[0]?.pacs_name || "-----"}
 									</td>
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>

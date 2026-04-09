@@ -3,14 +3,17 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button } from "antd"
-import { LoadingOutlined, SearchOutlined } from "@ant-design/icons"
+import { Spin, Button, Tooltip } from "antd"
+import { FileExcelOutlined, LoadingOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
 import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import { routePaths } from "../../Assets/Data/Routes"
-
+import Radiobtn from "../../Components/Radiobtn"
+import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
 const options = [
 	{
 		label: "Unapproved Disbursement",
@@ -21,7 +24,20 @@ const options = [
 	// 	value: "A",
 	// }
 ]
-
+const options_Disburs = [
+	{
+		label: "Acceptance Pending",
+		value: "U",
+	},
+	{
+		label: "Accepted",
+		value: "A",
+	},
+	{
+		label: "Rejected",
+		value: "R",
+	}
+]
 function SearchViewLoanBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
@@ -33,14 +49,21 @@ function SearchViewLoanBM_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 	const [loanType, setLoanType] = useState("U")
-	
-
+		const [disbursementStatus, setDisbursementStatus] = useState("U")
+	const [fromDate, setFromDate] = useState(() => new Date().toISOString().slice(0, 10))
+		const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10))
+const onChange = (e) => {
+		console.log("radio1 checked", e)
+		setDisbursementStatus(e)
+	}
 	const fetchSearchedGroups = async () => {
 		setLoading(true)
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
-			// approval_status: loanType
+			approval_status: disbursementStatus,
+			from_dt: disbursementStatus=='A'?fromDate:'',
+			to_dt: disbursementStatus=='A'?toDate:''
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
@@ -72,10 +95,55 @@ function SearchViewLoanBM_BDCCB() {
 			})
 		setLoading(false)
 	}
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+	const handleExportMembers = (loans) => {
+		const flattenedData = [];
+		loans.forEach((loan) => {
+			// if (loan.members && Array.isArray(loan.members)) {
+			// 	loan.members.forEach((member) => {
+					flattenedData.push({
+						// Loan level fields (non-nested)
+					    "CCB Loan ID": loan.ccb_loan_id,
+						"Group Code": loan.group_code,
+                        
+						"Group Name": loan.group_name,
+						"Total Members": loan.tot_member,
+						"Total Outstanding": loan.tot_outstanding,
+						"Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
 
+						
+						// Member level fields
+						
+					});
+				// });
+			// } else {
+			// 	// Fallback for loans without members
+			// 	flattenedData.push({ ...loan });
+			// }
+		});
+
+		const wb = XLSX.utils.book_new();
+		const ws = XLSX.utils.json_to_sheet(flattenedData);
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+		const fileName = `SocietyDisbursementTransaction_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		saveAs(blob, fileName);
+	};
 	useEffect(()=>{
+		if(disbursementStatus != "A"){
+			// fetchSearchedGroups()
 	fetchSearchedGroups()
-	}, [])
+
+		}
+	}, [disbursementStatus])
 
 		const setSearch = (word) => {
 		console.log(word, "wordwordwordword", copyLoanApplications)
@@ -126,8 +194,50 @@ function SearchViewLoanBM_BDCCB() {
 							Search
 						</button>
 					</div> */}
+<Radiobtn
+						data={options_Disburs}
+						val={disbursementStatus}
+						onChangeVal={(value) => {
+							onChange(value)
+						}}
+					/>
+{disbursementStatus == 'A' && <div className="grid grid-cols-3 gap-4">
+						{/* <form onSubmit={formik.handleSubmit}> */}
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="From Date"
+						name="from_dt"
+						formControlName={fromDate}
+						handleChange={(e) => setFromDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
 
-					<div className="mt-20">
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="To Date"
+						name="to_dt"
+						formControlName={toDate}
+						handleChange={(e) => setToDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
+						<div className="mt-1">
+						<button
+						type="button"
+						onClick={fetchSearchedGroups}
+						className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
+						>
+						<SearchOutlined />
+						Search
+						</button>
+						</div>
+
+						{/* </form> */}
+						</div>}
+					{/* <div className="mt-20">
 						<label
 							for="default-search"
 							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -169,7 +279,7 @@ function SearchViewLoanBM_BDCCB() {
 								Search
 							</button>
 						</div>
-					</div>
+					</div> */}
 					{/* {JSON.stringify(groups, 2)} */}
 					<ViewLoanTableBr
 						flag="BM"
@@ -178,6 +288,22 @@ function SearchViewLoanBM_BDCCB() {
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
 					/>
+
+					{groups?.length > 0 && <div className="flex justify-start gap-4 bg-white p-4">
+						<Tooltip title="Export to Excel">
+							<button
+								onClick={() => handleExportMembers(groups)}
+								className="mt-5 justify-center items-center rounded-full text-green-900"
+							>
+								<FileExcelOutlined
+									style={{
+										fontSize: 30,
+									}}
+								/>
+							</button>
+						</Tooltip>
+
+					</div>}
 					{/* <DialogBox
 					visible={visible}
 					flag={flag}

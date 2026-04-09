@@ -10,6 +10,8 @@ import { ErrorMessage, Field, FieldArray, Form, Formik, useFormik } from "formik
 import * as Yup from "yup"
 import axios from "axios"
 import { Message } from "../../Components/Message"
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import {
 	Spin,
@@ -22,6 +24,7 @@ import {
 	List,
 	Select,
 	Modal,
+	Tooltip,
 } from "antd"
 import {
 	LoadingOutlined,
@@ -33,6 +36,7 @@ import {
 	SyncOutlined,
 	UsergroupAddOutlined,
 	UserOutlined,
+	FileExcelOutlined,
 } from "@ant-design/icons"
 import FormHeader from "../../Components/FormHeader"
 import { routePaths } from "../../Assets/Data/Routes"
@@ -58,7 +62,14 @@ import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { saveMasterData } from "../../services/masterService"
 // import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 
-
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
 const loan_to = [
 	{
 		code: "P",
@@ -113,7 +124,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 	const loanAppData = location.state || {}
 	const navigate = useNavigate()
 	const userDetails = JSON.parse(localStorage.getItem("user_details"))
-
+    console.log(loanAppData, 'loanAppDataloanAppData');
+	const[excelDt,setExcelDt] = useState([loanAppData]);
 	const [districts, setDistricts] = useState(
 		userDetails[0]?.district_list?.map((item, i) => ({
 			code: item?.dist_code,
@@ -176,7 +188,14 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		],
 	}
 	const [formValues, setValues] = useState(initialValues)
-
+const exportToExcel = (data) => {
+		const wb = XLSX.utils.book_new()
+		const ws = XLSX.utils.json_to_sheet(data)
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1")
+		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" })
+		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" })
+		saveAs(blob, `details_2026.xlsx`)
+	}
 
 	const validationSchema = Yup.object({
 		// loan_id: Yup.string().required("Loan ID is required"),
@@ -452,11 +471,13 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			ip_address: ip,
 		}
 
+		// console.log(formData, 'formDataformDataformDataformData', creds, 'gggggggggg');
+
 
 		// return
 
 
-		console.log(formData, 'formDataformDataformDataformData', creds, userDetails[0]);
+		
 
 		await saveMasterData({
 			endpoint: "loan/save_disbursement",
@@ -674,8 +695,6 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		const groupList = res.data.data;
 
 		console.log(res.data.data, 'hhhhhhhhhhhhhhhh');
-		
-
 		// 👉 map API response to dropdown format
 		const formattedGroups = groupList.map((item) => ({
 		// code: item.group_code,
@@ -840,6 +859,11 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		}
 
 	};
+
+
+
+	
+	
 	
 
 	return (
@@ -937,70 +961,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 									</div>
 								</div>
 
-								{/* <div className="flex justify-start gap-5">
-									<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
-
-										<div>
-										
-											<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
-				 dark:text-gray-100">
-												Select PACS *
-												
-											</label>
-											
-											<Select
-												showSearch
-												// placeholder={userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' === 'S' ? 'Choose SHG ' : 'Choose '}
-												// placeholder="Choose SHG"
-												value={formik.values.branch_shg_id}
-												style={{ width: "100%" }}
-												optionFilterProp="children"
-												name="branch_shg_id"
-												// 🔍 typing search
-												// onSearch={(value) => {
-												// 	console.log(value, 'valuevaluevaluevalue');
-													
-												// 	// handleSearchPacsChange(value);   // your search function
-												// 	// userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-												// }}
-												// disabled={formik.values.loan_to.length > 0 ? false :  true}
-												// ✅ selecting option
-												onChange={(value) => { 
-													formik.setFieldValue("branch_shg_id", value)
-													// handleSearchPacsChange()
-												 }}
-												disabled={params.id > 0 ? true : false}
-												onBlur={formik.handleBlur}
-												filterOption={(input, option) =>
-													option?.children?.toLowerCase().includes(input.toLowerCase())
-												}
-
-											>
-												<Select.Option value="" disabled>Choose PACS</Select.Option>
-
-												{PACS_SHGList?.map((data) => (
-													<Select.Option key={data.code} value={data.code}>
-														{data.name}
-													</Select.Option>
-												))}
-											</Select>
-
-
-											{formik.errors.branch_shg_id && formik.touched.branch_shg_id ? (
-												<VError title={formik.errors.branch_shg_id} />
-											) : null}
-
-
-
-
-										</div>
-
-
-
-
-
-									</div>
-								</div> */}
+								
 
 								<div className="flex justify-start gap-5">
 									<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-3"}>
@@ -1206,6 +1167,18 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 											member => !selectedMembersInSameGroup.includes(member.member_id)
 										);
 
+										// ✅ 👉 PUT YOUR CODE HERE
+										if (
+											filteredMembers.length === 1 &&
+											!formik.values.rows[index].member_id
+										) {
+											const member = filteredMembers[0];
+
+											formik.setFieldValue(`rows[${index}].member_id`, member.member_id);
+											formik.setFieldValue(`rows[${index}].sb_acc_no`, member.sb_acc_no);
+											formik.setFieldValue(`rows[${index}].member_name`, member.member_name);
+										}
+
 
 										return (
 											<div
@@ -1356,12 +1329,15 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												</>
 											) : (
 												<>
-												<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800 dark:text-gray-100">Select Member</label>
+												{/* {JSON.stringify(row, 2)} ///
 
+												{JSON.stringify(filteredMembers, 2)} */}
+												<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800 dark:text-gray-100">Select Member</label>
 
 													<Select
 													placeholder="Select Member"
-													value={formik.values.rows[index].member_id}
+													value={filteredMembers.length === 1 ? filteredMembers[0].member_id : formik.values.rows[index].member_id}
+													// value={formik.values.rows[index].member_id}
 													style={{ width: "100%" }}
 													onChange={(value) => {
 
@@ -1378,12 +1354,13 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 													checkDuplicateMember_FN(value, index);
 													}}
+													disabled={true}
 													>
 													<Select.Option value="" disabled>
 													Choose Member
 													</Select.Option>
 
-													{/* 🔥 USE FILTERED MEMBERS */}
+													
 													{filteredMembers.map((member) => (
 													<Select.Option
 													key={member.member_id}
@@ -1393,9 +1370,34 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 													</Select.Option>
 													))}
 													</Select>
-													
 
-													
+
+													{/* <Select
+													placeholder="Select Member"
+													value={filteredMembers.length === 1 ? filteredMembers[0].member_id : formik.values.rows[index].member_id}
+													style={{ width: "100%" }}
+													onChange={(value) => {
+													formik.setFieldValue(`rows[${index}].member_id`, value);
+
+													const selectedMember = memberOptions[index]?.find(
+													(m) => m.member_id === value
+													);
+
+													formik.setFieldValue(
+													`rows[${index}].sb_acc_no`,
+													selectedMember?.sb_acc_no || ""
+													);
+
+													checkDuplicateMember_FN(value, index);
+													}}
+													>
+													{filteredMembers.map((member) => (
+													<Select.Option key={member.member_id} value={member.member_id}>
+													{member.member_name}
+													</Select.Option>
+													))}
+													</Select> */}
+
 												</>
 											)}
 
@@ -1535,9 +1537,28 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 								{/* } */}
 							</form>
+								{/* <div className="flex justify-end gap-4">
+											<Tooltip title="Export to Excel">
+												<button
+													onClick={() => exportToExcel(excelDt)}
+													className="mt-5 justify-center items-center rounded-full text-green-900"
+												>
+													<FileExcelOutlined
+														style={{
+															fontSize: 30,
+														}}
+													/>
+												</button>
+											</Tooltip>
+										
+										</div> */}
 						</div>
+					
 					</Spin>
 				</div>
+				{/* {reportData.length !== 0 && ( */}
+										
+									{/* )} */}
 			</section>
 
 			<DialogBox

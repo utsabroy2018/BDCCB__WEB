@@ -3,8 +3,8 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button } from "antd"
-import { LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import { Spin, Button, Tooltip } from "antd"
+import { FileExcelOutlined, LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
 import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
@@ -17,7 +17,8 @@ import Radiobtn from "../../Components/Radiobtn"
 import LoanRecoverySubmitSHGListTable_BDCCB from "../../Components/LoanRecoverySubmitSHGListTable_BDCCB"
 import { motion } from "framer-motion"
 import LoanRecoveryBranchSociListTable_BDCCB from "../../Components/LoanRecoveryBranchSociListTable_BDCCB"
-
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
 const option_recovery = [
 	{
 		label: "Unapproved Recovery",
@@ -55,7 +56,40 @@ function RecoveryListSocietyBranch_BDCCB() {
 		console.log("radio1 checked", e)
 		setRecoveryStatus(e)
 	}
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+const handleExportMembers = (loans) => {
+		const flattenedData = [];
+		loans.forEach((loan) => {
+			flattenedData.push({
+				"Loan ID": loan.loan_id,
+				"Group Code": loan.group_code,
+				"Group Name": loan.group_name,
+				"Disbursement Amount": loan.disb_amt,
 
+				"Transaction Date": loan.trans_dt,
+				"Transaction ID": loan.transaction_id,
+				
+				"Credit Amount": loan.credit_amount,
+				"Status": loan.approval_status === "U" ? "Unapproved" : loan.approval_status === "A" ? "Approved" : loan.approval_status,
+			
+			});
+		});
+
+		const wb = XLSX.utils.book_new();
+		const ws = XLSX.utils.json_to_sheet(flattenedData);
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+		const fileName = `SocietyRecovery_${recoveryStatus}_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		saveAs(blob, fileName);
+	};
 	// const initialValues = {
 	
 	// 		sanction_dt: "",
@@ -119,13 +153,15 @@ function RecoveryListSocietyBranch_BDCCB() {
 		setLoading(false)
 	}
 
-	useEffect(()=>{
-	fetchSearchedGroups()
-	}, [])
+	// useEffect(()=>{
+	// fetchSearchedGroups()
+	// }, [])
 
 
 	useEffect(()=>{
+		if(recoveryStatus != 'A'){
 	fetchSearchedGroups()
+		}
 	}, [recoveryStatus])
 
 		const setSearch = (word) => {
@@ -342,6 +378,21 @@ function RecoveryListSocietyBranch_BDCCB() {
 						setSearch={(data) => setSearch(data)}
 						refreshData={fetchSearchedGroups}
 					/>
+					{groups?.length > 0 && <div className="flex justify-start gap-4 bg-white p-4">
+						<Tooltip title="Export to Excel">
+							<button
+								onClick={() => handleExportMembers(groups)}
+								className="mt-5 justify-center items-center rounded-full text-green-900"
+							>
+								<FileExcelOutlined
+									style={{
+										fontSize: 30,
+									}}
+								/>
+							</button>
+						</Tooltip>
+
+					</div>}
 					{/* <DialogBox
 					visible={visible}
 					flag={flag}

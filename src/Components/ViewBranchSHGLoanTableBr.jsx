@@ -25,7 +25,7 @@ function ViewBranchSHGLoanTableBr({
 	isRejected = false,
 }) {
 	const navigate = useNavigate()
-
+     console.log("loanAppData in view branch shg table", loanAppData)
 	const [first, setFirst] = useState(0)
 	const [rows, setRows] = useState(10)
 
@@ -126,6 +126,9 @@ function ViewBranchSHGLoanTableBr({
 								Loan A/C Number
 							</th>
 							<th scope="col" className="p-4">
+								Branch/Society
+							</th>
+							<th scope="col" className="p-4">
 								Group Code
 							</th>
 							<th scope="col" className="p-4">
@@ -156,6 +159,9 @@ function ViewBranchSHGLoanTableBr({
 									</th> */}
 									<td className="px-6 py-3 text-slate-700">
 										{item.loan_acc_no || "-----"}
+									</td>
+									<td className="px-6 py-3 text-slate-700">
+										{item.group_details[0]?.pacs_id == 111 ? item.group_details[0]?.branch_name : item.group_details[0]?.pacs_name}
 									</td>
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>

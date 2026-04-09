@@ -453,10 +453,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		}
 
 
-
-
-
-		console.log(formData, 'formDataformDataformDataformData', creds, userDetails[0]);
+		// console.log(formData, 'formDataformDataformDataformData', creds);
 
 		// return
 
@@ -673,38 +670,16 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 				const groupList = res.data.data;
 
-				console.log(res.data.data, 'hhhhhhhhhhhhhhhh');
-
-
-
-
-				// setSHGList(res?.data?.data?.map((item, i) => ({
-				// code: item?.group_code,
-				// name: item?.group_name,
-				// branch_code: item?.branch_code,
-				// })))
-
 				if (userDetails[0]?.user_type == 'B') {
 					setSHGList(res?.data?.data?.map((item, i) => ({
 						code: item?.group_code,
 						name: item?.group_name,
 					})))
 				}
-
-				// if(formik.values.loan_to == "S" || loanAppData?.loan_to == "S"){
-				// if (userDetails[0]?.user_type == 'P') {
-				// setSHGList(res?.data?.data?.map((item, i) => ({
-				// code: item?.group_code,
-				// name: item?.group_name,
-				// })))
-				// }
-
-
-
 			} else {
-				Message('error', res?.data?.msg)
-				navigate(routePaths.LANDING)
-				localStorage.clear()
+				// Message('error', res?.data?.msg)
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
 			}
 
 		})
@@ -1196,6 +1171,18 @@ function DisbursmentForm_BDCCB({ flag }) {
 											member => !selectedMembersInSameGroup.includes(member.member_id)
 										);
 
+										// ✅ 👉 PUT YOUR CODE HERE
+										if (
+											filteredMembers.length === 1 &&
+											!formik.values.rows[index].member_id
+										) {
+											const member = filteredMembers[0];
+
+											formik.setFieldValue(`rows[${index}].member_id`, member.member_id);
+											formik.setFieldValue(`rows[${index}].sb_acc_no`, member.sb_acc_no);
+											formik.setFieldValue(`rows[${index}].member_name`, member.member_name);
+										}
+
 
 										return (
 											<div
@@ -1366,8 +1353,10 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 															<Select
 																placeholder="Select Member"
-																value={formik.values.rows[index].member_id}
+																// value={formik.values.rows[index].member_id}
+																value={filteredMembers.length === 1 ? filteredMembers[0].member_id : formik.values.rows[index].member_id}
 																style={{ width: "100%" }}
+																disabled={true}
 																onChange={(value) => {
 
 																	formik.setFieldValue(`rows[${index}].member_id`, value);

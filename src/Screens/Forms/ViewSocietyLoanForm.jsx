@@ -44,7 +44,7 @@ const formatINR = (num) =>
 		minimumFractionDigits: 2,
 	}).format(num || 0)
 function ViewSocietyLoanForm({ groupDataArr }) {
-	const [loanDtls,setLoanDtls] = useState([]);
+	const [loanDtls, setLoanDtls] = useState([]);
 	const [isOverdue, setIsOverdue] = useState('N');
 	const [overDueAmt, setOverDueAmt] = useState(0);
 	const params = useParams()
@@ -57,13 +57,15 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 	const userDetails = JSON.parse(localStorage.getItem("user_details"))
 	const [count, setCount] = useState(0)
 	const [groupData, setGroupData] = useState(() => [])
+	const [ccbgroupData, setCCBGroupData] = useState(() => [])
 	const [memberData, setMemberData] = useState(() => [])
 	const [openModal, setOpenModal] = useState(false)
 	const [branches, setBranches] = useState(() => [])
 	const [branch, setBranch] = useState(() => "")
-
+	const [show, setShow] = useState(false)
 	const [blocks, setBlocks] = useState(() => [])
 	const [block, setBlock] = useState(() => "")
+	const [memDetails,setMemDetails] = useState(() => [])
 
 	const [groupDetails, setGroupDetails] = useState(() => [])
 	const [memberDetails, setMemberDetails] = useState(() => [])
@@ -168,7 +170,7 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 	// ]
 
 	const initialValues = {
-		
+
 		g_group_name: "",
 		g_branch_name: "",
 		pacs_name: "",
@@ -177,7 +179,7 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 		g_address: "",
 		dist_name: "",
 		g_group_block: "",
-		
+
 		ps_name: "",
 		post_name: "",
 		gp_name: "",
@@ -219,7 +221,7 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 	// 		// navigate(routePaths.LANDING)
 	// 		// localStorage.clear()
 	// 		} else {
-				
+
 	// 			setValues({
 	// 				g_co_name: res?.data?.msg[0]?.emp_name,
 	// 				g_group_name: res?.data?.msg[0]?.group_name,
@@ -300,26 +302,77 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 
 		await axios
 			.post(`${url_bdccb}/recov/fetch_soc_loan_dtls`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
 			})
 			.then((res) => {
 
-			// console.log(res?.data?.data[0]?.loan_id, 'dataaaaaaaaaaaaaaaaaaa', creds);
-			if(res?.data?.success){
-			
-			
-			// setGroups(res?.data?.data)
-			// setCopyLoanApplications(res?.data?.data)
-			setGroupData(res?.data?.data)
-			fetchLoanMemberDetails(res?.data?.data[0]?.loan_id)
+				// console.log(res?.data?.data[0]?.loan_id, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				if (res?.data?.success) {
 
-			} else {
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			}
+
+					// setGroups(res?.data?.data)
+					// setCopyLoanApplications(res?.data?.data)
+					setGroupData(res?.data?.data)
+					fetchLoanMemberDetails(res?.data?.data[0]?.loan_id)
+
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+		setLoading(false)
+	}
+
+	const fetchCCBLoanDetails = async () => {
+		setLoading(true)
+		const creds = {
+			// group_code: params?.id,
+			tenant_id: userDetails[0]?.tenant_id,
+			branch_code: userDetails[0]?.user_type == 'B' ? branch_id : userDetails[0]?.brn_code,
+			pacs_id: userDetails[0]?.brn_code,
+			group_code: loanAppData?.group_code,
+			society_acc_no: loanAppData?.society_acc_no
+		}
+
+
+		// {
+		// "tenant_id" : "",
+		// "branch_code" : "",
+		// "group_code" : "",
+		// "society_acc_no" : ""
+		// }
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios
+			.post(`${url_bdccb}/recov/fetch_ccb_loan_details`, creds, {
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
+			})
+			.then((res) => {
+
+				// console.log(res?.data?.data[0]?.loan_id, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				if (res?.data?.success) {
+
+
+					// setGroups(res?.data?.data)
+					// setCopyLoanApplications(res?.data?.data)
+					setCCBGroupData(res?.data?.data)
+					// fetchLoanMemberDetails(res?.data?.data[0]?.loan_id)
+
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
 
 			})
 			.catch((err) => {
@@ -353,22 +406,22 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 
 		await axios
 			.post(`${url_bdccb}/recov/fetch_indivitual_member`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
 			})
 			.then((res) => {
 
-			console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
-			if(res?.data?.success){
-			// setGroupData(res?.data?.data)
-			setMemberData(res?.data?.data)
+				console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				if (res?.data?.success) {
+					// setGroupData(res?.data?.data)
+					setMemberData(res?.data?.data)
 
-			} else {
-			// navigate(routePaths.LANDING)
-			// localStorage.clear()
-			}
+				} else {
+					// navigate(routePaths.LANDING)
+					// localStorage.clear()
+				}
 
 			})
 			.catch((err) => {
@@ -379,46 +432,47 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 
 	const fetchGroupDetails = async () => {
 		setLoading(true)
-		
+
 		setValues({
-					// g_branch_name: res?.data?.msg[0]?.emp_name,
-					g_group_name: loanAppData?.group_details[0]?.group_name,
-					g_branch_name: loanAppData?.group_details[0]?.branch_name,
-					pacs_name: loanAppData?.group_details[0]?.pacs_name,
-					sahayika_name: loanAppData?.group_details[0]?.sahayika_name,
-					g_phone1: loanAppData?.group_details[0]?.phone1,
-					g_address: loanAppData?.group_details[0]?.group_addr,
-					dist_name: loanAppData?.group_details[0]?.dist_name,
-					g_group_block: loanAppData?.group_details[0]?.block_name,
-					ps_name: loanAppData?.group_details[0]?.ps_name,
-					post_name: loanAppData?.group_details[0]?.post_name,
-					gp_name: loanAppData?.group_details[0]?.gp_name,
-					vill_name: loanAppData?.group_details[0]?.vill_name,
-					pin_no: loanAppData?.group_details[0]?.pin_no,
-				})
-				// setGroupData(res?.data?.msg)
-				// setPeriodMode(res?.data?.msg[0].disb_details[0]?.period_mode)
-				// setPeriodModeVal(res?.data?.msg[0].disb_details[0]?.recovery_day)
-				// setWeekOfRecovery(res?.data?.msg[0].disb_details[0]?.week_no)
-				// setBranch(
-				// 	res?.data?.msg[0]?.disctrict + "," + res?.data?.msg[0]?.branch_code
-				// )
-				// setBlock(res?.data?.msg[0]?.block)
-				// setIsOverdue(res?.data?.msg[0]?.overdue_flag);
-				// setOverDueAmt(res?.data?.msg[0]?.overdue_amt);
-				
+			// g_branch_name: res?.data?.msg[0]?.emp_name,
+			g_group_name: loanAppData?.group_details[0]?.group_name,
+			g_branch_name: loanAppData?.group_details[0]?.branch_name,
+			pacs_name: loanAppData?.group_details[0]?.pacs_name,
+			sahayika_name: loanAppData?.group_details[0]?.sahayika_name,
+			g_phone1: loanAppData?.group_details[0]?.phone1,
+			g_address: loanAppData?.group_details[0]?.group_addr,
+			dist_name: loanAppData?.group_details[0]?.dist_name,
+			g_group_block: loanAppData?.group_details[0]?.block_name,
+			ps_name: loanAppData?.group_details[0]?.ps_name,
+			post_name: loanAppData?.group_details[0]?.post_name,
+			gp_name: loanAppData?.group_details[0]?.gp_name,
+			vill_name: loanAppData?.group_details[0]?.vill_name,
+			pin_no: loanAppData?.group_details[0]?.pin_no,
+		})
+		// setGroupData(res?.data?.msg)
+		// setPeriodMode(res?.data?.msg[0].disb_details[0]?.period_mode)
+		// setPeriodModeVal(res?.data?.msg[0].disb_details[0]?.recovery_day)
+		// setWeekOfRecovery(res?.data?.msg[0].disb_details[0]?.week_no)
+		// setBranch(
+		// 	res?.data?.msg[0]?.disctrict + "," + res?.data?.msg[0]?.branch_code
+		// )
+		// setBlock(res?.data?.msg[0]?.block)
+		// setIsOverdue(res?.data?.msg[0]?.overdue_flag);
+		// setOverDueAmt(res?.data?.msg[0]?.overdue_amt);
+
 		setLoading(false)
 	}
 
 	useEffect(() => {
 		fetchGroupDetails()
 		fetchLoanDetails()
-
+		fetchCCBLoanDetails()
+		society_member_details()
 		console.log(userDetails[0]?.user_type, 'gggggggggggggggggggg');
-		
+
 	}, [])
 
-	
+
 
 	const onSubmit = async (values) => {
 		console.log("onsubmit called")
@@ -440,50 +494,74 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 		validateOnMount: true,
 	})
 
-	
 
-	const callAPi = async (item) =>{
-			// console.log(item);
-			setLoading(true);
-			setLoanDtls([]);
-			const tokenValue = await getLocalStoreTokenDts(navigate);
-			try{
-					const payload = {
-						branch_code: userDetails?.brn_code,
-						loan_id: item?.loan_id,
-					}
-					axios.post(`${url}/admin/look_overdue_details`,payload, {
-					headers: {
+    const society_member_details = async ()=>{
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		const payload = {
+				"group_code" : loanAppData?.group_code,
+
+			}
+			axios.post(`${url_bdccb}/recov/fetch_mem_details`, payload, {
+				headers: {
 					Authorization: `${tokenValue?.token}`, // example header
 					"Content-Type": "application/json", // optional
-					},
-					})
-					.then((res) => {
-						// console.log(res?.data?.msg, 'testtttttttttt');
-						
-						if(res?.data?.suc === 0){
+				},
+			})
+				.then((res) => {
+					console.log(res?.data);
+					setMemDetails(res?.data?.data || [])
+				})
+				.catch((err) => {
+					setLoading(false);
+					console.log("Error occurred while calling API:", err);
+				});
+
+				
+
+	}
+	const callAPi = async (item) => {
+		// console.log(item);
+		setLoading(true);
+		setLoanDtls([]);
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+		try {
+			const payload = {
+				branch_code: userDetails?.brn_code,
+				loan_id: item?.loan_id,
+			}
+			axios.post(`${url}/admin/look_overdue_details`, payload, {
+				headers: {
+					Authorization: `${tokenValue?.token}`, // example header
+					"Content-Type": "application/json", // optional
+				},
+			})
+				.then((res) => {
+					// console.log(res?.data?.msg, 'testtttttttttt');
+
+					if (res?.data?.suc === 0) {
 						// Message('error', res?.data?.msg)
 						// navigate(routePaths.LANDING)
 						// localStorage.clear()
-						} else {
+					} else {
 
 						// console.log("API response:", res.data);
 						setOpenModal(true);
 						setLoanDtls(res?.data?.msg || []);
 						setLoading(false);
 
-						}
+					}
 
-					})
-					.catch((err) => {
-						setLoading(false);
-						console.log("Error occurred while calling API:", err);
-					});
-			}
-			catch(err){
-				setLoading(false);
-				console.log("Error occurred while calling API:", err);
-			}
+				})
+				.catch((err) => {
+					setLoading(false);
+					console.log("Error occurred while calling API:", err);
+				});
+		}
+		catch (err) {
+			setLoading(false);
+			console.log("Error occurred while calling API:", err);
+		}
 	}
 
 
@@ -498,18 +576,18 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 	// };
 
 	const totalOutstanding = memberData?.reduce(
-	(sum, item) => sum + Number(item?.member_outstanding || 0),
-	0
-)
-	
+		(sum, item) => sum + Number(item?.member_outstanding || 0),
+		0
+	)
+
 
 	return (
 		<>
-		{
-					isOverdue === 'Y' && <AlertComp 
-					
+			{
+				isOverdue === 'Y' && <AlertComp
+
 					msg={<p className="text-2xl font-normal"><span className="text-lg ">Loan Overdue Amount is </span>{formatINR(overDueAmt)}</p>} />
-				}
+			}
 			<Spin
 				indicator={<LoadingOutlined spin />}
 				size="large"
@@ -550,7 +628,7 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 									<VError title={formik.errors.g_group_name} />
 								) : null} */}
 							</div>
-							
+
 
 							<div>
 								<TDInputTemplateBr
@@ -600,23 +678,23 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 								/>
 							</div>
 
-						
-								<div>
-									
-									<TDInputTemplateBr
-										placeholder="Sahayika Name"
-										type="text"
-										label="Sahayika Name"
-										name="sahayika_name"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.sahayika_name}
-										mode={1}
-										disabled
-									/>
-								</div>
 
-								<div>
+							<div>
+
+								<TDInputTemplateBr
+									placeholder="Sahayika Name"
+									type="text"
+									label="Sahayika Name"
+									name="sahayika_name"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.sahayika_name}
+									mode={1}
+									disabled
+								/>
+							</div>
+
+							<div>
 								<TDInputTemplateBr
 									placeholder="Mobile No. 1"
 									type="number"
@@ -646,7 +724,7 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 
 
 
-							
+
 
 							<div>
 								<TDInputTemplateBr
@@ -675,7 +753,7 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 									disabled
 								/>
 							</div>
-							
+
 							<div>
 								<TDInputTemplateBr
 									placeholder="Police Station"
@@ -745,8 +823,11 @@ function ViewSocietyLoanForm({ groupDataArr }) {
 									disabled
 								/>
 							</div>
+							<div>
+								<button onClick={() => setVisible(true)} className=" disabled:bg-gray-400 disabled:dark:bg-gray-400 inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-teal-500 transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300  rounded-full focus:ring-gray-600  dark:focus:ring-primary-900 dark:bg-[#22543d] dark:hover:bg-gray-600">View Member Details</button>
 
-							
+							</div>
+
 							{/* <div>
 								<TDInputTemplateBr
 									placeholder="Bank Name"
@@ -1046,57 +1127,57 @@ Authorization: `${tokenValue?.token}`, // example header
 								</button>
 							</div>}
 						</div> */}
-						{/* purpose,scheme name,interest rate,period,period mode,fund name,total applied amount,total disbursement amount,disbursement date,current outstanding */}
-						<div className="text-[#DA4167] text-lg font-bold">Loan Details</div>
+
+						<div className="text-[#DA4167] text-lg font-bold">CCB Loan Details</div>
 
 						<div>
-							
+
 
 							<DynamicTailwindTable
-							data={
-							groupData?.length
-							? [
-							{
-							loan_id: groupData[0].loan_id,
-							loan_acc_no: groupData[0].loan_acc_no,
-							period: groupData[0].period,
-							curr_roi: groupData[0].curr_roi,
-							penal_roi: groupData[0].penal_roi,
-							disb_dt: groupData[0].disb_dt,
-							disb_amt: groupData[0].disb_amt,
-							pay_mode: groupData[0].pay_mode,
-							rep_start_dt: groupData[0].rep_start_dt,
-							rep_end_dt: groupData[0].rep_end_dt,
-							cuurent_loan_outstanding:
-							groupData[0].cuurent_loan_outstanding,
-							action: (
-							<button
-							onClick={() => {
-							// navigate(
-							// `/homepacs/loandetails/${groupData[0]?.loan_id}`
-							// );
-							navigate(`/homepacs/loandetails/${groupData[0]?.loan_id}`, {
-							state: groupData[0]?.trans_details,
-							})
-							}}
-							className="font-medium text-teal-500 hover:underline"
-							>
-							<EyeFilled />
-							</button>
-							),
-							},
-							]
-							: []
-							}
-							// pageSize={50}
-							// headersMap={disbursementDetailsHeader}
-							pageSize={50}
-							columnTotal={[6, 10]}
-							// headersMap={disbursementDetailsHeader}
-							headersMap={{
-								...disbursementDetailsHeader_SOCIE,
-								action: "Action", // ✅ only addition
-							}}
+								data={
+									ccbgroupData?.length
+										? [
+											{
+												loan_id: ccbgroupData[0].loan_id,
+												loan_acc_no: ccbgroupData[0].loan_acc_no,
+												period: ccbgroupData[0].period,
+												curr_roi: ccbgroupData[0].curr_roi,
+												penal_roi: ccbgroupData[0].penal_roi,
+												disb_dt: ccbgroupData[0].disb_dt,
+												disb_amt: ccbgroupData[0].disb_amt,
+												pay_mode: ccbgroupData[0].pay_mode,
+												rep_start_dt: ccbgroupData[0].rep_start_dt,
+												rep_end_dt: ccbgroupData[0].rep_end_dt,
+												cuurent_loan_outstanding:
+													ccbgroupData[0].cuurent_loan_outstanding,
+												action: (
+													<button
+														onClick={() => {
+															// navigate(
+															// `/homepacs/loandetails/${ccbgroupData[0]?.loan_id}`
+															// );
+															navigate(`/homepacs/loandetails/${ccbgroupData[0]?.loan_id}`, {
+																state: ccbgroupData[0]?.trans_details,
+															})
+														}}
+														className="font-medium text-teal-500 hover:underline"
+													>
+														<EyeFilled />
+													</button>
+												),
+											},
+										]
+										: []
+								}
+								// pageSize={50}
+								// headersMap={disbursementDetailsHeader}
+								pageSize={50}
+								columnTotal={[6, 10]}
+								// headersMap={disbursementDetailsHeader}
+								headersMap={{
+									...disbursementDetailsHeader_SOCIE,
+									action: "Action", // ✅ only addition
+								}}
 							// dateTimeExceptionCols={[16]}
 							// colRemove={[3, 5, 12]}
 							/>
@@ -1133,95 +1214,183 @@ Authorization: `${tokenValue?.token}`, // example header
 								colRemove={[3, 5, 12]}
 							/> */}
 						</div>
+						{/* purpose,scheme name,interest rate,period,period mode,fund name,total applied amount,total disbursement amount,disbursement date,current outstanding */}
+						{loanAppData?.pacs_id != 111 && <><div className="text-[#DA4167] text-lg font-bold">Soceity Loan Details</div>
 
-						
+							<div>
 
-						{params?.id > 0 && (
-							<div className="gap-3">
-								<div className="w-full my-5 border-t-4 border-gray-400 border-dashed"></div>
-								<div>
-									<div className="text-[#DA4167] text-lg mb-2 font-bold">
-										Members in this Group
-									</div>
 
-{/* {JSON.stringify(memberData, 2)} */}
+								<DynamicTailwindTable
+									data={
+										groupData?.length
+											? [
+												{
+													loan_id: groupData[0].loan_id,
+													loan_acc_no: groupData[0].loan_acc_no,
+													period: groupData[0].period,
+													curr_roi: groupData[0].curr_roi,
+													penal_roi: groupData[0].penal_roi,
+													disb_dt: groupData[0].disb_dt,
+													disb_amt: groupData[0].disb_amt,
+													pay_mode: groupData[0].pay_mode,
+													rep_start_dt: groupData[0].rep_start_dt,
+													rep_end_dt: groupData[0].rep_end_dt,
+													cuurent_loan_outstanding:
+														groupData[0].cuurent_loan_outstanding,
+													action: (
+														<button
+															onClick={() => {
+																// navigate(
+																// `/homepacs/loandetails/${groupData[0]?.loan_id}`
+																// );
+																navigate(`/homepacs/loandetails/${groupData[0]?.loan_id}`, {
+																	state: groupData[0]?.trans_details,
+																})
+															}}
+															className="font-medium text-teal-500 hover:underline"
+														>
+															<EyeFilled />
+														</button>
+													),
+												},
+											]
+											: []
+									}
+									// pageSize={50}
+									// headersMap={disbursementDetailsHeader}
+									pageSize={50}
+									columnTotal={[6, 10]}
+									// headersMap={disbursementDetailsHeader}
+									headersMap={{
+										...disbursementDetailsHeader_SOCIE,
+										action: "Action", // ✅ only addition
+									}}
+								// dateTimeExceptionCols={[16]}
+								// colRemove={[3, 5, 12]}
+								/>
+
+								{/* <DynamicTailwindTable
+								data={groupData[0]?.disb_details?.map((el) => {
+									//  console.log(el.loan_cycle, ' Loan Cycle');
+									 const loanCycle = 'Loan Cycle - '+ el.loan_cycle; 
+									 
+									//  el.loan_cycle = loanCycle;
+									//  console.log(el.week_no, ' Week No');
+									// let recoveryWeekNoText = el.week_no;
+									// if (+el.week_no === 1) {
+									// recoveryWeekNoText = "Week (1-3)";
+									// } else if (+el.week_no === 2) {
+									// recoveryWeekNoText = "Week (2-4)";
+									// }
+									const recoveryWeekNoText = getWeekOfRecoveryName(el.week_no);
+
+									const recoveryDayText = getFortnightDayName(el.recovery_day);
 									
 
-									<Spin spinning={loading}>
-										<div
-											ref={containerRef}
-											className={`relative overflow-x-auto shadow-md sm:rounded-lg`}
-											onWheel={handleWheel}
-											onMouseEnter={handleMouseEnter}
-											onMouseLeave={handleMouseLeave}
-										>
-											<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-												<thead className="text-xs text-white uppercase bg-slate-800 dark:bg-gray-700 dark:text-gray-400">
-													<tr>
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Member Name
-														</th>
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Loan ID
-														</th>
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Member Code
-														</th>
-														<th scope="col" className="px-6 py-3 font-semibold">
-															CCB Loan ID
-														</th>
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Outstanding
-														</th>
-														<th scope="col" className="px-6 py-3 font-semibold">Action </th>
-													</tr>
-												</thead>
-												<tbody>
-													{memberData?.map((item, i) => (
-														<tr
-															key={i}
-															className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600"
-														>
-															<th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{item?.member_name}</th>
-															<td className="px-6 py-4">{item?.loan_id}</td>
-															<td className="px-6 py-4">{item?.member_code}</td>
-															<td className="px-6 py-4">{item?.ccb_loan_id}</td>
-															<td className="px-6 py-4">{item?.member_outstanding}/-</td>
-															<td className="px-6 py-4 text-right">
-																<button
-																	onClick={() => {
-																		// navigate(
-																		// 	`/homepacs/memberloandetails/${item?.loan_id}`
-																		// )
-																		navigate(`/homepacs/memberloandetails/${item?.loan_id}`, {
-																		state: item,
-																		})
-																	}}
-																	className="font-medium text-teal-500 dark:text-blue-500 hover:underline"
-																>
-																	<EyeFilled />
-																</button>
+									 return {
+										...el,
+										// loan_cycle:loanCycle,
+										// week_no: recoveryWeekNoText,
+										// recovery_day: recoveryDayText,
+									 };
+								})}
+								pageSize={50}
+								columnTotal={[15, 17, 18]}
+								headersMap={disbursementDetailsHeader}
+								dateTimeExceptionCols={[16]}
+								colRemove={[3, 5, 12]}
+							/> */}
+							</div>
+
+
+
+							{params?.id > 0 && (
+								<div className="gap-3">
+									<div className="w-full my-5 border-t-4 border-gray-400 border-dashed"></div>
+									<div>
+										<div className="text-[#DA4167] text-lg mb-2 font-bold">
+											Group Member Loan Details
+										</div>
+
+										{/* {JSON.stringify(memberData, 2)} */}
+
+
+										<Spin spinning={loading}>
+											<div
+												ref={containerRef}
+												className={`relative overflow-x-auto shadow-md sm:rounded-lg`}
+												onWheel={handleWheel}
+												onMouseEnter={handleMouseEnter}
+												onMouseLeave={handleMouseLeave}
+											>
+												<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+													<thead className="text-xs text-white uppercase bg-slate-800 dark:bg-gray-700 dark:text-gray-400">
+														<tr>
+															<th scope="col" className="px-6 py-3 font-semibold">
+																Member Name
+															</th>
+															<th scope="col" className="px-6 py-3 font-semibold">
+																Loan ID
+															</th>
+															<th scope="col" className="px-6 py-3 font-semibold">
+																Member Code
+															</th>
+															<th scope="col" className="px-6 py-3 font-semibold">
+																CCB Loan ID
+															</th>
+															<th scope="col" className="px-6 py-3 font-semibold">
+																Outstanding
+															</th>
+															<th scope="col" className="px-6 py-3 font-semibold">Action </th>
+														</tr>
+													</thead>
+													<tbody>
+														{memberData?.map((item, i) => (
+															<tr
+																key={i}
+																className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600"
+															>
+																<th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{item?.member_name}</th>
+																<td className="px-6 py-4">{item?.loan_id}</td>
+																<td className="px-6 py-4">{item?.member_code}</td>
+																<td className="px-6 py-4">{item?.ccb_loan_id}</td>
+																<td className="px-6 py-4">{item?.member_outstanding}/-</td>
+																<td className="px-6 py-4 text-right">
+																	<button
+																		onClick={() => {
+																			// navigate(
+																			// 	`/homepacs/memberloandetails/${item?.loan_id}`
+																			// )
+																			navigate(`/homepacs/memberloandetails/${item?.loan_id}`, {
+																				state: item,
+																			})
+																		}}
+																		className="font-medium text-teal-500 dark:text-blue-500 hover:underline"
+																	>
+																		<EyeFilled />
+																	</button>
+																</td>
+															</tr>
+														))}
+														<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+															<td className="px-6 py-4 font-semibold" colSpan={4}>
+																Total Outstanding
+															</td>
+															<td
+																className="px-6 py-4 text-left font-semibold"
+																colSpan={2}
+															>
+																{totalOutstanding.toFixed(2)}/-
 															</td>
 														</tr>
-													))}
-													<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-														<td className="px-6 py-4 font-semibold" colSpan={4}>
-															Total Outstanding
-														</td>
-														<td
-															className="px-6 py-4 text-left font-semibold"
-															colSpan={2}
-														>
-															{totalOutstanding.toFixed(2)}/-
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
-									</Spin>
+													</tbody>
+												</table>
+											</div>
+										</Spin>
+									</div>
 								</div>
-							</div>
-						)}
+							)}
+						</>}
 					</div>
 					{/* <BtnComp
 						mode="A"
@@ -1238,7 +1407,17 @@ Authorization: `${tokenValue?.token}`, // example header
 					/> */}
 				</form>
 			</Spin>
-
+			<DialogBox
+				flag={7}
+				onPress={() => setVisible(!visible)}
+				visible={visible}
+				data={memDetails}
+				onPressYes={() => {
+					// editGroup()
+					setVisible(!visible)
+				}}
+				onPressNo={() => setVisible(!visible)}
+			/>
 			{/* <DialogBox
 				flag={4}
 				onPress={() => setVisible(!visible)}

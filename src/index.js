@@ -9,6 +9,9 @@ import Loader from "./Components/Loader"
 import CircularProgress from "@mui/material/CircularProgress"
 import RejectDisbursement from "./Screens/BMHome/Loans/RejectDisbursement"
 import SearchMemberBM from "./Screens/BMHome/SearchMemberBM"
+import DisbToSociety from "./Screens/Reports/DisbToSociety/DisbToSociety.jsx"
+import DisbOfSociety from "./Screens/Reports/DisbOfSociety/DisbOfSociety.jsx"
+import SHGDisb from "./Screens/Reports/SHGDisb/SHGDisb.jsx"
 
 // const LoanTransactionsMain = lazy(() => import("./Screens/Reports/LoanTransactions/LoanTransactionsMain.jsx__BDCCB"));
 // const PreviousLoanTransaction = lazy(()=> import('./Screens/Reports/PreviousLoanTransactions/PreviousLoanTransactions.jsx__BDCCB'));
@@ -364,6 +367,18 @@ const router = createBrowserRouter([
 							{
 								path: "",
 								element: <Dashboard />,
+							},
+							{
+								path:'disbtosociety',
+								element:<DisbToSociety/>
+							},
+							{
+								path:'disbofsociety',
+								element:<DisbOfSociety/>
+							},
+							{
+								path:'shgdisb',
+								element:<SHGDisb/>
 							},
 							// {
 							// 	path: "grtappls",

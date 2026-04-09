@@ -265,7 +265,8 @@ function ViewLoanTableBr_Branch_BDCCB({
 														// `/homebm/disburseloan/${rowData?.loan_id.split(",")[0].trim()}`,
 														// { state: rowData }
 														// );
-														navigate(`/homebm/viewloan_branch/${rowData?.loan_id.split(",")[0].trim()}`, {
+														// navigate(`/homebm/viewloan_branch/${rowData?.loan_id.split(",")[0].trim()}`, {
+														navigate(`/homebm/viewloan_branch/${rowData?.loan_id}`, {
 														state: rowData,
 													})
 														}}

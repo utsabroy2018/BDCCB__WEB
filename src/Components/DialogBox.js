@@ -22,6 +22,7 @@ const DialogBox = ({
 	const { handleLogOut } = useContext(loadingContext)
 	const navigate = useNavigate()
 	const [po_no, setPoNo] = useState("")
+	console.log(data)
 	useEffect(() => {
 		setPoNo("")
 	}, [])
@@ -189,6 +190,99 @@ const DialogBox = ({
 					</div>
 				</p>
 			)}
+			{flag==7 && <div>
+
+<div class="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default">
+    <table class="w-full text-sm text-left rtl:text-right text-body">
+        <thead class="text-sm text-body bg-neutral-secondary-soft bg-gray-900 border-b rounded-base border-default">
+            <tr>
+                <th scope="col" class="px-6 py-3 text-white font-medium">
+                   Member Code
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                   Member Name
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                   Gender
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                   Caste
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                   Account No.
+                </th>
+                <th scope="col" class="px-6 py-3 text-white font-medium">
+                    Aadhar No.
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                    IFSC
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                    Guardian
+                </th>
+                <th scope="col" class="px-6 py-3 text-white font-medium">
+                    Address
+                </th>
+				<th scope="col" class="px-6 py-3 text-white font-medium">
+                    Phone No.
+                </th>
+                <th scope="col" class="px-6 py-3 text-white font-medium">
+                    Group Designation
+                </th>
+                <th scope="col" class="px-6 py-3 text-white font-medium">
+                    Religion
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {data?.map(item=>
+				<tr class="bg-neutral-primary border-b border-default">
+                <th scope="row" class="px-6 py-4 font-medium text-heading whitespace-nowrap">
+                    {item?.member_code}
+                </th>
+                <td class="px-6 py-4">
+                    {item?.member_name}
+                </td>
+				 <td class="px-6 py-4">
+                    {item?.gender=='M'?'Male':'Female'}
+                </td>
+				<td class="px-6 py-4">
+                    {item?.caste}
+                </td>
+                <td class="px-6 py-4">
+                   {item?.member_account_no}
+                </td>
+                <td class="px-6 py-4">
+                   {item?.aadhar_no}
+
+                </td>
+                <td class="px-6 py-4">
+                    {item?.ifsc}
+                </td>
+				 <td class="px-6 py-4">
+                    {item?.gurdian_name}
+                </td>
+				 <td class="px-6 py-4">
+                    {item?.address}
+                </td>
+				
+				<td class="px-6 py-4">
+                    {item?.phone_no}
+                </td>
+				<td class="px-6 py-4">
+                    {item?.gp_leader_flag=='Y'?'Leader':item?.asst_gp_leader_flag=='Y'?'Asst. Leader':'Member'}
+                </td>
+				<td class="px-6 py-4">
+                    {item?.religion}
+                </td>
+            </tr>
+		
+		)}
+         
+        </tbody>
+    </table>
+</div>
+</div>}
 		</Dialog>
 	)
 }

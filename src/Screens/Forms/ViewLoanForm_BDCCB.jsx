@@ -10,7 +10,7 @@ import * as Yup from "yup"
 import axios from "axios"
 import { Message } from "../../Components/Message"
 import { url, url_bdccb } from "../../Address/BaseUrl"
-import { Spin, Button, Popconfirm, Tag, Timeline, Divider, Modal } from "antd"
+import { Spin, Button, Popconfirm, Tag, Timeline, Divider, Modal, Tooltip } from "antd"
 import {
 	LoadingOutlined,
 	DeleteOutlined,
@@ -25,6 +25,7 @@ import {
 	EyeFilled,
 	CheckCircleOutlined,
 	CloseCircleOutlined,
+	FileExcelOutlined,
 } from "@ant-design/icons"
 import FormHeader from "../../Components/FormHeader"
 import { routePaths } from "../../Assets/Data/Routes"
@@ -41,6 +42,8 @@ import moment from "moment"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 import { saveMasterData } from "../../services/masterService"
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
 const formatINR = (num) =>
 	new Intl.NumberFormat("en-IN", {
 		style: "currency",
@@ -78,7 +81,69 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	const containerRef = useRef(null)
 
 	const [isHovered, setIsHovered] = useState(false)
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+	const handleExportMembers = (loans) => {
+		const flattenedData = [];
+		loans.forEach((loan) => {
+			if (loan.members && Array.isArray(loan.members)) {
+				loan.members.forEach((member) => {
+					flattenedData.push({
+						// Loan level fields (non-nested)
+						"Loan ID": loan.loan_id,
+						"Tenant ID": loan.tenant_id,
+						"Branch ID": loan.branch_id,
+						"Loan Account No": loan.loan_acc_no,
+						"Group Name": loan.group_name,
+						"Group Code": loan.group_code,
+						"Branch SHG ID": loan.branch_shg_id,
+						"PACS Name": loan.pacs_name,
+						"Period": loan.period,
+						"Current ROI": loan.curr_roi,
+						"Penal ROI": loan.penal_roi,
+						"Disbursement Date": loan.disb_dt,
+						"Disbursement Amount": loan.disb_amt,
+						"Pay Mode": loan.period_mode,
+						"Repayment Start Date": loan.rep_start_dt,
+						"Repayment End Date": loan.rep_end_dt,
+						"Sanction No": loan.sanction_no,
+						"Soceity Account No": loan.society_acc_no,
+						"Sanction Date": loan.sanction_dt,
+						"Transaction Type": loan.trans_type === "D" ? "Disbursement" : loan.trans_type === "R" ? "Recovery" : loan.trans_type,
 
+						"Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
+
+						// Member level fields
+						"Member Loan ID": member.mem_loan_id,
+						"Transaction ID": member.tran_id,
+						"Member Group Code": member.group_code,
+						"Member Group Name": member.group_name,
+						"Member ID": member.member_id,
+						"Member Name": member.member_name,
+						"Disburse Amount": member.disburse_amt,
+						"SB Account No": member.sb_acc_no
+					});
+				});
+			} else {
+				// Fallback for loans without members
+				flattenedData.push({ ...loan });
+			}
+		});
+
+		const wb = XLSX.utils.book_new();
+		const ws = XLSX.utils.json_to_sheet(flattenedData);
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+		const fileName = `SocietyDisburse_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		saveAs(blob, fileName);
+	};
 	const handleWheel = (event) => {
 		if (isHovered && containerRef.current) {
 			containerRef.current.scrollLeft += event.deltaY
@@ -975,7 +1040,21 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						/>
 				</form>
 
-			
+				 <div className="flex justify-start gap-4 bg-white p-4">
+						<Tooltip title="Export to Excel">
+							<button
+								onClick={() => handleExportMembers(groupData)}
+								className="mt-5 justify-center items-center rounded-full text-green-900"
+							>
+								<FileExcelOutlined
+									style={{
+										fontSize: 30,
+									}}
+								/>
+							</button>
+						</Tooltip>
+
+					</div>
 
 
 			</Spin>

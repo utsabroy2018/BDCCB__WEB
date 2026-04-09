@@ -4,13 +4,29 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button } from "antd"
+import { Spin, Button, Select } from "antd"
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { routePaths } from "../../Assets/Data/Routes"
 import { useNavigate } from "react-router"
 import MemberTableViewBr_BDCCB from "../../Components/MemberTableViewBr_BDCCB"
+import Radiobtn from "../../Components/Radiobtn"
+
+const option_direcIndirec = [
+	{
+		label: "Direct",
+		value: "D",
+	},
+	{
+		label: "Indirect",
+		value: "I",
+	},
+	// {
+	// 	label: "Reject Recovery",
+	// 	value: "R",
+	// }
+]
 
 
 function SearchMemberBM_BDCCB() {
@@ -24,18 +40,28 @@ function SearchMemberBM_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 
-	useEffect(()=>{
+	const [radioDirectIndirec, setRadioDirectIndirec] = useState("D")
+	
+	const [PACS_SHGList, setPACS_SHGList] = useState([]);
+	const [selectedPacs, setSelectedPacs] = useState("");
 
-		if(userDetails[0]?.user_type == 'B'){
-		fetchSearchedGroups()
-		}
+	const onChange = (e) => {
+		console.log("radio1 checked", e)
+		setRadioDirectIndirec(e)
+	}
 
-		if(userDetails[0]?.user_type == 'P'){
-		fetchSearchedGroups_ForPacs()
-		}
+	// useEffect(()=>{
+
+	// 	if(userDetails[0]?.user_type == 'B'){
+	// 	fetchSearchedGroups()
+	// 	}
+
+	// 	if(userDetails[0]?.user_type == 'P'){
+	// 	fetchSearchedGroups_ForPacs()
+	// 	}
 
 		
-	}, [searchKeywords])
+	// }, [searchKeywords])
 	
 
 	const fetchSearchedGroups = async () => {
@@ -43,24 +69,32 @@ function SearchMemberBM_BDCCB() {
 		console.log(searchKeywords, 'search', userDetails[0]?.brn_code);
 		
 		setLoading(true)
+
+
 		const creds = {
-		group_name: searchKeywords,
+		group_name_code: searchKeywords,
 		branch_code: userDetails[0]?.brn_code,
+		pacs_id: radioDirectIndirec == "D" ? '111' : selectedPacs
 		}
+
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 
-		await axios.get(`${url_bdccb}/group/get_group_memb_list`, {
-		params: {
-		branch_code: userDetails[0]?.brn_code
-		},
+		// await axios.get(`${url_bdccb}/group/get_group_memb_list`, {
+		// params: {
+		// branch_code: userDetails[0]?.brn_code
+		// },
+		// headers: {
+		// Authorization: `${tokenValue?.token}`, // example header
+		// "Content-Type": "application/json", // optional
+		// },
+		// })
+		await axios.post(`${url_bdccb}/group/get_group_memb_list`, creds, {
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
 		"Content-Type": "application/json", // optional
 		},
 		})
-
-
 		.then((res) => {
 
 		// console.log(res?.data?.data, 'hhhhhhhhhhhhhhhhhhh');
@@ -82,27 +116,42 @@ function SearchMemberBM_BDCCB() {
 		setLoading(false)
 		}
 
-		const fetchSearchedGroups_ForPacs = async () => {
+	const fetchSearchedGroups_ForPacs = async () => {
 
-		console.log(searchKeywords, 'search', userDetails[0]?.brn_code);
-		
-		setLoading(true)
-		const creds = {
-		group_name: searchKeywords,
-		branch_code: userDetails[0]?.brn_code,
-		}
-		const tokenValue = await getLocalStoreTokenDts(navigate);
+	// console.log(searchKeywords, 'search', userDetails[0]?.brn_code);
 
-		await axios.get(`${url_bdccb}/group/get_group_memb_list`, {
-		params: {
-		branch_code: userDetails[0]?.brn_code
-		},
-		headers: {
-		Authorization: `${tokenValue?.token}`, // example header
-		"Content-Type": "application/json", // optional
-		},
-		})
-		.then((res) => {
+	setLoading(true)
+
+	const creds_branch = {
+	group_name_code: searchKeywords,
+	branch_code: userDetails[0]?.brn_code,
+	pacs_id: radioDirectIndirec == "D" ? '111' : selectedPacs
+	}
+
+	const creds_pacs = {
+	group_name_code: searchKeywords,
+	branch_code: 0,
+	pacs_id: userDetails[0]?.brn_code
+	}
+
+	const tokenValue = await getLocalStoreTokenDts(navigate);
+
+	// await axios.get(`${url_bdccb}/group/get_group_memb_list`, {
+	// params: {
+	// branch_code: userDetails[0]?.brn_code
+	// },
+	// headers: {
+	// Authorization: `${tokenValue?.token}`, // example header
+	// "Content-Type": "application/json", // optional
+	// },
+	// })
+	await axios.post(`${url_bdccb}/group/get_group_memb_list`, userDetails[0]?.user_type == 'B' ? creds_branch : creds_pacs, {
+	headers: {
+	Authorization: `${tokenValue?.token}`, // example header
+	"Content-Type": "application/json", // optional
+	},
+	})
+	.then((res) => {
 	console.log(res?.data?.data, 'searchsearchsearchsearch', res);
 	if(res?.data?.success){
 	setGroups(res?.data?.data)
@@ -118,6 +167,69 @@ function SearchMemberBM_BDCCB() {
 	})
 	setLoading(false)
 	}
+
+	const handleSearchPacsChange = async (value) => {
+	setPACS_SHGList([])
+	setGroups([])
+	setLoading(true)
+
+	const creds = {
+	loan_to: 'P',
+	branch_code: userDetails[0]?.brn_code,
+	branch_shg_id: '',
+	tenant_id: userDetails[0]?.tenant_id,
+	}
+
+	const tokenValue = await getLocalStoreTokenDts(navigate);
+
+	await axios.post(`${url_bdccb}/loan/fetch_pacs_shg_details`, creds, {
+	headers: {
+	Authorization: `${tokenValue?.token}`, // example header
+	"Content-Type": "application/json", // optional
+	},
+	})
+	.then((res) => {
+
+	if (res?.data?.success) {
+
+	console.log(creds, 'credscredscredscreds', res?.data?.data);
+
+
+	if (userDetails[0]?.user_type == 'B') {
+	setPACS_SHGList(res?.data?.data?.map((item, i) => ({
+	code: item?.branch_id,
+	name: item?.branch_name,
+	})))
+	}
+
+	} else {
+	navigate(routePaths.LANDING)
+	localStorage.clear()
+	}
+	})
+	.catch((err) => {
+	Message("error", "Some error occurred while fetching group form")
+	})
+
+	setLoading(false)
+	};
+
+	useEffect(()=>{
+
+		if(userDetails[0]?.user_type == 'B'){
+		fetchSearchedGroups()
+		}
+
+		if(userDetails[0]?.user_type == 'P'){
+		fetchSearchedGroups_ForPacs()
+		}
+
+		
+	}, [searchKeywords, selectedPacs, radioDirectIndirec])
+
+	useEffect(() => {
+	handleSearchPacsChange()
+	}, []);
 
 		const setSearch = (word) => {
 		// console.log(word, "wordwordwordword", copyLoanApplications)
@@ -147,15 +259,72 @@ function SearchMemberBM_BDCCB() {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
+
+					{userDetails[0]?.user_type == 'B' &&(
+					<div className="grid gap-6 sm:grid-cols-6 sm:gap-6 w-full mb-3">
+					<div className="sm:col-span-2">
+					<Radiobtn
+					data={option_direcIndirec}
+					val={radioDirectIndirec}
+					onChangeVal={(value) => {
+					onChange(value)
+					}}
+					/>
+					</div>
+
+				{radioDirectIndirec == "I" &&(
+				<div className="sm:col-span-2">
+				{/* {JSON.stringify(radioDirectIndirec, 2)}
+
+				{JSON.stringify(selectedPacs, 2)} */}
+
+				<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
+				dark:text-gray-100">
+				Select PACS *
+				{/* Select PACS/SHG * */}
+				</label>
+
+				<Select
+				showSearch
+				value={selectedPacs}
+				style={{ width: "100%" }}
+				optionFilterProp="children"
+				onChange={(value) => {
+					setSelectedPacs(value)
+				}}
+				filterOption={(input, option) =>
+					option?.children?.toLowerCase().includes(input.toLowerCase())
+				}
+				>
+				<Select.Option value="" disabled>
+					Choose PACS
+				</Select.Option>
+
+				{PACS_SHGList?.map((data) => (
+					<Select.Option key={data.code} value={data.code}>
+					{data.name}
+					</Select.Option>
+				))}
+				</Select>
+
+
+
+
+
+				</div>
+				)}
+
+				</div>
+				)}
 					
-					<div className="mt-20">
+					<div className="mt-0">
 						<label
 							for="default-search"
 							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
 						>
 							Search
 						</label>
-						<div className="relative mt-10">
+						<div className="relative mt-0">
 							<div className="absolute inset-y-0  start-0 flex items-center ps-3 pointer-events-none">
 								<svg
 									className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -176,7 +345,7 @@ function SearchMemberBM_BDCCB() {
 							<input
 								type="search"
 								id="default-search"
-								className="block mt-10 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
+								className="block mt-0 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
 								placeholder="Search by Group Code/Group Name"
 								// onChange={(e) => setSearchKeywords(e.target.value)}
 								onChange={(text) => setSearch(text.target.value)}
