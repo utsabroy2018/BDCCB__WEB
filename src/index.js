@@ -119,10 +119,17 @@ const PACSDashboard = lazy(() => import("./Screens/PACSHome/Dashboard/PACSDashbo
 const EditDisburseFormPACS_BDCCB = lazy(() => import("./Screens/PACSHome/EditDisburseFormPACS_BDCCB.jsx"))
 const SearchMemberForDisbursePACS_BDCCB = lazy(() => import("./Screens/PACSHome/SearchMemberForDisbursePACS_BDCCB.jsx"))
 
+
+const SearchRefinaceDisbursePACS_BDCCB = lazy(() => import("./Screens/PACSHome/SearchRefinaceDisbursePACS_BDCCB.jsx"))
+const EditRefinaceDisbFormPACS_BDCCB = lazy(() => import("./Screens/PACSHome/EditRefinaceDisbFormPACS_BDCCB.jsx"))
+
+
 const DisbursedLoanApproveSinglePACS_BDCCB =  lazy(() => import("./Screens/PACSHome/DisbursedLoanApproveSinglePACS_BDCCB.jsx"));
 const AcceptDisburseFormPACS_BDCCB =  lazy(() => import("./Screens/PACSHome/AcceptDisburseFormPACS_BDCCB.jsx"));
 
 const SearchViewLoanBM = lazy(() => import("./Screens/BMHome/SearchViewLoanBM_BDCCB.jsx"))
+const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
+
 
 const SearchViewLoanRecoveryBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchViewLoanRecoveryBM_BDCCB.jsx"))
 const LoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/LoanRecoveryAcceptReject/LoanRecoveryAcceptReject.jsx"))
@@ -130,8 +137,8 @@ const LoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/LoanRecover
 const BranchSHGLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryAcceptReject/BranchSHGLoanRecoveryAcceptReject.jsx"))
 const BranchSocietyLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHome/BranchSocietyLoanRecoveryAcceptReject/BranchSocietyLoanRecoveryAcceptReject.jsx"))
 
-const EditViewLoanFormBM = lazy(() => import("./Screens/BMHome/EditViewLoanFormBM_BDCCB.jsx"))
-
+const SearchRefinanceApprove_BDCCB = lazy(() => import("./Screens/BMHome/SearchRefinanceApprove_BDCCB.jsx"))
+const EditRefinanceApprovFormBDCCB = lazy(() => import("./Screens/BMHome/EditRefinanceApprovFormBDCCB.jsx"))
 
 const LoanDetails_PACS_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_PACS_BDCCB.jsx"));
 const LoanDetails_Branch_SHG_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SHG_BDCCB.jsx"));
@@ -757,6 +764,22 @@ const router = createBrowserRouter([
 							{
 								path: "loandetails-branch-shg/:id",
 								element: <LoanBranchSHGDetailsBM_BDCCB />,
+							},
+							{
+								path: "refinace",
+								element: <SearchRefinaceDisbursePACS_BDCCB />,
+							},
+							{
+								path: "refinace/:id",
+								element: <EditRefinaceDisbFormPACS_BDCCB />,
+							},
+							{
+								path: "refinace-approve-list",
+								element: <SearchRefinanceApprove_BDCCB />,
+							},
+							{
+								path: "refinace-approve-list/:id",
+								element: <EditRefinanceApprovFormBDCCB />,
 							},
 							
 						],

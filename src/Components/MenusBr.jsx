@@ -2856,35 +2856,40 @@ const items_bdccb_PACS = [
 					label: <Link to={"/homepacs/viewloan-society"}>View Loan</Link>,
 					// hidden: data?.approve_transaction == "Y" ? false : true,
 				},
-				
 				// {
-				// 	key: "sub4-2",
+				// 	key: "sub4-2-5",
 				// 	icon: <CheckCircleOutlined />,
-				// 	label: "Accept Transaction",
+				// 	label: <Link to={"/homepacs/refinace"}>Re-Finace</Link>,
 				// 	// hidden: data?.approve_transaction == "Y" ? false : true,
-				// 	children: [
-				// 		{
-				// 			key: "sub4-2-1",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homepacs/approvedisbursed"}>Disburse</Link>,
-				// 			// hidden: data?.approve_transaction == "Y" ? false : true,
-				// 		}, // Remove this menu.
-				// 		{
-				// 			key: "sub4-2-2",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homepacs/viewloan"}>Accept Disbursement</Link>,
-				// 			// hidden: data?.approve_transaction == "Y" ? false : true,
-				// 		},
-				// 		{
-				// 			key: "sub4-2-3",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homepacs/viewloan-recovery"}>Approve Recovery</Link>,
-				// 			// hidden: data?.approve_transaction == "Y" ? false : true,
-				// 		},
-				// 	],
 				// },
+				
+				
 			],
 		},
+
+		{
+			key: "sub5",
+			icon: <DatabaseOutlined />,
+			label: "Re-Finace",
+			children: [
+				{
+					key: "sub5-1",
+					icon: <CheckCircleOutlined />,
+					label: <Link to={"/homepacs/refinace"}>Disbursement Re-Finace</Link>,
+					// hidden: data?.approve_transaction == "Y" ? false : true,
+				},
+				{
+					key: "sub5-2",
+					icon: <CheckCircleOutlined />,
+					label: <Link to={"/homepacs/refinace-approve-list"}>Approve Re-Finace</Link>,
+					// hidden: data?.approve_transaction == "Y" ? false : true,
+				},
+				
+				
+				
+			],
+		},
+		
 // {
 // 					key: "sub_rep",
 // 					icon: <CheckCircleOutlined />,

@@ -3,35 +3,45 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button } from "antd"
-import { LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
+import { Spin, Button, Tooltip } from "antd"
+import { FileExcelOutlined, LoadingOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
 import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import { routePaths } from "../../Assets/Data/Routes"
-import ViewLoanTableRecovery_BDCCB from "../../Components/ViewLoanTableRecovery_BDCCB"
-import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
-import RecoverySHGListTable_BDCCB from "../../Components/RecoverySHGListTable_BDCCB"
 import Radiobtn from "../../Components/Radiobtn"
-import RecoverySocietyListTable_BDCCB from "../../Components/RecoverySocietyListTable_BDCCB"
+import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
+import { saveAs } from "file-saver"
+import * as XLSX from "xlsx"
+import ViewRefinanceApproveTable_BDCCB from "../../Components/ViewRefinanceApproveTable_BDCCB"
+import { motion } from "framer-motion"
 
-const option_recovery = [
+const options = [
 	{
-		label: "Unapproved Recovery",
+		label: "Unapproved Disbursement",
+		value: "U",
+	},
+	// {
+	// 	label: "Approved Disbursement",
+	// 	value: "A",
+	// }
+]
+const options_Disburs = [
+	{
+		label: "Acceptance Pending",
 		value: "U",
 	},
 	{
-		label: "Approved Recovery",
+		label: "Accepted",
 		value: "A",
 	},
-	// {
-	// 	label: "Reject Recovery",
-	// 	value: "R",
-	// }
+	{
+		label: "Rejected",
+		value: "R",
+	}
 ]
-
-function SearchRecoverySocietyBranchBM_BDCCB() {
+function SearchRefinanceApprove_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -42,57 +52,29 @@ function SearchRecoverySocietyBranchBM_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 	const [loanType, setLoanType] = useState("U")
-	const [recoveryStatus, setRecoveryStatus] = useState("U")
-
-	const today = new Date().toISOString().split("T")[0];
-
-	const [fromDate, setFromDate] = useState(today);
-	const [toDate, setToDate] = useState(today);
-
-	const onChange = (e) => {
+		const [disbursementStatus, setDisbursementStatus] = useState("U")
+	const [fromDate, setFromDate] = useState(() => new Date().toISOString().slice(0, 10))
+		const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10))
+const onChange = (e) => {
 		console.log("radio1 checked", e)
-		setRecoveryStatus(e)
+		setDisbursementStatus(e)
 	}
-
-	// const initialValues = {
-	
-	// 		sanction_dt: "",
-			
-	// 	}
-	// 	const [formValues, setValues] = useState(initialValues)
-
-	// 	const validationSchema = Yup.object({
-	// 			sanction_dt: Yup.mixed(),
-		
-	// 		})
-	
-
 	const fetchSearchedGroups = async () => {
 		setLoading(true)
-		// const creds = {
-		// 	branch_id: userDetails[0]?.brn_code ,
-		// 	tenant_id: userDetails[0]?.tenant_id,
-		// 	from_dt: '',
-		// 	to_dt: '',
-		// 	approval_status : recoveryStatus
-		// 	// approval_status: loanType
-		// }
-
 		const creds = {
-			branch_id: userDetails[0]?.brn_code ,
-			tenant_id: userDetails[0]?.tenant_id,
-			// from_dt: fromDate,
+			branch_shg_id: userDetails[0]?.brn_code ,
+			// tenant_id: userDetails[0]?.tenant_id,
+			approval_status: disbursementStatus,
 			from_dt: '',
-			// to_dt: toDate,
-			to_dt:  '',
-			approval_status : recoveryStatus
-			// approval_status: loanType
+			to_dt: ''
+			// from_dt: disbursementStatus=='A'?fromDate:'',
+			// to_dt: disbursementStatus=='A'?toDate:''
 		}
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_soc_recov_dtls_ccb_level`, creds, {
+			.post(`${url_bdccb}/refinance/show_unapprove_refinance`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -118,15 +100,55 @@ function SearchRecoverySocietyBranchBM_BDCCB() {
 			})
 		setLoading(false)
 	}
+const s2ab = (s) => {
+		const buf = new ArrayBuffer(s.length)
+		const view = new Uint8Array(buf)
+		for (let i = 0; i < s.length; i++) {
+			view[i] = s.charCodeAt(i) & 0xff
+		}
+		return buf
+	}
+	const handleExportMembers = (loans) => {
+		const flattenedData = [];
+		loans.forEach((loan) => {
+			// if (loan.members && Array.isArray(loan.members)) {
+			// 	loan.members.forEach((member) => {
+					flattenedData.push({
+						// Loan level fields (non-nested)
+					    "CCB Loan ID": loan.loan_id,
+						"Group Code": loan.group_code,
+                        
+						"Group Name": loan.group_name,
+						// "Total Members": loan.tot_member,
+						"Disbursement Amount": loan.disb_amt,
+						"Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
 
+						
+						// Member level fields
+						
+					});
+				// });
+			// } else {
+			// 	// Fallback for loans without members
+			// 	flattenedData.push({ ...loan });
+			// }
+		});
+
+		const wb = XLSX.utils.book_new();
+		const ws = XLSX.utils.json_to_sheet(flattenedData);
+		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+		const fileName = `Refinance_Approve_list_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		saveAs(blob, fileName);
+	};
 	useEffect(()=>{
-	fetchSearchedGroups()
-	}, [])
-
-
-	useEffect(()=>{
-	fetchSearchedGroups()
-	}, [recoveryStatus])
+		// if(disbursementStatus != "A"){
+		// // fetchSearchedGroups()
+		// fetchSearchedGroups()
+		// }
+		fetchSearchedGroups()
+	}, [disbursementStatus])
 
 		const setSearch = (word) => {
 		console.log(word, "wordwordwordword", copyLoanApplications)
@@ -155,53 +177,49 @@ function SearchRecoverySocietyBranchBM_BDCCB() {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
-					{/* <div className="flex flex-row gap-3 mt-20">
-						
-					<Radiobtn
-					data={option_recovery}
-					val={recoveryStatus}
-					onChangeVal={(value) => {
-					onChange(value)
-					}}
-					/>
-						
-					<div className="mt-1">
-					<TDInputTemplateBr
-					type="date"
-					label="From Date"
-					name="from_dt"
-					formControlName={fromDate}
-					handleChange={(e) => setFromDate(e.target.value)}
-					mode={1}
-					/>
-					</div>
+					
+						{/* <Radiobtn
+						data={options_Disburs}
+						val={disbursementStatus}
+						onChangeVal={(value) => {
+							onChange(value)
+						}}
+					/> */}
+						{/* {disbursementStatus == 'A' && <div className="grid grid-cols-3 gap-4">
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="From Date"
+						name="from_dt"
+						formControlName={fromDate}
+						handleChange={(e) => setFromDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
 
-					<div className="mt-1">
-					<TDInputTemplateBr
-					type="date"
-					label="To Date"
-					name="to_dt"
-					formControlName={toDate}
-					handleChange={(e) => setToDate(e.target.value)}
-					mode={1}
-					/>
-					</div>
-					<div className="mt-1">
-					<button
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="To Date"
+						name="to_dt"
+						formControlName={toDate}
+						handleChange={(e) => setToDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
+						<div className="mt-1">
+						<button
 						type="button"
 						onClick={fetchSearchedGroups}
 						className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
-					>
+						>
 						<SearchOutlined />
 						Search
-					</button>
-					</div>
+						</button>
+						</div>
 
-								
-					</div> */}
-					
-
-					<div className="mt-5">
+						</div>} */}
+					{/* <div className="mt-20">
 						<label
 							for="default-search"
 							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
@@ -243,23 +261,34 @@ function SearchRecoverySocietyBranchBM_BDCCB() {
 								Search
 							</button>
 						</div>
-					</div>
-					{/* {JSON.stringify(fromDate, 2)} */}
-
-					{/* {JSON.stringify(toDate, 2)} */}
-
-					{/* {JSON.stringify(groups, 2)} */}
+					</div> */}
 
 
-					<RecoverySocietyListTable_BDCCB
+					{JSON.stringify(groups, 2)}
+
+					<ViewRefinanceApproveTable_BDCCB
 						flag="BM"
 						loanAppData={groups}
-						// title="Find Recovery Loans by Society"
-						title="Find Recovery Society Loans List"
+						title="Re-Finance Approve List"
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
-						refreshData={fetchSearchedGroups}
 					/>
+
+					{groups?.length > 0 && <div className="flex justify-start gap-4 bg-white p-4">
+						<Tooltip title="Export to Excel">
+							<button
+								onClick={() => handleExportMembers(groups)}
+								className="mt-5 justify-center items-center rounded-full text-green-900"
+							>
+								<FileExcelOutlined
+									style={{
+										fontSize: 30,
+									}}
+								/>
+							</button>
+						</Tooltip>
+
+					</div>}
 					{/* <DialogBox
 					visible={visible}
 					flag={flag}
@@ -271,4 +300,4 @@ function SearchRecoverySocietyBranchBM_BDCCB() {
 	)
 }
 
-export default SearchRecoverySocietyBranchBM_BDCCB
+export default SearchRefinanceApprove_BDCCB
