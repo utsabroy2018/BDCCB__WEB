@@ -27,10 +27,10 @@ const options_Disburs = [
 		label: "Accepted",
 		value: "A",
 	},
-	{
-		label: "Rejected",
-		value: "R",
-	}
+	// {
+	// 	label: "Rejected",
+	// 	value: "R",
+	// }
 ]
 
 function SearchRefinaceDisbursePACS_BDCCB() {
@@ -51,6 +51,8 @@ function SearchRefinaceDisbursePACS_BDCCB() {
 	}
 
 	useEffect(() => {
+		setLoanApplications([])
+		setCopyLoanApplications([])
 		if(disbursementStatus != 'A'){
 		fetchApproveUapprove()
 		}
@@ -120,9 +122,10 @@ function SearchRefinaceDisbursePACS_BDCCB() {
 		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
 		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-		const fileName = `SocietyDisburse_${disbursementStatus}_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		const fileName = `Re-FinaceDisbursement_${disbursementStatus}_List_${new Date().toISOString().slice(0, 10)}.xlsx`;
 		saveAs(blob, fileName);
 	};
+
 	const fetchApproveUapprove = async () => {
 		setLoading(true)
 		const creds = {

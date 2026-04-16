@@ -496,7 +496,7 @@ setLoading_Unapprov(false)
 				</h1>
 			</div>
 
-			{userDetails[0]?.user_type == 'H' && (
+			{/* {userDetails[0]?.user_type == 'H' && (
 				<div className="flex flex-col md:flex-row justify-between items-center">
 					<TDInputTemplateBr
 						placeholder="Select Branch..."
@@ -507,7 +507,7 @@ setLoading_Unapprov(false)
 						mode={2}
 					/>
 				</div>
-			)}
+			)} */}
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 				<div className="col-span-1 md:col-span-2 rounded-3xl bg-white shadow-md p-6 space-y-4 overflow-hidden">

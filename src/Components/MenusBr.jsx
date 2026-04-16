@@ -2324,47 +2324,47 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 ];
 
 
-const items_bdccb_SUpper_User = [
+const items_bdccb_Supper_User = [
 		{
 			key: "sub1",
 			icon: <LineChartOutlined />,
 			label: <Link to={"/homebm/"}>Dashboard</Link>,
 		},
-		{
-			key: "sub6",
-			icon: <ImportOutlined />,
-			label: "User Management",
-			// hidden: data?.user_management == "Y" ? false : true,
-			children: [
-				// {
-				// 	key: "sub7-1",
-				// 	icon: <UserAddOutlined />,
-				// 	label: <Link to={"/homeadmin/createuser/0"}>Create User</Link>,
-				// 	// hidden: data?.create_user == "Y" ? false : true,
-				// },
-				{
-					key: "sub6-1",
-					icon: <SettingOutlined />,
-					label: <Link to={"/homebm/manageuser/"}>Manage User</Link>,
-					// hidden: data?.manage_user == "Y" ? false : true,
-				},
-				{
-					key: "sub7-3",
-					icon: <SettingOutlined />,
-					label: <Link to={"#"}>Group</Link>,
-				},
-			],
-		},
+		// {
+		// 	key: "sub6",
+		// 	icon: <ImportOutlined />,
+		// 	label: "User Management",
+		// 	// hidden: data?.user_management == "Y" ? false : true,
+		// 	children: [
+		// 		// {
+		// 		// 	key: "sub7-1",
+		// 		// 	icon: <UserAddOutlined />,
+		// 		// 	label: <Link to={"/homeadmin/createuser/0"}>Create User</Link>,
+		// 		// 	// hidden: data?.create_user == "Y" ? false : true,
+		// 		// },
+		// 		{
+		// 			key: "sub6-1",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"/homebm/manageuser/"}>Manage User</Link>,
+		// 			// hidden: data?.manage_user == "Y" ? false : true,
+		// 		},
+		// 		{
+		// 			key: "sub7-3",
+		// 			icon: <SettingOutlined />,
+		// 			label: <Link to={"#"}>Group</Link>,
+		// 		},
+		// 	],
+		// },
 		{
 			key: "sub2",
 			icon: <DatabaseOutlined />,
 			label: "Master",
 			children: [
-				{
-					key: "sub2-1",
-					icon: <DatabaseOutlined />,
-					label: <Link to={"/homeadmin/masterdistricts"}>District</Link>,
-				},
+				// {
+				// 	key: "sub2-1",
+				// 	icon: <DatabaseOutlined />,
+				// 	label: <Link to={"/homeadmin/masterdistricts"}>District</Link>,
+				// },
 				{
 					key: "sub2-2",
 					icon: <DatabaseOutlined />,
@@ -2397,120 +2397,101 @@ const items_bdccb_SUpper_User = [
 				},
 			],
 		},
-		
-		{
-			key: "sub3",
-			icon: <DeploymentUnitOutlined />,
-			label: "Groups",
-			children: [
-				{
-					key: "sub3-1",
-					icon: <PlusCircleOutlined />,
-					label: <Link to={"/homebm/editSahayikaFormBM/0"}>Add Sahayika</Link>,
-				},
-				{
-					key: "sub3-2",
-					icon: <FileSearchOutlined />,
-					label: <Link to={"/homebm/searchSahayikaBM/"}>Edit Sahayika</Link>,
-				},
-				{
-					key: "sub3-3",
-					icon: <PlusCircleOutlined />,
-					label: <Link to={"/homebm/editgroupform/0"}>Add Group</Link>,
-				},
-				{
-					key: "sub3-4",
-					icon: <FileSearchOutlined />,
-					label: <Link to={"/homebm/searchgroup/"}>Edit Group</Link>,
-				}
-			],
-		},
 
 		{
 			key: "sub4",
 			icon: <ThunderboltOutlined />,
 			label: "Loans",
 			children: [
-				{
-					key: "sub4-1",
-					icon: <CheckCircleOutlined />,
-					label: "Disbursement",
-					children: [
-						{
-							key: "sub4-1-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homepacs/disburseloan"}>Society</Link>,
-							// hidden: data?.approve_transaction == "Y" ? false : true,
-						},
-						{
-							key: "sub4-1-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
-							// hidden: data?.approve_transaction == "Y" ? false : true,
-						},
-					],
-				},
 				// {
 				// 	key: "sub4-1",
-				// 	icon: <ThunderboltOutlined />,
-				// 	label: <Link to={"/homepacs/disburseloan"}>Indirect Loan</Link>,
+				// 	icon: <CheckCircleOutlined />,
+				// 	label: "Disbursement",
+				// 	children: [
+				// 		{
+				// 			key: "sub4-1-1",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homepacs/disburseloan"}>Society</Link>,
+				// 		},
+						
+				// 		{
+				// 			key: "sub4-1-1",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
+				// 		},
+				// 	],
 				// },
+
 				// {
 				// 	key: "sub4-2",
-				// 	icon: <ThunderboltOutlined />,
-				// 	label: <Link to={"/homebm/disburseloan"}>Direct Loan</Link>,
+				// 	icon: <CheckCircleOutlined />,
+				// 	label: "Recovery",
+				// 	children: [
+				// 		{
+				// 			key: "sub4-2-1",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homebm/loan-recovery-society-list"}>Society</Link>,
+				// 		},
+				// 		{
+				// 			key: "sub4-2-2",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homebm/loan-recovery-shg-list"}>SHG</Link>,
+				// 		},
+				// 	],
 				// },
+
+				// {
+				// 	key: "sub4-3",
+				// 	icon: <CheckCircleOutlined />,
+				// 	label: "Approve",
+				// 	children: [
+				// 		{
+				// 			key: "sub4-3-1",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homebm/viewloan_branch"}>Disbursement SHG</Link>,
+				// 		},
+				// 		{
+				// 			key: "sub4-3-2",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homebm/recovery-shg-list"}>Recovery SHG</Link>,
+				// 		},
+				// 		{
+				// 			key: "sub4-3-3",
+				// 			icon: <CheckCircleOutlined />,
+				// 			label: <Link to={"/homebm/recovery-society-list"}>Recovery Society</Link>,
+				// 		}
+				// 	],
+				// },
+
 				{
-					key: "sub4-2",
+					key: "sub4-4",
 					icon: <CheckCircleOutlined />,
-					label: "Recovery",
-					children: [
-						{
-							key: "sub4-2-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
-							// hidden: data?.approve_transaction == "Y" ? false : true,
-						},
-						{
-							key: "sub4-2-2",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/loan_branch_shg-recovery"}>SHG</Link>,
-							// hidden: data?.approve_transaction == "Y" ? false : true,
-						},
-					],
+					label: <Link to={"/homepacs/viewloan-branch-shg"}>View Loan</Link>,
 				},
-				{
-					key: "sub4-3",
-					icon: <CheckCircleOutlined />,
-					label: "Approve",
-					children: [
-						{
-							key: "sub4-3-1",
-							icon: <CheckCircleOutlined />,
-							label: <Link to={"/homebm/viewloan_branch"}>Society</Link>,
-							// hidden: data?.approve_transaction == "Y" ? false : true,
-						},
-						// {
-						// 	key: "sub4-2-2",
-						// 	icon: <CheckCircleOutlined />,
-						// 	label: <Link to={"/homepacs/viewloan"}>SHG</Link>,
-						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
-						// }
-					],
-				},
+				
 			],
 		},
 
 		// {
 		// 	key: "sub5",
-		// 	icon: <ThunderboltOutlined />,
-		// 	label: "SB Transaction",
+		// 	icon: <DatabaseOutlined />,
+		// 	label: "Re-Finace",
 		// 	children: [
+		// 		// {
+		// 		// 	key: "sub5-1",
+		// 		// 	icon: <CheckCircleOutlined />,
+		// 		// 	label: <Link to={"/homepacs/refinace"}>Disbursement Re-Finace</Link>,
+		// 		// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+		// 		// },
 		// 		{
-		// 			key: "sub5-1",
-		// 			icon: <ThunderboltOutlined />,
-		// 			label: <Link to={"/homebm/transaction"}>Transaction</Link>,
-		// 		}
+		// 			key: "sub5-2",
+		// 			icon: <CheckCircleOutlined />,
+		// 			label: <Link to={"/homebm/branch_refinace-approve-list"}>Approve Re-Finace</Link>,
+		// 			// hidden: data?.approve_transaction == "Y" ? false : true,
+		// 		},
+				
+				
+				
 		// 	],
 		// },
 		
@@ -2734,49 +2715,30 @@ const items_bdccb = [
 				
 			],
 		},
-// {
-// 					key: "sub_rep",
-// 					icon: <CheckCircleOutlined />,
-// 					label: "Report",
-// 					children: [
-// 						// {
-// 						// 	key: "sub4-2-1",
-// 						// 	icon: <CheckCircleOutlined />,
-// 						// 	label: <Link to={"/homebm/loan_branch_soi-recovery"}>Society</Link>,
-// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
-// 						// },
-// 						{
-// 							key: "sub4-rep-1",
-// 							icon: <CheckCircleOutlined />,
-// 							label: <Link to={"/homebm/disbtosociety"}>Disbursement to Society</Link>,
-// 							// hidden: data?.approve_transaction == "Y" ? false : true,
-// 						},
-// 						{
-// 							key: "sub4-rep-3",
-// 							icon: <CheckCircleOutlined />,
-// 							label: <Link to={"/homebm/shgdisb"}>SHG Disbursement</Link>,
-// 							// hidden: data?.approve_transaction == "Y" ? false : true,
-// 						},
-// 						// {
-// 						// 	key: "sub4-rep-2",
-// 						// 	icon: <CheckCircleOutlined />,
-// 						// 	label: <Link to={"/homebm/disbofsociety"}>Disbursement of Society</Link>,
-// 						// 	// hidden: data?.approve_transaction == "Y" ? false : true,
-// 						// },
-// 					],
-// 				},
-		// {
-		// 	key: "sub5",
-		// 	icon: <ThunderboltOutlined />,
-		// 	label: "SB Transaction",
-		// 	children: [
-		// 		{
-		// 			key: "sub5-1",
-		// 			icon: <ThunderboltOutlined />,
-		// 			label: <Link to={"/homebm/transaction"}>Transaction</Link>,
-		// 		}
-		// 	],
-		// },
+
+		{
+			key: "sub5",
+			icon: <DatabaseOutlined />,
+			label: "Re-Finace",
+			children: [
+				// {
+				// 	key: "sub5-1",
+				// 	icon: <CheckCircleOutlined />,
+				// 	label: <Link to={"/homepacs/refinace"}>Disbursement Re-Finace</Link>,
+				// 	// hidden: data?.approve_transaction == "Y" ? false : true,
+				// },
+				{
+					key: "sub5-2",
+					icon: <CheckCircleOutlined />,
+					label: <Link to={"/homebm/branch_refinace-approve-list"}>Approve Re-Finace</Link>,
+					// hidden: data?.approve_transaction == "Y" ? false : true,
+				},
+				
+				
+				
+			],
+		},
+
 		
 	]
 
@@ -2965,7 +2927,7 @@ const items_bdccb_PACS = [
 			<Menu
 			onClick={onClick}
 			selectedKeys={[current]}
-			items={userDetails[0]?.user_type == 'B' ? items_bdccb : userDetails[0]?.user_type == 'P' ? items_bdccb_PACS : userDetails[0]?.user_type == 'S' ? items_bdccb_PACS : items_bdccb}
+			items={userDetails[0]?.user_type == 'B' ? items_bdccb : userDetails[0]?.user_type == 'P' ? items_bdccb_PACS : userDetails[0]?.user_type == 'H' ? items_bdccb_Supper_User : items_bdccb}
 			// disabled={getMenuShow === "yes" ? true : false}
 
 			mode="horizontal"

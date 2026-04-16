@@ -50,7 +50,7 @@ const formatINR = (num) =>
 		currency: "INR",
 		minimumFractionDigits: 2,
 	}).format(num || 0)
-function ViewRefinanceApproveForm_BDCCB({ groupDataArr }) {
+function ViewRefinanceApproveFormBranch_BDCCB({ groupDataArr }) {
 	const [loanDtls,setLoanDtls] = useState([]);
 	const [isOverdue, setIsOverdue] = useState('N');
 	const [overDueAmt, setOverDueAmt] = useState(0);
@@ -120,14 +120,14 @@ const s2ab = (s) => {
 						"Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
 
 						// Member level fields
-						"Member Loan ID": member.mem_loan_id,
-						"Transaction ID": member.tran_id,
-						"Member Group Code": member.group_code,
-						"Member Group Name": member.group_name,
-						"Member ID": member.member_id,
-						"Member Name": member.member_name,
-						"Disburse Amount": member.disburse_amt,
-						"SB Account No": member.sb_acc_no
+						// "Member Loan ID": member.mem_loan_id,
+						// "Transaction ID": member.tran_id,
+						// "Member Group Code": member.group_code,
+						// "Member Group Name": member.group_name,
+						// "Member ID": member.member_id,
+						// "Member Name": member.member_name,
+						// "Disburse Amount": member.disburse_amt,
+						// "SB Account No": member.sb_acc_no
 					});
 				});
 			} else {
@@ -141,7 +141,7 @@ const s2ab = (s) => {
 		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
 		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-		const fileName = `SocietyDisburse_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		const fileName = `BranchLoanDetails_${new Date().toISOString().slice(0, 10)}.xlsx`;
 		saveAs(blob, fileName);
 	};
 	const handleWheel = (event) => {
@@ -184,66 +184,9 @@ const s2ab = (s) => {
 	})
 
 	const fetchGroupDetails = async () => {
-		// setLoading(true)
-		// const creds = {
-		// 	group_code: params?.id,
-		// 	branch_code: userDetails[0]?.brn_code,
-		// 	tenant_id: userDetails[0]?.tenant_id,
-		// 	approval_status: loanAppData?.approval_status,
-		// 	loan_to: userDetails[0]?.user_type,
-		// 	ccb_loan_id: loanAppData?.ccb_loan_id,
-		// }
-
-
-		// const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		// await axios
-		// 	.post(`${url_bdccb}/refinance/show_unapprove_refinance`, creds, {
-		// 	headers: {
-		// 	Authorization: `${tokenValue?.token}`, // example header
-		// 	"Content-Type": "application/json", // optional
-		// 	},
-		// 	})
-		// 	.then((res) => {
-			
-		// 	if(res?.data?.success){
-		// 	console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaa');
-			
-		// 	setValues({
-		// 			society_loan_acc: res?.data?.data[0]?.society_acc_no,
-		// 		})
-		// 		setGroupData(res?.data?.data)
-							
-		// 	} else {
-		// 	navigate(routePaths.LANDING)
-		// 	localStorage.clear()
-		// 	}
-							
-			
-		// 	})
-		// 	.catch((err) => {
-		// 		Message("error", "Some error occurred while fetching group form")
-		// 	})
-		// setLoading(false)
 
 		setGroupData(loanAppData ? [loanAppData] : [])
-
-		// setValues({
-		// 	loan_acc_no: loanAppData?.loan_acc_no,
-		// 	loan_to: loanAppData?.loan_to,
-		// 	branch_shg_id: loanAppData?.loan_to_name,
-		// 	branch_shg_SearchField: '',
-		// 	period: loanAppData?.period,
-		// 	curr_roi: loanAppData?.curr_roi,
-		// 	over_roi: loanAppData?.over_roi,
-		// 	sanction_no: loanAppData?.sanction_no,
-		// 	disb_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.disb_dt)),
-		// 	sanction_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.sanction_dt)),
-		// 	disb_amt: loanAppData?.disb_amt,
-		// 	approved_by: loanAppData?.approved_by,
-		// 	approved_dt: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.approved_dt)),
-		// 	group_total: loanAppData?.tot_grp,
-		// });
+		
 	}
 
 	useEffect(() => {
@@ -292,13 +235,13 @@ const s2ab = (s) => {
 	const approveDisbursement = async () => {
 	
 	// alert('approveDisbursement')
-	const member_ids = groupData[0]?.members.map(item => ({
-	loan_id: item.mem_loan_id,
-	group_code: item.group_code,
-	member_code: item.member_id,
-	disb_amt: item.disburse_amt,
-	trans_id: item.tran_id,
-	}));
+	// const member_ids = groupData[0]?.members.map(item => ({
+	// loan_id: item.mem_loan_id,
+	// group_code: item.group_code,
+	// member_code: item.member_id,
+	// disb_amt: item.disburse_amt,
+	// trans_id: item.tran_id,
+	// }));
 
 
 	setLoading(true)
@@ -306,16 +249,27 @@ const s2ab = (s) => {
 	const ip = await getClientIP()
 
 	const creds = {
-	society_acc_no : formik.values.society_loan_acc,
-	loan_acc_no: groupData[0]?.loan_acc_no,
-	group_code: loanAppData?.group_code,
+	loan_id: groupData[0]?.loan_id,
+	branch_id: userDetails[0]?.brn_code,
+	tenant_id: userDetails[0]?.tenant_id,
+	trans_id: groupData[0]?.trans_id,
+	group_code: groupData[0]?.group_code,
+	curr_roi: groupData[0]?.curr_roi,
+	penal_roi: groupData[0]?.penal_roi,
+	period: groupData[0]?.period,
+	disb_dt: groupData[0]?.disb_dt,
 	created_by: userDetails[0]?.emp_id,
-	ip_address: ip,
-	member_ids: member_ids,
+	// ip_address: ip,
+
+	// society_acc_no : formik.values.society_loan_acc,
+	// loan_acc_no: groupData[0]?.loan_acc_no,
+	// group_code: loanAppData?.group_code,
+	// member_ids: member_ids,
+
 	}
 
-	await saveMasterData({
-	endpoint: "refinance/approve_refinance_disburse",
+await saveMasterData({
+	endpoint: "refinance/approve_re-finance_branch",
 	creds,
 	navigate,
 	successMsg: "Transaction Accepted",
@@ -382,9 +336,9 @@ const s2ab = (s) => {
 		if(actionType == 'A'){
 			approveDisbursement()
 		}
-		if(actionType == 'R'){
-			rejectDisbursement()
-		}
+		// if(actionType == 'R'){
+		// 	rejectDisbursement()
+		// }
 		
 	}
 
@@ -402,13 +356,15 @@ const s2ab = (s) => {
 				spinning={loading}
 			>
 				<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
-					{/* {JSON.stringify(formik.values, null, 2)} fdghfghfhg
-						{JSON.stringify(loanAppData, 2)}  */}
+					{/* {JSON.stringify(userDetails[0], null, 2)} //////////////////////////////////
+						{JSON.stringify(loanAppData, 2)} \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+						{JSON.stringify(groupData[0], 2)} */}
+						
 					<div className="flex flex-col justify-start gap-5">
 						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
 						
 						
-							<div className="text-[#DA4167] text-lg font-bold sm:col-span-3"> Society Loan Details</div>
+							<div className="text-[#DA4167] text-lg font-bold sm:col-span-3"> Branch Loan Details</div>
 
 							<div className="sm:col-span-1">
 							<TDInputTemplateBr
@@ -750,7 +706,7 @@ const s2ab = (s) => {
 
 						
 
-						{params?.id > 0 && (
+						{/* {params?.id > 0 && (
 							<div className="gap-3">
 								<div className="w-full my-10 border-t-4 border-gray-400 border-dashed"></div>
 								<div>
@@ -759,34 +715,7 @@ const s2ab = (s) => {
 									</div>
 
 
-									{/* {groupData[0]?.memb_dt?.map((item, i) => (
-										<Tag
-											key={i}
-											icon={<UserOutlined />}
-											color={
-												item?.approval_status === "U" ||
-												(userDetails?.id == 3 && item?.approval_status === "S")
-													? "geekblue"
-													: "red"
-											}
-											className="text-lg cursor-pointer mb-5 rounded-3xl
-									"
-											onClick={
-												userDetails?.id == 2
-													? () =>
-															navigate(`/homebm/editgrtform/${item?.form_no}`, {
-																state: item,
-															})
-													: () =>
-															navigate(`/homeco/editgrtform/${item?.form_no}`, {
-																state: item,
-															})
-											}
-										>
-											{item?.client_name}
-										</Tag>
-									))} */}
-									{/* {JSON.stringify(groupData[0]?.memb_dt, 2)} */}
+									
 									<Spin spinning={loading}>
 										<div
 											ref={containerRef}
@@ -810,15 +739,11 @@ const s2ab = (s) => {
 														<th scope="col" className="px-6 py-3 font-semibold">
 															SB Account
 														</th>
-														{/* <th scope="col" className="px-6 py-3 font-semibold">
-															Disburse Date
-														</th> */}
+														
 														<th scope="col" className="px-6 py-3 font-semibold">
 															Disburse Amount
 														</th>
-														{/* <th scope="col" className="px-6 py-3 font-semibold">
-															<span className="sr-only">Action</span>
-														</th> */}
+													
 													</tr>
 												</thead>
 												<tbody>
@@ -839,27 +764,10 @@ const s2ab = (s) => {
 															>
 																{item?.member_name}
 															</th>
-															{/* <td className="px-6 py-4">
-																
-																{item?.loan_id}
 															
-																</td> */}
-															{/* <td className="px-6 py-4">{item?.member_code}</td> */}
 															<td className="px-6 py-4">{item?.sb_acc_no}</td>
-															{/* <td className="px-6 py-4">{formatDateToYYYYMMDD_CurrentDT(item?.disb_dt)}</td> */}
 															<td className="px-6 py-4">{item?.disburse_amt}/-</td>
-															{/* <td className="px-6 py-4 text-right">
-																<button
-																	onClick={() => {
-																		navigate(
-																			`/homepacs/memberloandetails/${item?.loan_id}`
-																		)
-																	}}
-																	className="font-medium text-teal-500 dark:text-blue-500 hover:underline"
-																>
-																	<EyeFilled />
-																</button>
-															</td> */}
+															
 														</tr>
 													))}
 													<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
@@ -879,7 +787,7 @@ const s2ab = (s) => {
 									</Spin>
 								</div>
 							</div>
-						)}
+						)} */}
 					</div>
 					{/* <BtnComp
 						mode="A"
@@ -917,7 +825,7 @@ const s2ab = (s) => {
 						}
 
 						// if value exists → console it
-						console.log("Society Loan A/C No.:", formik.values.society_loan_acc);
+						// console.log("Society Loan A/C No.:", formik.values.society_loan_acc);
 
 						// continue existing flow
 						setActionType("A");
@@ -928,7 +836,7 @@ const s2ab = (s) => {
 						</button>
 
 
-						<button
+						{/* <button
 						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
 						onClick={async () => {
 						// check value first
@@ -949,7 +857,7 @@ const s2ab = (s) => {
 						}}
 						>
 						<CloseCircleOutlined /> <span className={`ml-2`}>Rejected Transaction</span>
-						</button>
+						</button> */}
 
 						
 
@@ -1093,4 +1001,4 @@ const s2ab = (s) => {
 	)
 }
 
-export default ViewRefinanceApproveForm_BDCCB
+export default ViewRefinanceApproveFormBranch_BDCCB

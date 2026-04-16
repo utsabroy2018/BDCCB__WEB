@@ -16,6 +16,7 @@ import { saveAs } from "file-saver"
 import * as XLSX from "xlsx"
 import ViewRefinanceApproveTable_BDCCB from "../../Components/ViewRefinanceApproveTable_BDCCB"
 import { motion } from "framer-motion"
+import ViewRefinanceApproveTableBranch_BDCCB from "../../Components/ViewRefinanceApproveTableBranch_BDCCB"
 
 const options = [
 	{
@@ -29,19 +30,19 @@ const options = [
 ]
 const options_Disburs = [
 	{
-		label: "Acceptance Pending",
-		value: "U",
-	},
-	{
-		label: "Accepted",
+		label: "Approved",
 		value: "A",
 	},
 	{
-		label: "Rejected",
-		value: "R",
-	}
+		label: "Unapproved",
+		value: "U",
+	},
+	// {
+	// 	label: "Rejected",
+	// 	value: "R",
+	// }
 ]
-function SearchRefinanceApprove_BDCCB() {
+function SearchRefinanceApproveBranch_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -52,7 +53,7 @@ function SearchRefinanceApprove_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 	const [loanType, setLoanType] = useState("U")
-		const [disbursementStatus, setDisbursementStatus] = useState("U")
+		const [disbursementStatus, setDisbursementStatus] = useState("A")
 	const [fromDate, setFromDate] = useState(() => new Date().toISOString().slice(0, 10))
 		const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10))
 const onChange = (e) => {
@@ -62,11 +63,11 @@ const onChange = (e) => {
 	const fetchSearchedGroups = async () => {
 		setLoading(true)
 		const creds = {
-			branch_shg_id: userDetails[0]?.brn_code ,
+			branch_id: userDetails[0]?.brn_code ,
 			// tenant_id: userDetails[0]?.tenant_id,
 			approval_status: disbursementStatus,
-			from_dt: '',
-			to_dt: ''
+			// from_dt: '',
+			// to_dt: ''
 			// from_dt: disbursementStatus=='A'?fromDate:'',
 			// to_dt: disbursementStatus=='A'?toDate:''
 		}
@@ -74,7 +75,7 @@ const onChange = (e) => {
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/refinance/show_unapprove_refinance`, creds, {
+			.post(`${url_bdccb}/refinance/fetch_unapprove_re-finance_data_branch_level`, creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -121,7 +122,7 @@ const s2ab = (s) => {
 						"Group Name": loan.group_name,
 						// "Total Members": loan.tot_member,
 						"Disbursement Amount": loan.disb_amt,
-						"Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
+						"Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status === "U" ? "Unapproved" : "Rejected",
 
 						
 						// Member level fields
@@ -139,14 +140,10 @@ const s2ab = (s) => {
 		XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 		const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
 		const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-		const fileName = `Refinance_Approve_list_${new Date().toISOString().slice(0, 10)}.xlsx`;
+		const fileName = `RefinanceBranch_Approve_list_${new Date().toISOString().slice(0, 10)}.xlsx`;
 		saveAs(blob, fileName);
 	};
 	useEffect(()=>{
-		// if(disbursementStatus != "A"){
-		// // fetchSearchedGroups()
-		// fetchSearchedGroups()
-		// }
 		fetchSearchedGroups()
 	}, [disbursementStatus])
 
@@ -178,13 +175,16 @@ const s2ab = (s) => {
 			>
 				<main className="px-4 h-auto my-10 mx-32">
 					
-						{/* <Radiobtn
+						{userDetails[0]?.user_type != "H" && (
+						<Radiobtn
 						data={options_Disburs}
 						val={disbursementStatus}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
-					/> */}
+						/>
+						)}
+						
 						{/* {disbursementStatus == 'A' && <div className="grid grid-cols-3 gap-4">
 						<div className="mt-1">
 						<TDInputTemplateBr
@@ -266,10 +266,10 @@ const s2ab = (s) => {
 
 					{/* {JSON.stringify(groups, 2)} */}
 
-					<ViewRefinanceApproveTable_BDCCB
+					<ViewRefinanceApproveTableBranch_BDCCB
 						flag="BM"
 						loanAppData={groups}
-						title="Re-Finance Approve List"
+						title="Branch Re-Finance Approve List"
 						showSearch={false}
 						setSearch={(data) => setSearch(data)}
 					/>
@@ -300,4 +300,4 @@ const s2ab = (s) => {
 	)
 }
 
-export default SearchRefinanceApprove_BDCCB
+export default SearchRefinanceApproveBranch_BDCCB

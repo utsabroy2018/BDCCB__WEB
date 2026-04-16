@@ -42,6 +42,7 @@ const SignInPage = () => {
 	const [num2, setNum2] = useState(0);
 	const [inputAnswer, setInputAnswer] = useState("");
 	const [loginMessage, setLoginMessage] = useState("");
+	const [loginUserType, setLoginUserType] = useState("");
 
 	// Store controller persistently
 	const abortControllerRef = useRef(null);
@@ -120,7 +121,9 @@ const SignInPage = () => {
 
 			const creds = {
 				username: values?.user_id,
-				password: values?.password
+				password: values?.password,
+				user_type: loginUserType,
+				branch_id: loginUserType === 'H' ? formik.values.brnch : '',
 			}
 			
 			
@@ -144,29 +147,8 @@ const SignInPage = () => {
 			.post(`${url_bdccb}/${api_name}`, creds)
 			.then((res) => {
 
-				
-				// console.log(res?.data?.suc, 'credscreds');
-				
-				// if (res?.data?.suc === 0) {
-				// 	Message("error", res?.data?.msg)
-				// 	// setVisible(true)
-				// 	// formik.handleSubmit()
-				// }
-
-				// if (res?.data?.suc === 3) {
-				// 	// Message("error", res?.data?.msg)
-				// 	// setVisible(true)
-				// 	return forceClearSession()
-				// }
-				
-
 				var userDtls = res?.data?.user_dtls
-				// userDtls["brn_code"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? formik.values.brnch : res?.data?.user_dtls?.brn_code
-				// userDtls["branch_name"] = userTypeId == 4 || userTypeId == 11 || userTypeId == 10 || userTypeId == 2 ? branches.filter((item) => item.code == formik.values.brnch)[0]?.name : res?.data?.user_dtls?.branch_name
-				
-				// console.log(res?.data, 'ggggggggggggggggg', res?.data?.msg, 'global');
 
-				// if (res?.data?.suc === 1) {
 				if (res?.data?.success) {
 					// console.log(res?.data, 'ggggggggggggggggg', res?.data?.success, 'ok');
 					Message('success', res?.data?.msg)
@@ -215,7 +197,7 @@ const SignInPage = () => {
 		}
 	}
 
-	const handleUserBlur = async (e) => {
+	const handleUserBlur__ = async (e) => {
 		formik.handleBlur(e)
 		if (e.target.value) {
 			// if (abortControllerRef.current) {
@@ -284,6 +266,68 @@ const SignInPage = () => {
 			setBranches([]);
 			formik.setFieldValue("brnch", "");
 		}
+	}
+
+	const handleUserBlur = async (e) => {
+		
+		// console.log('res.data', 'fffffffffffffffffffffff', formik.values.user_id);
+
+		const creds = {
+			emp_id: formik.values.user_id,
+			// modified_by: formik.values.user_id,
+		}
+		try {
+			const res = await axios.post(`${url_bdccb}/dashboard/fetch_emp_type`, creds)
+			
+			if (res?.data?.success) {
+				// Message("success", "Active sessions cleared successfully!")
+				// formik.handleSubmit()
+				setLoginUserType(res?.data?.data[0]?.user_type || "")
+				if(res?.data?.data[0]?.user_type === 'H'){
+					getBranchList()
+				}
+			} else {
+				// console.error("Session clearing failed", res.data.msg)
+			}
+		} catch (err) {
+			console.error(err)
+		}
+		
+	}
+
+
+	const getBranchList = async (e) => {
+		setLoading(true)
+
+		// const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/dashboard/fetch_brn_soc_name`)
+		.then((res) => {
+
+		if (res?.data?.success) {
+
+		console.log(res?.data?.data, 'fffffffffffffffffffffff', formik.values.user_id);
+		setBranches(res.data.data.map((item) => ({
+		code: item.branch_id,
+		name: `${item.branch_name} (${item.branch_id})`,
+		}))
+		)
+		
+
+		} else {
+		// console.log("QQQQQQQQQQQQQQQQ", res?.data)
+		// Message('error', res?.data?.msg)
+		navigate(routePaths.LANDING)
+		localStorage.clear()
+		}
+
+		})
+		.catch((err) => {
+		console.log("?????????????????????", err)
+		})
+
+		setLoading(false)
+		
 	}
 
 	return (
@@ -359,7 +403,7 @@ const SignInPage = () => {
 									name="user_id"
 									type="text"
 									onChange={formik.handleChange}
-									// onBlur={handleUserBlur}
+									onBlur={handleUserBlur}
 									value={formik.values.user_id}
 									className="w-full px-4 py-2 bg-slate-100 border border-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
 									placeholder="9999"
@@ -407,7 +451,11 @@ const SignInPage = () => {
 							</div>
 						</div>
 
-						{/* {[2, 4, 10, 11].includes(userTypeId) && (
+						{/* {[2, 4, 10, 11].includes(userTypeId) && ( */}
+						
+						{/* {JSON.stringify(formik.values.brnch, 2)} */}
+						
+						{loginUserType && loginUserType === 'H' && (
 							<div>
 								<label
 									htmlFor="brnch"
@@ -438,7 +486,8 @@ const SignInPage = () => {
 									</div>
 								)}
 							</div>
-						)} */}
+						)}
+						{/* )} */}
 
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<div style={{display:'flex', alignItems:'center'}}>

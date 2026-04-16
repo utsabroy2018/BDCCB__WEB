@@ -140,6 +140,10 @@ const BranchSocietyLoanRecoveryAcceptReject = lazy(() => import("./Screens/BMHom
 const SearchRefinanceApprove_BDCCB = lazy(() => import("./Screens/BMHome/SearchRefinanceApprove_BDCCB.jsx"))
 const EditRefinanceApprovFormBDCCB = lazy(() => import("./Screens/BMHome/EditRefinanceApprovFormBDCCB.jsx"))
 
+
+const SearchRefinanceApproveBranch_BDCCB = lazy(() => import("./Screens/BMHome/SearchRefinanceApproveBranch_BDCCB.jsx"))
+const EditRefinanceApprovFormBranchBDCCB = lazy(() => import("./Screens/BMHome/EditRefinanceApprovFormBranchBDCCB.jsx"))
+
 const LoanDetails_PACS_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_PACS_BDCCB.jsx"));
 const LoanDetails_Branch_SHG_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SHG_BDCCB.jsx"));
 const LoanDetails_Branch_SOCI_BDCCB = lazy(() => import("./Screens/BMHome/LoanDetails_Branch_SOCI_BDCCB.jsx"));
@@ -515,7 +519,15 @@ const router = createBrowserRouter([
 							{
 								path: "loan_branch_soi-recovery-details/:id",
 								element: <BranchSOCI_LoanRecoveryDetails />,
-							}
+							},
+							{
+								path: "branch_refinace-approve-list",
+								element: <SearchRefinanceApproveBranch_BDCCB />,
+							},
+							{
+								path: "branch_refinace-approve-list/:id",
+								element: <EditRefinanceApprovFormBranchBDCCB />,
+							},
 
 							// {
 							// 	path: "transfermember",
