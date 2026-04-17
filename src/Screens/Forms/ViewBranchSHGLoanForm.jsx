@@ -277,7 +277,11 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 			// branch_code: userDetails[0]?.brn_code,
 			branch_code: userDetails[0]?.brn_code,
 			group_code: loanAppData?.group_code,
-			loan_acc_no: loanAppData?.loan_acc_no
+			loan_acc_no: loanAppData?.loan_acc_no,
+			///////
+			society_acc_no: loanAppData?.group_details[0]?.society_acc_no,
+			branch_type: userDetails[0]?.branch_type,
+			pacs_id: loanAppData?.group_details[0]?.pacs_id
 		}
 
 
@@ -350,23 +354,18 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 		setLoading(false)
 	}
     const ccbloandetails = async()=>{
-setLoading(true)
+	setLoading(true)
+
 		const creds = {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
 			group_code: loanAppData?.group_code,
 			pacs_id: loanAppData?.group_details[0]?.pacs_id,
-			loan_acc_no: loanAppData?.loan_acc_no
+			loan_acc_no: loanAppData?.loan_acc_no,
+			//////
+			branch_type: userDetails[0]?.branch_type,
+			society_acc_no: loanAppData?.group_details[0]?.society_acc_no
 		}
-
-
-		// {
-		// "loan_id" : "CCB_LOAN_ID",
-		// "tenant_id" : "",
-		// "branch_code" : "",
-		// "group_code" : "",
-		// "society_acc_no" : ""
-		// }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 

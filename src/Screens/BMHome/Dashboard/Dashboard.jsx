@@ -39,30 +39,30 @@ import { url_bdccb } from "../../../Address/BaseUrl"
 		{ emp_name: "Vikram Mehta", emp_id: "EMP006", user_status: "A" },
 	]
 
-  const todayDisburse = [
-  { label: "Society", value: 45, color: "bg-orange-300" },
-  { label: "SHG", value: 128, color: "bg-blue-300" },
-  ]
+//   const todayDisburse = [
+//   { label: "Society", value: 45, color: "bg-orange-300" },
+//   { label: "SHG", value: 128, color: "bg-blue-300" },
+//   ]
 
-  const thisMonthDisburse = [
-  { label: "Society", value: 45, color: "bg-orange-300" },
-  { label: "SHG", value: 128, color: "bg-blue-300" },
-  ]
+//   const thisMonthDisburse = [
+//   { label: "Society", value: 45, color: "bg-orange-300" },
+//   { label: "SHG", value: 128, color: "bg-blue-300" },
+//   ]
 
 
-  const todayLoanCollect = [
-  { label: "Deposited at CCB", value: 350, color: "bg-red-300" },
-  { label: "Deposited at Society", value: 450, color: "bg-orange-300" },
-  { label: "Deposited at SHG", value: 128, color: "bg-green-300" },
-  { label: "Collected But Not Deposited", value: 128, color: "bg-blue-300" },
-  ]
+//   const todayLoanCollect = [
+//   { label: "Deposited at CCB", value: 350, color: "bg-red-300" },
+//   { label: "Deposited at Society", value: 450, color: "bg-orange-300" },
+//   { label: "Deposited at SHG", value: 128, color: "bg-green-300" },
+//   { label: "Collected But Not Deposited", value: 128, color: "bg-blue-300" },
+//   ]
 
-  const thisMonthLoanCollect = [
-  { label: "Deposited at CCB", value: 350, color: "bg-red-300" },
-  { label: "Deposited at Society", value: 450, color: "bg-orange-300" },
-  { label: "Deposited at SHG", value: 358, color: "bg-green-300" },
-  { label: "Collected But Not Deposited", value: 208, color: "bg-blue-300" },
-  ]
+//   const thisMonthLoanCollect = [
+//   { label: "Deposited at CCB", value: 350, color: "bg-red-300" },
+//   { label: "Deposited at Society", value: 450, color: "bg-orange-300" },
+//   { label: "Deposited at SHG", value: 358, color: "bg-green-300" },
+//   { label: "Collected But Not Deposited", value: 208, color: "bg-blue-300" },
+//   ]
 
   const PERIOD_OPTIONS = [
   { label: "Today", value: "Today" },
@@ -91,12 +91,16 @@ const userDetails = JSON.parse(localStorage.getItem("user_details")) || {}
 
 const navigate = useNavigate()
 
-const [branches, setBranches] = useState(() => [
-	{ code: "101", name: "Branch (101)" },
-	{ code: "102", name: "Branch (102)" },
-	{ code: "103", name: "Branch (103)" },
-])
+// const [branches, setBranches] = useState(() => [
+// 	{ code: "101", name: "Branch (101)" },
+// 	{ code: "102", name: "Branch (102)" },
+// 	{ code: "103", name: "Branch (103)" },
+// ])
+
+const [branches, setBranches] = useState([])
+
 const [choosenBranch, setChoosenBranch] = useState({})
+const [choosenBranch_ID, setChoosenBranch_ID] = useState({})
 
 const [dateOfOperation, setDateOfOperation] = useState(moment().format("DD-MM-YYYY"))
 
@@ -120,7 +124,7 @@ const [loanCollect, setLoanCollect] = useState([]);
 const [unapprovedCount, setUnapprovedCount] =	useState({})
 const [grtPeriodDisbursed, setGrtPeriodDisbursed] = useState("Today")
 const [loanCollection, setLoanCollection] = useState("Today")
-
+const [branchType, setBranchType] = useState(userDetails[0]?.branch_type)
 
 
 const getClientIP = async () => {
@@ -190,7 +194,7 @@ const getGroupList = async () => {
 		const ip = await getClientIP()
 
 		const creds = {
-		branch_code : userDetails[0]?.brn_code,
+		branch_code : userDetails[0]?.branch_type === 'H' ? choosenBranch_ID : userDetails[0]?.brn_code,
 		user_type : userDetails[0]?.user_type,
 		}
 
@@ -229,6 +233,7 @@ const getGroupList = async () => {
 		setLoading(false)
 	}
 
+
 const getTotalOutstanding = async () => {
 		setLoading_Outstan(true)
 
@@ -238,14 +243,9 @@ const getTotalOutstanding = async () => {
 		const ip = await getClientIP()
 
 		const creds = {
-		branch_code : userDetails[0]?.brn_code,
+		branch_code : userDetails[0]?.branch_type === 'H' ? choosenBranch_ID : userDetails[0]?.brn_code,
 		user_type : userDetails[0]?.user_type,
 		}
-
-    // {
-    //   "branch_code" : "41",
-    //   "user_type" : "P/B"
-    // }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -276,21 +276,13 @@ const getTotalOutstanding = async () => {
 const getLoanDisbursed = async () => {
 		setLoading(true)
 
-    // setGroupList(totalGroup)
-
-    // Here have function
 		const ip = await getClientIP()
 
 		const creds = {
-		branch_code : userDetails[0]?.brn_code,
+		branch_code : userDetails[0]?.branch_type === 'H' ? choosenBranch_ID : userDetails[0]?.brn_code,
 		user_type : userDetails[0]?.user_type,
-    flag : grtPeriodDisbursed,
+		flag : grtPeriodDisbursed,
 		}
-
-    // {
-    //   "branch_code" : "41",
-    //   "user_type" : "P/B"
-    // }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -332,7 +324,7 @@ const getLoanCollect = async () => {
 		const ip = await getClientIP()
 
 		const creds = {
-		branch_code : userDetails[0]?.brn_code,
+		branch_code : userDetails[0]?.branch_type === 'H' ? choosenBranch_ID : userDetails[0]?.brn_code,
 		user_type : userDetails[0]?.user_type,
     	flag : loanCollection,
 		}
@@ -392,7 +384,7 @@ setLoading_Unapprov(true)
 const ip = await getClientIP()
 
 const creds = {
-branch_code : userDetails[0]?.brn_code,
+branch_code : userDetails[0]?.branch_type === 'H' ? choosenBranch_ID : userDetails[0]?.brn_code,
 user_type : userDetails[0]?.user_type,
 }
 
@@ -423,29 +415,328 @@ setLoading_Unapprov(false)
 
 } 
 
+///////////////////////// Head Office Function Start /////////////////////////
 
-  useEffect(() => {
-  getLoanDisbursed()
-}, [grtPeriodDisbursed])
+const getGroupList_HeadOffice = async () => {
+		setLoading(true)
 
-  useEffect(() => {
-  getLoanCollect()
-}, [loanCollection])
+    // setGroupList(totalGroup)
+
+    // Here have function
+		const ip = await getClientIP()
+
+		const creds = {
+		branch_type : userDetails[0]?.branch_type,
+		}
+
+    // {
+    //   "branch_code" : "41",
+    //   "user_type" : "P/B"
+    // }
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+    await axios.post(`${url_bdccb}/dashboard/fetch_ho_dashboard_group_data`, creds, {
+    headers: {
+    Authorization: `${tokenValue?.token}`, // example header
+    "Content-Type": "application/json", // optional
+    },
+    })
+    .then((res) => {
+        // console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
+        if(res?.data?.success){
+
+        const apiData = res?.data?.data || {};
+
+      // 🔥 Transform here
+        const formattedData = transformGroupData(apiData);
+        setGroupList(formattedData);
+
+        } else {
+        navigate(routePaths.LANDING)
+        localStorage.clear()
+        }
+    })
+    .catch((err) => {
+    Message("error", "Some error occurred while fetching group form")
+    })
+		
+		setLoading(false)
+	}
+
+const getTotalOutstanding_HeadOffice = async () => {
+		setLoading_Outstan(true)
+
+    // setGroupList(totalGroup)
+
+    // Here have function
+		const ip = await getClientIP()
+
+		const creds = {
+		branch_type : userDetails[0]?.branch_type,
+		}
+
+    // {
+    //   "branch_code" : "41",
+    //   "user_type" : "P/B"
+    // }
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+    await axios.post(`${url_bdccb}/dashboard/fetch_ho_dashboard_tot_loan_outstanding`, creds, {
+    headers: {
+    Authorization: `${tokenValue?.token}`, // example header
+    "Content-Type": "application/json", // optional
+    },
+    })
+    .then((res) => {
+        // console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
+        if(res?.data?.success){
+
+        setActiveUsersCount(res?.data?.data?.total_outstanding)
+
+        } else {
+        navigate(routePaths.LANDING)
+        localStorage.clear()
+        }
+    })
+    .catch((err) => {
+    Message("error", "Some error occurred while fetching group form")
+    })
+		
+		setLoading_Outstan(false)
+	}
+
+const getLoanDisbursed_HeadOffice = async () => {
+		setLoading(true)
+
+		const ip = await getClientIP()
+
+		const creds = {
+		branch_type : userDetails[0]?.branch_type,
+		// user_type : userDetails[0]?.user_type,
+		flag : grtPeriodDisbursed,
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+    await axios.post(`${url_bdccb}/dashboard/fetch_ho_dashboard_tot_loan_disb`, creds, {
+    headers: {
+    Authorization: `${tokenValue?.token}`, // example header
+    "Content-Type": "application/json", // optional
+    },
+    })
+    .then((res) => {
+        console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'lll');
+        if(res?.data?.success){
+
+        const apiData = res?.data?.data || {};
+
+      // 🔥 Transform here
+        const formattedData = transformGroupDataDisburse(apiData);
+        setLoanDisburse(formattedData);
+
+        } else {
+        navigate(routePaths.LANDING)
+        localStorage.clear()
+        }
+    })
+    .catch((err) => {
+    Message("error", "Some error occurred while fetching group form")
+    })
+		
+		setLoading(false)
+	}
+
+const getLoanCollect_HeadOffice = async () => {
+		setLoading(true)
+
+    // setGroupList(totalGroup)
+
+    // Here have function
+		const ip = await getClientIP()
+
+		const creds = {
+		branch_type : userDetails[0]?.branch_type,
+		// user_type : userDetails[0]?.user_type,
+    	flag : loanCollection,
+		}
+
+    // {
+    //   "branch_code" : "41",
+    //   "user_type" : "P/B"
+    // }
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+    await axios.post(`${url_bdccb}/dashboard/fetch_ho_dashboard_tot_loan_collected`, creds, {
+    headers: {
+    Authorization: `${tokenValue?.token}`, // example header
+    "Content-Type": "application/json", // optional
+    },
+    })
+    .then((res) => {
+        console.log(res?.data?.data	, 'fffffffffffffffffffffff', creds, 'colected');
+        if(res?.data?.success){
+
+        const apiData = res?.data?.data || {};
+
+      // 🔥 Transform here
+        const formattedData = transformLoanCollect(apiData);
+        setLoanCollect(formattedData);
+
+        } else {
+        navigate(routePaths.LANDING)
+        localStorage.clear()
+        }
+    })
+    .catch((err) => {
+    Message("error", "Some error occurred while fetching group form")
+    })
+		
+		setLoading(false)
+	}
+
+const getUnapprovedTrans_HeadOffice = async () => {
+setLoading_Unapprov(true)
+
+// setGroupList(totalGroup)
+
+// Here have function
+const ip = await getClientIP()
+
+const creds = {
+branch_type : userDetails[0]?.branch_type,
+// user_type : userDetails[0]?.user_type,
+}
+
+const tokenValue = await getLocalStoreTokenDts(navigate);
+
+await axios.post(`${url_bdccb}/dashboard/fetch_ho_dashboard_tot_loan_unapprove_dtls`, creds, {
+headers: {
+Authorization: `${tokenValue?.token}`, // example header
+"Content-Type": "application/json", // optional
+},
+})
+.then((res) => {
+console.log(res?.data?.data	, 'unapproveeeeeeeeeeeee', creds, 'lll');
+if(res?.data?.success){
+
+setUnapprovedCount(res?.data?.data)
+
+} else {
+navigate(routePaths.LANDING)
+localStorage.clear()
+}
+})
+.catch((err) => {
+Message("error", "Some error occurred while fetching group form")
+})
+
+setLoading_Unapprov(false)
+
+} 
+
+const getBranchList = async () => {
+		setLoading(true)
+
+		// const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/dashboard/fetch_brn_soc_name`)
+		.then((res) => {
+
+		if (res?.data?.success) {
+
+		console.log(res?.data?.data, 'fffffffffffffffffffffff');
+		setBranches(res.data.data.map((item) => ({
+		code: item.branch_id +'@'+ item.branch_type,
+		name: `${item.branch_name} (${item.branch_id})`,
+		branch_type: item.branch_type,
+		}))
+		)
+		
+
+		} else {
+		// console.log("QQQQQQQQQQQQQQQQ", res?.data)
+		// Message('error', res?.data?.msg)
+		navigate(routePaths.LANDING)
+		localStorage.clear()
+		}
+
+		})
+		.catch((err) => {
+		console.log("?????????????????????", err)
+		})
+
+		setLoading(false)
+		
+	}
+
+///////////////////////// Head Office Function End /////////////////////////
+
+
+	useEffect(() => {
+	if(branchType === 'B' || branchType === 'P'){
+	getLoanDisbursed()
+	}
+
+	if(branchType === 'H'){
+	getLoanDisbursed_HeadOffice()
+	}
+
+	}, [grtPeriodDisbursed, branchType])
+
+	useEffect(() => {
+	if(branchType === 'B' || branchType === 'P'){
+	getLoanCollect()
+	}
+
+	if(branchType === 'H'){
+	getLoanCollect_HeadOffice()
+	}
+
+	}, [loanCollection, branchType])
 
 
   useEffect(()=>{
+	if(branchType === 'B' || branchType === 'P'){
     getGroupList()
-    getActiveUser()
     getTotalOutstanding()
-    // getLoanDisbursed()
-    // getLoanCollect()
 	getUnapprovedTrans();
-  }, [])
+	}
+
+	if(branchType === 'H'){
+	getGroupList_HeadOffice()
+	getTotalOutstanding_HeadOffice()
+	getUnapprovedTrans_HeadOffice();
+	}
+
+  }, [branchType])
+
+
+	useEffect(()=>{
+
+	if(branchType === 'H'){
+	getBranchList()
+	setChoosenBranch(`${userDetails[0]?.brn_code}@${userDetails[0]?.branch_type}`)
+	}
+	
+	}, [])
 
 	
 
 	const handleBranchChange = (e) => {
+		const [code, branchType] = e.target.value.split("@");
+
+		if(e.target.value.length > 0){
+		setBranchType(branchType)
+		} else {
+		setBranchType(userDetails[0]?.branch_type)
+		}
+
 		setChoosenBranch(e.target.value)
+		setChoosenBranch_ID(code)
+
 	}
 	
 	return (
@@ -476,7 +767,7 @@ setLoading_Unapprov(false)
 			{/* )} */}
 
 			<div className="flex flex-col md:flex-row justify-between items-center">
-				<h1 className="text-lg font-bold text-slate-700 uppercase pl-5">
+				<h1 className="text-lg font-bold text-slate-700 uppercase pl-6">
 					Welcome back,{" "}
 					<span className="text-slate-600 text-lg font-thin">
 						{userDetails[0]?.emp_name}
@@ -486,7 +777,7 @@ setLoading_Unapprov(false)
 						{userDetails[0]?.branch_name}
 					</span>
 				</h1>
-				<h1 className="text-lg font-bold text-slate-700 uppercase">
+				<h1 className="text-lg font-bold text-slate-700 uppercase pr-6">
 					<Spin spinning={loading}>
 						Date of operation :{" "}
 						<span className="text-slate-600 text-lg font-thin">
@@ -495,9 +786,18 @@ setLoading_Unapprov(false)
 					</Spin>
 				</h1>
 			</div>
+			
+			{/* {JSON.stringify(userDetails[0], null, 2)} */}
+			{/*  /////////////////////////////////
+			{JSON.stringify(branchType, null, 2)}
+			///////////////////////// */}
+			{/* {JSON.stringify(choosenBranch, null, 2)} */}
+			{/* //////////////////
+			{JSON.stringify(choosenBranch_ID, null, 2)} */}
 
-			{/* {userDetails[0]?.user_type == 'H' && (
+			{userDetails[0]?.branch_type == 'H' && (
 				<div className="flex flex-col md:flex-row justify-between items-center">
+					<div className="col-span-1 md:col-span-2 w-full p-6 pt-0 pb-0 space-y-4">
 					<TDInputTemplateBr
 						placeholder="Select Branch..."
 						type="text"
@@ -506,28 +806,14 @@ setLoading_Unapprov(false)
 						data={branches}
 						mode={2}
 					/>
+					</div>
 				</div>
-			)} */}
+			)}
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 				<div className="col-span-1 md:col-span-2 rounded-3xl bg-white shadow-md p-6 space-y-4 overflow-hidden">
 					<div className="flex justify-between items-center">
 						<h2 className="text-base font-medium text-slate-700">Total Group</h2>
-						{/* <div className="space-x-2">
-							{["Today", "This month"].map((option) => (
-								<button
-									key={option}
-									onClick={() => setGrtPeriod(option)}
-									className={`px-3 py-1 rounded-full font-medium text-sm ${
-										grtPeriod === option
-											? "bg-teal-600 text-white"
-											: "bg-slate-100 text-slate-600"
-									}`}
-								>
-									{option}
-								</button>
-							))}
-						</div> */}
 					</div>
 
 					{groupList.map((item) => (
@@ -554,42 +840,10 @@ setLoading_Unapprov(false)
 					))}
 				</div>
 
-				{/* <div className="bg-white rounded-3xl shadow-md p-6 flex flex-col items-center justify-center group">
-					<h3 className="text-lg font-medium text-slate-700">Active Groups</h3>
-					<div className="bg-green-100 rounded-full p-4 my-4">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							className="h-6 w-6 text-green-600 arrow"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M5 10l7-7m0 0l7 7m-7-7v18"
-							/>
-						</svg>
-					</div>
-					<Spin spinning={loading}>
-						<span className="text-3xl font-bold text-slate-800">
-							{formatNumber(activeGroupsCount)}
-						</span>
-					</Spin>
-					<span className="text-sm text-slate-600 mt-1">
-						Total Groups • {formatNumber(totalGroupsCount)}
-					</span>
-				</div> */}
+				
 
 				<div className="col-span-2 md:col-span-2">
-					<div
-						// className="relative w-full h-full transition-transform duration-500"
-            className="relative w-full h-full"
-						// style={{
-						// 	transformStyle: "preserve-3d",
-						// }}
-					>
+					<div className="relative w-full h-full">
 						<div
 							className="inset-0 bg-white rounded-3xl shadow-md p-6 flex flex-col items-center justify-center"
 							style={{ backfaceVisibility: "hidden" }}
@@ -602,61 +856,10 @@ setLoading_Unapprov(false)
             </div>
 							<Spin spinning={loading_Outstan}>
 								<span className="text-3xl font-bold text-slate-800">
-									{/* {new Intl.NumberFormat("en-IN").format(activeUsersCount || 0)} */}
                   {formatINR(activeUsersCount)}
 								</span>
 							</Spin>
-							{/* <span className="text-sm text-slate-600 mt-1">Active users</span> */}
 						</div>
-
-						{/* <div
-							className="absolute inset-0 bg-purple-50 rounded-3xl shadow-md p-6 flex items-center justify-center"
-							style={{
-								transform: "rotateY(-180deg)",
-								backfaceVisibility: "hidden",
-							}}
-						>
-							{activeUsers.length !== 0 ? (
-								<div className="w-full max-h-[160px] overflow-auto">
-									<ul className="max-w-md space-y-1 text-slate-600 list-inside dark:text-slate-400">
-										{activeUsers?.map((user, i) => (
-											<>
-												<li key={i} className="flex items-center">
-													{user?.user_status === "A" ? (
-														<svg
-															className="w-3.5 h-3.5 me-2 text-green-500 dark:text-green-400 shrink-0"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															fill="currentColor"
-															viewBox="0 0 20 20"
-														>
-															<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-														</svg>
-													) : (
-														<svg
-															className="w-3.5 h-3.5 me-2 shrink-0"
-															aria-hidden="true"
-															xmlns="http://www.w3.org/2000/svg"
-															viewBox="0 0 20 20"
-														>
-															<circle cx="10" cy="10" r="9.5" fill="#ef4444" />
-															<path
-																fill="#ffffff"
-																d="M13.414 6.586a1 1 0 0 0-1.414 0L10 8.586 8 6.586a1 1 0 1 0-1.414 1.414L8.586 10l-1.999 2a1 1 0 1 0 1.414 1.414L10 11.414l2 1.999a1 1 0 0 0 1.414-1.414L11.414 10l2-2a1 1 0 0 0 0-1.414z"
-															/>
-														</svg>
-													)}
-													{user?.emp_name} - {user?.emp_id}
-												</li>
-												<hr className="border-t border-purple-200 my-2 w-3/4" />
-											</>
-										))}
-									</ul>
-								</div>
-							) : (
-								<Empty />
-							)}
-						</div> */}
 					</div>
 				</div>
 			</div>

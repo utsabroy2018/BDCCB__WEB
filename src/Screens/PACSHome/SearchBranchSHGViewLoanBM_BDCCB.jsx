@@ -31,6 +31,7 @@ function SearchBranchSHGViewLoanBM_BDCCB() {
 			branch_code: userDetails[0]?.brn_code,
 			tenant_id: userDetails[0]?.tenant_id,
 			group_name_view: searchKeywords,
+			branch_type: userDetails[0]?.branch_type
 		}
 
 		// {
@@ -74,6 +75,10 @@ function SearchBranchSHGViewLoanBM_BDCCB() {
 			})
 		setLoading(false)
 	}
+
+	// useEffect(() => {
+	// 	fetchSearchedGroups()
+	// }, [])
 
 	return (
 		<div>

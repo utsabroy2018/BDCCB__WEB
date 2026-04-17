@@ -4,7 +4,7 @@ import * as Yup from "yup"
 import { NavLink, useNavigate } from "react-router-dom"
 import LOGO from "../../Assets/Images/ssvws_crop-round.png"
 import axios from "axios"
-import { Spin } from "antd"
+import { Select, Spin } from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
@@ -19,6 +19,19 @@ import localforage from 'localforage';
 
 
 import CryptoJS from "crypto-js";
+import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
+import Radiobtn from "../../Components/Radiobtn"
+
+const listOfBranch = [
+	{
+		label: "Branch",
+		value: "B",
+	},
+	{
+		label: "Society",
+		value: "P",
+	}
+]
 
 const DialogBox = React.lazy(() => import("../../Components/DialogBox"))
 const SignInPage = () => {
@@ -43,11 +56,17 @@ const SignInPage = () => {
 	const [inputAnswer, setInputAnswer] = useState("");
 	const [loginMessage, setLoginMessage] = useState("");
 	const [loginUserType, setLoginUserType] = useState("");
+	const [branch_Society, setBranch_Society] = useState("B")
 
 	// Store controller persistently
 	const abortControllerRef = useRef(null);
 
 	const SECRET_KEY = 'S!YSN@ESR#GAI$CSS%OYF^TVE&KAS&OWL*UNT(ISO)NTS_PSR+IIT=ESL/IKM*IST!EAD@'
+
+	const onChange = (e) => {
+		console.log("radio1 checked", e)
+		setBranch_Society(e)
+	}
 
 	useEffect(()=>{
 		// setCaptchaAnswer(num1 + num2);
@@ -86,17 +105,26 @@ const SignInPage = () => {
 
 	const formik = useFormik({
 		initialValues: { user_id: "", password: "", brnch: "" },
+		// validationSchema: Yup.object({
+		// 	user_id: Yup.string().required("User ID is required"),
+		// 	password: Yup.string().required("Password is required"),
+		// 	brnch: Yup.string().test(
+		// 		"branch-required",
+		// 		"Branch is required",
+		// 		(value) => {
+		// 			if ([2,4, 10, 11].includes(userTypeId)) return Boolean(value)
+		// 			return true
+		// 		}
+		// 	),
+		// }),
 		validationSchema: Yup.object({
-			user_id: Yup.string().required("User ID is required"),
-			password: Yup.string().required("Password is required"),
-			brnch: Yup.string().test(
-				"branch-required",
-				"Branch is required",
-				(value) => {
-					if ([2,4, 10, 11].includes(userTypeId)) return Boolean(value)
-					return true
-				}
-			),
+		user_id: Yup.string().required("User ID is required"),
+		password: Yup.string().required("Password is required"),
+		brnch: Yup.string().when("user_id", {
+			is: (val) => val === "9999",
+			then: (schema) => schema.required("Branch is required"),
+			otherwise: (schema) => schema.notRequired(),
+		}),
 		}),
 		validateOnMount: true,
 		
@@ -299,9 +327,13 @@ const SignInPage = () => {
 	const getBranchList = async (e) => {
 		setLoading(true)
 
+		setBranches([])
+
 		// const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.get(`${url_bdccb}/dashboard/fetch_brn_soc_name`)
+		await axios.get(`${url_bdccb}/dashboard/fetch_brn_soc_name`, {
+			params: {select_type: branch_Society}
+		})
 		.then((res) => {
 
 		if (res?.data?.success) {
@@ -329,6 +361,12 @@ const SignInPage = () => {
 		setLoading(false)
 		
 	}
+
+	useEffect(() => {
+	
+	getBranchList()
+		
+	}, [branch_Society])
 
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-slate-800 p-4">
@@ -453,17 +491,30 @@ const SignInPage = () => {
 
 						{/* {[2, 4, 10, 11].includes(userTypeId) && ( */}
 						
-						{/* {JSON.stringify(formik.values.brnch, 2)} */}
+						{/* {JSON.stringify(branches, 2)} */}
+
+						
 						
 						{loginUserType && loginUserType === 'H' && (
+							<>
+							<div className="radio_login">
+							<Radiobtn
+							data={listOfBranch}
+							val={branch_Society}
+							onChangeVal={(value) => {
+							onChange(value)
+							}}
+							/>
+							</div>
+
 							<div>
 								<label
 									htmlFor="brnch"
 									className="block text-sm font-medium text-slate-700 mb-1"
 								>
-									Branches / Choose branch
+									Choose Branches / Society
 								</label>
-								<select
+								{/* <select
 									id="brnch"
 									name="brnch"
 									onChange={formik.handleChange}
@@ -479,13 +530,48 @@ const SignInPage = () => {
 											{opt.name}
 										</option>
 									))}
-								</select>
+								</select> */}
 								{formik.touched.brnch && formik.errors.brnch && (
 									<div className="text-red-500 text-sm">
 										{formik.errors.brnch}
 									</div>
 								)}
+
+								<Select
+								showSearch
+								placeholder="Select a branch"
+								value={formik.values.brnch || undefined}
+								style={{ width: "100%" }}
+								optionFilterProp="children"
+								name="brnch"
+
+								// ✅ When selecting
+								onChange={(value) => {
+								formik.setFieldValue("brnch", value);
+								}}
+
+								// ✅ Formik touch
+								onBlur={() => formik.setFieldTouched("brnch", true)}
+
+								// 🔍 Search filter
+								filterOption={(input, option) =>
+								option?.children?.toLowerCase().includes(input.toLowerCase())
+								}
+								>
+								<Select.Option value="" disabled>
+								Select Branches / Society
+								</Select.Option>
+
+								{branches.map((opt) => (
+								<Select.Option key={opt.code} value={opt.code}>
+								{opt.name}
+								</Select.Option>
+								))}
+								</Select>
+
 							</div>
+
+						</>
 						)}
 						{/* )} */}
 
