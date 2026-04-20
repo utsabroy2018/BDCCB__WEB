@@ -726,6 +726,9 @@ const getBranchList = async () => {
 	
 
 	const handleBranchChange = (e) => {
+
+		// console.log(e.target.value, 'eeeeeeeeeee');
+		
 		const [code, branchType] = e.target.value.split("@");
 
 		if(e.target.value.length > 0){
@@ -798,14 +801,14 @@ const getBranchList = async () => {
 			{userDetails[0]?.branch_type == 'H' && (
 				<div className="flex flex-col md:flex-row justify-between items-center">
 					<div className="col-span-1 md:col-span-2 w-full p-6 pt-0 pb-0 space-y-4">
-					<TDInputTemplateBr
+					{/* <TDInputTemplateBr
 						placeholder="Select Branch..."
 						type="text"
 						formControlName={choosenBranch}
 						handleChange={handleBranchChange}
 						data={branches}
 						mode={2}
-					/>
+					/> */}
 
 
 					<Select
