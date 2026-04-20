@@ -3,7 +3,7 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button, Tooltip } from "antd"
+import { Spin, Button, Tooltip, Select } from "antd"
 import { FileExcelOutlined, LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import LoanApplicationsTableViewBr from "../../Components/LoanApplicationsTableViewBr.jsx__BDCCB"
 import Radiobtn from "../../Components/Radiobtn"
@@ -17,11 +17,23 @@ import { motion } from "framer-motion"
 import { saveAs } from "file-saver"
 import * as XLSX from "xlsx"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
+
 const options_Disburs = [
 	{
 		label: "Acceptance Pending",
 		value: "U",
 	},
+	{
+		label: "Accepted",
+		value: "A",
+	},
+	{
+		label: "Rejected",
+		value: "R",
+	}
+]
+
+const options_Disburs_HeadOffice = [
 	{
 		label: "Accepted",
 		value: "A",
@@ -41,8 +53,24 @@ function SearchMemberForDisburseBM_BDCCB() {
 	const [copyLoanApplications, setCopyLoanApplications] = useState(() => [])
     const [fromDate, setFromDate] = useState(() => new Date().toISOString().slice(0, 10))
 	const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10))
-	const [disbursementStatus, setDisbursementStatus] = useState("U")
+	const [disbursementStatus, setDisbursementStatus] = useState(userDetails[0]?.branch_type === 'H' ? "A" : "U");
+	const [branches, setBranches] = useState([])
+	const [branch_Select, setBranch_Select] = useState("");
 	const navigate = useNavigate()
+	
+
+
+	// const formik = useFormik({
+	// 		initialValues: { brnch: "" },
+	// 		validationSchema: Yup.object({
+	// 		brnch: Yup.string(),
+	// 		}),
+	// 		validateOnMount: true,
+			
+	// 		onSubmit: async (values) => {
+				
+	// 		},
+	// 	})
 
 	const onChange = (e) => {
 		console.log("radio1 checked", e)
@@ -128,13 +156,24 @@ function SearchMemberForDisburseBM_BDCCB() {
 			branch_id: userDetails[0]?.brn_code,
 			approval_status: disbursementStatus,
 			loan_to: "P",
-			from_dt: disbursementStatus=='A'?fromDate:'',
-			to_dt:  disbursementStatus=='A'?toDate:''
+			from_dt: disbursementStatus=='A'? fromDate:'',
+			to_dt:  disbursementStatus=='A'? toDate:'',
+			branch_type : userDetails[0]?.branch_type,
 		}
+
+		const creds_HeadOffice = {
+			branch_id: userDetails[0]?.branch_type === 'H' ? branch_Select : null,
+			approval_status: disbursementStatus,
+			loan_to: "P",
+			from_dt: fromDate,
+			to_dt:  toDate,
+			branch_type : userDetails[0]?.branch_type,
+		}
+
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 		await axios
 			// .post(`${url}/admin/fetch_loan_application_dtls`, creds)
-			.post(`${url_bdccb}/loan/show_loan_status`, creds, {
+			.post(`${url_bdccb}/loan/show_loan_status`, userDetails[0]?.branch_type === 'H' ? creds_HeadOffice : creds, {
 				headers: {
 					Authorization: `${tokenValue?.token}`, // example header
 					"Content-Type": "application/json", // optional
@@ -180,6 +219,49 @@ function SearchMemberForDisburseBM_BDCCB() {
 	}
 
 
+	const getBranchList = async (e) => {
+	setLoading(true)
+
+	setBranches([])
+	setBranch_Select('')
+
+	await axios.get(`${url_bdccb}/dashboard/fetch_brn_soc_name`, {
+	params: {select_type: userDetails[0]?.branch_type}
+	})
+	.then((res) => {
+
+	if (res?.data?.success) {
+
+	console.log(res?.data?.data, 'fffffffffffffffffffffff');
+	setBranches(res.data.data.map((item) => ({
+	code: item.branch_id,
+	name: `${item.branch_name} (${item.branch_id})`,
+	}))
+	)
+
+
+	} else {
+	navigate(routePaths.LANDING)
+	localStorage.clear()
+	}
+
+	})
+	.catch((err) => {
+	})
+
+	setLoading(false)
+
+	}
+
+	useEffect(() => {
+
+	if(userDetails[0]?.branch_type === 'H'){
+		getBranchList()
+	}
+
+	}, [disbursementStatus])
+
+
 
 	return (
 		<div>
@@ -193,13 +275,14 @@ function SearchMemberForDisburseBM_BDCCB() {
 				<main className="px-4 h-auto my-10 mx-32">
 
 					<Radiobtn
-						data={options_Disburs}
+						data={userDetails[0]?.branch_type === 'H' ? options_Disburs_HeadOffice :  options_Disburs}
 						val={disbursementStatus}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
 					/>
-{disbursementStatus == 'A' && <div className="grid grid-cols-3 gap-4">
+						{disbursementStatus == 'A' && 
+						<div className="grid grid-cols-4 gap-4">
 						{/* <form onSubmit={formik.handleSubmit}> */}
 						<div className="mt-1">
 						<TDInputTemplateBr
@@ -222,6 +305,43 @@ function SearchMemberForDisburseBM_BDCCB() {
 						mode={1}
 						/>
 						</div>
+						
+						
+						{userDetails[0]?.branch_type === 'H' &&(
+						<div className="mt-2">
+						<label htmlFor="brnch" className="block text-sm font-medium text-slate-700 mb-1">
+						<strong>Choose Branches</strong>
+						</label>
+
+						{/* {branch_Select} */}
+						<Select
+						showSearch
+						placeholder="Select a branch"
+						value={branch_Select || undefined}
+						style={{ width: "100%" }}
+						optionFilterProp="children"
+						onChange={(value) => {
+						setBranch_Select(value); // ✅ same as setFieldValue
+						console.log("Selected:", value);
+						}}
+						filterOption={(input, option) =>
+						option?.children?.toLowerCase().includes(input.toLowerCase())
+						}
+						>
+						<Select.Option value="" disabled>
+						Select Branches / Society
+						</Select.Option>
+
+						{branches.map((opt) => (
+						<Select.Option key={opt.code} value={opt.code}>
+						{opt.name}
+						</Select.Option>
+						))}
+						</Select>
+
+						</div>
+						)}
+
 						<div className="mt-1">
 						<button
 						type="button"
@@ -235,6 +355,88 @@ function SearchMemberForDisburseBM_BDCCB() {
 
 						{/* </form> */}
 						</div>}
+
+						{userDetails[0]?.branch_type === 'H' &&(
+						<>
+						{disbursementStatus == 'R' && 
+						<div className="grid grid-cols-4 gap-4">
+						{/* <form onSubmit={formik.handleSubmit}> */}
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="From Date"
+						name="from_dt"
+						formControlName={fromDate}
+						handleChange={(e) => setFromDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
+
+						<div className="mt-1">
+						<TDInputTemplateBr
+						type="date"
+						label="To Date"
+						name="to_dt"
+						formControlName={toDate}
+						handleChange={(e) => setToDate(e.target.value)}
+						mode={1}
+						/>
+						</div>
+						
+						
+						{userDetails[0]?.branch_type === 'H' &&(
+						<div className="mt-2">
+						<label htmlFor="brnch" className="block text-sm font-medium text-slate-700 mb-1">
+						<strong>Choose Branches</strong>
+						</label>
+
+
+						{/* {branch_Select} */}
+						<Select
+						showSearch
+						placeholder="Select a branch"
+						value={branch_Select || undefined}
+						style={{ width: "100%" }}
+						optionFilterProp="children"
+						onChange={(value) => {
+						setBranch_Select(value); // ✅ same as setFieldValue
+						console.log("Selected:", value);
+						}}
+						filterOption={(input, option) =>
+						option?.children?.toLowerCase().includes(input.toLowerCase())
+						}
+						>
+						<Select.Option value="" disabled>
+						Select Branches / Society
+						</Select.Option>
+
+						{branches.map((opt) => (
+						<Select.Option key={opt.code} value={opt.code}>
+						{opt.name}
+						</Select.Option>
+						))}
+						</Select>
+
+						</div>
+						)}
+
+						<div className="mt-1">
+						<button
+						type="button"
+						onClick={fetchApproveUapprove}
+						className="bg-slate-700 text-white hover:bg-slate-800 p-5 mt-7 text-sm border-none rounded-lg w-30 h-10 flex justify-center items-center gap-2"
+						>
+						<SearchOutlined />
+						Search
+						</button>
+						</div>
+
+						{/* </form> */}
+						</div>}
+						</>
+						)}
+
+
 					<motion.section
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
@@ -246,13 +448,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 										 md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-1.5`}
 						>
 							<div className="w-full flex flex-row-reverse justify-between items-center mx-4">
-								{/* <div className="flex items-center justify-between"> */}
-
-
-
-								{/* <label htmlFor="simple-search" className="sr-only">
-													Search
-												</label> */}
+								{userDetails[0]?.branch_type != 'H' &&(
 								<button
 									className="bg-slate-100 p-3 h-11 rounded-full float-right text-center ml-3"
 									onClick={() => {
@@ -261,6 +457,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 								>
 									<PlusOutlined className="text-xl" />
 								</button>
+								)}
 								{/* {showSearch && ( */}
 								<div className="relative w-full">
 									<div className="absolute inset-y-0 left-0 flex items-center md:ml-4 pl-3 pointer-events-none">

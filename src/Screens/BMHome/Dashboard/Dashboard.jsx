@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import axios from "axios"
 import TDInputTemplateBr from "../../../Components/TDInputTemplateBr"
 import DashboardCard from "../../../Components/Dashboard/DashboardCard"
-import { Alert, Button, Empty, Input, Modal, Spin, Table } from "antd"
+import { Alert, Button, Empty, Input, Modal, Select, Spin, Table } from "antd"
 import CurrencyRupeeOutlinedIcon from "@mui/icons-material/CurrencyRupeeOutlined"
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined"
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined"
@@ -806,6 +806,34 @@ const getBranchList = async () => {
 						data={branches}
 						mode={2}
 					/>
+
+
+					<Select
+					showSearch
+					placeholder="Select Branch..."
+					style={{ width: "100%" }}
+					value={choosenBranch || undefined}   // ✅ same as formControlName
+					optionFilterProp="children"
+					onChange={(value) => {
+					handleBranchChange({target: { value }});
+					}}
+					filterOption={(input, option) =>
+						option?.children?.toLowerCase().includes(input.toLowerCase())
+					}
+					>
+					<Select.Option value="" disabled>
+						Select Branches
+					</Select.Option>
+
+					{branches.map((opt) => (
+					<Select.Option key={opt.code} value={opt.code}>
+					{opt.name}
+					</Select.Option>
+					))}
+					</Select>
+
+					
+
 					</div>
 				</div>
 			)}

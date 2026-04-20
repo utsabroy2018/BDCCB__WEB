@@ -3,7 +3,7 @@ import Sidebar from "../../Components/Sidebar"
 import axios from "axios"
 import { url, url_bdccb } from "../../Address/BaseUrl"
 import { Message } from "../../Components/Message"
-import { Spin, Button, Tooltip } from "antd"
+import { Spin, Button, Tooltip, Select } from "antd"
 import { FileExcelOutlined, LoadingOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons"
 import GroupsTableViewBr from "../../Components/GroupsTableViewBr"
 import ViewLoanTableBr from "../../Components/ViewLoanTableBr_BDCCB"
@@ -19,6 +19,8 @@ import { motion } from "framer-motion"
 import LoanRecoveryBranchSociListTable_BDCCB from "../../Components/LoanRecoveryBranchSociListTable_BDCCB"
 import { saveAs } from "file-saver"
 import * as XLSX from "xlsx"
+
+
 const option_recovery = [
 	{
 		label: "Unapproved Recovery",
@@ -27,12 +29,17 @@ const option_recovery = [
 	{
 		label: "Approved Recovery",
 		value: "A",
-	},
-	// {
-	// 	label: "Reject Recovery",
-	// 	value: "R",
-	// }
+	}
 ]
+
+const option_recovery_HeadOffice = [
+	{
+		label: "Approved Recovery",
+		value: "A",
+	}
+]
+
+
 
 function RecoveryListSocietyBranch_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
@@ -45,12 +52,15 @@ function RecoveryListSocietyBranch_BDCCB() {
 	const [approvalStatus, setApprovalStatus] = useState("S")
 	const navigate = useNavigate()
 	const [loanType, setLoanType] = useState("U")
-	const [recoveryStatus, setRecoveryStatus] = useState("U")
+	const [recoveryStatus, setRecoveryStatus] = useState(userDetails[0]?.branch_type === 'H' ? "A" : "U")
 
 	const today = new Date().toISOString().split("T")[0];
 
 	const [fromDate, setFromDate] = useState(today);
 	const [toDate, setToDate] = useState(today);
+
+	const [branches, setBranches] = useState([])
+	const [branch_Select, setBranch_Select] = useState("");
 
 	const onChange = (e) => {
 		console.log("radio1 checked", e)
@@ -90,17 +100,6 @@ const handleExportMembers = (loans) => {
 		const fileName = `SocietyRecovery_${recoveryStatus}_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
 		saveAs(blob, fileName);
 	};
-	// const initialValues = {
-	
-	// 		sanction_dt: "",
-			
-	// 	}
-	// 	const [formValues, setValues] = useState(initialValues)
-
-	// 	const validationSchema = Yup.object({
-	// 			sanction_dt: Yup.mixed(),
-		
-	// 		})
 	
 
 	const fetchSearchedGroups = async () => {
@@ -108,25 +107,26 @@ const handleExportMembers = (loans) => {
 		const creds = {
 			branch_id: userDetails[0]?.brn_code ,
 			tenant_id: userDetails[0]?.tenant_id,
-			// from_dt: fromDate,
 			from_dt: recoveryStatus == 'A' ? fromDate : '',
-			// to_dt: toDate,
 			to_dt:  recoveryStatus == 'A' ? toDate : '',
-			approval_status : recoveryStatus
-			// approval_status: loanType
+			approval_status : recoveryStatus,
+			branch_type : userDetails[0]?.branch_type,
 		}
 
-		// {
-		// "tenant_id" : "CCB-78945",
-		// "branch_id" : "7",
-		// "from_dt" : "1",
-		// "to_dt" : "70017"
-		// }
+		const creds_HeadOffice = {
+			branch_id: userDetails[0]?.branch_type === 'H' ? branch_Select : null,
+			tenant_id: userDetails[0]?.tenant_id,
+			from_dt: recoveryStatus == 'A' ? fromDate : '',
+			to_dt:  recoveryStatus == 'A' ? toDate : '',
+			approval_status : recoveryStatus,
+			branch_type : userDetails[0]?.branch_type,
+		}
+
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
-			.post(`${url_bdccb}/recov/fetch_soc_recov_dtls_ccb_level`, creds, {
+			.post(`${url_bdccb}/recov/fetch_soc_recov_dtls_ccb_level`, userDetails[0]?.branch_type === 'H' ? creds_HeadOffice : creds, {
 			headers: {
 			Authorization: `${tokenValue?.token}`, // example header
 			"Content-Type": "application/json", // optional
@@ -181,6 +181,50 @@ const handleExportMembers = (loans) => {
 		)
 	}
 
+
+	const getBranchList = async (e) => {
+	setLoading(true)
+
+	setBranches([])
+	setBranch_Select('')
+
+	await axios.get(`${url_bdccb}/dashboard/fetch_brn_soc_name`, {
+	params: {select_type: userDetails[0]?.branch_type}
+	})
+	.then((res) => {
+
+	if (res?.data?.success) {
+
+	console.log(res?.data?.data, 'fffffffffffffffffffffff');
+	setBranches(res.data.data.map((item) => ({
+	code: item.branch_id,
+	name: `${item.branch_name} (${item.branch_id})`,
+	}))
+	)
+
+
+	} else {
+	navigate(routePaths.LANDING)
+	localStorage.clear()
+	}
+
+	})
+	.catch((err) => {
+	})
+
+	setLoading(false)
+
+	}
+
+	useEffect(() => {
+	if(userDetails[0]?.branch_type === 'H'){
+		getBranchList()
+	}
+	
+
+	}, [recoveryStatus])
+
+
 	return (
 		<div>
 			<Sidebar mode={2} />
@@ -191,10 +235,10 @@ const handleExportMembers = (loans) => {
 				spinning={loading}
 			>
 				<main className="px-4 h-auto my-10 mx-32">
-					<div className="flex flex-row gap-3 mt-20">
+					{/* <div className="flex flex-row gap-3 mt-20"> */}
 						
 					<Radiobtn
-					data={option_recovery}
+					data={userDetails[0]?.branch_type === 'H' ? option_recovery_HeadOffice :  option_recovery}
 					val={recoveryStatus}
 					onChangeVal={(value) => {
 					onChange(value)
@@ -202,7 +246,7 @@ const handleExportMembers = (loans) => {
 					/>
 
 					{recoveryStatus == 'A' &&(
-					<>
+					<div className="grid grid-cols-4 gap-4">
 						{/* <form onSubmit={formik.handleSubmit}> */}
 					<div className="mt-1">
 					<TDInputTemplateBr
@@ -225,6 +269,42 @@ const handleExportMembers = (loans) => {
 					mode={1}
 					/>
 					</div>
+
+					{userDetails[0]?.branch_type === 'H' &&(
+						<div className="mt-2">
+						<label htmlFor="brnch" className="block text-sm font-medium text-slate-700 mb-1">
+						<strong>Choose Branches</strong>
+						</label>
+
+						{/* {branch_Select} */}
+						<Select
+						showSearch
+						placeholder="Select a branch"
+						value={branch_Select || undefined}
+						style={{ width: "100%" }}
+						optionFilterProp="children"
+						onChange={(value) => {
+						setBranch_Select(value); // ✅ same as setFieldValue
+						console.log("Selected:", value);
+						}}
+						filterOption={(input, option) =>
+						option?.children?.toLowerCase().includes(input.toLowerCase())
+						}
+						>
+						<Select.Option value="" disabled>
+						Select Branches / Society
+						</Select.Option>
+
+						{branches.map((opt) => (
+						<Select.Option key={opt.code} value={opt.code}>
+						{opt.name}
+						</Select.Option>
+						))}
+						</Select>
+
+						</div>
+						)}
+
 					<div className="mt-1">
 					<button
 						type="button"
@@ -237,57 +317,13 @@ const handleExportMembers = (loans) => {
 					</div>
 
 					{/* </form> */}
-					</>
+					</div>
 					)}
 
-					</div>
+					{/* </div> */}
 					
 
-					{/* <div className="mt-5">
-						<label
-							for="default-search"
-							className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
-						>
-							Search
-						</label>
-						<div className="relative mt-10">
-							<div className="absolute inset-y-0  start-0 flex items-center ps-3 pointer-events-none">
-								<svg
-									className="w-4 h-4 text-gray-500 dark:text-gray-400"
-									aria-hidden="true"
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 20 20"
-								>
-									<path
-										stroke="currentColor"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-									/>
-								</svg>
-							</div>
-							<input
-								type="search"
-								id="default-search"
-								className="block mt-10 w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500"
-								placeholder="Search Loans by Group Name / Code"
-								// onChange={(e) => setSearchKeywords(e.target.value)}
-								onChange={(text) => setSearch(text.target.value)}
-							/>
-							<button
-								type="submit"
-								className="text-white absolute end-2.5 disabled:bg-[#ee7c98] bottom-2.5 bg-[#DA4167] hover:bg-[#DA4167] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								onClick={fetchSearchedGroups}
-								disabled={!searchKeywords}
-							>
-								Search
-							</button>
-
-							
-						</div>
-					</div> */}
+					
 					{/* {JSON.stringify(fromDate, 2)} */}
 
 					{/* {JSON.stringify(toDate, 2)} */}
@@ -306,13 +342,7 @@ const handleExportMembers = (loans) => {
 										 md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-1.5`}
 									>
 										<div className="w-full flex flex-row-reverse justify-between items-center mx-4">
-											{/* <div className="flex items-center justify-between"> */}
-												
-												
-					
-												{/* <label htmlFor="simple-search" className="sr-only">
-													Search
-												</label> */}
+											{userDetails[0]?.branch_type != 'H' &&(
 												<button
 												className="inline-flex items-center text-white ml-6 disabled:bg-[#ee7c98] bg-[#DA4167] hover:bg-[#DA4167] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 												onClick={() => {
@@ -322,6 +352,7 @@ const handleExportMembers = (loans) => {
 												{/* <PlusOutlined className="text-xl" /> */}
 												 Recovery
 											</button>
+											)}
 												{/* {showSearch && ( */}
 													<div className="relative w-full">
 														<div className="absolute inset-y-0 left-0 flex items-center md:ml-4 pl-3 pointer-events-none">

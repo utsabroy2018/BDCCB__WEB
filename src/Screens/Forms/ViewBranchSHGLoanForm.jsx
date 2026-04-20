@@ -232,7 +232,8 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_code: userDetails[0]?.brn_code,
 			group_code: loanAppData?.group_code,
-			society_acc_no: loanAppData?.group_details[0]?.society_acc_no
+			society_acc_no: loanAppData?.group_details[0]?.society_acc_no,
+			branch_type: userDetails[0]?.branch_type
 		}
 
 
@@ -247,10 +248,8 @@ function ViewBranchSHGLoanForm({ groupDataArr }) {
 			})
 			.then((res) => {
 
-				console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
+				// console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaaaa', creds);
 				if (res?.data?.success) {
-
-
 					// setGroups(res?.data?.data)
 					// setCopyLoanApplications(res?.data?.data)
 					setGroupData(res?.data?.data)

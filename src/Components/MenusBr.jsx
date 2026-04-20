@@ -2403,42 +2403,42 @@ const items_bdccb_Supper_User = [
 			icon: <ThunderboltOutlined />,
 			label: "Loans",
 			children: [
-				// {
-				// 	key: "sub4-1",
-				// 	icon: <CheckCircleOutlined />,
-				// 	label: "Disbursement",
-				// 	children: [
-				// 		{
-				// 			key: "sub4-1-1",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homepacs/disburseloan"}>Society</Link>,
-				// 		},
+				{
+					key: "sub4-1",
+					icon: <CheckCircleOutlined />,
+					label: "Disbursement",
+					children: [
+						{
+							key: "sub4-1-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homepacs/disburseloan"}>Society</Link>,
+						},
 						
-				// 		{
-				// 			key: "sub4-1-1",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
-				// 		},
-				// 	],
-				// },
+						{
+							key: "sub4-1-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
+						},
+					],
+				},
 
-				// {
-				// 	key: "sub4-2",
-				// 	icon: <CheckCircleOutlined />,
-				// 	label: "Recovery",
-				// 	children: [
-				// 		{
-				// 			key: "sub4-2-1",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homebm/loan-recovery-society-list"}>Society</Link>,
-				// 		},
-				// 		{
-				// 			key: "sub4-2-2",
-				// 			icon: <CheckCircleOutlined />,
-				// 			label: <Link to={"/homebm/loan-recovery-shg-list"}>SHG</Link>,
-				// 		},
-				// 	],
-				// },
+				{
+					key: "sub4-2",
+					icon: <CheckCircleOutlined />,
+					label: "Recovery",
+					children: [
+						{
+							key: "sub4-2-1",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/loan-recovery-society-list"}>Society</Link>,
+						},
+						{
+							key: "sub4-2-2",
+							icon: <CheckCircleOutlined />,
+							label: <Link to={"/homebm/loan-recovery-shg-list"}>SHG</Link>,
+						},
+					],
+				},
 
 				// {
 				// 	key: "sub4-3",
