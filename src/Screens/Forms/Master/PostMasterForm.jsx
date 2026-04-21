@@ -34,24 +34,45 @@ function PostMasterForm() {
 				}))
 			)
 	const [visible, setVisible] = useState(() => false)
+	const [blocks, setBlocks] = useState(() => [])
 
-	console.log(params, "params")
-	console.log(location, "location", location.state)
+	
 
 	const [masterData, setMasterData] = useState({
 		post_name: "",
 		dist_id: "",
 		pin_code: "",
+		block_id: "",
 	})
 
 	const handleChangeMaster = (e) => {
 		// console.log(e, 'vvvvvvvvvvvvvvvvv');
 		
 		const { name, value } = e.target
-		setMasterData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}))
+		// setMasterData((prevData) => ({
+		// 	...prevData,
+		// 	[name]: value,
+		// }))
+
+		setMasterData((prev) => {
+			const updated = {
+				...prev,
+				[name]: value,
+			}
+			// when district changes
+			if (name === "dist_id") {
+
+				if (value > 0) {
+					fetchBlock(value)
+				} else {
+					setBlocks([])
+				}
+				updated.block_id = ""
+			}
+
+
+			return updated
+		})
 	}
 
 	useEffect(() => {
@@ -62,6 +83,7 @@ function PostMasterForm() {
 			dist_id: masterDetails?.dist_id || "",
 			// pin_code: masterDetails?.pin || "",
 			pin_code: masterDetails?.pin ? String(masterDetails.pin) : "",
+			block_id: masterDetails?.block_id || "",
 		})
 	}, [])
 
@@ -112,60 +134,10 @@ function PostMasterForm() {
 	return data.ip
 	}
 
-	// const handleSaveMaster__________NEW = async () => {
-		
-	// 	console.log(masterDetails?.po_id, 'masterDetails', masterData);
-	// 	// return
-
-	// 	setLoading(true)
-
-	// 	const ip = await getClientIP()
-
-	// 	const creds = {
-	// 		po_id: params?.id > 0 ? masterDetails?.po_id : 0,
-	// 		dist_id: masterData?.dist_id,
-	// 		post_name: masterData?.post_name,
-	// 		pin: masterData?.pin_code,
-	// 		created_by: userDetails[0]?.emp_id,
-	// 		created_at: new Date().toISOString(),
-	// 		created_ip: ip,
-	// 	}
-
-	// 	console.log(params?.id, 'masterDetailsPPPPPPPPPPPPPPPPP', creds);
-	// 	// return;
-
-	// 	// const creds = params.id > 0 ? creds_edit : creds_add
-	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	// 	await axios
-	// 		.post(`${url_bdccb}/master/save_post`, creds, {
-	// 		headers: {
-	// 		Authorization: `${tokenValue?.token}`, // example header
-	// 		"Content-Type": "application/json", // optional
-	// 		},
-	// 		})
-	// 		.then((res) => {
-
-	// 			console.log(res, 'masterDetails_______________________');
-				
-	// 		if(res?.data?.success){
-	// 		Message("success", "Details saved.")
-	// 		navigate(-1)
-	// 		} else {
-	// 		Message('error', res?.data?.msg)
-	// 		navigate(routePaths.LANDING)
-	// 		localStorage.clear()
-	// 		}
-
-	// 		})
-	// 		.catch((err) => {
-	// 			Message("error", "Some error occurred.")
-	// 			console.log("ERR", err)
-	// 		})
-	// 	setLoading(false)
-	// }
+	
 
 	const handleSaveMaster = async () => {
+
 			setLoading(true)
 		
 			const ip = await getClientIP()
@@ -173,6 +145,7 @@ function PostMasterForm() {
 			const creds = {
 			po_id: params?.id > 0 ? masterDetails?.po_id : 0,
 			dist_id: masterData?.dist_id,
+			block_id: masterData?.block_id,
 			post_name: masterData?.post_name,
 			pin: masterData?.pin_code,
 			created_by: userDetails[0]?.emp_id,
@@ -214,8 +187,60 @@ function PostMasterForm() {
 			post_name: "",
 			dist_id: "",
 			pin_code: "",
+			block_id: "",
 		})
 	}
+
+
+	
+	const fetchBlock = async (dist_id) => {
+		setBlocks([])
+		setLoading(true)
+		console.log(dist_id, 'dist_iddist_iddist_iddist_iddist_iddist_id');
+
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/master/block_list`, {
+			params: {
+				dist_id: dist_id,
+			},
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+			},
+		})
+			.then((res) => {
+
+				console.log(res?.data?.data, 'hhhhhhhhhhhhhhhhh');
+
+				if (res?.data?.success) {
+					// setBlocks(res?.data?.data)
+					setBlocks(res?.data?.data?.map((item, i) => ({
+						code: item?.block_id,
+						name: item?.block_name,
+					})))
+
+				} else {
+					Message('error', res?.data?.msg)
+					navigate(routePaths.LANDING)
+					localStorage.clear()
+				}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
+
+	useEffect(() => {
+		if (params?.id > 0) {
+			fetchBlock(masterDetails?.dist_id)
+		}
+	}, [])
+
 
 	return (
 		<>
@@ -228,7 +253,7 @@ function PostMasterForm() {
 				<form onSubmit={onSubmit}>
 					<div>
 						<div>
-							<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
+							<div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
 
 								<div>
 									{/* {masterData.post_name} */}
@@ -267,6 +292,18 @@ function PostMasterForm() {
 										formControlName={masterData.dist_id}
 										handleChange={handleChangeMaster}
 										data={districts}
+										mode={2}
+									/>
+								</div>
+								<div>
+									<TDInputTemplateBr
+										placeholder="Select Block..."
+										type="text"
+										label="Block"
+										name="block_id"
+										formControlName={masterData.block_id}
+										handleChange={handleChangeMaster}
+										data={blocks}
 										mode={2}
 									/>
 								</div>

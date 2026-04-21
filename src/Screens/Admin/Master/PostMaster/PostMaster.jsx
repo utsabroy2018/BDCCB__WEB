@@ -169,7 +169,7 @@ function PostMaster() {
 					</div>
 
 					</div>
-
+					{/* {JSON.stringify(loanApplications, 2)} */}
 					<PostTable
 						// flag="BM"
 						flag=""

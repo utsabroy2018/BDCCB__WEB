@@ -91,6 +91,7 @@ const containerStyle = {
 	const [policeStation, setPoliceStation] = useState(() => [])
 	const [postOffice, setPostOffice] = useState(() => [])
 	const [gpName, setGpName] = useState(() => [])
+	const [pinCodeList, setPinCodeList] = useState(() => [])
 	const [villName, setVillName] = useState(() => [])
 	const [branch, setBranch] = useState(() => [])
 
@@ -160,11 +161,11 @@ const containerStyle = {
 		// otherwise: (schema) => schema.notRequired(),
 		// }),
 
-		// packs_id: Yup.string().when("directIndirectStatus", {
-		// 	is: "I",
-		// 	then: (schema) => schema.required("PACKS name is required"),
-		// 	otherwise: (schema) => schema.notRequired(),
-		// }),
+		
+		packs_id:
+		userDetails[0]?.user_type === "P"
+		? Yup.string().required("PACKS name is required")
+		: Yup.string().notRequired(),
 		g_group_name: Yup.string().required("Group name is required"),
 		saving_acc_no: Yup.string().required("Group Savings A/C Number is required"),
 		g_address: Yup.string().required("Address is required"),
@@ -526,29 +527,6 @@ const containerStyle = {
 				// members: formData?.members,
 				}
 
-				// {
-				// 	"group_code" : "0",
-				// 	"branch_code": "1",
-				// 	"tenant_id" : "1",
-				// 	"group_name" : "TO",
-				// 	"phone1" : "9632145555",
-				// 	"sahayika_id" : "8",
-				// 	"group_addr" : "KOLKATA",
-				// 	"dist_id" : "2",
-				// 	"block_id" : "2",
-				// 	"ps_id" : "2",
-				// 	"po_id" : "2",
-				// 	"gp_id" : "2",
-				// 	"village_id" : "2",
-				// 	"pin_no" : "712232",
-				// 	"saving_acc_no":"963566",
-				// 	"pacs_id":"10",
-				// 	"created_by": "Lokesh",
-				// 	"ip_address" : "12.23.23.23"
-				// }
-
-				
-
 				console.log(creds, 'credscredscredscreds', formData);
 
 				// return;
@@ -755,14 +733,17 @@ const containerStyle = {
 		setLoading(false)
 	}
 
-	const fetchPoliceStation = async (dist_id) => {
+	const fetchPoliceStation = async (dist_id, block_id) => {
+
+		// console.log(dist_id, block_id, 'namenamenamename');
+		
 		setLoading(true)
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios
 			.get(`${url_bdccb}/master/policestation_list`, {
 				params: {
-				dist_id: dist_id,
+				dist_id: dist_id, block_id: block_id
 				},
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
@@ -792,14 +773,15 @@ const containerStyle = {
 		setLoading(false)
 	}
 
-	const fetchPosOffice = async (dist_id) => {
+	const fetchPosOffice = async (dist_id, block_id) => {
+		// console.log(dist_id, block_id, 'namenamenamename');
 		setLoading(true)
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios.get(`${url_bdccb}/master/po_list`, {
 			params: {
-		dist_id: dist_id,
+		dist_id: dist_id, block_id: block_id
 		},
 		headers: {
 		Authorization: `${tokenValue?.token}`, // example header
@@ -830,12 +812,6 @@ const containerStyle = {
 
 	const fetchGPList = async (dist_id, block_id) => {
 		setLoading(true)
-
-		// const creds = {
-		// 	prov_grp_code: 0,
-		// 	user_type: userDetails?.id,
-		// 	branch_code: userDetails?.brn_code,
-		// }
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
@@ -947,6 +923,46 @@ const containerStyle = {
 	}
 
 
+	const fetchPINCodeList = async (dist_id, block_id) => {
+		setLoading(true)
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/master/pin_list`, {
+			params: {
+		dist_id: dist_id, block_id: block_id
+		},
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		},
+		})
+			.then((res) => {
+
+
+			if(res?.data?.success){
+			console.log(res?.data?.data, 'ffffffffffffffffffffff');
+			
+			// setPinCodeList()
+			setPinCodeList(res?.data?.data?.map((item, i) => ({
+			code: item?.pin,
+			name: item?.pin,
+			})))
+			} else {
+			Message('error', res?.data?.msg)
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
+
+
 
 
 const handleFormikMasterChange = async (e) => {
@@ -955,12 +971,15 @@ const handleFormikMasterChange = async (e) => {
   // 1️⃣ Always update Formik first
   formik.setFieldValue(name, value);
 
+//   console.log(name, 'namenamenamename', value, 'vvvvvvvvvvvvvvv', formik.values.dist_id, formik.values.block_id);
+  
+
   // 2️⃣ District changed
   if (name === "dist_id") {
 	if (value?.length > 0) {
 	  fetchBlock(value);
-	  fetchPoliceStation(value);
-	  fetchPosOffice(value);
+	//   fetchPoliceStation(value);
+	//   fetchPosOffice(value);
 	  fetchBranch(value);
 	  console.log("load district");
 	} else {
@@ -968,8 +987,10 @@ const handleFormikMasterChange = async (e) => {
 	  setPoliceStation([]);
 	  setPostOffice([]);
 	  setBranch([]);
-	  console.log("reset district");
+	  setPinCodeList([]);
+	//   console.log("reset district");
 	}
+
 
 	// reset dependent Formik fields
 	formik.setFieldValue("block_id", "");
@@ -987,9 +1008,17 @@ const handleFormikMasterChange = async (e) => {
 	const distId = formik.values.dist_id;
 
 	if (distId?.length > 0 && value?.length > 0) {
+
+	  fetchPoliceStation(distId, value);
+	  fetchPosOffice(distId, value);
 	  fetchGPList(distId, value);
+	  fetchPINCodeList(distId, value);
+	  
 	} else {
 	  setGpName([]);
+	  setPoliceStation([]);
+	  setPostOffice([]);
+	  setPinCodeList([]);
 	}
 
 	// reset downstream
@@ -1023,6 +1052,8 @@ const checkMobileExists = async (mobile) => {
 	  params: { user_id: mobile },
 	});
 
+	console.log(res.data, 'ddddddddddddddddddddddd');
+	
 	setMobileExists(res.data)
 	
 	return res.data; // true / false
@@ -1035,8 +1066,9 @@ const checkMobileExists = async (mobile) => {
 
 
 const handleMobileChange = async (e) => {
-  const value = e.target.value;
-
+//   const value = e.target.value;
+let value = e.target.value;
+	value = value.replace(/\D/g, "").slice(0, 10);
   formik.setFieldValue("g_phone1", value);
 
   if (value.length === 10) {
@@ -1104,34 +1136,7 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 					<div className="flex justify-start gap-5">
 						<div className={"grid gap-4 sm:grid-cols-4 sm:gap-6 w-full mb-3"}>
 							{/* {JSON.stringify(branchList, null, 2)} */}
-					{/* <div className="sm:col-span-3 radioBtn_addgrp">
-						
-						{userDetails[0]?.user_type == 'B' ? 
-							(
-							<Radiobtn
-							data={group_trans_process}
-							val={directIndirectStatus}
-							// disabled={true}
-							onChangeVal={(value) => {
-							onChange(value)
-							}}
-							/>
-							):(
-							<Radiobtn
-							data={[{
-							label: directIndirectStatus == "D" ? "Direct" : "Indirect",
-							value: directIndirectStatus,
-							}]}
-							val={directIndirectStatus}
-							disabled
-							onChangeVal={(value) => {
-							onChange(value)
-							}}
-							/>
-							)}
-						
-						
-					</div> */}
+					
 					{/* {directIndirectStatus == 'D' &&( */}
 					<div className="sm:col-span-2">
 					<TDInputTemplateBr
@@ -1161,7 +1166,6 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 
 					{userDetails[0]?.user_type == "P" ? (
 						<div className="sm:col-span-2">
-{/* {JSON.stringify(PACKSList, null, 2)} */}
 					<TDInputTemplateBr
 					placeholder="Select Society"
 					type="text"
@@ -1268,22 +1272,6 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="PIN No."
-									type="number"
-									label="PIN No."
-									name="g_pin"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_pin}
-									mode={1}
-								/>
-								{formik.errors.g_pin && formik.touched.g_pin ? (
-									<VError title={formik.errors.g_pin} />
-								) : null}
-							</div>
-
-							<div>
-								<TDInputTemplateBr
 									placeholder="Mobile No. Of Group Leader"
 									type="number"
 									label="Mobile No. Of Group Leader"
@@ -1293,6 +1281,7 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 									handleBlur={formik.handleBlur}
 									formControlName={formik.values.g_phone1}
 									mode={1}
+									maxLength={10}
 								/>
 								{mobileExists?.user_status == 1 ?(
 									<div style={{fontSize:12, color:'red'}}>{mobileExists?.msg}</div>
@@ -1305,29 +1294,6 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 									<VError title={formik.errors.g_phone1} />
 								) : null}
 							</div>
-
-							
-
-							
-
-							
-
-							{/* <div>
-								<TDInputTemplateBr
-									placeholder="SB Account"
-									type="text"
-									label="SB Account"
-									name="g_acc1"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_acc1}
-									mode={1}
-								/>
-								{formik.errors.g_acc1 && formik.touched.g_acc1 ? (
-									<VError title={formik.errors.g_acc1} />
-								) : null}
-							</div> */}
-
 
 							<div>
 							<TDInputTemplateBr
@@ -1348,6 +1314,63 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 									<VError title={formik.errors.dist_id} />
 								) : null}
 							</div>
+
+							<div>
+								{/* {JSON.stringify(masterData, null, 2)}  */}
+						<TDInputTemplateBr
+						placeholder="Select Block..."
+						type="text"
+						label="Block"
+						name="block_id"
+						// formControlName={masterData.block_id}
+						// handleChange={handleChangeMaster}
+						formControlName={formik.values.block_id}
+						// handleChange={formik.handleChange}
+						handleChange={handleFormikMasterChange} 
+						handleBlur={formik.handleBlur}
+						data={blocks}
+						mode={2}
+						/>
+						{formik.errors.block_id && formik.touched.block_id ? (
+									<VError title={formik.errors.block_id} />
+								) : null}
+					</div>
+
+
+							<div>
+								{/* <TDInputTemplateBr
+									placeholder="PIN No."
+									type="number"
+									label="PIN No."
+									name="g_pin"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.g_pin}
+									mode={1}
+								/> */}
+
+								<TDInputTemplateBr
+								placeholder="Select PIN No..."
+								type="text"
+								label="PIN No."
+								name="g_pin"
+								// formControlName={masterData.gp_id}
+								// handleChange={handleChangeMaster}
+								formControlName={formik.values.g_pin}
+								// handleChange={formik.handleChange}
+								handleChange={handleFormikMasterChange} 
+								handleBlur={formik.handleBlur}
+								data={pinCodeList}
+								mode={2}
+								/>
+
+								{formik.errors.g_pin && formik.touched.g_pin ? (
+									<VError title={formik.errors.g_pin} />
+								) : null}
+							</div>
+
+
+							
 
 							
 
@@ -1391,26 +1414,7 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 								) : null}
 					</div>
 
-							<div>
-								{/* {JSON.stringify(masterData, null, 2)}  */}
-						<TDInputTemplateBr
-						placeholder="Select Block..."
-						type="text"
-						label="Block"
-						name="block_id"
-						// formControlName={masterData.block_id}
-						// handleChange={handleChangeMaster}
-						formControlName={formik.values.block_id}
-						// handleChange={formik.handleChange}
-						handleChange={handleFormikMasterChange} 
-						handleBlur={formik.handleBlur}
-						data={blocks}
-						mode={2}
-						/>
-						{formik.errors.block_id && formik.touched.block_id ? (
-									<VError title={formik.errors.block_id} />
-								) : null}
-					</div>
+							
 
 					<div>
 						

@@ -120,6 +120,9 @@ function PoliceStationTable({
 							<th scope="col" className="p-4">
 								Police Station Name
 							</th>
+							<th scope="col" className="p-4">
+								Block Name
+							</th>
 							{/* <th scope="col" className="p-4">
 								District Name
 							</th> */}
@@ -145,6 +148,9 @@ function PoliceStationTable({
                                     </th> */}
 									<td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.ps_name}
+									</td>
+									<td className="px-6 py-3 text-slate-800 font-bold">
+										{item?.block_name}
 									</td>
 									{/* <td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.dist_name}

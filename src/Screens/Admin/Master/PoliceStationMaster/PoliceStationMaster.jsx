@@ -174,6 +174,7 @@ function PoliceStationMaster() {
 
 					</div>
 
+					{/* {JSON.stringify(loanApplications, 2)}  */}
 					<PoliceStationTable
 						// flag="BM"
 						flag=""

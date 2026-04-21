@@ -110,52 +110,7 @@ function GPListMasterForm() {
 		return data.ip
 	}
 
-	// const handleSaveMaster__________NEW = async () => {
-
-	// 	// return
-
-	// 	setLoading(true)
-
-	// 	const ip = await getClientIP()
-
-	// 	const creds = {
-	// 		gp_id: params?.id > 0 ? masterDetails?.gp_id : 0,
-	// 		dist_id: masterData?.dist_id,
-	// 		block_id: masterData?.block_id,
-	// 		gp_name: masterData?.gp_name,
-	// 		created_by: userDetails[0]?.emp_id,
-	// 		created_at: new Date().toISOString(),
-	// 		created_ip: ip,
-	// 	}
-
-	// 	// const creds = params.id > 0 ? creds_edit : creds_add
-	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	// 	await axios
-	// 		.post(`${url_bdccb}/master/save_gp`, creds, {
-	// 			headers: {
-	// 				Authorization: `${tokenValue?.token}`, // example header
-	// 				"Content-Type": "application/json", // optional
-	// 			},
-	// 		})
-	// 		.then((res) => {
-
-	// 			if (res?.data?.success) {
-	// 				Message("success", "Details saved.")
-	// 				navigate(-1)
-	// 			} else {
-	// 				Message('error', res?.data?.msg)
-	// 				navigate(routePaths.LANDING)
-	// 				localStorage.clear()
-	// 			}
-
-	// 		})
-	// 		.catch((err) => {
-	// 			Message("error", "Some error occurred.")
-	// 			console.log("ERR", err)
-	// 		})
-	// 	setLoading(false)
-	// }
+	
 
 	const handleSaveMaster = async () => {
 	setLoading(true)
@@ -268,7 +223,7 @@ function GPListMasterForm() {
 								</div>
 
 								<div>
-									{/* {masterData.dist_id} */}
+									{/* {masterData.block_id} */}
 									<TDInputTemplateBr
 										placeholder="Select Block..."
 										type="text"

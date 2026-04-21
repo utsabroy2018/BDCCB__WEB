@@ -34,23 +34,46 @@ function PoliceStationForm() {
 			}))
 		)
 	const [visible, setVisible] = useState(() => false)
+	const [blocks, setBlocks] = useState(() => [])
 
-	console.log(params, "params")
-	console.log(location, "location", location.state)
+	// console.log(params, "params")
+	// console.log(location, "location", location.state)
 
 	const [masterData, setMasterData] = useState({
 		ps_name: "",
 		dist_id: "",
+		block_id: "",
 	})
 
 	const handleChangeMaster = (e) => {
 		// console.log(e, 'vvvvvvvvvvvvvvvvv');
 		
 		const { name, value } = e.target
-		setMasterData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}))
+		// setMasterData((prevData) => ({
+		// 	...prevData,
+		// 	[name]: value,
+		// }))
+
+		setMasterData((prev) => {
+			const updated = {
+				...prev,
+				[name]: value,
+			}
+			// when district changes
+			if (name === "dist_id") {
+
+				if (value > 0) {
+					fetchBlock(value)
+				} else {
+					setBlocks([])
+				}
+				updated.block_id = ""
+			}
+
+
+			return updated
+		})
+
 	}
 
 	useEffect(() => {
@@ -59,6 +82,7 @@ function PoliceStationForm() {
 		setMasterData({
 			ps_name: masterDetails?.ps_name || "",
 			dist_id: masterDetails?.dist_id || "",
+			block_id: masterDetails?.block_id || "",
 		})
 	}, [])
 
@@ -109,61 +133,6 @@ function PoliceStationForm() {
 	return data.ip
 	}
 
-	// const handleSaveMaster__________NEW = async () => {
-		
-	// 	console.log(masterDetails?.po_id, 'masterDetails', masterData);
-	// 	// return
-
-	// 	setLoading(true)
-
-	// 	const ip = await getClientIP()
-
-	// 	const creds = {
-	// 		ps_id: params?.id > 0 ? masterDetails?.ps_id : 0,
-	// 		dist_id: masterData?.dist_id,
-	// 		block_id: 0,
-	// 		ps_name: masterData?.ps_name,
-	// 		created_by: userDetails[0]?.emp_id, //userDetails[0]?.emp_id
-	// 		created_at: new Date().toISOString(),
-	// 		created_ip: ip,
-	// 	}
-
-
-
-	// 	console.log(params?.id, 'masterDetailsPPPPPPPPPPPPPPPPP', creds);
-	// 	// return;
-
-	// 	// const creds = params.id > 0 ? creds_edit : creds_add
-	// 	const tokenValue = await getLocalStoreTokenDts(navigate);
-
-	// 	await axios
-	// 		.post(`${url_bdccb}/master/save_policestation`, creds, {
-	// 		headers: {
-	// 		Authorization: `${tokenValue?.token}`, // example header
-	// 		"Content-Type": "application/json", // optional
-	// 		},
-	// 		})
-	// 		.then((res) => {
-
-	// 			console.log(res, 'masterDetails_______________________');
-				
-	// 		if(res?.data?.success){
-	// 		Message("success", "Details saved.")
-	// 		navigate(-1)
-	// 		} else {
-	// 		Message('error', res?.data?.msg)
-	// 		navigate(routePaths.LANDING)
-	// 		localStorage.clear()
-	// 		}
-
-	// 		})
-	// 		.catch((err) => {
-	// 			Message("error", "Some error occurred.")
-	// 			console.log("ERR", err)
-	// 		})
-	// 	setLoading(false)
-	// }
-
 	const handleSaveMaster = async () => {
 				setLoading(true)
 			
@@ -172,7 +141,8 @@ function PoliceStationForm() {
 				const creds = {
 				ps_id: params?.id > 0 ? masterDetails?.ps_id : 0,
 				dist_id: masterData?.dist_id,
-				block_id: 0,
+				// block_id: 0,
+				block_id: masterData?.block_id,
 				ps_name: masterData?.ps_name,
 				created_by: userDetails[0]?.emp_id, //userDetails[0]?.emp_id
 				created_at: new Date().toISOString(),
@@ -199,21 +169,62 @@ function PoliceStationForm() {
 		setVisible(true)
 	}
 
-	// const onReset = () => {
-	// 	// params?.id < 1
-	// 	setMasterData({
-	// 		ps_name: "",
-	// 		dist_id: "",
-	// 		pin_code: "",
-	// 	})
-	// }
-
 	const onReset = () => {
 		setMasterData({
 			ps_name: "",
 			dist_id: "",
+			block_id: "",
 		})
 	}
+
+	
+	const fetchBlock = async (dist_id) => {
+		setBlocks([])
+		setLoading(true)
+		console.log(dist_id, 'dist_iddist_iddist_iddist_iddist_iddist_id');
+
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/master/block_list`, {
+			params: {
+				dist_id: dist_id,
+			},
+			headers: {
+				Authorization: `${tokenValue?.token}`, // example header
+				"Content-Type": "application/json", // optional
+			},
+		})
+			.then((res) => {
+
+				console.log(res?.data?.data, 'hhhhhhhhhhhhhhhhh');
+
+				if (res?.data?.success) {
+					// setBlocks(res?.data?.data)
+					setBlocks(res?.data?.data?.map((item, i) => ({
+						code: item?.block_id,
+						name: item?.block_name,
+					})))
+
+				} else {
+					Message('error', res?.data?.msg)
+					navigate(routePaths.LANDING)
+					localStorage.clear()
+				}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
+
+	useEffect(() => {
+		if (params?.id > 0) {
+			fetchBlock(masterDetails?.dist_id)
+		}
+	}, [])
 
 	return (
 		<>
@@ -267,6 +278,20 @@ function PoliceStationForm() {
 										mode={2}
 									/>
 								</div>
+
+								<div>
+									<TDInputTemplateBr
+										placeholder="Select Block..."
+										type="text"
+										label="Block"
+										name="block_id"
+										formControlName={masterData.block_id}
+										handleChange={handleChangeMaster}
+										data={blocks}
+										mode={2}
+									/>
+								</div>
+								
 							</div>
 						</div>
 

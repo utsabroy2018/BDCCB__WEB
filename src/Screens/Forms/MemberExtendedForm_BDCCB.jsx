@@ -125,10 +125,11 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 	const [visible, setVisible] = useState(() => false)
 	const [pendingValues, setPendingValues] = useState(null);
-	const [mobileExists, setMobileExists] = useState();
+	const [mobileExists, setMobileExists] = useState({});
 	const [adharNoExists, setAdharNoExists] = useState();
 	const [adharStatus, setAdharStatus] = useState({})
 	const [SBAccountStatus, setSBAccountStatus] = useState({})
+	const [IFSCCodeStatus, setIFSCCodeStatus] = useState({})
 
 	const [directIndirectStatus, setDirectIndirectStatus] = useState("D")
 	const [branchList, setBranchList] = useState([]);
@@ -190,68 +191,23 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 	const validationSchema = Yup.object({
-		// branch_id: Yup.string(),
 		g_group_name: Yup.mixed(),
-		// g_group_name: Yup.string().required("Group Name required"),
-		// saving_acc_no: Yup.string(),
-		// g_address: Yup.string(),
-		// sahayika_id: Yup.string(),
-		// dist_id: Yup.mixed(),
-		// ps_id: Yup.mixed(),
-		// po_id: Yup.mixed(),
-		// block_id: Yup.mixed(),
-		// gp_id: Yup.mixed(),
-		// village_id: Yup.mixed(),
-		// g_phone1: Yup.mixed(),
-
-		// members: Yup.array()
-		// 	.of(
-		// 		Yup.object({
-		// 			member_name: Yup.string().required("Member name required"),
-		// 			// member_name: Yup.string().required("Member name required"),
-
-		// 			address: Yup.string(),
-		// 			sb_acc_no: Yup.string().required("SB Acc No. required"),
-		// 			aadhar_no: Yup.string().matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits").required("Aadhaar required"),
-		// 			// aadhar_no: Yup.string(),
-
-		// 			gp_leader_flag: Yup.string()
-		// 				.oneOf(["Y", "N"])
-		// 				.required(),
-
-		// 			asst_gp_leader_flag: Yup.string()
-		// 				.oneOf(["Y", "N"])
-		// 				.required(),
-		// 		})
-		// 	).min(1, "At least one member required")
-
-		// 	// 🔐 ROLE VALIDATION
-		// 	.test(
-		// 		"leader-assistant-rule",
-		// 		"Only one Group Leader and one Assistant Member allowed",
-		// 		(members = []) => {
-		// 			const leaderCount = members.filter(
-		// 				(m) => m.gp_leader_flag === "Y"
-		// 			).length;
-
-		// 			const assistantCount = members.filter(
-		// 				(m) => m.asst_gp_leader_flag === "Y"
-		// 			).length;
-
-		// 			return leaderCount <= 1 && assistantCount <= 1;
-		// 		}
-		// 	)
+		
 
 		members: Yup.array()
-  .of(
-    Yup.object({
+		.of(
+		Yup.object({
       member_name: Yup.string().required("Member name required"),
 
       sb_acc_no: Yup.string().required("SB A/C No. required"),
 
+	  ifsc_code: Yup.string().required("IFSC Code required"),
+
       aadhar_no: Yup.string()
         .matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
         .required("Aadhaar required (Aadhaar must be 12 digits)"),
+
+	  husb_father: Yup.string().required("IFSC Code required"),
 
       mobile_no: Yup.string()
         .matches(/^[0-9]{10}$/, "Mobile must be 10 digits")
@@ -1103,37 +1059,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		formik.setFieldValue("members", updated);
 	};
 
-	const checkMobileExists = async (mobile) => {
-		try {
-			const res = await axios.get(`${url_bdccb}/user/checkuser`, {
-				params: { user_id: mobile },
-			});
-
-			setMobileExists(res.data)
-
-			return res.data; // true / false
-		} catch (err) {
-			console.log(err);
-			return false;
-		}
-	};
-
-
-
-	const handleMobileChange = async (e) => {
-		const value = e.target.value;
-
-		formik.setFieldValue("g_phone1", value);
-
-		if (value.length === 10) {
-			const exists = await checkMobileExists(value);
-
-
-			if (exists?.user_status == 1) {
-				formik.setFieldValue("g_phone1", "");
-			}
-		}
-	};
+	
 
 
 	const checkAdharNoExists = async (aadhaarNo, index) => {
@@ -1248,6 +1174,147 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		members[index].sb_acc_no = value;
 		formik.setFieldValue("members", members);
 	};
+
+
+	const checkIFCS_code_format = (ifsc, index) => {
+	const value = ifsc.toUpperCase();
+
+	// Rule-based validation
+	const isValid = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(value);
+
+	if (!isValid) {
+		setIFSCCodeStatus(prev => ({
+			...prev,
+			[index]: {
+				user_status: 1,
+				msg: "Invalid IFSC (Format: ABCD0XXXXXX)",
+			},
+		}));
+		return;
+	}
+
+	// ✅ Valid IFSC
+	setIFSCCodeStatus(prev => ({
+		...prev,
+		[index]: {
+			user_status: 0,
+			msg: "Valid IFSC",
+		},
+	}));
+};
+
+
+	const checkIFSC_Code = (e, index) => {
+		// let value = e.target.value.replace(/\D/g, "");
+		let value = e.target.value.toUpperCase(); 
+
+		const members = [...formik.values.members];
+
+		// 🔴 DUPLICATE CHECK INSIDE FORM
+		const isDuplicate = members.some(
+			(m, i) => i !== index && m.ifsc_code === value
+		);
+
+		if (isDuplicate) {
+			// set error message for this row
+			setIFSCCodeStatus(prev => ({
+				...prev,
+				[index]: {
+					user_status: 1,
+					msg: "Duplicate IFSC Code",
+				},
+			}));
+		} else {
+			// clear duplicate message
+			setIFSCCodeStatus(prev => {
+				const copy = { ...prev };
+				delete copy[index];
+				return copy;
+			});
+
+			// call API only if 12 digits and not duplicate
+			// if (value.length > 0) {
+			checkIFCS_code_format(value, index);
+			// }
+		}
+
+		members[index].ifsc_code = value;
+		formik.setFieldValue("members", members);
+	};
+
+
+	const checkMobileExists = async (mobileNum, index) => {
+		// try {
+		// 	const res = await axios.get(`${url_bdccb}/group/checacc_no`, {
+		// 		params: { account_no: mobileNum },
+		// 	});
+
+		// 	setIFSCCodeStatus(prev => ({
+		// 		...prev,
+		// 		[index]: res.data
+		// 	}));
+		// } catch (err) {
+		// 	console.log(err);
+		// }
+
+		console.log(mobileNum, 'mobileNummobileNummobileNum', index);
+		
+	};
+
+
+
+	const handleMobileChange = async (e, index) => {
+	let value = e.target.value.replace(/\D/g, ""); // ✅ only digits
+
+	// ✅ limit to 10 digits
+	if (value.length > 10) return;
+
+	const members = [...formik.values.members];
+
+	// 🔴 Duplicate check inside form
+	const isDuplicate = members.some(
+		(m, i) => i !== index && m.mobile_no === value
+	);
+
+	if (isDuplicate) {
+		setMobileExists(prev => ({
+			...prev,
+			[index]: {
+				user_status: 1,
+				msg: "Duplicate Mobile Number",
+			},
+		}));
+	} else {
+		// clear error
+		setMobileExists(prev => {
+			const copy = { ...prev };
+			delete copy[index];
+			return copy;
+		});
+
+		// ✅ Call API ONLY when exactly 10 digits
+		if (value.length === 10) {
+			checkMobileExists(value, index);
+		}
+	}
+
+	members[index].mobile_no = value;
+	formik.setFieldValue("members", members);
+};
+
+
+
+const hasErrorStatus =
+	formik.values.members.some((_, index) =>
+		IFSCCodeStatus[index]?.user_status == 1 ||
+		SBAccountStatus[index]?.user_status == 1 ||
+		adharStatus[index]?.user_status == 1 ||
+		mobileExists[index]?.user_status == 1
+	);
+
+
+
+
 	return (
 		<>
 			{/* {
@@ -1453,10 +1520,31 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 											type="text"   // ✅ MUST be text
 											name={`members[${index}].ifsc_code`}
 											formControlName={member.ifsc_code}
-											handleChange={formik.handleChange}
+											// handleChange={formik.handleChange}
+											handleChange={(e) => checkIFSC_Code(e, index)}
 											mode={1}
 										// disabled={params?.id > 0}
 										/>
+
+										{member.ifsc_code?.length > 0 && IFSCCodeStatus[index] && (
+											IFSCCodeStatus[index]?.user_status == 1 ? (
+												<div style={{ fontSize: 12, color: "red" }}>
+													{IFSCCodeStatus[index]?.msg}
+												</div>
+											) : (
+											<>
+											{/* <div style={{ fontSize: 12, color: "green" }}>
+											{SBAccountStatus[index]?.msg}
+											</div> */}
+											</>
+											)
+										)}
+
+										{formik.errors?.members?.[index]?.ifsc_code && (
+										<div className="text-red-500 text-xs">
+											{formik.errors.members[index].ifsc_code}
+										</div>
+										)}
 
 									</div>
 
@@ -1507,6 +1595,13 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 											handleChange={formik.handleChange}
 											mode={1}
 										/>
+
+										{formik.errors?.members?.[index]?.husb_father && (
+										<div className="text-red-500 text-xs">
+											{formik.errors.members[index].husb_father}
+										</div>
+										)}
+
 									</div>
 
 									{/* Mobile No. */}
@@ -1517,7 +1612,8 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 											type="number"
 											name={`members[${index}].mobile_no`}
 											formControlName={member.mobile_no}
-											handleChange={formik.handleChange}
+											// handleChange={formik.handleChange}
+											handleChange={(e) => handleMobileChange(e, index)}
 											mode={1}
 										/>
 
@@ -1525,6 +1621,20 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 										<div className="text-red-500 text-xs">
 											{formik.errors.members[index].mobile_no}
 										</div>
+										)}
+
+										{member.mobile_no?.length > 0 && mobileExists[index] && (
+											mobileExists[index]?.user_status == 1 ? (
+												<div style={{ fontSize: 12, color: "red" }}>
+													{mobileExists[index]?.msg}
+												</div>
+											) : (
+											<>
+											{/* <div style={{ fontSize: 12, color: "green" }}>
+											{SBAccountStatus[index]?.msg}
+											</div> */}
+											</>
+											)
 										)}
 
 									</div>
@@ -1790,7 +1900,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 
 					{/* {userDetails?.id != 3 &&  */}
-					<BtnComp mode="A" onReset={formik.resetForm} param={params?.id} />
+					<BtnComp mode="A" onReset={formik.resetForm} param={params?.id} disabled={hasErrorStatus} />
 					{/* } */}
 				</form>
 			</Spin>

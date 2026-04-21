@@ -120,6 +120,9 @@ function PostTable({
 								Post Name
 							</th>
 							<th scope="col" className="p-4">
+								Block Name
+							</th>
+							<th scope="col" className="p-4">
 								Pin Code
 							</th>
 							{/* <th scope="col" className="p-4">
@@ -147,6 +150,9 @@ function PostTable({
                                     </th> */}
 									<td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.post_name}
+									</td>
+									<td className="px-6 py-3 text-slate-800 font-bold">
+										{item?.block_name}
 									</td>
 									<td className="px-6 py-3 text-slate-800 font-bold">
 										{item?.pin}
@@ -185,7 +191,7 @@ function PostTable({
 							)) :  <tr 	className={
 										"bg-white border-b-pink-200 border-2 dark:bg-gray-800 dark:border-gray-700"
 									}>
-										<td colSpan={2} className="text-center p-5">
+										<td colSpan={4} className="text-center p-5">
 												<span className="text-lg">No Data Available</span>
 										</td>
 							</tr> 

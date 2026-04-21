@@ -108,6 +108,7 @@ function GroupExtendedForm({ groupDataArr }) {
 	const [branchList, setBranchList] = useState([]);
 	const [PACKSList, setPACKSList] = useState([]);
 	const [socityEditTimeBranch, setSocityEditTimeBranch] = useState([]);
+	const [pinCodeList, setPinCodeList] = useState(() => [])
 
 
 	const initialValues = {
@@ -343,8 +344,9 @@ function GroupExtendedForm({ groupDataArr }) {
 					// fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
 					fetchBlock(res?.data?.data[0]?.dist_id)
-					fetchPoliceStation(res?.data?.data[0]?.dist_id)
-					fetchPosOffice(res?.data?.data[0]?.dist_id)
+					fetchPoliceStation(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					fetchPosOffice(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					fetchPINCodeList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
 					fetchBranch(res?.data?.data[0]?.dist_id)
 
 					fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
@@ -374,12 +376,6 @@ function GroupExtendedForm({ groupDataArr }) {
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		// await axios.post(`${url_bdccb}/group/fetch_grp_dtls_code`, creds, {
-		// 	headers: {
-		// 		Authorization: `${tokenValue?.token}`, // example header
-		// 		"Content-Type": "application/json", // optional
-		// 	},
-		// })
 		await axios.get(`${url_bdccb}/group/fetch_grp_dtls_code`, {
 		params: {group_code: params?.id},
 		headers: {
@@ -430,8 +426,9 @@ function GroupExtendedForm({ groupDataArr }) {
 					// fetchPacks_Group(res?.data?.data[0]?.branch_code)
 
 					fetchBlock(res?.data?.data[0]?.dist_id)
-					fetchPoliceStation(res?.data?.data[0]?.dist_id)
-					fetchPosOffice(res?.data?.data[0]?.dist_id)
+					fetchPoliceStation(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					fetchPosOffice(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
+					fetchPINCodeList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
 					fetchBranch(res?.data?.data[0]?.dist_id)
 
 					fetchGPList(res?.data?.data[0]?.dist_id, res?.data?.data[0]?.block_id)
@@ -742,7 +739,7 @@ function GroupExtendedForm({ groupDataArr }) {
 		setLoading(false)
 	}
 
-	const fetchPoliceStation = async (dist_id) => {
+	const fetchPoliceStation = async (dist_id, block_id) => {
 		setLoading(true)
 
 		// const creds = {
@@ -756,7 +753,7 @@ function GroupExtendedForm({ groupDataArr }) {
 		await axios
 			.get(`${url_bdccb}/master/policestation_list`, {
 				params: {
-					dist_id: dist_id,
+					dist_id: dist_id, block_id: block_id
 				},
 				headers: {
 					Authorization: `${tokenValue?.token}`, // example header
@@ -795,14 +792,14 @@ function GroupExtendedForm({ groupDataArr }) {
 		setLoading(false)
 	}
 
-	const fetchPosOffice = async (dist_id) => {
+	const fetchPosOffice = async (dist_id, block_id) => {
 		setLoading(true)
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
 		await axios.get(`${url_bdccb}/master/po_list`, {
 			params: {
-				dist_id: dist_id,
+				dist_id: dist_id, block_id: block_id
 			},
 			headers: {
 				Authorization: `${tokenValue?.token}`, // example header
@@ -981,8 +978,8 @@ function GroupExtendedForm({ groupDataArr }) {
 		if (name === "dist_id") {
 			if (value?.length > 0) {
 				fetchBlock(value);
-				fetchPoliceStation(value);
-				fetchPosOffice(value);
+				// fetchPoliceStation(value);
+				// fetchPosOffice(value);
 				fetchBranch(value);
 				console.log("load district");
 			} else {
@@ -990,7 +987,8 @@ function GroupExtendedForm({ groupDataArr }) {
 				setPoliceStation([]);
 				setPostOffice([]);
 				setBranch([]);
-				console.log("reset district");
+				setPinCodeList([]);
+				// console.log("reset district");
 			}
 
 			// reset dependent Formik fields
@@ -1006,21 +1004,24 @@ function GroupExtendedForm({ groupDataArr }) {
 
 		// 3️⃣ Block changed
 		if (name === "block_id") {
-			// console.log('block_id', 'block_idblock_idblock_id', formik.values.dist_id, value);
 			
 			const distId = formik.values.dist_id;
-			fetchGPList(distId, value);
 
 			// if (distId?.length > 0 && value?.length > 0) {
-			// 	fetchGPList(distId, value);
-			// } else {
-			// 	setGpName([]);
-			// } // 27/03/2026
+			fetchPoliceStation(distId, value);
+	  		fetchPosOffice(distId, value);
+			fetchGPList(distId, value);
+			fetchPINCodeList(distId, value);
 
+			// } else {
 			// reset downstream
 			formik.setFieldValue("gp_id", "");
 			formik.setFieldValue("village_id", "");
 			setVillName([]);
+			setPoliceStation([]);
+	  		setPostOffice([]);
+			// setPinCodeList([]);
+			// }
 		}
 
 		// 4️⃣ GP changed
@@ -1081,7 +1082,10 @@ function GroupExtendedForm({ groupDataArr }) {
 
 
 	const handleMobileChange = async (e) => {
-		const value = e.target.value;
+		// const value = e.target.value;
+
+		let value = e.target.value;
+		value = value.replace(/\D/g, "").slice(0, 10);
 
 		formik.setFieldValue("g_phone1", value);
 
@@ -1208,6 +1212,46 @@ function GroupExtendedForm({ groupDataArr }) {
 		members[index].sb_acc_no = value;
 		formik.setFieldValue("members", members);
 	};
+
+	const fetchPINCodeList = async (dist_id, block_id) => {
+		setLoading(true)
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.get(`${url_bdccb}/master/pin_list`, {
+			params: {
+		dist_id: dist_id, block_id: block_id
+		},
+		headers: {
+		Authorization: `${tokenValue?.token}`, // example header
+		"Content-Type": "application/json", // optional
+		},
+		})
+			.then((res) => {
+
+
+			if(res?.data?.success){
+			console.log(res?.data?.data, 'ffffffffffffffffffffff');
+			
+			// setPinCodeList()
+			setPinCodeList(res?.data?.data?.map((item, i) => ({
+			code: item?.pin,
+			name: item?.pin,
+			})))
+			} else {
+			Message('error', res?.data?.msg)
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching data!")
+				console.log("ERRR", err)
+			})
+		setLoading(false)
+	}
+
 	return (
 		<>
 			{/* {
@@ -1423,22 +1467,6 @@ function GroupExtendedForm({ groupDataArr }) {
 
 							<div>
 								<TDInputTemplateBr
-									placeholder="PIN No."
-									type="number"
-									label="PIN No."
-									name="g_pin"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_pin}
-									mode={1}
-								/>
-								{formik.errors.g_pin && formik.touched.g_pin ? (
-									<VError title={formik.errors.g_pin} />
-								) : null}
-							</div>
-
-							<div>
-								<TDInputTemplateBr
 									placeholder="Mobile No. Of Group Leader"
 									type="number"
 									label="Mobile No. Of Group Leader"
@@ -1461,29 +1489,6 @@ function GroupExtendedForm({ groupDataArr }) {
 								) : null}
 							</div>
 
-
-
-
-
-
-
-							{/* <div>
-								<TDInputTemplateBr
-									placeholder="SB Account"
-									type="text"
-									label="SB Account"
-									name="g_acc1"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_acc1}
-									mode={1}
-								/>
-								{formik.errors.g_acc1 && formik.touched.g_acc1 ? (
-									<VError title={formik.errors.g_acc1} />
-								) : null}
-							</div> */}
-
-
 							<div>
 								<TDInputTemplateBr
 									placeholder="Select District..."
@@ -1504,6 +1509,59 @@ function GroupExtendedForm({ groupDataArr }) {
 								) : null}
 							</div>
 
+							<div>
+								{/* {JSON.stringify(masterData, null, 2)}  */}
+								<TDInputTemplateBr
+									placeholder="Select Block..."
+									type="text"
+									label="Block"
+									name="block_id"
+									// formControlName={masterData.block_id}
+									// handleChange={handleChangeMaster}
+									formControlName={formik.values.block_id}
+									// handleChange={formik.handleChange}
+									handleChange={handleFormikMasterChange}
+									handleBlur={formik.handleBlur}
+									data={blocks}
+									mode={2}
+								/>
+								{formik.errors.block_id && formik.touched.block_id ? (
+									<VError title={formik.errors.block_id} />
+								) : null}
+							</div>
+
+
+							<div>
+								{/* <TDInputTemplateBr
+									placeholder="PIN No."
+									type="number"
+									label="PIN No."
+									name="g_pin"
+									handleChange={formik.handleChange}
+									handleBlur={formik.handleBlur}
+									formControlName={formik.values.g_pin}
+									mode={1}
+								/> */}
+
+								<TDInputTemplateBr
+								placeholder="Select PIN No..."
+								type="text"
+								label="PIN No."
+								name="g_pin"
+								// formControlName={masterData.gp_id}
+								// handleChange={handleChangeMaster}
+								formControlName={formik.values.g_pin}
+								// handleChange={formik.handleChange}
+								handleChange={handleFormikMasterChange} 
+								handleBlur={formik.handleBlur}
+								data={pinCodeList}
+								mode={2}
+								/>
+
+								{formik.errors.g_pin && formik.touched.g_pin ? (
+									<VError title={formik.errors.g_pin} />
+								) : null}
+							</div>
 
 
 							<div>
@@ -1546,26 +1604,7 @@ function GroupExtendedForm({ groupDataArr }) {
 								) : null}
 							</div>
 
-							<div>
-								{/* {JSON.stringify(masterData, null, 2)}  */}
-								<TDInputTemplateBr
-									placeholder="Select Block..."
-									type="text"
-									label="Block"
-									name="block_id"
-									// formControlName={masterData.block_id}
-									// handleChange={handleChangeMaster}
-									formControlName={formik.values.block_id}
-									// handleChange={formik.handleChange}
-									handleChange={handleFormikMasterChange}
-									handleBlur={formik.handleBlur}
-									data={blocks}
-									mode={2}
-								/>
-								{formik.errors.block_id && formik.touched.block_id ? (
-									<VError title={formik.errors.block_id} />
-								) : null}
-							</div>
+							
 
 							<div>
 
