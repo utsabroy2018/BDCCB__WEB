@@ -205,7 +205,7 @@ function MemberEditExtendedForm({ groupDataArr }) {
 				.matches(/^[0-9]{12}$/, "Aadhaar must be 12 digits")
 				.required("Aadhaar required (Aadhaar must be 12 digits)"),
 
-			  husb_father: Yup.string().required("IFSC Code required"),
+			  husb_father: Yup.string().required("Husband's/Father's Name required"),
 		
 			  mobile_no: Yup.string()
 				.matches(/^[0-9]{10}$/, "Mobile must be 10 digits")
