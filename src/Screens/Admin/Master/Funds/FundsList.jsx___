@@ -12,7 +12,7 @@ import { getLocalStoreTokenDts } from '../../../../Components/getLocalforageToke
 import { useNavigate } from "react-router"
 import { routePaths } from '../../../../Assets/Data/Routes';
 
-const AddOrUpdateFunds = React.lazy(() => import('./AddOrUpdateFunds'));
+// const AddOrUpdateFunds = React.lazy(() => import('./AddOrUpdateFunds.jsx___'));
 const FundsList = () => {
 
   // State to hold funds data
@@ -125,7 +125,7 @@ const FundsList = () => {
         fundDtls={formData}
       >
         <Suspense fallback={<div>Loading...</div>}>
-            <AddOrUpdateFunds
+            {/* <AddOrUpdateFunds
                 fundDtls={formData}
                 saveFunds={(formDtls)=>{
                         console.log(formData);
@@ -149,7 +149,7 @@ const FundsList = () => {
                         console.log(formDtls);
                         onClose();
                 }}
-            />
+            /> */}
         </Suspense>
 
       </Drawer>

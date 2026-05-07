@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import Sidebar from "../../Components/Sidebar"
-import Payroll from "../Admin/Payroll/Payroll"
+import Payroll from "../Admin/Payroll/Payroll.jsx___"
 import LoanDetails from "../Admin/LoanDetails/LoanDetails"
 import LoanDetailsBranch from "../Admin/LoanDetailsBranchSOCI/LoanDetailsBranchSOCI"
 import LoanDetailsBranchSOCI from "../Admin/LoanDetailsBranchSOCI/LoanDetailsBranchSOCI"

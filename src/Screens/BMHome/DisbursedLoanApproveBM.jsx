@@ -7,9 +7,9 @@ import { Spin } from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
 import Radiobtn from "../../Components/Radiobtn"
 import DisburseApproveTable from "../../Components/DisburseApproveTable"
-import RecoveryMemberApproveTable from "../../Components/RecoveryMemberApproveTable"
-import RecoveryGroupApproveTable from "../../Components/RecoveryGroupApproveTable"
-import RecoveryCoApproveTable from "../../Components/RecoveryCoApproveTable"
+// import RecoveryMemberApproveTable from "../../Components/RecoveryMemberApproveTable.jsx___"
+// import RecoveryGroupApproveTable from "../../Components/RecoveryGroupApproveTable.jsx___"
+// import RecoveryCoApproveTable from "../../Components/RecoveryCoApproveTable.jsx___"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
@@ -365,7 +365,7 @@ localStorage.clear()
 
 					</div> */}
 
-							<RecoveryGroupApproveTable
+							{/* <RecoveryGroupApproveTable
 								flag="BM"
 								loanAppData={loanApplicationsGroup}
 								title="Approve Transaction"
@@ -374,7 +374,7 @@ localStorage.clear()
 								// fetchLoanApplications={fetchLoanApplications}
 								fetchLoanApplicationsDate={{ fromDate, toDate }}
 								onRefresh={fetchLoanApplicationsGroup}
-							/>
+							/> */}
 						</>
 					) : loanType === "C" ? (
 						<>
@@ -431,7 +431,7 @@ localStorage.clear()
 								</div>
 							</div>
 
-							<RecoveryCoApproveTable
+							{/* <RecoveryCoApproveTable
 								flag="BM"
 								loanAppData={loanApplicationsCo}
 								title="Approve Transaction"
@@ -444,7 +444,7 @@ localStorage.clear()
 									selectedEmployeeId,
 								}}
 								onRefresh={fetchLoanApplicationsCo}
-							/>
+							/> */}
 						</>
 					) : loanType === "M" ? (
 						<>
@@ -474,14 +474,14 @@ localStorage.clear()
 							/>
 						</div>
 					</div> */}
-							<RecoveryMemberApproveTable
+							{/* <RecoveryMemberApproveTable
 								flag="BM"
 								loanAppData={loanApplicationsMember}
 								title="Approve Transaction"
 								setSearch={(data) => setSearch(data)}
 								loanType={loanType}
 								onRefresh={fetchLoanApplicationsMember}
-							/>
+							/> */}
 						</>
 					) : null}
 					{/* <DialogBox

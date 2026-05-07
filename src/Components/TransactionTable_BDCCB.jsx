@@ -154,6 +154,7 @@ function TransactionTable_BDCCB({
 					rowsPerPageOptions={[3, 5, 10, 15, 20, 30, loanAppData?.length]}
 					onPageChange={onPageChange}
 				/>
+				
 			</motion.section>
 		</>
 	)

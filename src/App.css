@@ -164,5 +164,11 @@ table.table_Custome_2nd thead tr th:first-child{width: auto;}
 .accept_dis_2{background: #6cbb3f; color: #fff; 
   margin-top: 0; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 0; font-size: 11px;}
 
+.deposit_div{background: #77be5a; color: #fff; 
+  margin-top: 0; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 0; font-size: 11px;}
+
+.withdraw_div{background: #d46b0e; color: #fff; 
+  margin-top: 0; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 0; font-size: 11px;}
+
 
 

@@ -7,19 +7,19 @@ import { Spin } from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
 import Radiobtn from "../../Components/Radiobtn"
 import DisburseApproveTable from "../../Components/DisburseApproveTable"
-import RecoveryMemberApproveTable from "../../Components/RecoveryMemberApproveTable"
-import RecoveryGroupApproveTable from "../../Components/RecoveryGroupApproveTable"
-import RecoveryCoApproveTable from "../../Components/RecoveryCoApproveTable"
+// import RecoveryMemberApproveTable from "../../Components/RecoveryMemberApproveTable.jsx___"
+// import RecoveryGroupApproveTable from "../../Components/RecoveryGroupApproveTable.jsx___"
+// import RecoveryCoApproveTable from "../../Components/RecoveryCoApproveTable.jsx___"
 import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import { formatDateToYYYYMMDD } from "../../Utils/formateDate"
-import RecoveryGroupDisbursTable from "../../Components/RecoveryGroupDisbursTable"
-import RecoveryCoDisbursTable from "../../Components/RecoveryCoDisbursTable"
-import RecoveryMemberDisbursTable from "../../Components/RecoveryMemberDisbursTable"
+// import RecoveryGroupDisbursTable from "../../Components/RecoveryGroupDisbursTable.jsx___"
+// import RecoveryCoDisbursTable from "../../Components/RecoveryCoDisbursTable.jsx___"
+// import RecoveryMemberDisbursTable from "../../Components/RecoveryMemberDisbursTable.jsx___"
 import { routePaths } from "../../Assets/Data/Routes"
 import { getLocalStoreTokenDts } from "../../Components/getLocalforageTokenDts"
 import { useNavigate } from "react-router"
 import UnapprovedDisbursTable_BDCCB from "../../Components/UnapprovedDisbursTable_BDCCB"
-import ApprovedDisbursTable_BDCCB from "../../Components/ApprovedDisbursTable_BDCCB"
+// import ApprovedDisbursTable_BDCCB from "../../Components/ApprovedDisbursTable_BDCCB.jsx____"
 
 const options = [
 	{
@@ -176,13 +176,13 @@ function DisbursedLoanApproveSinglePACS_BDCCB() {
 						</>
 					) : loanType === "A" ? (
 						<>
-							<ApprovedDisbursTable_BDCCB
+							{/* <ApprovedDisbursTable_BDCCB
 								flag="PACS"
 								loanAppData={DisburseData}
 								title="Approve Disburse"
 								setSearch={(data) => setSearch(data)}
 								loanType={loanType}
-							/>
+							/> */}
 						</>
 					) : null}
 					{/* <DialogBox

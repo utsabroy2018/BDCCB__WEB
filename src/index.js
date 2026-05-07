@@ -91,6 +91,9 @@ const EditSahayikaFormBM = lazy(() => import("./Screens/BMHome/EditSahayikaFormB
 const EditDisburseFormBM_BDCCB = lazy(() => import("./Screens/BMHome/EditDisburseFormBM_BDCCB"))
 const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchMemberForDisburseBM_BDCCB.jsx"))
 
+const AddEditDipositFormBM_BDCCB = lazy(() => import("./Screens/BMHome/AddEditDipositFormBM_BDCCB"))
+const SearchDipositBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchDipositBM_BDCCB.jsx"))
+
 const SearchRecoverySHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchRecoverySHGBranchBM_BDCCB.jsx"))
 const RecoverySubmitStatusSHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBranchBM_BDCCB.jsx"))
 const BranchSHGLoanRecoveryDetails = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryDetails/BranchSHGLoanRecoveryDetails.jsx"))
@@ -188,21 +191,21 @@ const AuditReport = lazy(()=> import('./Screens/Admin/UserManagement/AuditReport
 const ALoanStatementMain = lazy(() => import("./Screens/Admin/Reports/LoanStatements/ALoanStatementMain"));
 const ALoanTransactionsMain = lazy(() => import("./Screens/Admin/Reports/LoanTransactions/ALoanTransactionsMain"));
 
-const ADemandReportsMain = lazy(() => import("./Screens/Admin/Reports/DemandReports/ADemandReportsMain"));
+// const ADemandReportsMain = lazy(() => import("./Screens/Admin/Reports/DemandReports/ADemandReportsMain.jsx___"));
 const AOutstandingReportMain = lazy(() => import("./Screens/Admin/Reports/OutstandingReports/AOutstandingReportMain"));
 
 const AFundwiseMain = lazy(() => import("./Screens/Admin/Reports/SummaryReports/FundwiseReport/AFundwiseMain"));
 const ASchemewiseMain = lazy(() => import("./Screens/Admin/Reports/SummaryReports/SchemewiseReport/ASchemewiseMain"));
-const ADemandVsCollectionMain = lazy(() => import("./Screens/Admin/Reports/DemandVsCollectionReports/ADemandVsCollectionMain"));
-const AttendanceDashboard = lazy(() => import("./Screens/Admin/Attendance/AttendanceDashboard"));
+// const ADemandVsCollectionMain = lazy(() => import("./Screens/Admin/Reports/DemandVsCollectionReports/ADemandVsCollectionMain.jsx____"));
+// const AttendanceDashboard = lazy(() => import("./Screens/Admin/Attendance/AttendanceDashboard.jsx___"));
 
-const MasterDesignations = lazy(() => import("./Screens/Admin/Master/Designations/MasterDesignations"));
+// const MasterDesignations = lazy(() => import("./Screens/Admin/Master/Designations/MasterDesignations.jsx___"));
 const EditMasterDesignations = lazy(() => import("./Screens/Admin/Master/Designations/EditMasterDesignations"));
 const TranceferCO = lazy(() => import("./Screens/BMHome/TranceferCO"));
 const TransferCOScreen = lazy(() => import("./Screens/BMHome/TransferCOScreen"));
 const TranceferCOApproveForm = lazy(() => import("./Screens/BMHome/TranceferCOApproveForm"));
 const TransferCOApprovalUnic = lazy(() => import("./Screens/BMHome/TransferCOApprovalUnic"));
-const MemberTransfer = lazy(() => import("./Screens/BMHome/MemberTransfer"));
+const MemberTransfer = lazy(() => import("./Screens/BMHome/MemberTransfer.jsx____"));
 const EditMemberTransfer = lazy(() => import("./Screens/Admin/Master/Employees/EditMemberTransfer"));
 
 const ApproveEditMemberTrans = lazy(() => import("./Screens/Admin/Master/Employees/ApproveEditMemberTrans"));
@@ -211,13 +214,13 @@ const TransferMemberViewScreen = lazy(() => import("./Screens/BMHome/TransferMem
 const MonthEnd = lazy(() => import("./Screens/Admin/UserManagement/MonthEnd"));
 const MonthOpen = lazy(() => import("./Screens/Admin/UserManagement/MonthOpen"));
 
-const Payroll = lazy(() => import("./Screens/Admin/Payroll/Payroll"));
+// const Payroll = lazy(() => import("./Screens/Admin/Payroll/Payroll.jsx___"));
 
 const RejectTransaction = lazy(() => import("./Screens/BMHome/Loans/RejectTransaction"));
 
-const MasterBanks = lazy(() =>
-	import("./Screens/Admin/Master/Banks/MasterBanks")
-)
+// const MasterBanks = lazy(() =>
+// 	import("./Screens/Admin/Master/Banks/MasterBanks.jsx___")
+// )
 const EditMasterBank = lazy(() =>
 	import("./Screens/Admin/Master/Banks/EditMasterBank")
 )
@@ -278,12 +281,12 @@ const EditDisburseApproveFormBM = lazy(() =>
 
 /*** Scheme Screen Including Add Or Update */
 const SchemeLayout = lazy(() => import("./Screens/Admin/Master/Scheme/SchemeLayout"));
-const SchemeListPage = lazy(() =>import("./Screens/Admin/Master/Scheme/SchemeList"));
-const SchemeAddOrUpdatePage = lazy(() =>import("./Screens/Admin/Master/Scheme/AddOrUpdateScheme"));
+// const SchemeListPage = lazy(() =>import("./Screens/Admin/Master/Scheme/SchemeList.jsx___"));
+// const SchemeAddOrUpdatePage = lazy(() =>import("./Screens/Admin/Master/Scheme/AddOrUpdateScheme.jsx___"));
 /**** End */
 
 /*** Funds Screen Including Drawer */
-const FundsListPage = lazy(() =>import("./Screens/Admin/Master/Funds/FundsList"));
+// const FundsListPage = lazy(() =>import("./Screens/Admin/Master/Funds/FundsList.jsx___"));
 /*** End */
 
 const LoanCalculator = lazy(() =>import("./Screens/BMHome/Loans/LoanCalculator/index"))
@@ -321,10 +324,10 @@ const router = createBrowserRouter([
 						// element: <SigninMis />,
 						element: <SignInPage />,
 					},
-					{
-						path: "payroll",
-						element: <></>,
-					},
+					// {
+					// 	path: "payroll",
+					// 	element: <></>,
+					// },
 					{
 						path: "ssvws_fin",
 						element: <></>,
@@ -445,6 +448,31 @@ const router = createBrowserRouter([
 								element: <SearchMemberForDisburseBM_BDCCB />,
 							},
 							{
+								path: "disburseloan/:id",
+								element: <EditDisburseFormBM_BDCCB />,
+							},
+
+							{
+								path: "deposit",
+								element: <SearchDipositBM_BDCCB />,
+							},
+							{
+								path: "deposit/:id",
+								element: <AddEditDipositFormBM_BDCCB />,
+							},
+
+							{
+								path: "transaction",
+								element: <SearchTransactionBM_BDCCB />,
+							},
+							{
+								path: "transaction/:id",
+								element: <EditTransactionFormBM_BDCCB />,
+							},
+
+
+
+							{
 								path: "recovery-shg-list",
 								element: <SearchRecoverySHGBranchBM_BDCCB />,
 							},
@@ -465,19 +493,9 @@ const router = createBrowserRouter([
 								path: "loan-recovery-society-list",
 								element: <RecoveryListSocietyBranch_BDCCB />,
 							},
-							{
-								path: "disburseloan/:id",
-								element: <EditDisburseFormBM_BDCCB />,
-							},
+							
 
-							{
-								path: "transaction",
-								element: <SearchTransactionBM_BDCCB />,
-							},
-							{
-								path: "transaction/:id",
-								element: <EditTransactionFormBM_BDCCB />,
-							},
+							
 							{
 								path: "manageuser/:id",
 								element: <CreateUser />,
@@ -804,10 +822,10 @@ const router = createBrowserRouter([
 								path: "",
 								element: <AdminDashboard />,
 							},
-							{
-								path: "masterbanks",
-								element: <MasterBanks />,
-							},
+							// {
+							// 	path: "masterbanks",
+							// 	element: <MasterBanks />,
+							// },
 							// {
 							// 	path:"masterschemes",
 							// 	element: <SchemeLayout />,
@@ -1000,10 +1018,10 @@ const router = createBrowserRouter([
 			},
 		],
 	},
-	{
-		path: "attendance_report",
-		element: <Payroll />,
-	},
+	// {
+	// 	path: "attendance_report",
+	// 	element: <Payroll />,
+	// },
 	{
 		path: "error/:id/:message",
 		element: <CatchError />,
