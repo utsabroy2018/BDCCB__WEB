@@ -116,10 +116,10 @@ function DepositTable_BDCCB({
 					<Column
 						field="trans_dt"
 						header="Transaction Date"
-						// body={(rowData) => {
-						// const date = new Date(rowData.trans_dt);
-						// return date.toISOString().split("T")[0];
-						// }}
+					// body={(rowData) => {
+					// const date = new Date(rowData.trans_dt);
+					// return date.toISOString().split("T")[0];
+					// }}
 					></Column>
 
 					<Column
@@ -180,10 +180,6 @@ function DepositTable_BDCCB({
 						}}
 					/>
 
-
-
-
-
 					<Column
 						// field="curr_prn"
 						header="Action"
@@ -201,12 +197,12 @@ function DepositTable_BDCCB({
 									}}
 									style={{ background: "transparent", border: "none", cursor: "pointer" }}
 								>
-									<EditOutlined className="text-md text-slate-800" />
-									{/* {disbursementStatus === "U" ? (
-										<EditOutlined className="text-md text-slate-800" />
-										) : disbursementStatus === "A" ? (
+									{/* <EditOutlined className="text-md text-slate-800" /> */}
+									{rowData.approval_flag === "U" ? (
+										<CheckCircleOutlined className="text-md text-slate-800" />
+									) : rowData.approval_flag === "A" ? (
 										<EyeOutlined className="text-md text-slate-800" />
-										) : null} */}
+									) : null}
 
 								</button>
 							</div>

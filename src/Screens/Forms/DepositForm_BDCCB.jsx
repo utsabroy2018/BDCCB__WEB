@@ -406,7 +406,7 @@ function DepositForm_BDCCB({ flag }) {
 						sb_acc_no: row?.sb_acc_no,
 						member_name: row?.member_name,
 						member_balance: row.member_balance,
-						member_amount : row.cr_amt
+						member_amount : loanAppData?.dep_with_flag == "D" ? row.cr_amt : row.dr_amt, // for withdrawal show the amount in credit column as well for reference, but it won't be editable
 					}))
 
 			// 		{
@@ -522,7 +522,9 @@ function DepositForm_BDCCB({ flag }) {
 			members: formik.values.direct_member === 'D' ? [] : formattedRows
 		}
 
-		console.log(formData, 'formDataformDataformDataformData', creds);
+		// console.log(formData, 'formDataformDataformDataformData', creds);
+		
+		// return;
 
 		await saveMasterData({
 			endpoint: "savings/save_sb_transaction",
@@ -577,35 +579,6 @@ function DepositForm_BDCCB({ flag }) {
 		}
 
 
-// 		{
-//   "flag" : "M/D",
-//   "tenant_id" : "",
-//   "branch_id" : "",
-//   "shg_id" : "",
-//   "grp_acc_no" : "",
-//   "balance" : "",
-//   "trans_dt" : "",
-//   "members" : [
-//     {
-//       "member_id": ,
-//       "sb_acc_no": "",
-//       "member_balance": "",
-//     },
-//     {
-//         "member_id": ,
-//         "sb_acc_no": "",
-//         "member_balance": ""
-//       },
-//       {
-//         "member_id": 
-//         "sb_acc_no": "",
-//         "member_balance": ""
-//       }
-//     ],
-//   "approved_by" : "",
-//   "approved_ip" : ""
-// }
-
 		// console.log(formData, 'formDataformDataformDataformData', creds);
 
 		// return;
@@ -656,10 +629,6 @@ function DepositForm_BDCCB({ flag }) {
 		}
 	}, [])
 
-	
-
-
-
 
 	return (
 		<>
@@ -675,6 +644,9 @@ function DepositForm_BDCCB({ flag }) {
 						className="text-blue-800 dark:text-gray-400"
 						spinning={loading}
 					>
+						
+					{/* {JSON.stringify(loanAppData?.dep_with_flag, null, 2)} ///////////////////
+					{JSON.stringify(groupDetails[0], null, 2)} */}
 
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 
@@ -698,7 +670,7 @@ function DepositForm_BDCCB({ flag }) {
 									}}
 									onChange={(value) => {
 										formik.setFieldValue("soci_loan_no", value);
-										console.log(value, 'selected value', 'ressssssssssssssssssssssssss');
+										// console.log(value, 'selected value', 'ressssssssssssssssssssssssss');
 										fetchGroupDetails(value);
 										
 									}}
@@ -890,7 +862,8 @@ function DepositForm_BDCCB({ flag }) {
 
 								<div className="sm:col-span-3 mt-6">
 									{/* {formik.values.rows.length > 0 && ( */}
-										<Tag color="#2563eb" className="text-white mb-3 font-bold">
+										{/* <Tag color="#2563eb" className="text-white mb-3 font-bold"> */}
+										<Tag className={`text-white mb-3 rounded-md text-sm font-bold pl-3 pr-3 pt-2 pb-2 ${formik.values.direct_member === 'D' ? 'bg-[#DA4167]' : 'bg-[#2563eb]'}`}>	
 											{groupDetails && groupDetails[0]?.memb_dt?.length > 0 ? (
 												<>
 												Member Details {formik.values.direct_member === 'D' ? "(You can't Add Member Amount)" : ""} 
@@ -1027,7 +1000,7 @@ function DepositForm_BDCCB({ flag }) {
 								<CheckCircleOutlined /> <span className={`ml-2`}>Accept Transaction</span>
 								</button>
 
-								<button
+								{/* <button
 								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] duration-300 rounded-full  dark:focus:ring-primary-900`}
 								onClick={async () => {
 								setActionType("R")
@@ -1036,7 +1009,7 @@ function DepositForm_BDCCB({ flag }) {
 								}}
 								>
 								<CloseCircleOutlined /> <span className={`ml-2`}>Reject Transaction</span>
-								</button>
+								</button> */}
 
 
 								</div>

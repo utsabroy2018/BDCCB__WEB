@@ -28,7 +28,7 @@ const options_status = [
 	},
 	{
 		label: "Withdrawal",
-		value: "A",
+		value: "W",
 	},
 ]
 

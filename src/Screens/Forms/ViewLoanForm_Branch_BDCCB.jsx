@@ -1582,45 +1582,6 @@ function ViewLoanForm_Branch_BDCCB({ flag }) {
 						>
 						<CloseCircleOutlined /> <span className={`ml-2`}>Reject Transaction</span>
 						</button>
-
-						{/* <div>
-				<Popconfirm
-				title={`Reject Transaction?`}
-				description={
-				<>
-				<div>
-				<TDInputTemplateBr
-				placeholder="Please give a reason behind rejecting this item"
-				type="date"
-				label="Please give a reason behind rejecting this item"
-				name="fromDate"
-				formControlName={rej_res}
-				handleChange={(e) => setRejRes(e.target.value)}
-				// min={"1900-12-31"}
-				mode={3}
-				/>
-				</div>
-				</>
-				}
-				onConfirm={async () => {
-				await rejectDisbursement()
-				// setData([])
-				// Message("success", "Transaction Rejected.")
-				}}
-				onCancel={() => setRejRes("")}
-				okText="Reject"
-				cancelText="No"
-				// disabled={selectedRowIndices?.length === 0}
-				>
-				<a
-				className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
-				>
-				<CloseCircleOutlined />{" "}
-				<span className="ml-2">Reject Transaction</span>
-				</a>
-				</Popconfirm>
-				</div> */}
-
 						
 											
 						</div>
