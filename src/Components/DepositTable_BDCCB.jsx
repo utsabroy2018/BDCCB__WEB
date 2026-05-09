@@ -45,7 +45,7 @@ function DepositTable_BDCCB({
 
 	useEffect(() => {
 		// setAmountTd_(loanAppData.reduce((sum, r) => sum + parseFloat(r.disb_amt || 0), 0).toFixed(2));
-		setAmountDr_Amt(0)
+		// setAmountDr_Amt(0)
 
 		if (loanAppData && loanAppData.length > 0) {
 			const total_dr_amt = loanAppData.reduce(
@@ -145,11 +145,22 @@ function DepositTable_BDCCB({
 					/>
 
 
-					<Column
+					{/* <Column
 						field="cr_amt"
 						header="Credit Amount"
+						// footer={<span style={{ fontWeight: "bold" }}>{`rowData.dep_with_flag === "D" ? AmountCr_Amt : AmountDr_Amt`}</span>}
 						footer={<span style={{ fontWeight: "bold" }}>{AmountCr_Amt}</span>}
-					></Column>
+					></Column> */}
+
+					<Column
+	field={disbursementStatus=== "D" ? "cr_amt" : "dr_amt"}
+	header={disbursementStatus === "D" ? "Credit Amount" : "Withdrawal Amount"}
+	footer={
+		<span style={{ fontWeight: "bold" }}>
+			{disbursementStatus === "D" ? AmountCr_Amt : AmountDr_Amt}
+		</span>
+	}
+/>
 
 					<Column
 						field="approval_flag"

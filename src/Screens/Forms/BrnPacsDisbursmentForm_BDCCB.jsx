@@ -359,7 +359,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			created_date: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.created_date)),
 			group_total: loanAppData?.tot_grp,
 			sb_acc_no: loanAppData?.members?.[0]?.sb_acc_no || "",
-			shg_id: loanAppData?.members?.[0]?.group_code || "",
+			shg_id: loanAppData?.members?.[0]?.group_name || "",
 
 			// 🔥 THIS IS IMPORTANT
 			rows: formattedRows.length > 0
