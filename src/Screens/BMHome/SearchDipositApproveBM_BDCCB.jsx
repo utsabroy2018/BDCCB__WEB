@@ -20,6 +20,7 @@ import TDInputTemplateBr from "../../Components/TDInputTemplateBr"
 import { saveAs } from "file-saver"
 import * as XLSX from "xlsx"
 import DepositTable_BDCCB from "../../Components/DepositTable_BDCCB"
+import DepositTableApprove_BDCCB from "../../Components/DepositTableApprove_BDCCB"
 
 const options_status = [
 	{
@@ -34,7 +35,7 @@ const options_status = [
 
 
 
-function SearchDipositBM_BDCCB() {
+function SearchDipositApproveBM_BDCCB() {
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const [loading, setLoading] = useState(false)
 
@@ -75,39 +76,35 @@ const s2ab = (s) => {
 	}
 
 // const handleExportMembers = (loans) => {
-	
-	
 //   const flattenedData = [];
 //   loans.forEach((loan) => {
-// 	console.log(loans, "loansloansloansloans", 'if');
-//     if (loan && Array.isArray(loan)) {
-		
-//       loan.forEach((member) => {
+//     if (loan.members && Array.isArray(loan.members)) {
+//       loan.members.forEach((member) => {
 //         flattenedData.push({
 //           // Loan level fields (non-nested)
+//           "Loan ID": loan.loan_id,
+//           "Tenant ID": loan.tenant_id,
+//           "Branch ID": loan.branch_id,
+//           "Loan Account No": loan.loan_acc_no,
 //           "Group Name": loan.group_name,
-//         //   "Tenant ID": loan.tenant_id,
-//         //   "Branch ID": loan.branch_id,
-//         //   "Loan Account No": loan.loan_acc_no,
-//         //   "Group Name": loan.group_name,
-//         //   "Group Code": loan.group_code,
-//         //   "Period": loan.period,
-//         //   "Current ROI": loan.curr_roi,
-//         //   "Penal ROI": loan.penal_roi,
-//         //   "Disbursement Date": loan.disb_dt,
-//         //   "Disbursement Amount": loan.disb_amt,
-//         //   "Pay Mode": loan.pay_mode,
-//         //   "Repayment Start Date": loan.rep_start_dt,
-//         //   "Repayment End Date": loan.rep_end_dt,
-//         //   "Sanction No": loan.sanction_no,
-//         //   "Sanction Date": loan.sanction_dt,
-//         //   "Principal Amount": loan.prn_amt,
-//         //   "Interest Amount": loan.intt_amt,
-//         //   "Overdue Principal Amount": loan.ovd_prn_amt,
-//         //   "Overdue Interest Amount": loan.ovd_intt_amt,
-//         //   "Total Group": loan.tot_grp,
-//         //   "Transaction Type": loan.trans_type === "D" ? "Disbursement" : loan.trans_type === "R" ? "Recovery" : loan.trans_type,
-//         //   "Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
+//           "Group Code": loan.group_code,
+//           "Period": loan.period,
+//           "Current ROI": loan.curr_roi,
+//           "Penal ROI": loan.penal_roi,
+//           "Disbursement Date": loan.disb_dt,
+//           "Disbursement Amount": loan.disb_amt,
+//           "Pay Mode": loan.pay_mode,
+//           "Repayment Start Date": loan.rep_start_dt,
+//           "Repayment End Date": loan.rep_end_dt,
+//           "Sanction No": loan.sanction_no,
+//           "Sanction Date": loan.sanction_dt,
+//           "Principal Amount": loan.prn_amt,
+//           "Interest Amount": loan.intt_amt,
+//           "Overdue Principal Amount": loan.ovd_prn_amt,
+//           "Overdue Interest Amount": loan.ovd_intt_amt,
+//           "Total Group": loan.tot_grp,
+//           "Transaction Type": loan.trans_type === "D" ? "Disbursement" : loan.trans_type === "R" ? "Recovery" : loan.trans_type,
+//           "Approval Status": loan.approval_status === "A" ? "Approved" : loan.approval_status,
           
 //           // Member level fields
 //           "Member Loan ID": member.mem_loan_id,
@@ -122,7 +119,6 @@ const s2ab = (s) => {
 //       });
 //     } else {
 //       // Fallback for loans without members
-// 	  console.log(loans, "loansloansloansloans", 'else');
 //       flattenedData.push({ ...loan });
 //     }
 //   });
@@ -132,25 +128,24 @@ const s2ab = (s) => {
 //   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 //   const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
 //   const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
-//   const fileName = `Transaction_${disbursementStatus == "D" ? "Deposit" : "Withdrawal"}${new Date().toISOString().slice(0, 10)}.xlsx`;
+//   const fileName = `SHGDisburse_${disbursementStatus}_Members_${new Date().toISOString().slice(0, 10)}.xlsx`;
 //   saveAs(blob, fileName);
 // };
-
 
 const handleExportMembers = (loans) => {
 
   const flattenedData = loans.map((loan) => ({
-    // "SHG ID": loan.shg_id,
-    "Group Name": loan.group_name,
-    "Account No": loan.acc_no,
-    "Transaction Date": loan.trans_dt,
-    "Transaction Type": loan.dep_with_flag === "D" ? "Deposit" : "Withdrawal",
-    "Debit Amount": loan.dr_amt,
-    "Credit Amount": loan.cr_amt,
-    // "Balance": loan.balance,
-    // "Remarks": loan.remarks,
-    "Approval Status": loan.approval_flag === "A" ? "Approved" : "Unapproved",
-    // "Flag": loan.flag,
+	// "SHG ID": loan.shg_id,
+	"Group Name": loan.group_name,
+	"Account No": loan.acc_no,
+	"Transaction Date": loan.trans_dt,
+	"Transaction Type": loan.dep_with_flag === "D" ? "Deposit" : "Withdrawal",
+	"Debit Amount": loan.dr_amt,
+	"Credit Amount": loan.cr_amt,
+	// "Balance": loan.balance,
+	// "Remarks": loan.remarks,
+	"Approval Status": loan.approval_flag === "A" ? "Approved" : "Unapproved",
+	// "Flag": loan.flag,
   }));
 
   const wb = XLSX.utils.book_new();
@@ -159,16 +154,16 @@ const handleExportMembers = (loans) => {
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
   const wbout = XLSX.write(wb, {
-    bookType: "xlsx",
-    type: "binary",
+	bookType: "xlsx",
+	type: "binary",
   });
 
   const blob = new Blob([s2ab(wbout)], {
-    type: "application/octet-stream",
+	type: "application/octet-stream",
   });
 
-  const fileName = `Transaction_${
-    disbursementStatus == "D" ? "Deposit" : "Withdrawal"
+  const fileName = `Transaction_Status${
+	disbursementStatus == "D" ? "Deposit" : "Withdrawal"
   }_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
   saveAs(blob, fileName);
@@ -178,7 +173,7 @@ const handleExportMembers = (loans) => {
 		setLoading(true)
 		const creds = {
 			dep_with_flag : disbursementStatus,
-			approval_status : "A",
+			approval_status : "U",
 			tenant_id : userDetails[0]?.tenant_id,
 			branch_id : userDetails[0]?.brn_code,
 		}
@@ -318,14 +313,14 @@ const handleExportMembers = (loans) => {
 									>
 										<div className="w-full flex flex-row-reverse justify-between items-center mx-4">
 												{/* {userDetails[0]?.branch_type != 'H' &&( */}
-												<button
+												{/* <button
 												className="bg-slate-100 p-3 h-11 rounded-full float-right text-center ml-3"
 												onClick={() => {
 												navigate(`/homebm/deposit/0`)
 												}}
 												>
 												<PlusOutlined className="text-xl" />
-												</button>
+												</button> */}
 												{/* )} */}
 												{/* {showSearch && ( */}
 													<div className="relative w-full">
@@ -366,7 +361,7 @@ const handleExportMembers = (loans) => {
 													className="text-xl capitalize text-nowrap font-bold text-white dark:text-white sm:block hidden mx-4"
 												>
 													{/* {`Loan Disburse ${userDetails[0]?.user_type == 'B' ? 'Branch': userDetails[0]?.user_type == 'P' ? 'PACS' : ''} to SHG`} */}
-													{`SB Deposit List`}
+													{`Transaction Unapproved List`}
 												</motion.h2>
 											{/* </div> */}
 										</div>
@@ -375,10 +370,10 @@ const handleExportMembers = (loans) => {
 					
 					{/* {JSON.stringify(loanApplications[0], null, 2)} */}
 
-					<DepositTable_BDCCB
+					<DepositTableApprove_BDCCB
 					flag="BM"
 					loanAppData={loanApplications}
-					title="SB Deposit List"
+					title="Transaction Approved List"
 					showSearch={true}
 					disbursementStatus={disbursementStatus}
 					setSearch={(data) => setSearch(data)}
@@ -411,4 +406,4 @@ const handleExportMembers = (loans) => {
 	)
 }
 
-export default SearchDipositBM_BDCCB
+export default SearchDipositApproveBM_BDCCB

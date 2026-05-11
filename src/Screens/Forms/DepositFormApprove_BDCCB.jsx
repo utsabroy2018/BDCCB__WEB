@@ -139,7 +139,7 @@ const dataDropdown_Member=[
 ]
 
 
-function DepositForm_BDCCB({ flag }) {
+function DepositFormApprove_BDCCB({ flag }) {
 
 
 	const params = useParams()
@@ -243,10 +243,10 @@ function DepositForm_BDCCB({ flag }) {
 
 
 	// wherever you open popup (e.g. on submit)
-	const handleOpenConfirm = (values) => {
-		setPendingValues(values);   // store formik values
-		setVisible(true);           // open dialog
-	};
+	// const handleOpenConfirm = (values) => {
+	// 	setPendingValues(values);   // store formik values
+	// 	setVisible(true);           // open dialog
+	// };
 
 	const onSubmit = async (values) => {
 
@@ -261,7 +261,7 @@ function DepositForm_BDCCB({ flag }) {
 		// console.log("Updated Member List:", updatedMemberList, depositWithdrawStatus)
 		// console.log("Total Amount:", updatedMemberList.reduce((sum, member) => sum + member.member_amount, 0))
 		
-		handleOpenConfirm(values)
+		// handleOpenConfirm(values)
 	}
 
 
@@ -455,101 +455,184 @@ function DepositForm_BDCCB({ flag }) {
 
 
 
-	const editGroup = async (formData) => {
-		if (formik.values.rows.reduce((sum, r) => sum + Number(r.member_amount || 0), 0) > Number(formik.values.disb_amt)) {
-			return Message("error", "Total Amount Greater Than Disbursement Amount")
-		}
-		// return;
-		const formattedRows = formData?.rows?.map(row => ({
-			mem_loan_id: row.mem_loan_id,
-			group_code: row.shg_id,
-			member_id: row.member_id,
-			member_amount: Number(row.member_amount || 0),
-			disburse_amt: Number(row.member_amount || 0),
-		}))
+	// const editGroup = async (formData) => {
+	// 	if (formik.values.rows.reduce((sum, r) => sum + Number(r.member_amount || 0), 0) > Number(formik.values.disb_amt)) {
+	// 		return Message("error", "Total Amount Greater Than Disbursement Amount")
+	// 	}
+	// 	// return;
+	// 	const formattedRows = formData?.rows?.map(row => ({
+	// 		mem_loan_id: row.mem_loan_id,
+	// 		group_code: row.shg_id,
+	// 		member_id: row.member_id,
+	// 		member_amount: Number(row.member_amount || 0),
+	// 		disburse_amt: Number(row.member_amount || 0),
+	// 	}))
 
-		console.log("Formatted Rows for Edit:", formattedRows)
+	// 	console.log("Formatted Rows for Edit:", formattedRows)
 
-		setLoading(true)
+	// 	setLoading(true)
 
-		const ip = await getClientIP()
+	// 	const ip = await getClientIP()
 
-		const creds = {
-			loan_id: loanAppData?.loan_id,
-			tran_id: 0,
-			tenant_id: userDetails[0]?.tenant_id,
-			branch_id: userDetails[0]?.brn_code,
-			loan_acc_no: formData?.loan_ac_no,
-			loan_to: 'S',
-			// branch_shg_id: PACS_SHGList[0]?.code,
-			period: formData?.period,
-			curr_roi: formData?.curr_roi,
-			penal_roi: formData?.over_roi,
-			sanction_no: formData?.sanction_no,
-			disb_dt: formData?.disb_dt,
-			sanction_dt: formData?.sanction_dt,
-			disb_amt: formData?.disb_amt,
-			tot_grp: formData?.group_total,
-			members: formattedRows,
-			created_by: userDetails[0]?.emp_id,
-			ip_address: ip,
-		}
+	// 	const creds = {
+	// 		loan_id: loanAppData?.loan_id,
+	// 		tran_id: 0,
+	// 		tenant_id: userDetails[0]?.tenant_id,
+	// 		branch_id: userDetails[0]?.brn_code,
+	// 		loan_acc_no: formData?.loan_ac_no,
+	// 		loan_to: 'S',
+	// 		// branch_shg_id: PACS_SHGList[0]?.code,
+	// 		period: formData?.period,
+	// 		curr_roi: formData?.curr_roi,
+	// 		penal_roi: formData?.over_roi,
+	// 		sanction_no: formData?.sanction_no,
+	// 		disb_dt: formData?.disb_dt,
+	// 		sanction_dt: formData?.sanction_dt,
+	// 		disb_amt: formData?.disb_amt,
+	// 		tot_grp: formData?.group_total,
+	// 		members: formattedRows,
+	// 		created_by: userDetails[0]?.emp_id,
+	// 		ip_address: ip,
+	// 	}
 
-		console.log("Edit Group Credentials:", creds);
+	// 	console.log("Edit Group Credentials:", creds);
 
-		// return;
+	// 	// return;
 
-		await saveMasterData({
-			endpoint: "loan/save_disbursement",
-			creds,
-			navigate,
-			successMsg: "Loan Disburse edited saved.",
-			onSuccess: () => navigate(-1),
+	// 	await saveMasterData({
+	// 		endpoint: "loan/save_disbursement",
+	// 		creds,
+	// 		navigate,
+	// 		successMsg: "Loan Disburse edited saved.",
+	// 		onSuccess: () => navigate(-1),
 
-			// 🔥 fully dynamic failure handling
-			failureRedirect: routePaths.LANDING,
-			clearStorage: true,
-		})
+	// 		// 🔥 fully dynamic failure handling
+	// 		failureRedirect: routePaths.LANDING,
+	// 		clearStorage: true,
+	// 	})
 
-		setLoading(false)
-	}
+	// 	setLoading(false)
+	// }
 
-	const saveGroupData = async (formData) => {
+	// const saveGroupData = async (formData) => {
 		
-		const formattedRows = formData?.rows?.map(row => ({
-			// mem_loan_id: 0,
+	// 	const formattedRows = formData?.rows?.map(row => ({
+	// 		// mem_loan_id: 0,
 
+	// 		member_id: row?.member_id,
+	// 		sb_acc_no: row?.sb_acc_no,
+	// 		member_balance: row.member_balance,
+	// 		amount : row.member_amount
+	// 	}))
+
+	// 	const total_cr_amt = formData?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
+
+	// 	// setLoading(true)
+
+	// 	const ip = await getClientIP()
+
+	// 	const creds = {
+	// 		flag : formik.values.direct_member,
+	// 		tenant_id : userDetails[0]?.tenant_id,
+	// 		branch_id : userDetails[0]?.brn_code ,
+	// 		shg_id : groupDetails[0]?.group_code,
+	// 		grp_acc_no : groupDetails[0]?.sb_ac_no,
+	// 		dep_with_flag : depositWithdrawStatus,
+	// 		cr_amt : formik.values.direct_member == "M" ? total_cr_amt : formik.values.total_group_amount,
+	// 		created_by : userDetails[0]?.emp_id,
+	// 		created_ip : ip,
+	// 		members: formik.values.direct_member === 'D' ? [] : formattedRows
+	// 	}
+
+	// 	// console.log(formData, 'formDataformDataformDataformData', creds);
+		
+	// 	// return;
+
+	// 	await saveMasterData({
+	// 		endpoint: "savings/save_sb_transaction",
+	// 		creds,
+	// 		navigate,
+	// 		successMsg: "Deposit/Withdrawal saved.",
+	// 		onSuccess: () => navigate(-1),
+	// 		// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
+	// 		// 🔥 fully dynamic failure handling
+	// 		failureRedirect: routePaths.LANDING,
+	// 		clearStorage: true,
+	// 	})
+
+	// 	setLoading(false)
+	// }
+
+	const approveTransaction = async (formData) => {
+		
+		// const formattedRows = groupDetails[0]?.memb_dt?.map(row => ({
+		// 	member_id: row?.member_id,
+		// 	sb_acc_no: row?.sb_acc_no,
+		// 	member_balance: row.member_balance,
+		// 	// amount : row.member_amount
+		// }))
+
+		const formattedRows = formik.values.rows?.map(row => ({
 			member_id: row?.member_id,
 			sb_acc_no: row?.sb_acc_no,
 			member_balance: row.member_balance,
 			amount : row.member_amount
 		}))
 
-		const total_cr_amt = formData?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
+		const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
 
 		// setLoading(true)
 
 		const ip = await getClientIP()
 
 		const creds = {
-			flag : formik.values.direct_member,
+			flag : loanAppData?.flag,
 			tenant_id : userDetails[0]?.tenant_id,
 			branch_id : userDetails[0]?.brn_code ,
-			shg_id : groupDetails[0]?.group_code,
-			grp_acc_no : groupDetails[0]?.sb_ac_no,
+			shg_id : groupDetails[0]?.shg_id,
+			grp_acc_no : groupDetails[0]?.grp_acc_no,
 			dep_with_flag : depositWithdrawStatus,
-			cr_amt : formik.values.direct_member == "M" ? total_cr_amt : formik.values.total_group_amount,
-			created_by : userDetails[0]?.emp_id,
-			created_ip : ip,
-			members: formik.values.direct_member === 'D' ? [] : formattedRows
+			cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
+			trans_dt : loanAppData?.trans_dt,
+			members: loanAppData?.flag === 'D' ? [] : formattedRows,
+			approved_by : userDetails[0]?.emp_id,
+			approved_ip : ip,
 		}
 
-		// console.log(formData, 'formDataformDataformDataformData', creds);
-		
+// {
+//   "flag" : "",
+//   "tenant_id" : "",
+//   "branch_id" : "",
+//   "shg_id" : "",
+//   "grp_acc_no" : "",
+//   "dep_with_flag" : "",
+//   "cr_amt" : "",
+//   "trans_dt" : "",
+//   "members" : [
+//     {
+//       "member_id": "",
+//       "sb_acc_no": "",
+//       "member_balance": "",
+//       "amount" : ""
+//     },
+//     {
+//         "member_id": "",
+//         "sb_acc_no": "",
+//         "member_balance": "",
+//       	"amount" : ""
+//       }
+//     ],
+//   "approved_by" : "",
+//   "approved_ip" : ""
+// }
+
+
+		// console.log(depositWithdrawStatus, total_cr_amt,  'formDataformDataformDataformData', creds);
+
 		// return;
 
 		await saveMasterData({
-			endpoint: "savings/save_sb_transaction",
+			endpoint: "savings/approve_sb_transaction",
 			creds,
 			navigate,
 			successMsg: "Deposit/Withdrawal saved.",
@@ -563,149 +646,64 @@ function DepositForm_BDCCB({ flag }) {
 		setLoading(false)
 	}
 
-// 	const approveTransaction = async (formData) => {
-		
-		
-		
-// 		// const formattedRows = groupDetails[0]?.memb_dt?.map(row => ({
-// 		// 	member_id: row?.member_id,
-// 		// 	sb_acc_no: row?.sb_acc_no,
-// 		// 	member_balance: row.member_balance,
-// 		// 	// amount : row.member_amount
-// 		// }))
+	const rejectDisbursement = async (formData) => {
 
-// 		const formattedRows = formik.values.rows?.map(row => ({
-// 			member_id: row?.member_id,
-// 			sb_acc_no: row?.sb_acc_no,
-// 			member_balance: row.member_balance,
-// 			amount : row.member_amount
-// 		}))
+		const formattedRows = formik.values.rows?.map(row => ({
+			member_id: row?.member_id,
+			sb_acc_no: row?.sb_acc_no,
+			// member_balance: row.member_balance,
+			// amount : row.member_amount
+		}))
 
-// 		const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
+		// {
+//       "member_id": ,
+//       "sb_acc_no": ""
+//     }
 
-// 		// setLoading(true)
+		const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
 
-// 		const ip = await getClientIP()
+		const ip = await getClientIP()
 
-// 		const creds = {
-// 			flag : loanAppData?.flag,
-// 			tenant_id : userDetails[0]?.tenant_id,
-// 			branch_id : userDetails[0]?.brn_code ,
-// 			shg_id : groupDetails[0]?.shg_id,
-// 			grp_acc_no : groupDetails[0]?.grp_acc_no,
-// 			dep_with_flag : depositWithdrawStatus,
-// 			cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
-// 			trans_dt : loanAppData?.trans_dt,
-// 			members: loanAppData?.flag === 'D' ? [] : formattedRows,
-// 			approved_by : userDetails[0]?.emp_id,
-// 			approved_ip : ip,
-// 		}
-
-// // {
-// //   "flag" : "",
-// //   "tenant_id" : "",
-// //   "branch_id" : "",
-// //   "shg_id" : "",
-// //   "grp_acc_no" : "",
-// //   "dep_with_flag" : "",
-// //   "cr_amt" : "",
-// //   "trans_dt" : "",
-// //   "members" : [
-// //     {
-// //       "member_id": "",
-// //       "sb_acc_no": "",
-// //       "member_balance": "",
-// //       "amount" : ""
-// //     },
-// //     {
-// //         "member_id": "",
-// //         "sb_acc_no": "",
-// //         "member_balance": "",
-// //       	"amount" : ""
-// //       }
-// //     ],
-// //   "approved_by" : "",
-// //   "approved_ip" : ""
-// // }
-
-
-// 		// console.log(depositWithdrawStatus, total_cr_amt,  'formDataformDataformDataformData', creds);
-
-// 		// return;
-
-// 		await saveMasterData({
-// 			endpoint: "savings/approve_sb_transaction",
-// 			creds,
-// 			navigate,
-// 			successMsg: "Deposit/Withdrawal saved.",
-// 			onSuccess: () => navigate(-1),
-// 			// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
-// 			// 🔥 fully dynamic failure handling
-// 			failureRedirect: routePaths.LANDING,
-// 			clearStorage: true,
-// 		})
-
-// 		setLoading(false)
-// 	}
-
-// 	const rejectDisbursement = async () => {
-
-// 		const formattedRows = formik.values.rows?.map(row => ({
-// 			member_id: row?.member_id,
-// 			sb_acc_no: row?.sb_acc_no,
-// 			// member_balance: row.member_balance,
-// 			// amount : row.member_amount
-// 		}))
-
-// 		// {
-// //       "member_id": ,
-// //       "sb_acc_no": ""
-// //     }
-
-// 		const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
-
-// 		const ip = await getClientIP()
-
-// 		const creds = {
-// 			flag : loanAppData?.flag,
-// 			tenant_id : userDetails[0]?.tenant_id,
-// 			branch_id : userDetails[0]?.brn_code ,
-// 			shg_id : groupDetails[0]?.shg_id,
-// 			grp_acc_no : groupDetails[0]?.grp_acc_no,
-// 			dep_with_flag : depositWithdrawStatus,
-// 			// cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
-// 			trans_dt : loanAppData?.trans_dt,
-// 			members: loanAppData?.flag === 'D' ? [] : formattedRows,
-// 			modified_by : userDetails[0]?.emp_id,
-// 			modified_ip : ip,
-// 		}
+		const creds = {
+			flag : loanAppData?.flag,
+			tenant_id : userDetails[0]?.tenant_id,
+			branch_id : userDetails[0]?.brn_code ,
+			shg_id : groupDetails[0]?.shg_id,
+			grp_acc_no : groupDetails[0]?.grp_acc_no,
+			dep_with_flag : depositWithdrawStatus,
+			// cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
+			trans_dt : loanAppData?.trans_dt,
+			members: loanAppData?.flag === 'D' ? [] : formattedRows,
+			modified_by : userDetails[0]?.emp_id,
+			modified_ip : ip,
+		}
 		
 
-// 		await saveMasterData({
-// 			endpoint: "savings/reject_sb_transaction",
-// 			creds,
-// 			navigate,
-// 			successMsg: "Deposit/Withdrawal saved.",
-// 			onSuccess: () => navigate(-1),
-// 			// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
-// 			// 🔥 fully dynamic failure handling
-// 			failureRedirect: routePaths.LANDING,
-// 			clearStorage: true,
-// 		})
+		await saveMasterData({
+			endpoint: "savings/reject_sb_transaction",
+			creds,
+			navigate,
+			successMsg: "Deposit/Withdrawal saved.",
+			onSuccess: () => navigate(-1),
+			// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
+			// 🔥 fully dynamic failure handling
+			failureRedirect: routePaths.LANDING,
+			clearStorage: true,
+		})
 
-// 		setLoading(false)
-// 	}
+		setLoading(false)
+	}
 
-	// const acceptReject = (actionType)=>{
+	const acceptReject = (actionType)=>{
 
-	// 	if(actionType == 'A'){
-	// 		approveTransaction(groupDetails[0])
-	// 	}
+		if(actionType == 'A'){
+			approveTransaction(groupDetails[0])
+		}
 
-	// 	if(actionType == 'R'){
-	// 		rejectDisbursement()
-	// 	}
-	// }
+		if(actionType == 'R'){
+			rejectDisbursement()
+		}
+	}
 
 
 	useEffect(() => {
@@ -1187,7 +1185,7 @@ function DepositForm_BDCCB({ flag }) {
 									</>
 								)}
 
-								{/* {loanAppData?.approval_flag == 'U' &&(	
+								{loanAppData?.approval_flag == 'U' &&(	
 								<div className="flex justify-center  sm:gap-6 mt-8">
 								<button
 								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
@@ -1213,7 +1211,7 @@ function DepositForm_BDCCB({ flag }) {
 
 
 								</div>
-								)} */}
+								)}
 
 								
 								
@@ -1255,11 +1253,11 @@ function DepositForm_BDCCB({ flag }) {
 					
 						if (params?.id > 0) {
 							// editGroup(pendingValues);
-							// acceptReject(actionType)
+							acceptReject(actionType)
 						} else {
-							if (pendingValues) {
-							saveGroupData(pendingValues)
-							}
+							// if (pendingValues) {
+							// saveGroupData(pendingValues)
+							// }
 						}
 
 
@@ -1281,4 +1279,4 @@ function DepositForm_BDCCB({ flag }) {
 	)
 }
 
-export default DepositForm_BDCCB
+export default DepositFormApprove_BDCCB

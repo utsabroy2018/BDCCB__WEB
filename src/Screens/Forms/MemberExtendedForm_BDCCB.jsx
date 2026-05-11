@@ -1215,16 +1215,16 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			(m, i) => i !== index && m.ifsc_code === value
 		);
 
-		if (isDuplicate) {
-			// set error message for this row
-			setIFSCCodeStatus(prev => ({
-				...prev,
-				[index]: {
-					user_status: 1,
-					msg: "Duplicate IFSC Code",
-				},
-			}));
-		} else {
+		// if (isDuplicate) {
+			// // set error message for this row
+			// setIFSCCodeStatus(prev => ({
+			// 	...prev,
+			// 	[index]: {
+			// 		user_status: 1,
+			// 		msg: "Duplicate IFSC Code",
+			// 	},
+			// }));
+		// } else {
 			// clear duplicate message
 			setIFSCCodeStatus(prev => {
 				const copy = { ...prev };
@@ -1236,7 +1236,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			// if (value.length > 0) {
 			checkIFCS_code_format(value, index);
 			// }
-		}
+		// }
 
 		members[index].ifsc_code = value;
 		formik.setFieldValue("members", members);

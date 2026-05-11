@@ -94,6 +94,9 @@ const SearchMemberForDisburseBM_BDCCB = lazy(() => import("./Screens/BMHome/Sear
 const AddEditDipositFormBM_BDCCB = lazy(() => import("./Screens/BMHome/AddEditDipositFormBM_BDCCB"))
 const SearchDipositBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchDipositBM_BDCCB.jsx"))
 
+const AddEditDipositApproveFormBM_BDCCB = lazy(() => import("./Screens/BMHome/AddEditDipositApproveFormBM_BDCCB"))
+const SearchDipositApproveBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchDipositApproveBM_BDCCB.jsx"))
+
 const SearchRecoverySHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/SearchRecoverySHGBranchBM_BDCCB.jsx"))
 const RecoverySubmitStatusSHGBranchBM_BDCCB = lazy(() => import("./Screens/BMHome/RecoverySubmitStatusSHGBranchBM_BDCCB.jsx"))
 const BranchSHGLoanRecoveryDetails = lazy(() => import("./Screens/BMHome/BranchSHGLoanRecoveryDetails/BranchSHGLoanRecoveryDetails.jsx"))
@@ -460,15 +463,23 @@ const router = createBrowserRouter([
 								path: "deposit/:id",
 								element: <AddEditDipositFormBM_BDCCB />,
 							},
+							{
+								path: "deposit-approve",
+								element: <SearchDipositApproveBM_BDCCB />,
+							},
+							{
+								path: "deposit-approve/:id",
+								element: <AddEditDipositApproveFormBM_BDCCB />,
+							},
 
-							{
-								path: "transaction",
-								element: <SearchTransactionBM_BDCCB />,
-							},
-							{
-								path: "transaction/:id",
-								element: <EditTransactionFormBM_BDCCB />,
-							},
+							// {
+							// 	path: "transaction",
+							// 	element: <SearchTransactionBM_BDCCB />,
+							// },
+							// {
+							// 	path: "transaction/:id",
+							// 	element: <EditTransactionFormBM_BDCCB />,
+							// },
 
 
 

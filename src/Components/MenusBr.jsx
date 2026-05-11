@@ -2496,9 +2496,21 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 	// 	],
 	// },
 	{
-	key: "sub5",
-	icon: <LineChartOutlined />,
-	label: <Link to={"/homebm/deposit"}>SB Deposit</Link>,
+		key: "sub6",
+		icon: <ThunderboltOutlined />,
+		label: "Deposit",
+		children: [
+			{
+				key: "sub6-1",
+				icon: <ThunderboltOutlined />,
+				label: <Link to={"/homebm/deposit"}>Transaction</Link>,
+			},
+			{
+				key: "sub6-2",
+				icon: <ThunderboltOutlined />,
+				label: <Link to={"/homebm/deposit-approve"}>Approve</Link>,
+			}
+		],
 	},
 
 	]
@@ -2510,7 +2522,7 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 	label: <Link to={"/homebm/"}>Dashboard</Link>,
 	},
 	{
-	key: "sub6",
+	key: "sub7",
 	icon: <ImportOutlined />,
 	label: "User Management",
 	// hidden: data?.user_management == "Y" ? false : true,
@@ -2522,7 +2534,7 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 	// 	// hidden: data?.create_user == "Y" ? false : true,
 	// },
 	{
-	key: "sub6-1",
+	key: "sub7-1",
 	icon: <SettingOutlined />,
 	label: <Link to={"/homebm/manageuser/"}>Manage User</Link>,
 	// hidden: data?.manage_user == "Y" ? false : true,
@@ -2746,9 +2758,21 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 	},
 
 	{
-	key: "sub7",
-	icon: <WalletOutlined />,
-	label: <Link to={"/homebm/deposit"}>SB Deposit</Link>,
+		key: "sub6",
+		icon: <ThunderboltOutlined />,
+		label: "Deposit",
+		children: [
+			{
+				key: "sub6-1",
+				icon: <ThunderboltOutlined />,
+				label: <Link to={"/homebm/deposit"}>Transaction</Link>,
+			},
+			{
+				key: "sub6-2",
+				icon: <ThunderboltOutlined />,
+				label: <Link to={"/homebm/deposit-approve"}>Approve</Link>,
+			}
+		],
 	},
 
 
@@ -2905,10 +2929,27 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 	// 	],
 	// },
 	{
-	key: "sub6",
-	icon: <LineChartOutlined />,
-	label: <Link to={"/homebm/deposit"}>SB Deposit</Link>,
+		key: "sub6",
+		icon: <ThunderboltOutlined />,
+		label: "Deposit",
+		children: [
+			{
+				key: "sub6-1",
+				icon: <ThunderboltOutlined />,
+				label: <Link to={"/homebm/deposit"}>Transaction</Link>,
+			},
+			{
+				key: "sub6-2",
+				icon: <ThunderboltOutlined />,
+				label: <Link to={"/homebm/deposit-approve"}>Approve</Link>,
+			}
+		],
 	},
+	// {
+	// key: "sub6",
+	// icon: <LineChartOutlined />,
+	// label: <Link to={"/homebm/deposit"}>SB Deposit</Link>,
+	// },
 
 
 	]
