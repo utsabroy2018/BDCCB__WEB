@@ -180,6 +180,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		sb_acc_no: "",
 		shg_id: "",
 		group_name: '',
+		sb_balance: '',
 		rows: [
 			{
 				mem_loan_id: "",
@@ -442,7 +443,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		}
 		const formattedRows = formData?.rows?.map(row => ({
 			mem_loan_id: 0,
-			group_code: formData?.shg_id,
+			// group_code: formData?.shg_id,
+			group_code: SHGList[0]?.code,
 			member_id: row.member_id,
 			disburse_amt: Number(row.amount),
 		}))
@@ -478,16 +480,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		}
 
 		// console.log(formData, 'formDataformDataformData', creds);
-
 		// return;
-
-		// console.log(formData, 'formDataformDataformDataformData', creds, 'gggggggggg');
-
-
-		// return
-
-
-
 
 		await saveMasterData({
 			endpoint: "loan/save_disbursement",
@@ -670,6 +663,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 					// branch_code: item?.branch_code,
 				})))
 
+				// formik.setFieldValue(`shg_id`, res?.data?.data[0]?.sb_ac_no)
+
 				// setSHGList(res?.data?.data?.map((item, i) => ({
 				// code: item?.group_code,
 				// name: item?.group_name,
@@ -694,6 +689,17 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 		console.log(sb_acc_no, 'sb_acc_no', 'selectGroupSB_Acc');
 		// setGroupSBAccNoList([])
 		setSHGList([])
+
+		setMemberOptions([]);
+		setCheckDuplicateMember({});
+		formik.setFieldValue("rows", [
+		{
+		mem_loan_id: "",
+		member_id: "",
+		amount: "",
+		member_name: "",
+		},
+		]);
 
 		//   try {
 		// const res = await axios.get(`/your-api?sb_acc_no=${sb_acc_no}`);
@@ -732,6 +738,10 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 					// branch_code: item?.branch_code,
 				})))
 
+				formik.setFieldValue(`shg_id`, res?.data?.data[0]?.group_name)
+
+				fetchGroupData(res?.data?.data[0]?.group_code)
+
 			} else {
 				Message('error', res?.data?.msg)
 				navigate(routePaths.LANDING)
@@ -748,6 +758,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 	useEffect(() => {
+		// setMemberOptions([])
 		if (Number(params?.id) > 0) {
 			formik.values.rows.forEach((row, index) => {
 				if (row.shg_id) {
@@ -759,39 +770,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 	const fetchGroupData = async (value) => {
-		console.log(value, 'valueeeeeeeeeeeeeeeeeeeeeeee');
-
-		//  const groups = [...formik.values.rows];
-
-		// 🔴 DUPLICATE CHECK INSIDE FORM
-		// const isDuplicate = groups.some(
-		// 	(m, i) => i !== rowIndex && m.shg_id === value
-		// );
-
-		// if (isDuplicate) {
-		// 	// set error message for this row
-		// 	setCheckDuplicateGroup(prev => ({
-		// 	...prev,
-		// 	[rowIndex]: {
-		// 		user_status: 1,
-		// 		msg: "Duplicate Group Name",
-		// 	},
-		// 	}));
-		// } else {
-		// 	// clear duplicate message
-		// 	setCheckDuplicateGroup(prev => {
-		// 	const copy = { ...prev };
-		// 	delete copy[rowIndex];
-		// 	return copy;
-		// 	});
-
-		// 	// call API only if 12 digits and not duplicate
-		// 	// if (value.length > 0) {
-		// 	//   checkSBAccNoExists(value, index);
-		// 	// }
-		// }
-
-
+		
 		setLoading(true)
 		const creds = {
 			branch_code: userDetails[0]?.brn_code,
@@ -917,6 +896,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 								Disbursement Pending </div>)}
 							<form onSubmit={formik.handleSubmit}>
 								<div className="flex justify-start gap-5">
+									
 									<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-4"}>
 
 
@@ -1168,9 +1148,27 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												</>
 											): (
 												<>
-												<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
-									 dark:text-gray-100">Group SB Acc No.</label>
-											{/* {formik.values.sb_acc_no} */}
+												<TDInputTemplateBr
+												type="text"
+												label="Type SB Acc No."
+												placeholder="Type SB Acc No."
+												name="sb_acc_no"
+												formControlName={formik.values.sb_acc_no}
+												handleChange={(e) => {
+													formik.setFieldValue("sb_acc_no", e.target.value.toUpperCase());
+													formik.setFieldValue("shg_id", "");
+													setMemberOptions([]);
+													setCheckDuplicateMember({});
+													// fetchGroupBySB(e.target.value);
+													selectGroupSB_Acc(e.target.value.toUpperCase())
+												}}
+												handleBlur={formik.handleBlur("sb_acc_no")}
+												mode={1}
+												disabled={params.id > 0 ? true : false}
+												/>
+												{/* <label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
+									 			dark:text-gray-100">Group SB Acc No.</label>
+											
 											<Select
 												showSearch
 												placeholder="Group SB Acc No."
@@ -1184,10 +1182,6 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 													fetchGroupBySB(value);
 													// }
 												}}
-												// onChange={(value) => {
-												// 	formik.setFieldValue(`sb_acc_no`, value);
-												// 	selectGroupSB_Acc(value);
-												// }}
 												onChange={(value) => {
 												formik.setFieldValue("sb_acc_no", value);
 												formik.setFieldValue("shg_id", "");
@@ -1224,7 +1218,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 														{data.name}
 													</Select.Option>
 												))}
-											</Select>
+											</Select> */}
 
 											{formik.touched.sb_acc_no &&
 												formik.errors.sb_acc_no && (
@@ -1252,13 +1246,25 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 												</>
 											) : (
 												<>
-													<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
+												<TDInputTemplateBr
+														type="text"
+														label="Group Name"
+														placeholder="Group Name"
+														name="shg_id"
+														formControlName={formik.values.shg_id}
+														mode={1}
+														disabled={true}
+													/>
+
+													{/* {JSON.stringify(formik.values.shg_id, 2)} 
+													{JSON.stringify(SHGList[0]?.code, 2)}  */}
+
+													{/* <label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
 									 dark:text-gray-100">Select Group</label>
-													{/* {formik.values.shg_id} */}
+													
 													<Select
 														showSearch
 														placeholder="Choose Group"
-														// value={row.shg_id}
 														style={{ width: "100%" }}
 														optionFilterProp="children"
 														name={`shg_id`}
@@ -1286,7 +1292,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 																{data.name}
 															</Select.Option>
 														))}
-													</Select>
+													</Select> */}
 												</>
 											)}
 
@@ -1297,6 +1303,20 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 
 
 										</div>
+
+										{/* SB Balance */}
+										<div className="col-span-4">
+											<TDInputTemplateBr
+											type="text"
+											label="SB Group Balance"
+											name="sb_balance"
+											formControlName={formik.values.sb_balanc}
+											mode={1}
+											disabled={true}
+											/>
+											</div>
+
+	
 									</div>
 
 

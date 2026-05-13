@@ -249,18 +249,6 @@ function DepositForm_BDCCB({ flag }) {
 	};
 
 	const onSubmit = async (values) => {
-
-		// Log the updated member list with amounts (0 if empty)
-		// const updatedMemberList = values.rows.map(row => ({
-		// 	sb_acc_no: row.sb_acc_no,
-		// 	member_name: row.member_name,
-		// 	member_balance: row.member_balance,
-		// 	member_amount: row.member_amount ? Number(row.member_amount) : 0
-		// }))
-
-		// console.log("Updated Member List:", updatedMemberList, depositWithdrawStatus)
-		// console.log("Total Amount:", updatedMemberList.reduce((sum, member) => sum + member.member_amount, 0))
-		
 		handleOpenConfirm(values)
 	}
 
@@ -563,159 +551,29 @@ function DepositForm_BDCCB({ flag }) {
 		setLoading(false)
 	}
 
-// 	const approveTransaction = async (formData) => {
-		
-		
-		
-// 		// const formattedRows = groupDetails[0]?.memb_dt?.map(row => ({
-// 		// 	member_id: row?.member_id,
-// 		// 	sb_acc_no: row?.sb_acc_no,
-// 		// 	member_balance: row.member_balance,
-// 		// 	// amount : row.member_amount
-// 		// }))
-
-// 		const formattedRows = formik.values.rows?.map(row => ({
-// 			member_id: row?.member_id,
-// 			sb_acc_no: row?.sb_acc_no,
-// 			member_balance: row.member_balance,
-// 			amount : row.member_amount
-// 		}))
-
-// 		const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
-
-// 		// setLoading(true)
-
-// 		const ip = await getClientIP()
-
-// 		const creds = {
-// 			flag : loanAppData?.flag,
-// 			tenant_id : userDetails[0]?.tenant_id,
-// 			branch_id : userDetails[0]?.brn_code ,
-// 			shg_id : groupDetails[0]?.shg_id,
-// 			grp_acc_no : groupDetails[0]?.grp_acc_no,
-// 			dep_with_flag : depositWithdrawStatus,
-// 			cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
-// 			trans_dt : loanAppData?.trans_dt,
-// 			members: loanAppData?.flag === 'D' ? [] : formattedRows,
-// 			approved_by : userDetails[0]?.emp_id,
-// 			approved_ip : ip,
-// 		}
-
-// // {
-// //   "flag" : "",
-// //   "tenant_id" : "",
-// //   "branch_id" : "",
-// //   "shg_id" : "",
-// //   "grp_acc_no" : "",
-// //   "dep_with_flag" : "",
-// //   "cr_amt" : "",
-// //   "trans_dt" : "",
-// //   "members" : [
-// //     {
-// //       "member_id": "",
-// //       "sb_acc_no": "",
-// //       "member_balance": "",
-// //       "amount" : ""
-// //     },
-// //     {
-// //         "member_id": "",
-// //         "sb_acc_no": "",
-// //         "member_balance": "",
-// //       	"amount" : ""
-// //       }
-// //     ],
-// //   "approved_by" : "",
-// //   "approved_ip" : ""
-// // }
-
-
-// 		// console.log(depositWithdrawStatus, total_cr_amt,  'formDataformDataformDataformData', creds);
-
-// 		// return;
-
-// 		await saveMasterData({
-// 			endpoint: "savings/approve_sb_transaction",
-// 			creds,
-// 			navigate,
-// 			successMsg: "Deposit/Withdrawal saved.",
-// 			onSuccess: () => navigate(-1),
-// 			// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
-// 			// 🔥 fully dynamic failure handling
-// 			failureRedirect: routePaths.LANDING,
-// 			clearStorage: true,
-// 		})
-
-// 		setLoading(false)
-// 	}
-
-// 	const rejectDisbursement = async () => {
-
-// 		const formattedRows = formik.values.rows?.map(row => ({
-// 			member_id: row?.member_id,
-// 			sb_acc_no: row?.sb_acc_no,
-// 			// member_balance: row.member_balance,
-// 			// amount : row.member_amount
-// 		}))
-
-// 		// {
-// //       "member_id": ,
-// //       "sb_acc_no": ""
-// //     }
-
-// 		const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
-
-// 		const ip = await getClientIP()
-
-// 		const creds = {
-// 			flag : loanAppData?.flag,
-// 			tenant_id : userDetails[0]?.tenant_id,
-// 			branch_id : userDetails[0]?.brn_code ,
-// 			shg_id : groupDetails[0]?.shg_id,
-// 			grp_acc_no : groupDetails[0]?.grp_acc_no,
-// 			dep_with_flag : depositWithdrawStatus,
-// 			// cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
-// 			trans_dt : loanAppData?.trans_dt,
-// 			members: loanAppData?.flag === 'D' ? [] : formattedRows,
-// 			modified_by : userDetails[0]?.emp_id,
-// 			modified_ip : ip,
-// 		}
-		
-
-// 		await saveMasterData({
-// 			endpoint: "savings/reject_sb_transaction",
-// 			creds,
-// 			navigate,
-// 			successMsg: "Deposit/Withdrawal saved.",
-// 			onSuccess: () => navigate(-1),
-// 			// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
-// 			// 🔥 fully dynamic failure handling
-// 			failureRedirect: routePaths.LANDING,
-// 			clearStorage: true,
-// 		})
-
-// 		setLoading(false)
-// 	}
-
-	// const acceptReject = (actionType)=>{
-
-	// 	if(actionType == 'A'){
-	// 		approveTransaction(groupDetails[0])
-	// 	}
-
-	// 	if(actionType == 'R'){
-	// 		rejectDisbursement()
-	// 	}
-	// }
 
 
 	useEffect(() => {
-		// formik.setFieldValue("total_group_amount", "")
+
+		// formik.setFieldValue("direct_member", "")
 
 		if(groupDetails[0]?.memb_dt.length > 0){
 		formik.setFieldValue("rows", groupDetails[0]?.memb_dt || [])
 		}
+
+		formik.setFieldValue("rows", groupDetails[0]?.memb_dt || [])
+
 					
 	}, [formik.values.direct_member, depositWithdrawStatus])
+
+	useEffect(() => {
+	formik.setFieldValue("direct_member", "")
+	formik.setFieldValue("total_group_amount", "")
+	}, [depositWithdrawStatus])
+
+	useEffect(() => {
+	formik.setFieldValue("total_group_amount", "")
+	}, [formik.values.direct_member])
 
 
 	useEffect(() => {
@@ -730,7 +588,7 @@ function DepositForm_BDCCB({ flag }) {
 			<section className=" dark:bg-[#001529] flex justify-center align-middle p-5">
 				<div className="p-5 w-4/5 min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
-						<FormHeader text={`${params?.id == 0 ? "Deposit / Withdrawal" : loanAppData?.approval_status == 'A' ? "View Deposit" : "Edit/Preview Deposit"}`} mode={2} />
+						<FormHeader text={`Deposit / Withdrawal`} mode={2} />
 					</div>
 
 					<Spin
@@ -741,10 +599,6 @@ function DepositForm_BDCCB({ flag }) {
 					>
 						{/* {JSON.stringify(formik.values, null, 2)} hhhhhhhhhhhhhhhhhhhhhhhh
 						{JSON.stringify(groupDetails[0]?.cr_amt, null, 2)} */}
-					{/* {JSON.stringify(loanAppData?.dep_with_flag, null, 2)} ///////////////////
-					{JSON.stringify(groupDetails[0], null, 2)} */}
-
-					{/* {JSON.stringify(groupDetails[0], null, 2)} */}
 
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 
@@ -945,15 +799,22 @@ function DepositForm_BDCCB({ flag }) {
 												handleChange={formik.handleChange}
 												handleBlur={formik.handleBlur}
 												mode={2}
+												
+												// data={depositWithdrawStatus == "D" ? dataDropdown?.map((item) => ({
+												// 	code: item?.code,
+												// 	name: item?.name,
+												// })) : dataDropdown_Member?.map((item) => ({
+												// 	code: item?.code,
+												// 	name: item?.name,
+												// }))}
 
-												data={depositWithdrawStatus == "D" ? dataDropdown?.map((item) => ({
-													code: item?.code,
-													name: item?.name,
-												})) : dataDropdown_Member?.map((item) => ({
+												data={dataDropdown?.map((item) => ({
 													code: item?.code,
 													name: item?.name,
 												}))}
+
 											/>
+
 											{formik.errors.direct_member && formik.touched.direct_member ? (
 											<VError title={formik.errors.direct_member} />
 											) : null}
@@ -962,22 +823,10 @@ function DepositForm_BDCCB({ flag }) {
 											
 										</div>
 										
-										{formik.values.direct_member === 'D' && depositWithdrawStatus == "D" && (
+										{formik.values.direct_member === 'D' && (
 											<div className="transition-all duration-500 ease-in-out opacity-100 scale-100 transform">
 											{params?.id > 0 ? (
 												<> 
-											{/* <TDInputTemplateBr
-											placeholder="Group Amount"
-											type="text"
-											label="Group Amount"
-											name="total_group_amount_custom"
-											formControlName={groupDetails[0]?.cr_amt}
-											handleChange={formik.handleChange}
-											handleBlur={formik.handleBlur}
-											mode={1}
-											disabled={true}
-											/> */}
-											{/* {JSON.stringify(groupDetails[0]?.cr_amt, null, 2)} */}
 											
 											<TDInputTemplateBr
 												placeholder="Group Amount"
