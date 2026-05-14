@@ -117,6 +117,20 @@ const disbursementDetailsHeader_SOCIE = {
 	cuurent_loan_outstanding: "Cuurent Loan Outstanding",
 }
 
+const SB_AC_Ledger_Group = {
+	// loan_id: "Loan Id",
+	acc_no: "A/C Number",
+	acc_opening_dt: "A/C Opening Date",
+	balance: "Balance",
+	// penal_roi: "Ovd ROI",
+	// disb_dt: "Disbursement Date",
+	// disb_amt: "Disbursement Amount",
+	// pay_mode: "Pay Mode",
+	// rep_start_dt: "Start Date",
+	// rep_end_dt: "End Date",
+	// cuurent_loan_outstanding: "Cuurent Loan Outstanding",
+}
+
 const branchwiseOutstandingHeader = {
 	branch_code: "Branch Code",
 	branch_name: "Branch Name",
@@ -961,6 +975,20 @@ const txnDetailsHeader = {
 	approval_status: "Approval Status",
 }
 
+const SB_AC_Group_DetailsHeader = {
+	acc_no: "Account No.",
+	trans_no: "Transaction No.",
+	trans_dt: "Transaction Date",
+	dep_with_flag: "Transaction Type",
+	dr_amt: "Debit Amount",
+	cr_amt: "Credit Amount",
+	balance: "Balance",
+	// remarks: "Remarks",
+	approved_by: "Approved By",
+	approved_at: "Approved Date",
+	approval_flag: "Approval Status",
+}
+
 const txnDetailsHeader_Member = {
 	loan_id: "Loan ID",
 	loan_acc_no: "Loan A/C Number",
@@ -974,6 +1002,20 @@ const txnDetailsHeader_Member = {
 	approved_by: "Approved By",
 	approved_dt: "Approved Date",
 	approval_status: "Approval Status",
+}
+
+const SB_AC_MEMBER_DETAILS_Header_Member = {
+	trans_no: "Transaction No.",
+	mem_sb_acc_no: "Member SB A/C No.",
+	trans_dt: "Transaction Date",
+	dep_with_flag: "Transaction Type",
+	dr_amt: "Debit Amount",
+	cr_amt: "Credit Amount",
+	member_balance: "Member Balance",
+	// remarks: "Remarks",
+	approved_by: "Approved By",
+	approved_at: "Approved Date",
+	approval_flag: "Approval Status",
 }
 
 const portfolioReportHeaderGroupwise = {
@@ -1243,5 +1285,8 @@ export {
 	memberwiseReportHeader_No_CloseDate,
 	txnGrpHeaderForPreviousLoanTrxns,
 	txnFundHeaderforPreviousLoanTrxns,
-	txnCoHeaderForPreviousLoanTrxns
+	txnCoHeaderForPreviousLoanTrxns,
+	SB_AC_Ledger_Group,
+	SB_AC_Group_DetailsHeader,
+	SB_AC_MEMBER_DETAILS_Header_Member
 }

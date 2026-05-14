@@ -739,6 +739,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 				})))
 
 				formik.setFieldValue(`shg_id`, res?.data?.data[0]?.group_name)
+				formik.setFieldValue(`sb_balance`, res?.data?.data[0]?.grp_balance)
 
 				fetchGroupData(res?.data?.data[0]?.group_code)
 
@@ -1256,8 +1257,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 														disabled={true}
 													/>
 
-													{/* {JSON.stringify(formik.values.shg_id, 2)} 
-													{JSON.stringify(SHGList[0]?.code, 2)}  */}
+													{/* {JSON.stringify(formik.values.shg_id, 2)}  */}
+													{/* {JSON.stringify(SHGList[0]?.code, 2)}  */}
 
 													{/* <label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
 									 dark:text-gray-100">Select Group</label>
@@ -1309,8 +1310,9 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 											<TDInputTemplateBr
 											type="text"
 											label="SB Group Balance"
+											placeholder="SB Group Balance"
 											name="sb_balance"
-											formControlName={formik.values.sb_balanc}
+											formControlName={formik.values.sb_balance}
 											mode={1}
 											disabled={true}
 											/>

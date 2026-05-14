@@ -9,6 +9,7 @@ import {
 	CheckCircleOutlined,
 	ClockCircleOutlined,
 	CloseCircleOutlined,
+	DeleteOutlined,
 	EditOutlined,
 	EyeOutlined,
 	FileTextOutlined,
@@ -153,14 +154,14 @@ function DepositTable_BDCCB({
 					></Column> */}
 
 					<Column
-	field={disbursementStatus=== "D" ? "cr_amt" : "dr_amt"}
-	header={disbursementStatus === "D" ? "Credit Amount" : "Withdrawal Amount"}
-	footer={
-		<span style={{ fontWeight: "bold" }}>
-			{disbursementStatus === "D" ? AmountCr_Amt : AmountDr_Amt}
-		</span>
-	}
-/>
+					field={disbursementStatus=== "D" ? "cr_amt" : "dr_amt"}
+					header={disbursementStatus === "D" ? "Credit Amount" : "Withdrawal Amount"}
+					footer={
+					<span style={{ fontWeight: "bold" }}>
+					{disbursementStatus === "D" ? AmountCr_Amt : AmountDr_Amt}
+					</span>
+					}
+					/>
 
 					<Column
 						field="approval_flag"
@@ -209,9 +210,9 @@ function DepositTable_BDCCB({
 									style={{ background: "transparent", border: "none", cursor: "pointer" }}
 								>
 									{/* <EditOutlined className="text-md text-slate-800" /> */}
-									{rowData.approval_flag === "U" ? (
-										<CheckCircleOutlined className="text-md text-slate-800" />
-									) : rowData.approval_flag === "A" ? (
+									{rowData.delete_flag == "Y" ? (
+										<DeleteOutlined className="text-md text-red-600" />
+									) : rowData.delete_flag == "N" ? (
 										<EyeOutlined className="text-md text-slate-800" />
 									) : null}
 

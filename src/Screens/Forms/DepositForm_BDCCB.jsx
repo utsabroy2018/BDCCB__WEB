@@ -161,7 +161,7 @@ function DepositForm_BDCCB({ flag }) {
 	const [actionType, setActionType] = useState("");
 	const [societyLoanNo, setSocietyLoanNo] = useState('')
 	const [societySrchMsg, setSocietySrchMsg] = useState('')
-	
+	const [GroupBalanceCheck, setGroupBalanceCheck] = useState({})
 	
 	const onChange = (e) => {
 		console.log("radio1 checked", e)
@@ -198,7 +198,8 @@ function DepositForm_BDCCB({ flag }) {
 		// total_group_amount: Yup.string().required("Group Amount is required"),
 		total_group_amount: Yup.string().when('direct_member', {
 			is: (value) => value === 'D',
-			then: (schema) => schema.required("Group Amount is required when Direct is selected"),
+			// then: (schema) => schema.required("Group Amount is required when Direct is selected"),
+			then: (schema) => schema.required("Group Amount is required."),
 			otherwise: (schema) => schema.notRequired()
 		}),
 	})
@@ -349,8 +350,6 @@ function DepositForm_BDCCB({ flag }) {
 			},
 			})
 			.then((res) => {
-				
-				console.log(res?.data?.data, 'rrrrrrrrrrrrr');
 
 				if(res?.data?.success){
 					// Message("success", res?.data?.msg)
@@ -410,13 +409,11 @@ function DepositForm_BDCCB({ flag }) {
 						formik.setFieldValue("direct_member", "M")
 					}
 					
-
-					console.log(res?.data?.data?.memb_dt, 'fetchGroupDetails_fffApprove_memb_dt', groupDetails[0]);
-					
 					// Set deposit/withdraw status
 					setDepositWithdrawStatus(res?.data?.data?.dep_with_flag)
 					
-					formik.setFieldValue("total_group_amount", res?.data?.data?.cr_amt) // Set total group amount for reference, but it won't be editable as per current requirements
+					// formik.setFieldValue("total_group_amount", res?.data?.data?.cr_amt || res?.data?.data?.dr_amt) // Set total group amount for reference, but it won't be editable as per current requirements
+					formik.setFieldValue("total_group_amount", res?.data?.data?.cr_amt !== "0.00" ? res?.data?.data?.cr_amt : res?.data?.data?.dr_amt)
 
 					const memberListData = res?.data?.data?.memb_dt?.map(row => ({
 						member_id: row?.member_id,
@@ -441,7 +438,57 @@ function DepositForm_BDCCB({ flag }) {
 			setLoading(false)
 	}
 
+	const rejectDisbursement = async (formData) => {
 
+	const formattedRows = formik.values.rows?.map(row => ({
+	member_id: row?.member_id,
+	sb_acc_no: row?.sb_acc_no,
+	}))
+
+	const total_cr_amt = formik.values?.rows?.reduce((sum, r) => sum + Number(r.member_amount || 0), 0)
+
+	const ip = await getClientIP()
+
+	const creds = {
+	flag : loanAppData?.flag,
+	tenant_id : userDetails[0]?.tenant_id,
+	branch_id : userDetails[0]?.brn_code ,
+	shg_id : groupDetails[0]?.shg_id,
+	grp_acc_no : groupDetails[0]?.grp_acc_no,
+	dep_with_flag : depositWithdrawStatus,
+	// cr_amt : loanAppData?.flag == "M" ? total_cr_amt : formik.values?.total_group_amount,
+	trans_dt : loanAppData?.trans_dt,
+	members: loanAppData?.flag === 'D' ? [] : formattedRows,
+	modified_by : userDetails[0]?.emp_id,
+	modified_ip : ip,
+	}
+
+
+	await saveMasterData({
+	endpoint: "savings/reject_sb_transaction",
+	creds,
+	navigate,
+	successMsg: "Deposit/Withdrawal saved.",
+	onSuccess: () => navigate(-1),
+	// onSuccess: () => navigate('/homepacs/recovery-shg-list'),
+	// 🔥 fully dynamic failure handling
+	failureRedirect: routePaths.LANDING,
+	clearStorage: true,
+	})
+
+	setLoading(false)
+	}
+
+	const acceptReject = (actionType)=>{
+
+	// if(actionType == 'A'){
+	// 	approveTransaction(groupDetails[0])
+	// }
+
+	if(actionType == 'R'){
+	rejectDisbursement()
+	}
+	}
 
 	const editGroup = async (formData) => {
 		if (formik.values.rows.reduce((sum, r) => sum + Number(r.member_amount || 0), 0) > Number(formik.values.disb_amt)) {
@@ -551,28 +598,32 @@ function DepositForm_BDCCB({ flag }) {
 		setLoading(false)
 	}
 
-
-
 	useEffect(() => {
-
 		// formik.setFieldValue("direct_member", "")
-
+		if(params?.id < 1){
 		if(groupDetails[0]?.memb_dt.length > 0){
 		formik.setFieldValue("rows", groupDetails[0]?.memb_dt || [])
 		}
 
 		formik.setFieldValue("rows", groupDetails[0]?.memb_dt || [])
+		}
 
 					
 	}, [formik.values.direct_member, depositWithdrawStatus])
 
 	useEffect(() => {
+	if(params?.id < 1){
 	formik.setFieldValue("direct_member", "")
 	formik.setFieldValue("total_group_amount", "")
+	setGroupBalanceCheck({})
+	}
 	}, [depositWithdrawStatus])
 
 	useEffect(() => {
+	if(params?.id < 1){
 	formik.setFieldValue("total_group_amount", "")
+	setGroupBalanceCheck({})
+	}
 	}, [formik.values.direct_member])
 
 
@@ -581,6 +632,61 @@ function DepositForm_BDCCB({ flag }) {
 			fetchGroupDetails_Approve(params?.id, loanAppData?.trans_dt )
 		}
 	}, [])
+
+
+	const handleGroupAmountCheck = async (value) => {
+    // const value = e.target.value;
+   
+		setGroupBalanceCheck({})
+
+		setLoading(true)
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+			shg_id: groupDetails[0]?.group_code,
+			grp_acc_no : groupDetails[0]?.sb_ac_no,
+			withdraw_amount : value
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios.post(`${url_bdccb}/savings/check_before_withdrawal_grp_amt`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+				
+				console.log(res?.data, 'rrrrrrrrrrrrr', creds);
+				var get_data = res?.data;
+
+				
+
+				console.log(get_data, 'rrrrrrrrrrrrr', creds);
+
+				if(res?.data?.success){
+					setGroupBalanceCheck(res?.data)
+				} else {
+					get_data['typeAmount'] = value;
+					formik.setFieldValue("total_group_amount", '');
+					setGroupBalanceCheck(get_data)
+				}
+				// formik.setFieldValue("total_group_amount", e.target.value);
+				// formik.values.total_group_amount
+				// if(res?.data?.success){
+					
+
+				// } else {
+				// navigate(routePaths.LANDING)
+				// localStorage.clear()
+				// }
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+			setLoading(false)
+	
+	};
 
 
 	return (
@@ -597,8 +703,8 @@ function DepositForm_BDCCB({ flag }) {
 						className="text-blue-800 dark:text-gray-400"
 						spinning={loading}
 					>
-						{/* {JSON.stringify(formik.values, null, 2)} hhhhhhhhhhhhhhhhhhhhhhhh
-						{JSON.stringify(groupDetails[0]?.cr_amt, null, 2)} */}
+						{/* {JSON.stringify(formik.values, null, 2)} hhhhhhhhhhhhhhhhhhhhhhhh */}
+						{/* {JSON.stringify(loanAppData, null, 2)} */}
 
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 
@@ -836,14 +942,32 @@ function DepositForm_BDCCB({ flag }) {
 												formControlName={formik.values.total_group_amount}
 												handleChange={formik.handleChange}
 												handleBlur={formik.handleBlur}
+												disabled={params?.id > 0 ? true : false}
 												mode={1}
-												
 											/>
 											</>
 
 											) : (
 											<>
 											<TDInputTemplateBr
+											placeholder="Group Amount"
+											type="text"
+											label={GroupBalanceCheck?.success === false ? 'Group Amount ' + '('+ GroupBalanceCheck?.typeAmount+' is not valid)' : 'Group Amount'}
+											// label={`Group Amount`}
+											name="total_group_amount"
+											formControlName={formik.values.total_group_amount}
+											// handleChange={handleGroupAmountCheck}
+											handleChange={(e) => {
+												formik.setFieldValue("total_group_amount", e.target.value);
+												const value = e.target.value;
+												handleGroupAmountCheck(value)
+											}}
+											// disabled={params?.id > 0 ? true : false}
+											handleBlur={formik.handleBlur}
+											mode={1}
+											/>
+
+											{/* <TDInputTemplateBr
 												placeholder="Group Amount"
 												type="text"
 												label="Group Amount"
@@ -853,7 +977,21 @@ function DepositForm_BDCCB({ flag }) {
 												handleBlur={formik.handleBlur}
 												mode={1}
 												
-											/>
+											/> */}
+											
+
+											{GroupBalanceCheck?.msg && (
+												<div
+													className={`mt-1 text-xs px-2 py-1 rounded inline-block ${
+														GroupBalanceCheck?.success === true
+															? "bg-green-100 text-green-700"
+															: "bg-red-100 text-red-700"
+													}`}
+												>
+													{GroupBalanceCheck?.msg}
+												</div>
+											)}
+
 											{formik.errors.total_group_amount && formik.touched.total_group_amount ? (
 											<VError title={formik.errors.total_group_amount} />
 											) : null}
@@ -972,7 +1110,7 @@ function DepositForm_BDCCB({ flag }) {
 													name={`rows[${index}].member_amount`}
 													formControlName={formik.values.rows[index].member_amount || 0}
 													handleBlur={formik.handleBlur}
-													disabled={formik.values.direct_member === 'D' ? true : false}
+													disabled={formik.values.direct_member === 'D' ? true : params?.id > 0 ? true : false}
 													mode={1}
 													handleChange={(e) => {
 													let value = Number(e.target.value || 0);
@@ -1036,9 +1174,9 @@ function DepositForm_BDCCB({ flag }) {
 									</>
 								)}
 
-								{/* {loanAppData?.approval_flag == 'U' &&(	
+								{loanAppData?.delete_flag == 'Y' &&(	
 								<div className="flex justify-center  sm:gap-6 mt-8">
-								<button
+								{/* <button
 								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
 								onClick={async () => {
 								setActionType("A");
@@ -1047,7 +1185,7 @@ function DepositForm_BDCCB({ flag }) {
 
 								>
 								<CheckCircleOutlined /> <span className={`ml-2`}>Accept Transaction</span>
-								</button>
+								</button> */}
 
 								<button
 								className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] duration-300 rounded-full  dark:focus:ring-primary-900`}
@@ -1062,7 +1200,7 @@ function DepositForm_BDCCB({ flag }) {
 
 
 								</div>
-								)} */}
+								)}
 
 								
 								
@@ -1105,6 +1243,7 @@ function DepositForm_BDCCB({ flag }) {
 						if (params?.id > 0) {
 							// editGroup(pendingValues);
 							// acceptReject(actionType)
+							acceptReject(actionType)
 						} else {
 							if (pendingValues) {
 							saveGroupData(pendingValues)

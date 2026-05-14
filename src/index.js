@@ -167,6 +167,12 @@ const EditViewBranchSHGLoanFormBM = lazy(() => import("./Screens/PACSHome/EditVi
 const MemberBranchSHGLoanDetailsBM_BDCCB = lazy(() => import("./Screens/BMHome/MemberBranchSHGLoanDetailsBM_BDCCB.jsx"))
 const LoanBranchSHGDetailsBM_BDCCB = lazy(() => import("./Screens/BMHome/LoanBranchSHGDetailsBM_BDCCB.jsx"))
 
+const SearchSB_AC_LedgerBM_BDCCB = lazy(() => import("./Screens/PACSHome/SearchSB_AC_LedgerBM_BDCCB.jsx"))
+const ViewSBLedgerDetailFormBM = lazy(() => import("./Screens/PACSHome/ViewSBLedgerDetailFormBM.jsx"))
+const SB_AC_LedgerGroupBM_BDCCB = lazy(() => import("./Screens/BMHome/SB_AC_LedgerGroupBM_BDCCB.jsx"))
+const SB_AC_LedgerMemberBM_BDCCB = lazy(() => import("./Screens/BMHome/SB_AC_LedgerMemberBM_BDCCB.jsx"))
+
+
 //////////////// BDCCB PACS End ////////////////
 
 //////////////// BDCCB Transaction Open Start ////////////////
@@ -557,163 +563,22 @@ const router = createBrowserRouter([
 								path: "branch_refinace-approve-list/:id",
 								element: <EditRefinanceApprovFormBranchBDCCB />,
 							},
-
-							// {
-							// 	path: "transfermember",
-							// 	element: <MemberTransfer />,
-							// },
-							// {
-							// 	path: "transfermember/:id",
-							// 	element: <EditMemberTransfer />,
-							// },
-							// {
-							// 	path: "approvemembertransfer",
-							// 	element: <ApproveMemberTransfer />,
-							// },
-							// {
-							// 	path: "approvemembertransfer/:id",
-							// 	element: <ApproveEditMemberTrans />,
-							// },
-							// {
-							// 	path:'loancalculator',
-							// 	element: <LoanCalculator />,
-							// },
-							// {
-							// 	path: "rejecttxn",
-							// 	element: <RejectTransaction />,
-							// },
-							// {
-							// 	path: "rejecdisbursement",
-							// 	element: <RejectDisbursement />,
-							// },
-							// {
-							// 	path: "approveloan",
-							// 	element: <DisbursedLoanApproveBM />,
-							// },
-							// {
-							// 	path: "approvedisbursed",
-							// 	element: <DisbursedLoanApproveSingleBM />,
-							// },
-							// {
-							// 	path: "approveloan/:id",
-							// 	element: <EditDisburseApproveFormBM />,
-							// },
-							// {
-							// 	path: "recoveryloan/:id",
-							// 	element: <EditRecoveryApproveFormBM />,
-							// },
-							// {
-							// 	path: "viewloan",
-							// 	element: <SearchViewLoanBM />,
-							// },
-							// {
-							// 	path: "viewloan/:id",
-							// 	element: <EditViewLoanFormBM />,
-							// },
-							// {
-							// 	path: "memberloandetails/:id",
-							// 	element: <MemberLoanDetailsBM />,
-							// },
-							// {
-							// 	path: "editgrtform/:id",
-							// 	element: <EditGRTFormBM />,
-							// },
-							// {
-							// 	path: "memberwiserecoveryreport",
-							// 	element: <MemberwiseRecoveryReport />,
-							// },
-							// {
-							// 	path: "groupwiserecoveryreport",
-							// 	element: <GroupwiseRecoveryReport />,
-							// },
-							// {
-							// 	path: "searchmember",
-							// 	element: <SearchMemberBM />,
-							// },
-							// {
-							// 	path: "loanstatements",
-							// 	element: <LoanStatementMain />,
-							// },
-							// {
-							// 	path: "loantxns",
-							// 	element: <ALoanTransactionsMain />,
-							// },
-							// {
-							// 	path:'previous-loantxns',
-							// 	element:<PreviousLoanTransaction/>
-							// },
-							// {
-							// 	path: "testpage",
-							// 	element: <TestPage />,
-							// },
-							// {
-							// 	path: "demandreport",
-							// 	element: <DemandReportsMain />,
-							// },
-							// {
-							// 	path: "outstasndingreport",
-							// 	element: <OutstaningReportMain />,
-							// },
-							// {
-							// 	path: "demandvscollectionreport",
-							// 	element: <DemandVsCollectionMain />,
-							// },
-							// {
-							// 	path: "advancecollectionreport",
-							// 	element: <AdvanceCollectionReportMain />,
-							// },
-							// {
-							// 	path: "overduereport",
-							// 	element: <OverdueReport />,
-							// },
-							// {
-							// 	path:"groupreport",
-							// 	element:<GroupReport/>
-							// },
-							// {
-							// 	path: "portfolioreport",
-							// 	element: <PortfolioReport />,
-							// },
-							// {
-							// 	path: "fundwisesummary",
-							// 	element: <FundwiseMain />,
-							// },
-							// {
-							// 	path: "schemewisesummary",
-							// 	element: <SchemewiseMain />,
-							// },
-							// {
-							// 	path: "groupclosereport",
-							// 	element: <GroupClose />,
-							// },
-							// {
-							// 	path: "trancefercofrom",
-							// 	element: <TranceferCO />,
-							// },
-							// {
-							// 	path: "tranceferco",
-							// 	element: <TransferCOScreen />,
-							// },
-							// {
-							// 	path: "trancefercofrom/:id",
-							// 	element: <TranceferCO />,
-							// },
-							// {
-							// 	path: "trancefercofromapprove/:id",
-							// 	element: <TranceferCOApproveForm />,
-							// },
-							// {
-							// 	path: "trancefercofromapprove-unic",
-							// 	element: <TransferCOApprovalUnic />,
-							// },
-							// {
-							// 	path: "viewmembertransfer",
-							// 	element: <ViewMemberTransfer />,
-							// },
-							// {
-							// 	path: "viewmembertransfer/:id",
-							// 	element: <TransferMemberViewScreen />,
-							// },
+							{
+								path: "view-sb-ledger",
+								element: <SearchSB_AC_LedgerBM_BDCCB />,
+							},
+							{
+								path: "view-sb-ledger/:id",
+								element: <ViewSBLedgerDetailFormBM />,
+							},
+							{
+								path: "sb-ledger-group/:id",
+								element: <SB_AC_LedgerGroupBM_BDCCB />,
+							},
+							{
+								path: "sb-ledger-member/:id",
+								element: <SB_AC_LedgerMemberBM_BDCCB />,
+							}
 						],
 					},
 					{
