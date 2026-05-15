@@ -19,6 +19,10 @@ export const ADDRESSES = {
     BRANCH_LIST: `${BASE_URL_BDCCB}/master/branch_list`,
     GROUP_LIST_FOR_LOGIN: `${BASE_URL_BDCCB}/group/group_list_for_login`,
     // LOGOUT_APP:`${BASE_URL_BDCCB}/logout_app`,
+
+    //////////////// BDCCB Deposit ////////////////
+    FTECH_GP_DTLS: `${BASE_URL_BDCCB}/savings/fetch_gp_dtls`,
+    SAVE_SB_TRANSACTION: `${BASE_URL_BDCCB}/savings/save_sb_transaction`,
     
     //////////////// BDCCB End ////////////////
 
@@ -27,6 +31,7 @@ export const ADDRESSES = {
     FETCH_EMP_TYPE: `${BASE_URL}/fetch_emp_type`,
     FTECH_BRN_ASSIGN: `${BASE_URL}/fetch_brn_assign`,
     // LOGIN: `${BASE_URL}/login_app`,
+
     
     
     GROUP_NAMES: `${BASE_URL}/get_group`,

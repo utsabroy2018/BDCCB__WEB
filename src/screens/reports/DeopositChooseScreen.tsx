@@ -10,7 +10,7 @@ import { CommonActions, useNavigation } from '@react-navigation/native'
 import navigationRoutes from '../../routes/routes'
 import { loginStorage } from '../../storage/appStorage'
 
-const ReportsChooseScreen = () => {
+const DeopositChooseScreen = () => {
     const theme = usePaperColorScheme()
     const navigation = useNavigation()
     const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "")
@@ -20,7 +20,7 @@ const ReportsChooseScreen = () => {
             <ScrollView keyboardShouldPersistTaps="handled" style={{
                 backgroundColor: theme.colors.background
             }}>
-                <HeadingComp title="Deposit" subtitle="Choose desired report" />
+                <HeadingComp title="Deposit" subtitle="Choose desired menu" />
                 <View style={{
                     minHeight: SCREEN_HEIGHT,
                     height: "auto",
@@ -74,16 +74,29 @@ const ReportsChooseScreen = () => {
                             }}
                         /> */}
                         <CollectionButton
-                            icon={"table-refresh"}
-                            text="Attendance Report"
+                            icon={"bank-transfer-in"}
+                            text="Deposit & Withdraw"
                             color={theme.colors.secondaryContainer}
                             textColor={theme.colors.onSecondaryContainer}
                             onPress={() => {
                                 navigation.dispatch(CommonActions.navigate({
-                                    name: navigationRoutes.attendanceReportScreen
+                                    name: navigationRoutes.depositWithdrawScreen
                                 }))
                             }}
                         />
+
+                        {/* <CollectionButton
+                            icon={"swap-horizontal"}
+                            text="Transaction"
+                            color={theme.colors.secondaryContainer}
+                            textColor={theme.colors.onSecondaryContainer}
+                            onPress={() => {
+                                navigation.dispatch(CommonActions.navigate({
+                                    name: navigationRoutes.transactionDepositScreen
+                                }))
+                            }}
+                        /> */}
+                        
                     </CollectionButtonsWrapper>
                 </View>
             </ScrollView>
@@ -91,6 +104,6 @@ const ReportsChooseScreen = () => {
     )
 }
 
-export default ReportsChooseScreen
+export default DeopositChooseScreen
 
 const styles = StyleSheet.create({})

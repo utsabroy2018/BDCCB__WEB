@@ -30,7 +30,11 @@ const navigationRoutes = {
     recoveryReportScreen: "RecoveryReportScreen",
     groupwiseRecovery: "GroupwiseRecovery",
     disbursementReportScreen: "DisbursementReportScreen",
-    
+
+    sbDepositNavigation: "DepositNavigation",
+    depositChooseScreen: "DeopositChooseScreen",
+    depositWithdrawScreen: "DepositWithdrawScreen",
+    transactionDepositScreen: "TransactionDepositScreen",
 
 
     DemandNavigation: "DemandNavigation",

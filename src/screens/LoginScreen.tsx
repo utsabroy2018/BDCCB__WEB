@@ -282,6 +282,7 @@ const fetchBlocks = async () => {
             });
 
             // if (res?.request?.status === 200) {
+            console.log(res?.data?.data, 'gggggggggggggggggggggggg');
             if (res?.data?.success) {
             // console.log(res?.data?.data, 'gggggggggggggggggggggggg');
             // setBlockList(res?.data?.data);

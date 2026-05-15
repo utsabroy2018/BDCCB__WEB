@@ -18,6 +18,8 @@ import DemandNavigation from './DemandNavigation'
 // import useCheckOpenCloseDate from '../components/useCheckOpenCloseDate'
 import { useIsFocused } from '@react-navigation/native'
 import LoanRecoveryFormNavigation from './LoanRecoveryFormNavigation'
+import DepositNavigation from './DepositNavigation'
+import DepositWithdrawScreen from '../screens/deposit/DepositWithdrawScreen'
 // import { loginStorage } from "../storage/appStorage"
 // import { LoginDataMessage } from "../models/api_types"
 
@@ -92,9 +94,9 @@ function BottomNavigationPaper() {
                     : (null)
             }
             {/* ===========================to be enabled================= */}
-            {(loginStore?.id === 1 || loginStore?.id === 2) &&   
+
+            {/* {(loginStore?.id === 1 || loginStore?.id === 2) &&   
             <>
-            {/* {openDtCloseDt === "O" &&( */}
             <Tab.Screen
                 name={navigationRoutes.reportsNavigation}
                 component={ReportsNavigation}
@@ -112,10 +114,45 @@ function BottomNavigationPaper() {
                         ),
                 }}
             />
-            {/* )} */}
-            
             </>
-            }
+            } */}
+            {/* ===========================to be enabled================= */}
+            {/* <Tab.Screen
+                name={navigationRoutes.sbDepositNavigation}
+                component={DepositNavigation}
+                options={{
+                    tabBarLabel: "Deposit",
+                    tabBarIcon: ({ color, focused }) =>
+                        !focused ? (
+                            <MaterialCommunityIcons
+                                name="cash-plus"
+                                color={color}
+                                size={26}
+                            />
+                        ) : (
+                            <MaterialCommunityIcons name="cash-plus" color={color} size={26} />
+                        ),
+                }}
+            /> */}
+
+            <Tab.Screen
+                name={navigationRoutes.depositWithdrawScreen}
+                component={DepositWithdrawScreen}
+                options={{
+                    tabBarLabel: "Deposit",
+                    tabBarIcon: ({ color, focused }) =>
+                        !focused ? (
+                            <MaterialCommunityIcons
+                                name="cash-plus"
+                                color={color}
+                                size={26}
+                            />
+                        ) : (
+                            <MaterialCommunityIcons name="cash-plus" color={color} size={26} />
+                        ),
+                }}
+            />
+            
             {/* ===========================to be enabled================= */}
 
             {/* {(loginStore?.id === 1 || loginStore?.id === 2) &&  */}

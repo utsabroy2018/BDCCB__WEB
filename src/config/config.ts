@@ -9,14 +9,14 @@
 
 // export const BASE_URL = "http://192.168.1.33:3014"
 
-// export const BASE_URL = "https://ssvwsadmin.opentech4u.co.in" //Local Sayantika
-// export const BASE_URL_BDCCB = "http://192.168.1.33:3017/v1" //Local Sayantika
 
 
 // export const BASE_URL = "https://ssvwsadmin.opentech4u.co.in" //Local Lokesh
 // export const BASE_URL_BDCCB = "http://192.168.1.60:3017/v1" //Local Lokesh
 
 
+// export const BASE_URL = "https://ssvwsadmin.opentech4u.co.in" //Local Sayantika
+// export const BASE_URL_BDCCB = "http://192.168.1.33:3017/v1" //Local Sayantika
 
 export const BASE_URL = "https://bdccbshg.opentech4u.co.in/v1" //UAT
 // export const BASE_URL = "https://ssvwsadmin.opentech4u.co.in" //UAT
