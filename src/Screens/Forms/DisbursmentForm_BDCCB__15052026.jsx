@@ -145,8 +145,6 @@ function DisbursmentForm_BDCCB({ flag }) {
 	const [checkDuplicateGroup, setCheckDuplicateGroup] = useState({})
 	const [checkDuplicateMember, setCheckDuplicateMember] = useState({})
 
-	const [duplicateSBError, setDuplicateSBError] = useState({});
-
 	const initialValues = {
 		// loan_id: "",
 		loan_ac_no: "",
@@ -216,12 +214,12 @@ function DisbursmentForm_BDCCB({ flag }) {
 						.required("Account number is required"),
 
 					shg_id: Yup.string()
-						.required("Group Name is required"),
+						.required("SHG is required"),
 
-					// member_id: Yup.string()
-					// 	.typeError("No. of Group must be a number")
-					// 	.required("No. of Group is required")
-					// 	.min(1, "Must be at least 1"),
+					member_id: Yup.string()
+						.typeError("No. of Group must be a number")
+						.required("No. of Group is required")
+						.min(1, "Must be at least 1"),
 
 					amount: Yup.number()
 						.typeError("Amount must be a number")
@@ -384,6 +382,12 @@ function DisbursmentForm_BDCCB({ flag }) {
 			ip_address: ip,
 		}
 
+
+
+		console.log(formData, 'formDataformDataformDataformData', creds);
+
+		// return;
+
 		await saveMasterData({
 			endpoint: "loan/save_disbursement",
 			creds,
@@ -410,6 +414,11 @@ function DisbursmentForm_BDCCB({ flag }) {
 			member_id: row.member_id,
 			disburse_amt: Number(row.amount),
 		}))
+
+		console.log(formData, 'formDataformDataformData', formattedRows);
+
+
+
 
 		setLoading(true)
 
@@ -444,9 +453,9 @@ function DisbursmentForm_BDCCB({ flag }) {
 		}
 
 
-		console.log(formData, 'formDataformDataformDataformData', creds);
+		// console.log(formData, 'formDataformDataformDataformData', creds);
 
-		return
+		// return
 
 		await saveMasterData({
 			endpoint: "loan/save_disbursement",
@@ -494,8 +503,20 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 
 	const handleSearchPacsChange = async (value) => {
+		// if (value.length < 3) {
+		// 	// Message("error", "Minimum type 3 character")
+		// 	return;
+		// }
 		setPACS_SHGList([])
 		setLoading(true)
+
+		// const creds = {
+		// loan_to : userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+		// branch_code : userDetails[0]?.user_type == 'B' ? 0 : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : '',
+		// branch_shg_id : value,
+		// tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
+		// }
+
 		const creds = {
 			loan_to: 'P',
 			branch_code: userDetails[0]?.brn_code,
@@ -628,70 +649,33 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 	const fetchGroupBySB = async (sb_acc_no, index) => {
 
-		const creds = {
-			branch_code: formik.values.branch_shg_id,
-			sb_ac_no: sb_acc_no,
-		}
+		//   try {
+		// const res = await axios.get(`/your-api?sb_acc_no=${sb_acc_no}`);
+		console.log(formik.values.branch_shg_id, 'vvvvvvvvvvvvvvvvvvvvvvvvvvv');
 
 
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-		await axios.post(`${url_bdccb}/loan/fetch_gp_based_ac_no_soc`, creds, {
+		await axios.get(`${url_bdccb}/group/fetch_grp_dtls_memb_acc`, {
+			params: {
+				member_account_no: sb_acc_no, branch_code: formik.values.branch_shg_id, org_type: 'P'
+			},
 			headers: {
 				Authorization: `${tokenValue?.token}`, // example header
 				"Content-Type": "application/json", // optional
-			},
+			}
 		}).then((res) => {
-
-			// console.log(res?.data?.data, 'formDataformDataformDataformData', creds);
 
 			if (res?.data?.success) {
 
-				// const groupList = res.data.data;
+				const groupList = res.data.data;
 
-				// if (userDetails[0]?.user_type == 'B') {
-				// 	setSHGList(res?.data?.data?.map((item, i) => ({
-				// 		code: item?.group_code,
-				// 		name: item?.group_name,
-				// 	})))
-				// }
-
-				const groupList = res?.data?.data || [];
-
-				if (groupList.length > 0) {
-
-					// prepare dropdown list
-					const updatedSHGList = groupList.map((item) => ({
+				if (userDetails[0]?.user_type == 'B') {
+					setSHGList(res?.data?.data?.map((item, i) => ({
 						code: item?.group_code,
 						name: item?.group_name,
-						pacs_id: item?.branch_code, // IMPORTANT
-					}));
-
-					setSHGList(updatedSHGList);
-
-					const firstGroup = updatedSHGList[0];
-
-					// ✅ AUTO SELECT GROUP
-					formik.setFieldValue(
-						`rows[${index}].shg_id`,
-						firstGroup.code
-					);
-
-					// OPTIONAL
-					formik.setFieldValue(
-						`rows[${index}].group_name`,
-						firstGroup.name
-					);
-
-					// ✅ AUTO FETCH MEMBERS
-					fetchGroupData(
-						firstGroup.code,
-						index,
-						firstGroup.pacs_id,
-						sb_acc_no
-					);
+					})))
 				}
-
 			} else {
 				// Message('error', res?.data?.msg)
 				// navigate(routePaths.LANDING)
@@ -948,12 +932,24 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 											<Select
 												showSearch
+												// placeholder={userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' === 'S' ? 'Choose SHG ' : 'Choose '}
+												// placeholder="Choose SHG"
 												value={formik.values.branch_shg_id}
 												style={{ width: "100%" }}
 												optionFilterProp="children"
 												name="branch_shg_id"
+												// 🔍 typing search
+												// onSearch={(value) => {
+												// 	console.log(value, 'valuevaluevaluevalue');
+
+												// 	// handleSearchPacsChange(value);   // your search function
+												// 	// userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
+												// }}
+												// disabled={formik.values.loan_to.length > 0 ? false :  true}
+												// ✅ selecting option
 												onChange={(value) => {
 													formik.setFieldValue("branch_shg_id", value)
+													// handleSearchPacsChange()
 												}}
 												disabled={params.id > 0 ? true : false}
 												onBlur={formik.handleBlur}
@@ -1157,25 +1153,12 @@ function DisbursmentForm_BDCCB({ flag }) {
 </div> */}
 
 									{formik.values.rows.map((row, index) => {
-										// const isRowFilled =
-										// 	row.sb_acc_no &&
-										// 	row.shg_id &&
-										// 	// row.member_id &&
-										// 	// row.loany_member &&
-										// 	row.amount;
-
-										const isDuplicateSB = formik.values.rows.some(
-											(r, i) =>
-												i !== index &&
-												r.sb_acc_no?.trim()?.toLowerCase() ===
-													row.sb_acc_no?.trim()?.toLowerCase()
-										);
-
 										const isRowFilled =
 											row.sb_acc_no &&
 											row.shg_id &&
-											row.amount &&
-											!isDuplicateSB;
+											row.member_id &&
+											// row.loany_member &&
+											row.amount;
 
 										// ⭐⭐ IMPORTANT LOGIC HERE ⭐⭐
 										const currentGroupId = formik.values.rows[index].shg_id;
@@ -1195,9 +1178,9 @@ function DisbursmentForm_BDCCB({ flag }) {
 										) {
 											const member = filteredMembers[0];
 
-											// formik.setFieldValue(`rows[${index}].member_id`, member.member_id);
+											formik.setFieldValue(`rows[${index}].member_id`, member.member_id);
 											formik.setFieldValue(`rows[${index}].sb_acc_no`, member.sb_acc_no);
-											// formik.setFieldValue(`rows[${index}].member_name`, member.member_name);
+											formik.setFieldValue(`rows[${index}].member_name`, member.member_name);
 										}
 
 
@@ -1208,9 +1191,9 @@ function DisbursmentForm_BDCCB({ flag }) {
 											>
 
 												{/* Account Number */}
-												<div className="col-span-4">
+												<div className="col-span-2">
 
-													{/* <TDInputTemplateBr
+													<TDInputTemplateBr
 														placeholder="SB Account No."
 														type="text"
 														label="SB Acc No."
@@ -1229,91 +1212,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 														handleBlur={formik.handleBlur}
 														mode={1}
 														disabled={params.id > 0 ? true : false}
-													/> */}
-
-												{/* <TDInputTemplateBr
-												placeholder="SB Account No."
-												type="text"
-												label="SB Acc No."
-												name={`rows[${index}].sb_acc_no`}
-												formControlName={formik.values.rows[index].sb_acc_no}
-												handleChange={(e) => {
-												const value = e.target.value;
-
-												// ✅ check duplicate SB Account No
-												const isDuplicate = formik.values.rows.some(
-												(row, i) =>
-												i !== index &&
-												row.sb_acc_no?.trim()?.toLowerCase() === value?.trim()?.toLowerCase()
-												);
-
-												if (isDuplicate) {
-												Message("error", "SB Account No. is Duplicate");
-
-												// clear current field
-												formik.setFieldValue(`rows[${index}].sb_acc_no`, "");
-
-												return;
-												}
-
-												// normal set value
-												formik.setFieldValue(`rows[${index}].sb_acc_no`, value);
-
-												// API call
-												if (value.length >= 5) {
-												fetchGroupBySB(value, index);
-												}
-												}}
-												handleBlur={formik.handleBlur}
-												mode={1}
-												disabled={params.id > 0 ? true : false}
-												/> */}
-
-
-												<TDInputTemplateBr
-												placeholder="SB Account No."
-												type="text"
-												label="SB Acc No."
-												name={`rows[${index}].sb_acc_no`}
-												formControlName={formik.values.rows[index].sb_acc_no}
-												handleChange={(e) => {
-												const value = e.target.value;
-												formik.setFieldValue(`rows[${index}].sb_acc_no`, value);
-												const isDuplicate = formik.values.rows.some(
-												(row, i) =>
-												i !== index &&
-												row.sb_acc_no &&
-												row.sb_acc_no.trim().toLowerCase() === value.trim().toLowerCase()
-												);
-
-												if (isDuplicate) {
-												setDuplicateSBError((prev) => ({
-													...prev,
-													[index]: "SB Account No. is Duplicate",
-												}));
-												Message("error", "SB Account No. is Duplicate");
-												// formik.setFieldValue(`rows[${index}].sb_acc_no`, "");
-												return;
-												} else {
-												setDuplicateSBError((prev) => {
-													const copy = { ...prev };
-													delete copy[index];
-													return copy;
-												});
-											}
-												// API call
-												if (value.length >= 5) {
-												fetchGroupBySB(value, index);
-												}
-												}}
-												handleBlur={formik.handleBlur}
-												mode={1}
-												disabled={params.id > 0 ? true : false}
-												/>
-
-												{duplicateSBError[index] && (
-													<VError title={duplicateSBError[index]} />
-												)}
+													/>
 
 													{formik.touched.rows?.[index]?.sb_acc_no &&
 														formik.errors.rows?.[index]?.sb_acc_no && (
@@ -1324,7 +1223,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 
 												{/* SHG / PACS */}
-												<div className="col-span-4">
+												<div className="col-span-3">
 													{/* {JSON.stringify(SHGList, null, 2)} */}
 													{params.id > 0 ? (
 														<>
@@ -1352,7 +1251,24 @@ function DisbursmentForm_BDCCB({ flag }) {
 																style={{ width: "100%" }}
 																optionFilterProp="children"
 																name={`rows[${index}].shg_id`}
-																disabled={true}
+																disabled={params.id > 0 ? true : false}
+																// 🔍 typing search
+																onSearch={(value) => {
+																	handleSearchSHGChange(value, formik.values.branch_shg_id, index);
+																	// handleSearchPacsChange();
+																}}
+																// ✅ selecting option (ROW SAFE)
+																onChange={(value) => {
+																	formik.setFieldValue(`rows[${index}].member_id`, "")
+																	formik.setFieldValue(`rows[${index}].shg_id`, value);
+																	const selectedGroup = SHGList.find(item => item.code === value);
+																	const pacsId = selectedGroup?.pacs_id;
+																	// console.log("credscredscredscreds____", value, "PACS ID:", pacsId);
+																	// console.log(value, 'credscredscredscreds____');
+
+																	fetchGroupData(value, index, pacsId, formik.values.rows[index].sb_acc_no);
+																}}
+
 																onBlur={() =>
 																	formik.setFieldTouched(
 																		`rows[${index}].shg_id`,
@@ -1379,6 +1295,20 @@ function DisbursmentForm_BDCCB({ flag }) {
 														</>
 													)}
 
+													{/* {checkDuplicateGroup[index] && (
+											checkDuplicateGroup[index]?.user_status == 1 ? (
+												<div style={{ fontSize: 12, color: "red" }}>
+												{checkDuplicateGroup[index]?.msg}
+												</div>
+											) : (
+												<>
+												<div style={{ fontSize: 12, color: "green" }}>
+												{SBAccountStatus[index]?.msg}
+												</div>
+												</>
+											)
+											)} */}
+
 
 													{formik.touched.rows?.[index]?.shg_id &&
 														formik.errors.rows?.[index]?.shg_id && (
@@ -1388,9 +1318,117 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 												</div>
 
+												{/* No of Group */}
+												<div className="col-span-4">
+													{params.id > 0 ? (
+														<>
+
+															<TDInputTemplateBr
+																// placeholder="Approved Date"
+																type="text"
+																label="Select Member"
+																// name="approved_dt"
+																formControlName={formik.values.rows?.[index]?.member_name}
+																// handleChange={formik.handleChange}
+																// handleBlur={formik.handleBlur}
+																mode={1}
+																disabled={params.id > 0 ? true : false}
+															/>
+														</>
+													) : (
+														<>
+															<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800 dark:text-gray-100">Select Member</label>
+
+
+															<Select
+																placeholder="Select Member"
+																// value={formik.values.rows[index].member_id}
+																value={filteredMembers.length === 1 ? filteredMembers[0].member_id : formik.values.rows[index].member_id}
+																style={{ width: "100%" }}
+																disabled={true}
+																onChange={(value) => {
+
+																	formik.setFieldValue(`rows[${index}].member_id`, value);
+
+																	const selectedMember = memberOptions[index]?.find(
+																		(m) => m.member_id === value
+																	);
+
+																	formik.setFieldValue(
+																		`rows[${index}].sb_acc_no`,
+																		selectedMember?.sb_acc_no || ""
+																	);
+
+																	checkDuplicateMember_FN(value, index);
+																}}
+															>
+																<Select.Option value="" disabled>
+																	Choose Member
+																</Select.Option>
+
+																{/* 🔥 USE FILTERED MEMBERS */}
+																{filteredMembers.map((member) => (
+																	<Select.Option
+																		key={member.member_id}
+																		value={member.member_id}
+																	>
+																		{member.member_name}
+																	</Select.Option>
+																))}
+															</Select>
+
+
+
+														</>
+													)}
+
+													{checkDuplicateMember[index] && (
+														checkDuplicateMember[index]?.user_status == 1 ? (
+															<div style={{ fontSize: 12, color: "red" }}>
+																{checkDuplicateMember[index]?.msg}
+															</div>
+														) : (
+															<>
+																{/* <div style={{ fontSize: 12, color: "green" }}>
+												{SBAccountStatus[index]?.msg}
+												</div> */}
+															</>
+														)
+													)}
+
+
+
+													{formik.touched.rows?.[index]?.member_id &&
+														formik.errors.rows?.[index]?.member_id && (
+															<VError title={formik.errors.rows[index].member_id} />
+														)}
+
+
+												</div>
+
+												{/* Account Number */}
+												{/* <div className="col-span-2">
+
+													<TDInputTemplateBr
+														placeholder="SB Account No."
+														type="text"
+														label="SB Acc No."
+														name={`rows[${index}].sb_acc_no`}
+														formControlName={formik.values.rows[index].sb_acc_no}
+														mode={1}
+														disabled={true}   // 👈 auto-filled only
+													/>
+													{formik.touched.rows?.[index]?.sb_acc_no &&
+														formik.errors.rows?.[index]?.sb_acc_no && (
+															<VError title={formik.errors.rows[index].sb_acc_no} />
+														)}
+
+												</div> */}
+
+
 
 												{/* Amount */}
-												<div className="col-span-4">
+												<div className="col-span-3">
 													<TDInputTemplateBr
 														placeholder="Amount"
 														label="Amount"

@@ -40,6 +40,7 @@ function SB_AC_MemberDetailsForm_BDCCB() {
 	const location = useLocation()
 	const loanAppData  = location?.state?.item || {}
 	const group_code_Data  = location?.state?.group_code || {}
+	const flag  = location?.state?.flag || {}
 	const userDetails = JSON.parse(localStorage.getItem("user_details")) || ""
 	const navigate = useNavigate()
 	const [memberList, setMemberList] = useState(() => [])
@@ -156,10 +157,10 @@ function SB_AC_MemberDetailsForm_BDCCB() {
 				<form onSubmit={onSubmit}>
 					<div>
 
-						{/* {JSON.stringify(loanAppData, 2)}
+						{/* {JSON.stringify(loanAppData, 2)} */}
 						
-						{JSON.stringify(group_code_Data, 2)} */}
-						
+						{JSON.stringify(group_code_Data, 2)} //
+						{/* {JSON.stringify(flag, 2)} */}
 						<div>
 							{/* <div className="w-full my-10 border-t-4 border-gray-500 border-dashed"></div> */}
 							<div className="text-xl mb-2 mt-5 text-[#DA4167] font-semibold underline">

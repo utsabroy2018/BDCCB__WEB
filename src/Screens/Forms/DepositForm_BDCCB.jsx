@@ -324,8 +324,7 @@ function DepositForm_BDCCB({ flag }) {
 		// return;
 		setLoading(true)
 		const creds = {
-			group_code: societyLoanNo,
-
+			// group_code: societyLoanNo,
 			branch_code: userDetails[0]?.brn_code,
 			pacs_id: userDetails[0]?.user_type == 'B' ? "111" : "0",
 			sb_ac_no: societyLoanNo,
