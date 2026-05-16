@@ -405,18 +405,11 @@ function DisbursmentForm_BDCCB({ flag }) {
 			return Message("error", "Total Amount Greater Than Disbursement Amount")
 		}
 		const formattedRows = formData?.rows?.map(row => ({
-			// mem_loan_id: 0,
-			grp_sb_acc_no: row.sb_acc_no,
+			mem_loan_id: 0,
 			group_code: row.shg_id,
-			// member_id: row.member_id,
-			disb_amt: Number(row.amount),
+			member_id: row.member_id,
+			disburse_amt: Number(row.amount),
 		}))
-
-		// {
-//         "grp_sb_acc_no" : "group saving account no",
-//          "group_code" : "group code",
-//          "disb_amt" : "input amount"
-//         }
 
 		setLoading(true)
 
@@ -428,6 +421,8 @@ function DisbursmentForm_BDCCB({ flag }) {
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
 			loan_acc_no: formData?.loan_ac_no,
+			// loan_to: formData?.loan_to,
+			// loan_to: userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
 			loan_to: 'P',
 			branch_shg_id: formData?.branch_shg_id, ///////////////
 			period: formData?.period,
@@ -441,7 +436,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 			sanction_no: formData?.sanction_no,
 			sanction_dt: formData?.sanction_dt,
 
-			groups: formattedRows,
+			members: formattedRows,
 			// tot_memb: formData?.member_total,
 			// pay_mode: formData?.pay_mode,
 			created_by: userDetails[0]?.emp_id,
@@ -449,12 +444,12 @@ function DisbursmentForm_BDCCB({ flag }) {
 		}
 
 
-		// console.log(userDetails[0], 'formDataformDataformDataformData', creds);
+		console.log(formData, 'formDataformDataformDataformData', creds);
 
-		// return;
+		return
 
 		await saveMasterData({
-			endpoint: "loan/save_society_disbursement",
+			endpoint: "loan/save_disbursement",
 			creds,
 			navigate,
 			successMsg: "Loan Disburse Successfully",

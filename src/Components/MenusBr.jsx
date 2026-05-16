@@ -2416,7 +2416,7 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 		},
 		
 		{
-			key: "sub4-1-1",
+			key: "sub4-1-2",
 			icon: <CheckCircleOutlined />,
 			label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
 		},
@@ -2653,7 +2653,7 @@ function MenusBr({ theme, data, data_ApprovPending}) {
 		},
 		
 		{
-			key: "sub4-1-1",
+			key: "sub4-1-2",
 			icon: <CheckCircleOutlined />,
 			label: <Link to={"/homebm/disburseloan"}>SHG</Link>,
 			// hidden: data?.approve_transaction == "Y" ? false : true,
