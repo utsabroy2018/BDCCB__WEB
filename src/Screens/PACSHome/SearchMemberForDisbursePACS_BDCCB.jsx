@@ -162,7 +162,7 @@ function SearchMemberForDisburseBM_BDCCB() {
 		}
 
 		const creds_HeadOffice = {
-			branch_id: userDetails[0]?.branch_type === 'H' ? branch_Select : null,
+			branch_id: userDetails[0]?.branch_type === 'H' ? branch_Select : userDetails[0]?.brn_code,
 			approval_status: disbursementStatus,
 			loan_to: "P",
 			from_dt: fromDate,
@@ -170,10 +170,13 @@ function SearchMemberForDisburseBM_BDCCB() {
 			branch_type : userDetails[0]?.branch_type,
 		}
 
+		console.log(creds, 'credscredscredscreds', creds_HeadOffice);
+		
+
 		const tokenValue = await getLocalStoreTokenDts(navigate);
 		await axios
 			// .post(`${url}/admin/fetch_loan_application_dtls`, creds)
-			.post(`${url_bdccb}/loan/show_loan_status`, userDetails[0]?.branch_type === 'H' ? creds_HeadOffice : creds, {
+			.post(`${url_bdccb}/loan/fetch_society_disbursement_dtls`, userDetails[0]?.branch_type === 'H' ? creds_HeadOffice : creds, {
 				headers: {
 					Authorization: `${tokenValue?.token}`, // example header
 					"Content-Type": "application/json", // optional
@@ -531,7 +534,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 
 
 					{/* <DisbursmentForm_BDCCB /> */}
-					{/* {JSON.stringify(loanApplications, 2)} */}
+					{/* {JSON.stringify(loanApplications[0], 2)} */}
+
 					<LoanApplicationsDisburseTable_BDCCB
 						flag="BM"
 						loanAppData={loanApplications}

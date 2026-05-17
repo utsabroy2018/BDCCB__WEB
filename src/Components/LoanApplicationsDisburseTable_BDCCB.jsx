@@ -101,11 +101,11 @@ function LoanApplicationsDisburseTable_BDCCB({
 										header="Sanction Date"
 									></Column> */}
 				
-									<Column
+									{/* <Column
 										field="loan_id"
 										header="CCB Loan ID"
 										footer={<span style={{ fontWeight: "bold" }}>Total</span>}
-									></Column>
+									></Column> */}
 				
 									
 									<Column
@@ -114,7 +114,7 @@ function LoanApplicationsDisburseTable_BDCCB({
 										
 									></Column>
 									<Column
-										field="group_name"
+										field="loan_to_name"
 										header="Society Name"
 									></Column>
 										<Column
@@ -146,10 +146,17 @@ function LoanApplicationsDisburseTable_BDCCB({
 										
 										<button
 										type="button"
+										// onClick={() => {
+										// console.log("ROW DATA:", rowData);
+										// navigate(
+										// `/homepacs/disburseloan/${rowData?.loan_id}`,
+										// { state: rowData }
+										// );
+										// }}
 										onClick={() => {
 										console.log("ROW DATA:", rowData);
 										navigate(
-										`/homepacs/disburseloan/${rowData?.loan_id}`,
+										`/homepacs/disburseloan/${rowData?.branch_shg_id}`,
 										{ state: rowData }
 										);
 										}}

@@ -167,7 +167,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		// pay_mode: "",
 		rows: [
 			{
-				mem_loan_id: "",
+				loan_id: "",
 				sb_acc_no: "",
 				shg_id: "",
 				member_id: "",
@@ -298,15 +298,22 @@ function DisbursmentForm_BDCCB({ flag }) {
 
 	const fetchDisburseDetails = async () => {
 
-		const formattedRows = loanAppData?.members?.map(row => ({
+		
+		
+
+		const formattedRows = loanAppData?.groups?.map(row => ({
 			mem_loan_id: row.mem_loan_id || "",
-			sb_acc_no: row.sb_acc_no || "",
+			sb_acc_no: row.grp_sb_acc_no || "",
 			shg_id: row.group_code || "",
-			member_id: row.member_id || "",
-			amount: row.disburse_amt || "",
+			loan_id: row.loan_id || "",
+			amount: row.disb_amt || "",
 			group_name: row.group_name || "",
-			member_name: row.member_name || "",
+			// member_name: row.member_name || "",
 		}));
+
+		// console.log(formattedRows, 'formDataformDataformDataformData', loanAppData);
+
+		// return;
 
 		// group_code: row.branch_shg_id,
 		// member_id: row.member_id,
@@ -347,11 +354,20 @@ function DisbursmentForm_BDCCB({ flag }) {
 			return Message("error", "Total Amount Greater Than Disbursement Amount")
 		}
 		// return;
+		// const formattedRows = formData?.rows?.map(row => ({
+		// 	mem_loan_id: row.mem_loan_id,
+		// 	group_code: row.shg_id,
+		// 	member_id: row.member_id,
+		// 	disburse_amt: Number(row.amount),
+		// }))
+
 		const formattedRows = formData?.rows?.map(row => ({
-			mem_loan_id: row.mem_loan_id,
+			// mem_loan_id: 0,
+			loan_id: row.loan_id,
+			grp_sb_acc_no: row.sb_acc_no,
 			group_code: row.shg_id,
-			member_id: row.member_id,
-			disburse_amt: Number(row.amount),
+			// member_id: row.member_id,
+			disb_amt: Number(row.amount),
 		}))
 
 		setLoading(true)
@@ -359,7 +375,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		const ip = await getClientIP()
 
 		const creds = {
-			loan_id: loanAppData?.loan_id,
+			// loan_id: 0,
 			tran_id: 0,
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
@@ -379,13 +395,16 @@ function DisbursmentForm_BDCCB({ flag }) {
 			tot_grp: formData?.group_total,
 			// tot_memb: formData?.member_total,
 			// pay_mode: formData?.pay_mode,
-			members: formattedRows,
+			groups: formattedRows,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
 		}
 
+		// console.log(creds, 'formDataformDataformDataformData');
+		// return;
+
 		await saveMasterData({
-			endpoint: "loan/save_disbursement",
+			endpoint: "/loan/save_society_disbursement",
 			creds,
 			navigate,
 			successMsg: "Loan Disburse edited saved.",
@@ -407,6 +426,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		const formattedRows = formData?.rows?.map(row => ({
 			// mem_loan_id: 0,
 			grp_sb_acc_no: row.sb_acc_no,
+			loan_id: row.loan_id,
 			group_code: row.shg_id,
 			// member_id: row.member_id,
 			disb_amt: Number(row.amount),
@@ -423,7 +443,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		const ip = await getClientIP()
 
 		const creds = {
-			loan_id: 0,
+			// loan_id: 0,
 			tran_id: 0,
 			tenant_id: userDetails[0]?.tenant_id,
 			branch_id: userDetails[0]?.brn_code,
@@ -454,7 +474,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		// return;
 
 		await saveMasterData({
-			endpoint: "loan/save_society_disbursement",
+			endpoint: "/loan/save_society_disbursement",
 			creds,
 			navigate,
 			successMsg: "Loan Disburse Successfully",
@@ -493,9 +513,6 @@ function DisbursmentForm_BDCCB({ flag }) {
 	useEffect(() => {
 		handleSearchPacsChange()
 	}, []);
-
-
-
 
 
 	const handleSearchPacsChange = async (value) => {
@@ -859,7 +876,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 						className="text-blue-800 dark:text-gray-400"
 						spinning={loading}
 					>
-						{/* {JSON.stringify(loanAppData, 2)}  */}
+						{/* {JSON.stringify(loanAppData?.loan_acc_no, 2)}  */}
 						{/* {JSON.stringify(loanAppData, null, 2)} */}
 						<div className="card shadow-lg bg-white border-2 p-5 mx-16 rounded-3xl surface-border border-round surface-ground flex-auto font-medium">
 							{loanAppData?.approval_status == 'A' && (<div className="accept_dis"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
