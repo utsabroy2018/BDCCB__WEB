@@ -867,18 +867,19 @@ function DepositForm_BDCCB({ flag }) {
 										
 										) : (
 											<Radiobtn
-										data={options_status}
-										val={depositWithdrawStatus}
-										onChangeVal={(value) => {
-										onChange(value)
-										}}
-										/>
+											data={options_status}
+											val={depositWithdrawStatus}
+											onChangeVal={(value) => {
+											onChange(value)
+											}}
+											/>
 										)}
 										
 										</div>
 
 										<div>
-											{/* {JSON.stringify(formik.values.direct_member, null, 2)} */}
+											{/* {JSON.stringify(depositWithdrawStatus, null, 2)} */}
+
 											{params?.id > 0 ? (
 
 											<TDInputTemplateBr
@@ -904,15 +905,6 @@ function DepositForm_BDCCB({ flag }) {
 												handleChange={formik.handleChange}
 												handleBlur={formik.handleBlur}
 												mode={2}
-												
-												// data={depositWithdrawStatus == "D" ? dataDropdown?.map((item) => ({
-												// 	code: item?.code,
-												// 	name: item?.name,
-												// })) : dataDropdown_Member?.map((item) => ({
-												// 	code: item?.code,
-												// 	name: item?.name,
-												// }))}
-
 												data={dataDropdown?.map((item) => ({
 													code: item?.code,
 													name: item?.name,
@@ -951,7 +943,7 @@ function DepositForm_BDCCB({ flag }) {
 											<TDInputTemplateBr
 											placeholder="Group Amount"
 											type="text"
-											label={GroupBalanceCheck?.success === false ? 'Group Amount ' + '('+ GroupBalanceCheck?.typeAmount+' is not valid)' : 'Group Amount'}
+											label={GroupBalanceCheck?.success === false ? 'Group Amount ' + '(Rs.'+ GroupBalanceCheck?.typeAmount+' is not valid)' : 'Group Amount'}
 											// label={`Group Amount`}
 											name="total_group_amount"
 											formControlName={formik.values.total_group_amount}
@@ -959,7 +951,10 @@ function DepositForm_BDCCB({ flag }) {
 											handleChange={(e) => {
 												formik.setFieldValue("total_group_amount", e.target.value);
 												const value = e.target.value;
-												handleGroupAmountCheck(value)
+												if(depositWithdrawStatus == 'W'){
+													handleGroupAmountCheck(value)
+												}
+												
 											}}
 											// disabled={params?.id > 0 ? true : false}
 											handleBlur={formik.handleBlur}

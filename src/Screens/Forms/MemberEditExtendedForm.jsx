@@ -1306,28 +1306,24 @@ function MemberEditExtendedForm({ groupDataArr }) {
 		console.log(isDuplicate, 'isDuplicateisDuplicateisDuplicate', value);
 		
 
-		if (isDuplicate) {
-			// set error message for this row
-			setIFSCCodeStatus(prev => ({
-				...prev,
-				[index]: {
-					user_status: 1,
-					msg: "Duplicate SB A/C No.",
-				},
-			}));
-		} else {
-			// clear duplicate message
-			setIFSCCodeStatus(prev => {
-				const copy = { ...prev };
-				delete copy[index];
-				return copy;
-			});
+		// if (isDuplicate) {
+		// 	setIFSCCodeStatus(prev => ({
+		// 		...prev,
+		// 		[index]: {
+		// 			user_status: 1,
+		// 			msg: "Duplicate SB A/C No.",
+		// 		},
+		// 	}));
+		// } else {
+		// 	setIFSCCodeStatus(prev => {
+		// 		const copy = { ...prev };
+		// 		delete copy[index];
+		// 		return copy;
+		// 	});
+		// 	checkIFCS_code_format(value, index);
+		// }
 
-			// call API only if 12 digits and not duplicate
-			// if (value.length > 0) {
-			checkIFCS_code_format(value, index);
-			// }
-		}
+		checkIFCS_code_format(value, index);
 
 		members[index].ifsc_code = value;
 		formik.setFieldValue("members", members);

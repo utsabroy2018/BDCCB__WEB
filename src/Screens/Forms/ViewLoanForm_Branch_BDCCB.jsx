@@ -502,19 +502,8 @@ function ViewLoanForm_Branch_BDCCB({ flag }) {
 
 	const handleSearchPacsChange = async (value) => {
 		
-		// if (value.length < 3) {
-		// 	// Message("error", "Minimum type 3 character")
-		// 	return;
-		// }
 		setPACS_SHGList([])
 		setLoading(true)
-
-		// const creds = {
-		// loan_to : userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-		// branch_code : userDetails[0]?.user_type == 'B' ? 0 : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : '',
-		// branch_shg_id : value,
-		// tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
-		// }
 
 		const creds = {
 			loan_to: 'P',
@@ -574,26 +563,9 @@ function ViewLoanForm_Branch_BDCCB({ flag }) {
 
 
 	const handleSearchSHGChange = async (value, branch_shg_id, index) => {
-
-		// if (value.length < 3) {
-		// 	// Message("error", "Minimum type 3 character")
-		// 	return;
-		// }
-		// setPACS_SHGList([])
 		setLoading(true)
 
-		// const creds = {
-		// loan_to : userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-		// branch_code : userDetails[0]?.user_type == 'B' ? 0 : userDetails[0]?.user_type == 'P' ? userDetails[0]?.brn_code : '',
-		// branch_shg_id : value,
-		// tenant_id: userDetails[0]?.user_type == 'B' ? userDetails[0]?.tenant_id : 0,
-		// }
-
 		const creds = {
-			// loan_to: 'S',
-			// branch_code: branch_shg_id,
-			// branch_shg_id: value,
-			// tenant_id: 0,
 			branch_code :userDetails[0]?.brn_code,
 		}
 
@@ -787,21 +759,26 @@ function ViewLoanForm_Branch_BDCCB({ flag }) {
 	member_id: item.member_id,
 	}));
 
+	
+
 
 	setLoading(true)
 
 	const ip = await getClientIP()
 
 	const creds = {
-	loan_id: loanAppData?.loan_id?.split(",").map(id => Number(id.trim())),
-	trans_id: loanAppData?.trans_id?.split(",").map(id => Number(id.trim())),
-	group_code: loanAppData?.group_code?.split(",").map(id => Number(id.trim())),
+	// loan_id: loanAppData?.loan_id?.split(",").map(id => Number(id.trim())),
+	// trans_id: loanAppData?.trans_id?.split(",").map(id => Number(id.trim())),
+	// group_code: loanAppData?.group_code?.split(",").map(id => Number(id.trim())),
+	loan_id: String(loanAppData?.loan_id),
+	trans_id: String(loanAppData?.trans_id),
+	group_code: String(loanAppData?.group_code),
 	created_by: userDetails[0]?.emp_id,
 	ip_address: ip,
 	member_disburse: member_ids,
 	}
 
-	// console.log(creds, 'formDataformDataformDataformData', loanAppData?.members);
+	// console.log(member_ids, 'formDataformDataformDataformData', loanAppData?.loan_id);
 	// return
 
 	await saveMasterData({
@@ -982,71 +959,6 @@ function ViewLoanForm_Branch_BDCCB({ flag }) {
 
 									</div>
 								</div>
-
-								{/* <div className="flex justify-start gap-5">
-									<div className={"grid gap-4 sm:grid-cols-1 sm:gap-6 w-full mb-3"}>
-
-										<div>
-										
-											<label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
-				 dark:text-gray-100">
-												Select PACS *
-												
-											</label>
-											
-											<Select
-												showSearch
-												// placeholder={userDetails[0]?.user_type == 'B' ? 'Choose PACS ' : userDetails[0]?.user_type == 'P' === 'S' ? 'Choose SHG ' : 'Choose '}
-												// placeholder="Choose SHG"
-												value={formik.values.branch_shg_id}
-												style={{ width: "100%" }}
-												optionFilterProp="children"
-												name="branch_shg_id"
-												// 🔍 typing search
-												// onSearch={(value) => {
-												// 	console.log(value, 'valuevaluevaluevalue');
-													
-												// 	// handleSearchPacsChange(value);   // your search function
-												// 	// userDetails[0]?.user_type == 'B' ? 'P' : userDetails[0]?.user_type == 'P' ? 'S' : '',
-												// }}
-												// disabled={formik.values.loan_to.length > 0 ? false :  true}
-												// ✅ selecting option
-												onChange={(value) => { 
-													formik.setFieldValue("branch_shg_id", value)
-													// handleSearchPacsChange()
-												 }}
-												disabled={params.id > 0 ? true : false}
-												onBlur={formik.handleBlur}
-												filterOption={(input, option) =>
-													option?.children?.toLowerCase().includes(input.toLowerCase())
-												}
-
-											>
-												<Select.Option value="" disabled>Choose PACS</Select.Option>
-
-												{PACS_SHGList?.map((data) => (
-													<Select.Option key={data.code} value={data.code}>
-														{data.name}
-													</Select.Option>
-												))}
-											</Select>
-
-
-											{formik.errors.branch_shg_id && formik.touched.branch_shg_id ? (
-												<VError title={formik.errors.branch_shg_id} />
-											) : null}
-
-
-
-
-										</div>
-
-
-
-
-
-									</div>
-								</div> */}
 
 								<div className="flex justify-start gap-5">
 									<div className={"grid gap-4 sm:grid-cols-3 sm:gap-6 w-full mb-3"}>

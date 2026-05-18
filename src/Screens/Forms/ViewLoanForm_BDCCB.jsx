@@ -26,6 +26,8 @@ import {
 	CheckCircleOutlined,
 	CloseCircleOutlined,
 	FileExcelOutlined,
+	CheckCircleFilled,
+	SyncOutlined,
 } from "@ant-design/icons"
 import FormHeader from "../../Components/FormHeader"
 import { routePaths } from "../../Assets/Data/Routes"
@@ -78,10 +80,14 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	const [actionType, setActionType] = useState(""); 
 	const [rej_res, setRejRes] = useState("")
 
+	const [LoanApproveORUnApprov, setLoanApproveORUnApprov] = useState(loanAppData?.approval_status)
+
+	const [FormData, setFormData] = useState(() => [])
+
 	const containerRef = useRef(null)
 
 	const [isHovered, setIsHovered] = useState(false)
-const s2ab = (s) => {
+	const s2ab = (s) => {
 		const buf = new ArrayBuffer(s.length)
 		const view = new Uint8Array(buf)
 		for (let i = 0; i < s.length; i++) {
@@ -163,78 +169,68 @@ const s2ab = (s) => {
 
 	const initialValues = {
 		society_loan_acc: '',
-		// g_group_name: "",
-		// g_address: "",
-		// sahayika_id: "",
-		// g_pin: "",
-		// g_phone1: "",
-		// dist_id: "",
-		// ps_id: "",
-		// po_id: "",
-		// block_id: "",
-		// gp_id: "",
-		// village_id: "",
-		// g_total_outstanding: "",
+		sanction_dt: '',
+		sanction_No: "",
+		period_month: "",
+		current_roi: "",
+		ovd_roi: "",
+		disburse_date: "",
+		members: [],
+		// member: [
+		// 	{
+		// 		member_name: "",
+		// 		member_code: "",
+		// 		member_account_no: "",
+		// 		amount: "",
+		// 	},
+		// ],
 	}
 	const [formValues, setValues] = useState(initialValues)
 
 	const validationSchema = Yup.object({
 		// society_loan_acc: Yup.string().required("Society Loan A/C No. name is required"),
-		society_loan_acc: Yup.string(),
+		society_loan_acc: Yup.string().required("Society Loan A/C No. name is required"),
+		sanction_dt: Yup.date().required("Sanction Date is required"),
+		sanction_No: Yup.mixed().required("Sanction No is required"),
+		period_month: Yup.string().required("Period is required"),
+		current_roi: Yup.mixed().required("Current ROI is required"),
+		ovd_roi: Yup.mixed().required("Overdue ROI is required"),
+		disburse_date: Yup.date()
+					.required("Disbursement Date is required")
+					.min(
+						Yup.ref("sanction_dt"),
+						"Disbursement Date must be greater than or equal to Sanction Date"
+					),
+		members: Yup.array().of(
+		Yup.object().shape({
+			disburse_amt: Yup.number()
+				.typeError("Amount must be number")
+				.required("Member Amount is required")
+				.moreThan(0, "Amount must be greater than 0"),
+		})
+	),
+
 	})
 
-	const fetchGroupDetails = async () => {
-		setLoading(true)
-		const creds = {
-			group_code: params?.id,
-			branch_code: userDetails[0]?.brn_code,
-			tenant_id: userDetails[0]?.tenant_id,
-			approval_status: loanAppData?.approval_status,
-			loan_to: userDetails[0]?.user_type,
-			ccb_loan_id: loanAppData?.ccb_loan_id,
-		}
-
-
-		const tokenValue = await getLocalStoreTokenDts(navigate);
-
-		await axios
-			.post(`${url_bdccb}/loan/fetch_unapprove_disburse`, creds, {
-			headers: {
-			Authorization: `${tokenValue?.token}`, // example header
-			"Content-Type": "application/json", // optional
-			},
-			})
-			.then((res) => {
-			
-			if(res?.data?.success){
-			console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaa');
-			
-			setValues({
-					society_loan_acc: res?.data?.data[0]?.society_acc_no,
-				})
-				setGroupData(res?.data?.data)
-							
-			} else {
-			navigate(routePaths.LANDING)
-			localStorage.clear()
-			}
-							
-			
-			})
-			.catch((err) => {
-				Message("error", "Some error occurred while fetching group form")
-			})
-		setLoading(false)
-	}
-
-	useEffect(() => {
-		fetchGroupDetails()
-	}, [count])
 
 	
 	const onSubmit = async (values) => {
 		console.log("onsubmit called")
-		console.log(values, "formDataformDataformDataformData")
+		console.log(values, "formDataformDataformDataformData", formValues)
+		console.log("Full Form Values", values, 'Member Amount Array');
+		setFormData(values)
+
+		// console.log(
+		// 	"Member Amount Array",
+		// 	values.members.map((item) => ({
+		// 		member_code: item.group_code,
+		// 		member_id: item.member_id,
+		// 		disburse_amt: item.disburse_amt,
+		// 	}))
+		// );
+
+		// return;
+		setActionType("S");
 		setLoading(true)
 
 		setVisible(true)
@@ -243,7 +239,7 @@ const s2ab = (s) => {
 	}
 
 	const formik = useFormik({
-		initialValues: +params.id > 0 ? formValues : initialValues,
+		initialValues: initialValues,
 		onSubmit,
 		validationSchema,
 		validateOnChange: true,
@@ -270,148 +266,286 @@ const s2ab = (s) => {
 		return data.ip
 	}
 
+
+
 	const approveDisbursement = async () => {
+		setLoading(true)
+		
+		const ip = await getClientIP()
+
+		const creds = {
+		ccb_loan_id: loanAppData?.ccb_loan_id,
+		tenant_id: userDetails[0]?.tenant_id,
+		group_code: loanAppData?.group_code,
+		branch_id: userDetails[0]?.brn_code,
+		loan_acc_no: loanAppData?.loan_acc_no,
+		tot_outstanding: loanAppData?.tot_outstanding,
+		loan_trans_id: loanAppData?.loan_trans_id,
+		transaction_id: loanAppData?.transaction_id,
+		created_by: userDetails[0]?.emp_id,
+		ip_address: ip,
+		}
+
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios
+			.post(`${url_bdccb}/loan/approve_pacs_dib_via_branch`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+			
+			if(res?.data?.success){
+			console.log(res?.data, 'formDataformDataformDataformData');
+			setLoanApproveORUnApprov('A')
+			fetchMemberDetails()
+			// setValues({
+			// society_loan_acc: res?.data?.data[0]?.society_acc_no,
+			// })
+			// setGroupData(res?.data?.data)
+							
+			} else {
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+							
+			
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+		setLoading(false)
+	}
+
+	const fetchMemberDetails = async () => {
+		setLoading(true)
+		const creds = {
+			tenant_id: userDetails[0]?.tenant_id,
+			group_code: loanAppData?.group_code,
+		}
+
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios
+			.post(`${url_bdccb}/loan/fetch_member_dt`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+			
+			if(res?.data?.success){
+			console.log(res?.data?.data, 'dataaaaaaaaaaaaaaaaa');
+			
+			// setValues({
+			// 		society_loan_acc: res?.data?.data[0]?.society_acc_no,
+			// 	})
+			setGroupData(res?.data?.data)
+
+			formik.setFieldValue(
+				"members",
+				res?.data?.data?.map((item) => ({
+					group_code: loanAppData?.group_code,
+					member_id: item?.member_code,
+					disburse_amt: "",
+					
+				}))
+			)
+
+							
+			} else {
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+							
+			
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+		setLoading(false)
+	}
+
+	// const rejectDisbursement = async () => {
 	
-	// alert('approveDisbursement')
-	const member_ids = groupData[0]?.members.map(item => ({
-	loan_id: item.mem_loan_id,
-	member_code: item.member_id,
-	trans_id: item.tran_id,
-	disb_amt: item.disburse_amt
-	}));
+	// const member_ids = groupData[0]?.members.map(item => ({
+	// loan_id: item.mem_loan_id,
+	// disb_amt: item.disburse_amt,
+	// trans_id: item.tran_id,
+	// member_id: item.member_id,
+	// }));
 
-	setLoading(true)
+	// setLoading(true)
 
-	const ip = await getClientIP()
+	// const ip = await getClientIP()
 
-	const creds = {
-	tenant_id: userDetails[0]?.tenant_id,
-	branch_id: userDetails[0]?.brn_code,
-	voucher_dt: formatDateToYYYYMMDD(new Date()),
-	voucher_id: 0,
-	trans_id: groupData[0]?.loan_id,
-	voucher_type: "J",
-	acc_code: "23101",
-	trans_type: 'C',
-	dr_amt: groupData[0]?.disb_amt,
-	cr_amt: groupData[0]?.disb_amt,
-	society_acc_no : formik.values.society_loan_acc,
-	member_ids: member_ids,
-	group_code: loanAppData?.group_code,
-	loan_acc_no: groupData[0]?.loan_acc_no,
-	created_by: userDetails[0]?.emp_id,
-	ip_address: ip,
-	}
+	// const creds = {
+	// // ccb_loan_id: groupData[0]?.loan_id,
+	// // loan_id: groupData[0]?.loan_id,
+	// // trans_id: 0,
+	// // group_code: groupData[0]?.group_code,
 
+	// loan_id: [groupData[0]?.loan_id],
+	// trans_id: '0',
+	// group_code: [groupData[0]?.group_code],
+	// // reject_remarks: rej_res,
+	// member_reject: member_ids,
+	// created_by: userDetails[0]?.emp_id,
+	// ip_address: ip,
+	// }
 
-// 	{ 
-//   "tenant_id" : "1",
-//   "branch_id" : "7",
-//   "voucher_dt" : "2026-03-05",
-//   "voucher_id":"0",
-//   "trans_id":"70002",
-//   "voucher_type":"J",
-//   "acc_code":"23101",
-//   "trans_type":"C",
-//   "dr_amt":"500000.00",
-//   "cr_amt":"500000.00",
-//   "society_acc_no" : "458547HUJK",
-//   "created_by" : "test_123",
-//   "ip_address" : "11:12:28",
-//   "group_code" : "70035",
-//   "member_ids" : [
-//     {
-//         "loan_id" : 7007501,
-//         "member_code": "70075",
-//         "trans_id": "1772111858363",
-//         "disb_amt" : "300000.00"
-//     },
-//     {
-//         "loan_id" : 7007602,
-//         "member_code": 70076,
-//         "trans_id": "1772111858396",
-//         "disb_amt" : "200000.00"
-//     }
-//   ]
-// }
+	// // console.log(creds, 'formDataformDataformDataformData', 'reject');
+	// // return;
 
+	// await saveMasterData({
+	// endpoint: "loan/reject_pacs_disbursement",
+	// creds,
+	// navigate,
+	// successMsg: "Transaction Accepted",
+	// onSuccess: () => navigate(-1),
 
-	// console.log(creds, 'formDataformDataformDataformData', 'approve');
-	// return
+	// // 🔥 fully dynamic failure handling
+	// failureRedirect: routePaths.LANDING,
+	// clearStorage: true,
+	// })
 
-	await saveMasterData({
-	endpoint: "account/save_loan_voucher",
-	creds,
-	navigate,
-	successMsg: "Transaction Accepted",
-	onSuccess: () => navigate(-1),
+	// setLoading(false)
 
-	// 🔥 fully dynamic failure handling
-	failureRedirect: routePaths.LANDING,
-	clearStorage: true,
-	})
-
-	// console.log(creds, 'formDataformDataformDataformData');
-
-	setLoading(false)
-	}
+	// }
 
 	const rejectDisbursement = async () => {
+		setLoading(true)
+		const ip = await getClientIP()
+
+		const creds = {
+		ccb_loan_id: loanAppData?.ccb_loan_id,
+		tenant_id: userDetails[0]?.tenant_id,
+		loan_trans_id: loanAppData?.loan_trans_id,
+		transaction_id: loanAppData?.transaction_id,
+		group_code: loanAppData?.group_code,
+		loan_acc_no: loanAppData?.loan_acc_no,
+		tot_outstanding: loanAppData?.tot_outstanding,
+		}
+
+		const tokenValue = await getLocalStoreTokenDts(navigate);
+
+		await axios
+			.post(`${url_bdccb}/loan/reject_pacs_disbursement`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+			
+			if(res?.data?.success){
+			navigate(-1)
+							
+			} else {
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+							
+			
+			})
+			.catch((err) => {
+				Message("error", "Some error occurred while fetching group form")
+			})
+		setLoading(false)
+	}
+
+	const saveGroupData = async () => {
+
+		// FormData
 	
-	const member_ids = groupData[0]?.members.map(item => ({
-	loan_id: item.mem_loan_id,
-	disb_amt: item.disburse_amt,
-	trans_id: item.tran_id,
-	member_id: item.member_id,
-	}));
+			// if (formik.values.rows.reduce((sum, r) => sum + Number(r.amount || 0), 0) > Number(formik.values.disb_amt)) {
+			// 	return Message("error", "Total Amount Greater Than Disbursement Amount")
+			// }
+			const formattedRows = FormData?.members?.map(row => ({
+				group_code: row.group_code,
+				member_id: row.member_id,
+				disburse_amt: Number(row.disburse_amt),
+			}))
 
-	setLoading(true)
-
-	const ip = await getClientIP()
-
-	const creds = {
-	// ccb_loan_id: groupData[0]?.loan_id,
-	// loan_id: groupData[0]?.loan_id,
-	// trans_id: 0,
-	// group_code: groupData[0]?.group_code,
-
-	loan_id: [groupData[0]?.loan_id],
-	trans_id: '0',
-	group_code: [groupData[0]?.group_code],
-	// reject_remarks: rej_res,
-	member_reject: member_ids,
-	created_by: userDetails[0]?.emp_id,
-	ip_address: ip,
-	}
-
-	// console.log(creds, 'formDataformDataformDataformData', 'reject');
-	// return;
-
-	await saveMasterData({
-	endpoint: "loan/reject_pacs_disbursement",
-	creds,
-	navigate,
-	successMsg: "Transaction Accepted",
-	onSuccess: () => navigate(-1),
-
-	// 🔥 fully dynamic failure handling
-	failureRedirect: routePaths.LANDING,
-	clearStorage: true,
-	})
-
-	setLoading(false)
-
-	}
+	
+			setLoading(true)
+	
+			const ip = await getClientIP()
+	
+			const creds = {
+				ccb_loan_id : loanAppData?.ccb_loan_id,
+				tenant_id: userDetails[0]?.tenant_id,
+				loan_to : "P",
+				branch_shg_id : userDetails[0]?.brn_code,
+				loan_acc_no: loanAppData?.loan_acc_no,
+				period : FormData?.period_month,
+				curr_roi : FormData?.current_roi,
+				penal_roi : FormData?.ovd_roi,
+				disb_dt : FormData?.disburse_date,
+				sanction_no : FormData?.sanction_No,
+				sanction_dt : FormData?.sanction_dt,
+				society_acc_no : FormData?.society_loan_acc,
+				members: formattedRows,
+				created_by : userDetails[0]?.emp_id,
+  				ip_address : ip,
+			}
+	
+			await saveMasterData({
+				endpoint: "loan/save_society_level_disburse",
+				creds,
+				navigate,
+				successMsg: "Loan Disburse Successfully",
+				onSuccess: () => navigate(-1),
+				// 🔥 fully dynamic failure handling
+				failureRedirect: routePaths.LANDING,
+				clearStorage: true,
+			})
+	
+			setLoading(false)
+		}
 
 	const acceptReject = async (actionType)=>{
+		console.log(actionType, 'actionTypeactionTypeactionType');
+		
 		if(actionType == 'A'){
 			approveDisbursement()
 		}
 		if(actionType == 'R'){
 			rejectDisbursement()
 		}
+
+		if(actionType == 'S'){
+			saveGroupData()
+		}
 		
 	}
+
+
+
+	useEffect(()=>{
+		if(LoanApproveORUnApprov == "A"){
+			fetchMemberDetails()
+		}
+
+		fetchMemberDetails()
+		
+	}, [])
+
+	useEffect(() => {
+			const currRoi = Number(formik.values.current_roi);
+	
+			if (!isNaN(currRoi) && currRoi !== "") {
+				// console.log(formik.values.curr_roi, 'ccccccccccc');
+				if (formik.values.current_roi > 0) {
+					formik.setFieldValue("ovd_roi", currRoi + 2);
+				}
+			}
+		}, [formik.values.current_roi]);
 
 	return (
 		<>
@@ -426,525 +560,78 @@ const s2ab = (s) => {
 				className="text-blue-800 dark:text-gray-400"
 				spinning={loading}
 			>
-				<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
-					{/* {JSON.stringify(groupData[0], null, 2)} fdghfghfhg
-						{JSON.stringify(loanAppData, 2)}  */}
-					<div className="flex flex-col justify-start gap-5">
-						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
-						
-						
-							<div className="text-[#DA4167] text-lg font-bold sm:col-span-3"> Society Loan Details</div>
 
+				<div className="flex flex-col justify-start gap-5 mb-5">
+					{LoanApproveORUnApprov== 'A' && (<div className="accept_dis_3"><CheckCircleFilled style={{ color: "#fff", marginRight: 6 }} />
+						Accepted Transaction </div>)}
+						{LoanApproveORUnApprov == 'U' && (<div className="pending_dis_3"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />
+						Unapproved Transaction </div>)}
+						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
+						{/* {JSON.stringify(LoanApproveORUnApprov, null, 2)} fdghfghfhg	 */}
+						{/* {JSON.stringify(groupData, null, 2)} fdghfghfhg */}
+						{/* {JSON.stringify(userDetails[0], null, 2)} fdghfghfhg */}
+						
+						{/* {JSON.stringify(loanAppData, 2)}  */}
+				
+						
+						
+						
+							<div className="text-[#DA4167] text-lg font-bold sm:col-span-3 mb-0"> Group Loan Details</div>
+						
 							<div className="sm:col-span-1">
 							<TDInputTemplateBr
-							placeholder="Society Loan A/C No."
+							placeholder="Unapproved Amount"
 							type="text"
-							label="Society Loan A/C No."
-							name="society_loan_acc"
+							label="Unapproved Amount"
+							name="unapprovedAmount_new"
 							handleChange={formik.handleChange}
 							handleBlur={formik.handleBlur}
-							formControlName={formik.values.society_loan_acc}
-							disabled={loanAppData?.approval_status == 'U' ? false : true}
+							formControlName={loanAppData?.tot_outstanding}
+							disabled
 							mode={1}
 							/>
-								{formik.errors.society_loan_acc && formik.touched.society_loan_acc ? (
-									<VError title={formik.errors.society_loan_acc} />
-								) : null}
+								
 							</div>
 
 							<div className="sm:col-span-1">
 							<TDInputTemplateBr
-									type="text"
-									label="Loan Account No. "
-									name="loan_acc_no"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={groupData[0]?.loan_acc_no}
-									mode={1}
-									disabled
-								/>
-							</div>
-
-							 <div className="sm:col-span-3">
-							<TDInputTemplateBr
-									type="text"
-									label="Select PACS "
-									name="pacs_name"
-									handleChange={formik.handleChange}
-									handleBlur={formik.handleBlur}
-									formControlName={groupData[0]?.pacs_name}
-									mode={1}
-									disabled
-								/>
-							</div>
-
-
-						<div>
-
-							<TDInputTemplateBr
-							type="date"
-							label="Sanction Date"
-							name="sanction_dt"
-							formControlName={formatDateToYYYYMMDD_CurrentDT(groupData[0]?.sanction_dt)}
-							mode={1}
-							disabled={true}
-						/>
-						</div>
-
-						<div>
-
-							<TDInputTemplateBr
-								type="text"
-								// label={loanAppData?.loan_to == 'P'? 'Pacs' : 'SHG'}
-								label="Sanction No."
-								formControlName={groupData[0]?.sanction_no} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div>
-
-						<div>
-
-							<TDInputTemplateBr
-								type="text"
-								// label={loanAppData?.loan_to == 'P'? 'Pacs' : 'SHG'}
-								label="Period (In Month)"
-								formControlName={groupData[0]?.period} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div>
-
-						<div>
-
-							<TDInputTemplateBr
-								type="text"
-								// label={loanAppData?.loan_to == 'P'? 'Pacs' : 'SHG'}
-								label="Current ROI"
-								formControlName={groupData[0]?.curr_roi} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div>
-						
-
-						<div>
-								
-								<TDInputTemplateBr
-									type="text"
-									// label={loanAppData?.loan_to == 'P'? 'Pacs' : 'SHG'}
-									label="Ovd ROI"
-									formControlName={groupData[0]?.penal_roi} // Default to SHG
-									mode={1}
-									disabled={true}
-								/>
-							</div>
-
-						<div>
-
-							<TDInputTemplateBr
-								type="date"
-								label="Disburse Date"
-								formControlName={formatDateToYYYYMMDD_CurrentDT(groupData[0]?.disb_dt)} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div>
-
-						{/* <div>
-
-							<TDInputTemplateBr
-								type="text"
-								label="Disburse Amount"
-								formControlName={groupData[0]?.disb_amt} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div>
-						
-
-						
-
-						<div>
-
-							<TDInputTemplateBr
-								type="text"
-								label="Number Of Group"
-								formControlName={groupData[0]?.tot_grp} // Default to SHG
-								mode={1}
-								disabled={true}
-							/>
-						</div> */}
-
-						
-
-
-
-						{/* ////////////////////////// Below Old ///////////////////////// */}
-
-
-								{/* {JSON.stringify(formik.values, null, 2)} */}
-							{/* <div className="text-[#DA4167] text-lg font-bold sm:col-span-3"> Group Loan Details</div>
-							<div className="sm:col-span-1">
-								<TDInputTemplateBr
-									placeholder="Group Code"
-									type="text"
-									label="Group Code"
-									name="g_code"
-									// handleChange={formik.handleChange}
-									// handleBlur={formik.handleBlur}
-									// formControlName={formik.values.g_co_name}
-									formControlName={params.id}
-									mode={1}
-									disabled
-								/>
-								
-							</div>
-							
-
-							<div>
-								<TDInputTemplateBr
-									placeholder="Group Name"
 									type="text"
 									label="Group Name"
-									name="g_group_name"
+									name="group_name_new"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}
-									formControlName={formik.values.g_group_name}
+									formControlName={loanAppData?.group_name}
 									mode={1}
 									disabled
 								/>
-							
 							</div>
 
-							<div className="sm:col-span-3">
-								<TDInputTemplateBr
-									placeholder="Type Address..."
+							<div className="sm:col-span-1">
+							<TDInputTemplateBr
 									type="text"
-									label={`Address`}
-									name="g_address"
-									formControlName={formik.values.g_address}
+									label="Group SB A/C"
+									name="group_sb_acc"
 									handleChange={formik.handleChange}
 									handleBlur={formik.handleBlur}
-									mode={3}
+									formControlName={loanAppData?.sb_ac_no}
+									mode={1}
 									disabled
 								/>
-								
 							</div>
 
-							
-
-					
-							
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="Sahayika Name"
-										name="sahayika_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.sahayika_id}
-										mode={1}
-										disabled
-									/>
-								</div>
-
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="PIN No."
-										name="g_pin"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.g_pin}
-										mode={1}
-										disabled
-									/>
-								</div>
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="Mobile No. Of Group Leader/Sahayika"
-										name="g_phone1"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.g_phone1}
-										mode={1}
-										disabled
-									/>
-								</div>
-
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="District"
-										name="dist_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.dist_id}
-										mode={1}
-										disabled
-									/>
-								</div>
-
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="Police Station"
-										name="ps_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.ps_id}
-										mode={1}
-										disabled
-									/>
-								</div>
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="Post Office"
-										name="po_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.po_id}
-										mode={1}
-										disabled
-									/>
-								</div>
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="Block"
-										name="block_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.block_id}
-										mode={1}
-										disabled
-									/>
-								</div>
-
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="GP Name"
-										name="gp_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.gp_id}
-										mode={1}
-										disabled
-									/>
-								</div>
-
-								<div>
-									
-									<TDInputTemplateBr
-										// placeholder="Branch Name"
-										type="text"
-										label="Village Name"
-										name="village_id"
-										handleChange={formik.handleChange}
-										handleBlur={formik.handleBlur}
-										formControlName={formik.values.village_id}
-										mode={1}
-										disabled
-									/>
-								</div> */}
-								
-							
-							
 						</div>
-						
 
-						
-
-						{params?.id > 0 && (
-							<div className="gap-3">
-								<div className="w-full my-10 border-t-4 border-gray-400 border-dashed"></div>
-								<div>
-									<div className="text-[#DA4167] text-lg mb-2 font-bold">
-										Members in this Group
-									</div>
-
-
-									{/* {groupData[0]?.memb_dt?.map((item, i) => (
-										<Tag
-											key={i}
-											icon={<UserOutlined />}
-											color={
-												item?.approval_status === "U" ||
-												(userDetails?.id == 3 && item?.approval_status === "S")
-													? "geekblue"
-													: "red"
-											}
-											className="text-lg cursor-pointer mb-5 rounded-3xl
-									"
-											onClick={
-												userDetails?.id == 2
-													? () =>
-															navigate(`/homebm/editgrtform/${item?.form_no}`, {
-																state: item,
-															})
-													: () =>
-															navigate(`/homeco/editgrtform/${item?.form_no}`, {
-																state: item,
-															})
-											}
-										>
-											{item?.client_name}
-										</Tag>
-									))} */}
-									{/* {JSON.stringify(groupData[0]?.memb_dt, 2)} */}
-									<Spin spinning={loading}>
-										<div
-											ref={containerRef}
-											className={`relative overflow-x-auto shadow-md sm:rounded-lg`}
-											onWheel={handleWheel}
-											onMouseEnter={handleMouseEnter}
-											onMouseLeave={handleMouseLeave}
-										>
-											<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-												<thead className="text-xs text-white uppercase bg-slate-800 dark:bg-gray-700 dark:text-gray-400">
-													<tr>
-
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Group Name
-														</th>
-
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Member Name
-														</th>
-														
-														<th scope="col" className="px-6 py-3 font-semibold">
-															SB Account
-														</th>
-														{/* <th scope="col" className="px-6 py-3 font-semibold">
-															Disburse Date
-														</th> */}
-														<th scope="col" className="px-6 py-3 font-semibold">
-															Disburse Amount
-														</th>
-														{/* <th scope="col" className="px-6 py-3 font-semibold">
-															<span className="sr-only">Action</span>
-														</th> */}
-													</tr>
-												</thead>
-												<tbody>
-													{groupData[0]?.members?.map((item, i) => (
-														<tr
-															key={i}
-															className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600"
-														>
-															<th
-																scope="row"
-																className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-															>
-																{item?.group_name}
-															</th>
-															<th
-																scope="row"
-																className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-															>
-																{item?.member_name}
-															</th>
-															{/* <td className="px-6 py-4">
-																
-																{item?.loan_id}
-															
-																</td> */}
-															{/* <td className="px-6 py-4">{item?.member_code}</td> */}
-															<td className="px-6 py-4">{item?.sb_acc_no}</td>
-															{/* <td className="px-6 py-4">{formatDateToYYYYMMDD_CurrentDT(item?.disb_dt)}</td> */}
-															<td className="px-6 py-4">{item?.disburse_amt}/-</td>
-															{/* <td className="px-6 py-4 text-right">
-																<button
-																	onClick={() => {
-																		navigate(
-																			`/homepacs/memberloandetails/${item?.loan_id}`
-																		)
-																	}}
-																	className="font-medium text-teal-500 dark:text-blue-500 hover:underline"
-																>
-																	<EyeFilled />
-																</button>
-															</td> */}
-														</tr>
-													))}
-													<tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-														<td className="px-6 py-4 font-semibold" colSpan={3}>
-															Total Disburse Amount
-														</td>
-														<td
-															className="px-6 py-4 text-left font-semibold"
-															colSpan={1}
-														>
-															{groupData[0]?.disb_amt}/-
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
-									</Spin>
-								</div>
-							</div>
-						)}
-					</div>
-					{/* <BtnComp
-						mode="A"
-						// rejectBtn={true}
-						// onReject={() => {
-						// 	setVisibleModal(false)
-						// }}
-						onReset={formik.resetForm}
-						// sendToText="Credit Manager"
-						// onSendTo={() => console.log("dsaf")}
-						// condition={fetchedFileDetails?.length > 0}
-						// showSave
-						param={params?.id}
-					/> */}
-
-				
-					{loanAppData?.approval_status == 'U' &&(	
+						{LoanApproveORUnApprov == 'U' &&(	
 						<div className="flex justify-center  sm:gap-6 mt-8">
 						<button
 						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-green-600 border-teal-500 bg-teal-500 transition ease-in-out hover:bg-green-600 duration-300 rounded-full  dark:focus:ring-primary-900`}
-						// onClick={async () => {
-						// // await checkingBeforeApprove()
-						// setActionType("A")
-						// setVisible(true)
-						
-						// }}
 						onClick={async () => {
-						// check value first
-						if (!formik.values.society_loan_acc) {
-							// mark field touched to show error
-							formik.setFieldTouched("society_loan_acc", true);
-
-							Message("error", "Society Loan A/C No. is required");
-							return;
-						}
-
-						// if value exists → console it
-						console.log("Society Loan A/C No.:", formik.values.society_loan_acc);
-
-						// continue existing flow
+						// if (!formik.values.society_loan_acc) {
+						// 	// mark field touched to show error
+						// 	formik.setFieldTouched("society_loan_acc", true);
+						// 	Message("error", "Society Loan A/C No. is required");
+						// 	return;
+						// }
 						setActionType("A");
 						setVisible(true);
 						}}
@@ -956,89 +643,350 @@ const s2ab = (s) => {
 						<button
 						className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
 						onClick={async () => {
-						// check value first
-						// if (!formik.values.society_loan_acc) {
-						// 	// mark field touched to show error
-						// 	formik.setFieldTouched("society_loan_acc", true);
-
-						// 	Message("error", "Society Loan A/C No. is required");
-						// 	return;
-						// }
-
-						// if value exists → console it
-						// console.log("Society Loan A/C No.:", formik.values.society_loan_acc);
-
-						// continue existing flow
 						setActionType("R");
 						setVisible(true);
 						}}
 						>
 						<CloseCircleOutlined /> <span className={`ml-2`}>Rejected Transaction</span>
 						</button>
-
-						
-
-						{/* <div>
-				<Popconfirm
-				title={`Reject Transaction?`}
-				description={
-				<>
-				<div>
-				<TDInputTemplateBr
-				placeholder="Please give a reason behind rejecting this item"
-				type="date"
-				label="Please give a reason behind rejecting this item"
-				name="fromDate"
-				formControlName={rej_res}
-				handleChange={(e) => setRejRes(e.target.value)}
-				// min={"1900-12-31"}
-				mode={3}
-				/>
-				</div>
-				</>
-				}
-				onConfirm={async () => {
-				await rejectDisbursement()
-				// setData([])
-				// Message("success", "Transaction Rejected.")
-				}}
-				onCancel={() => setRejRes("")}
-				okText="Reject"
-				cancelText="No"
-				// disabled={selectedRowIndices?.length === 0}
-				>
-				<a
-				className={`inline-flex items-center px-4 py-2 mt-0 ml-0 sm:mt-0 text-sm font-small text-center text-white border hover:border-[#DA4167] border-[#DA4167] bg-[#DA4167] transition ease-in-out hover:bg-[#DA4167] hover:text-white duration-300 rounded-full  dark:focus:ring-primary-900`}
-				>
-				<CloseCircleOutlined />{" "}
-				<span className="ml-2">Reject Transaction</span>
-				</a>
-				</Popconfirm>
-				</div> */}
-
-						
 											
 						</div>
 						)} 
+						
+					</div>
 
-						<DialogBox
-							flag={4}
-							onPress={() => setVisible(!visible)}
-							visible={visible}
-							onPressYes={async () => {
-							await acceptReject(actionType)
-							.then(() => {
-							})
-							.catch((err) => {
-							// console.log("Err in RecoveryCoApproveTable.jsx", err)
-							})
-							setVisible(!visible)
-							}}
-							onPressNo={() => {
-								setVisible(!visible)
-							}}
-						/>
-				</form>
+					{LoanApproveORUnApprov == "A" &&(
+					<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
+
+					<div className="flex flex-col justify-start gap-5">
+					<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
+
+
+					<div className="text-[#DA4167] text-lg font-bold sm:col-span-3"> Society Loan Details</div>
+
+					<div className="sm:col-span-1">
+					<TDInputTemplateBr
+					placeholder="Society Loan A/C No."
+					type="text"
+					label="Society Loan A/C No."
+					name="society_loan_acc"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formik.values.society_loan_acc}
+					// disabled={loanAppData?.approval_status == 'U' ? false : true}
+					mode={1}
+					/>
+					{formik.errors.society_loan_acc && formik.touched.society_loan_acc ? (
+					<VError title={formik.errors.society_loan_acc} />
+					) : null}
+					</div>
+
+					<div className="sm:col-span-1">
+					<TDInputTemplateBr
+					type="text"
+					label="Loan Account No. "
+					name="loan_acc_no"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={loanAppData?.loan_acc_no}
+					mode={1}
+					disabled
+					/>
+					</div>
+
+					<div className="sm:col-span-3">
+					<TDInputTemplateBr
+					type="text"
+					label="Select PACS "
+					name="pacs_name"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={userDetails[0]?.branch_name}
+					mode={1}
+					disabled
+					/>
+					</div>
+
+
+					<div>
+
+					{/* <TDInputTemplateBr
+					type="date"
+					label="Sanction Date"
+					name="sanction_dt"
+					formControlName={formatDateToYYYYMMDD_CurrentDT(groupData[0]?.sanction_dt)}
+					mode={1}
+					// disabled={true}
+					/> */}
+					<TDInputTemplateBr
+					placeholder="Sanction Date"
+					type="date"
+					label="Sanction Date"
+					name="sanction_dt"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formatDateToYYYYMMDD_CurrentDT(formik.values.sanction_dt)}
+					mode={1}
+					/>
+					{formik.errors.sanction_dt && formik.touched.sanction_dt ? (
+					<VError title={formik.errors.sanction_dt} />
+					) : null}
+					</div>
+
+					<div>
+
+					{/* <TDInputTemplateBr
+					type="text"
+					label="Sanction No."
+					formControlName={groupData[0]?.sanction_no} // Default to SHG
+					mode={1}
+					// disabled={true}
+					/> */}
+					<TDInputTemplateBr
+					placeholder="Sanction No."
+					type="text"
+					label="Sanction No."
+					name="sanction_No"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formik.values.sanction_No}
+					mode={1}
+					/>
+					{formik.errors.sanction_No && formik.touched.sanction_No ? (
+					<VError title={formik.errors.sanction_No} />
+					) : null}
+					</div>
+
+					<div>
+
+					{/* <TDInputTemplateBr
+					type="text"
+					label="Period (In Month)"
+					formControlName={groupData[0]?.period} // Default to SHG
+					mode={1}
+					// disabled={true}
+					/> */}
+
+					<TDInputTemplateBr
+					placeholder="Period (In Month)"
+					type="text"
+					label="Period (In Month)"
+					name="period_month"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formik.values.period_month}
+					mode={1}
+					/>
+					{formik.errors.period_month && formik.touched.period_month ? (
+					<VError title={formik.errors.period_month} />
+					) : null}
+
+					</div>
+
+					<div>
+
+					{/* <TDInputTemplateBr
+					type="text"
+					// label={loanAppData?.loan_to == 'P'? 'Pacs' : 'SHG'}
+					label="Current ROI"
+					formControlName={groupData[0]?.curr_roi} // Default to SHG
+					mode={1}
+					disabled={true}
+					/> */}
+
+					<TDInputTemplateBr
+					placeholder="Current ROI"
+					type="text"
+					label="Current ROI"
+					name="current_roi"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formik.values.current_roi}
+					mode={1}
+					/>
+					{formik.errors.current_roi && formik.touched.current_roi ? (
+					<VError title={formik.errors.current_roi} />
+					) : null}
+
+					</div>
+
+
+					<div>
+
+					{/* <TDInputTemplateBr
+					type="text"
+					label="Ovd ROI"
+					formControlName={groupData[0]?.penal_roi} // Default to SHG
+					mode={1}
+					disabled={true}
+					/> */}
+
+					<TDInputTemplateBr
+					placeholder="Ovd ROI"
+					type="text"
+					label="Ovd ROI"
+					name="ovd_roi"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formik.values.ovd_roi}
+					mode={1}
+					/>
+					{formik.errors.ovd_roi && formik.touched.ovd_roi ? (
+					<VError title={formik.errors.ovd_roi} />
+					) : null}
+					</div>
+
+					<div>
+
+					{/* <TDInputTemplateBr
+					type="date"
+					label="Disburse Date"
+					formControlName={formatDateToYYYYMMDD_CurrentDT(groupData[0]?.disb_dt)} // Default to SHG
+					mode={1}
+					disabled={true}
+					/> */}
+
+					<TDInputTemplateBr
+					placeholder="Disburse Date"
+					type="date"
+					label="Disburse Date"
+					name="disburse_date"
+					handleChange={formik.handleChange}
+					handleBlur={formik.handleBlur}
+					formControlName={formatDateToYYYYMMDD_CurrentDT(formik.values.disburse_date)}
+					mode={1}
+					/>
+					{formik.errors.disburse_date && formik.touched.disburse_date ? (
+					<VError title={formik.errors.disburse_date} />
+					) : null}
+
+					</div>
+
+					</div>
+
+
+
+
+					{params?.id > 0 && (
+					<div className="gap-3">
+					<div className="w-full my-10 border-t-4 border-gray-400 border-dashed"></div>
+					<div>
+					<div className="text-[#DA4167] text-lg mb-2 font-bold">
+					Members in this Group
+					</div>
+
+
+					
+					{/* {JSON.stringify(groupData, 2)} */}
+
+					<Spin spinning={loading}>
+					<div
+					ref={containerRef}
+					className={`relative overflow-x-auto shadow-md sm:rounded-lg`}
+					onWheel={handleWheel}
+					onMouseEnter={handleMouseEnter}
+					onMouseLeave={handleMouseLeave}
+					>
+					<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+					<thead className="text-xs text-white uppercase bg-slate-800 dark:bg-gray-700 dark:text-gray-400">
+					<tr>
+
+					{/* <th scope="col" className="px-6 py-3 font-semibold">
+					Group Name
+					</th> */}
+
+					<th scope="col" className="px-6 py-3 font-semibold">
+					Member Name
+					</th>
+
+					<th scope="col" className="px-6 py-3 font-semibold">
+					Member Code
+					</th>
+
+					<th scope="col" className="px-6 py-3 font-semibold">
+					Member A/C No.
+					</th>
+					<th scope="col" className="px-6 py-3 font-semibold">
+					Member Amount
+					</th>
+					</tr>
+					</thead>
+					<tbody>
+					{groupData?.map((item, i) => (
+					<tr
+					key={i}
+					className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600"
+					>
+					{/* <th
+					scope="row"
+					className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+					>
+					{item?.group_name}
+					</th> */}
+					<th
+					scope="row"
+					className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+					>
+					{item?.member_name}
+					</th>
+					<td className="px-6 py-4">{item?.member_code}</td>
+					<td className="px-6 py-4">{item?.member_account_no}</td>
+					<td className="px-6 py-4">
+					<TDInputTemplateBr
+						placeholder="Member Disburse Amount"
+						type="text"
+						name={`members[${i}].disburse_amt`}
+						handleChange={formik.handleChange}
+						handleBlur={formik.handleBlur}
+						formControlName={formik.values.members?.[i]?.disburse_amt}
+						mode={1}
+					/>
+					{formik.errors.members?.[i]?.disburse_amt &&
+					formik.touched.members?.[i]?.disburse_amt ? (
+						<VError title={formik.errors.members[i].disburse_amt} />
+					) : null}
+					</td>
+					</tr>
+					))}
+					
+					</tbody>
+					</table>
+					</div>
+					</Spin>
+					</div>
+					</div>
+					)}
+					</div>
+					<BtnComp
+					mode="A"
+					onReset={formik.resetForm}
+					param={params?.id}
+					/>
+
+
+
+
+					
+					</form>
+					)}
+
+					<DialogBox
+					flag={4}
+					onPress={() => setVisible(!visible)}
+					visible={visible}
+					onPressYes={async () => {
+					await acceptReject(actionType)
+					.then(() => {
+					})
+					.catch((err) => {
+					// console.log("Err in RecoveryCoApproveTable.jsx", err)
+					})
+					setVisible(!visible)
+					}}
+					onPressNo={() => {
+					setVisible(!visible)
+					}}
+					/>
 
 				 <div className="flex justify-start gap-4 bg-white p-4">
 						<Tooltip title="Export to Excel">

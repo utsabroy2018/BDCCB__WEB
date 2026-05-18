@@ -404,7 +404,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		// return;
 
 		await saveMasterData({
-			endpoint: "/loan/save_society_disbursement",
+			endpoint: "loan/save_society_disbursement",
 			creds,
 			navigate,
 			successMsg: "Loan Disburse edited saved.",
@@ -474,7 +474,7 @@ function DisbursmentForm_BDCCB({ flag }) {
 		// return;
 
 		await saveMasterData({
-			endpoint: "/loan/save_society_disbursement",
+			endpoint: "loan/save_society_disbursement",
 			creds,
 			navigate,
 			successMsg: "Loan Disburse Successfully",

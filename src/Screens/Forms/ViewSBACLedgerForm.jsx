@@ -686,8 +686,6 @@ function ViewSBACLedgerForm({ groupDataArr }) {
 						</div>
 						
 						
-						<div className="text-[#DA4167] text-lg font-bold">CCB Loan Details</div>
-
 						<div>
 
 
@@ -695,6 +693,7 @@ function ViewSBACLedgerForm({ groupDataArr }) {
         "acc_no": "GP2020",
         "acc_opening_dt": "2026-05-14",
         "balance": "900.00", */}
+		<div className="text-[#DA4167] text-lg font-bold">Group Transaction Details</div>
 							<DynamicTailwindTable
 								data={
 									ccbLoanDetails?.length
@@ -749,7 +748,7 @@ function ViewSBACLedgerForm({ groupDataArr }) {
 								<div className="w-full my-5 border-t-4 border-gray-400 border-dashed"></div>
 								<div>
 									<div className="text-[#DA4167] text-lg mb-2 font-bold">
-										Group Member Loan Details
+										Member Transaction Details
 									</div>
 
 									{/* {JSON.stringify(memberData, 2)} */}

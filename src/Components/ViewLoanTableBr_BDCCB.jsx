@@ -131,7 +131,7 @@ function ViewLoanTableBr_BDCCB({
 								Group Name
 							</th>
 							<th scope="col" className="p-4">
-								Total Member
+								Loan A/C No.
 							</th>
 							<th scope="col" className="p-4">
 								Total Outstanding
@@ -166,7 +166,7 @@ function ViewLoanTableBr_BDCCB({
 									
 									<td className="px-6 py-3 font-bold text-slate-800">{item.group_code || "-----"}</td>
 									<td className="px-6 py-3 text-slate-700">{item.group_name}</td>
-									<td className="px-6 py-3 text-slate-700">{item.tot_member}</td>
+									<td className="px-6 py-3 text-slate-700">{item.loan_acc_no}</td>
 									<td className="px-6 py-3 text-slate-700">{item.tot_outstanding}</td>
 									<td className="px-6 py-3 text-slate-700">
 										{item.approval_status == "U" ? (

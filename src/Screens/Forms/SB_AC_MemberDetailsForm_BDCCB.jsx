@@ -159,7 +159,7 @@ function SB_AC_MemberDetailsForm_BDCCB() {
 
 						{/* {JSON.stringify(loanAppData, 2)} */}
 						
-						{JSON.stringify(group_code_Data, 2)} //
+						{/* {JSON.stringify(group_code_Data, 2)} // */}
 						{/* {JSON.stringify(flag, 2)} */}
 						<div>
 							{/* <div className="w-full my-10 border-t-4 border-gray-500 border-dashed"></div> */}

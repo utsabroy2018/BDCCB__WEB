@@ -27,10 +27,10 @@ const options_Disburs = [
 		label: "Accepted",
 		value: "A",
 	},
-	{
-		label: "Rejected",
-		value: "R",
-	}
+	// {
+	// 	label: "Rejected",
+	// 	value: "R",
+	// }
 ]
 
 const options_Disburs_HeadOffice = [
@@ -38,10 +38,10 @@ const options_Disburs_HeadOffice = [
 		label: "Accepted",
 		value: "A",
 	},
-	{
-		label: "Rejected",
-		value: "R",
-	}
+	// {
+	// 	label: "Rejected",
+	// 	value: "R",
+	// }
 ]
 
 function SearchMemberForDisburseBM_BDCCB() {
@@ -54,6 +54,7 @@ function SearchMemberForDisburseBM_BDCCB() {
     const [fromDate, setFromDate] = useState(() => new Date().toISOString().slice(0, 10))
 	const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10))
 	const [disbursementStatus, setDisbursementStatus] = useState(userDetails[0]?.branch_type === 'H' ? "A" : "U");
+	// const [disbursementStatus, setDisbursementStatus] = useState("A");
 	const [branches, setBranches] = useState([])
 	const [branch_Select, setBranch_Select] = useState("");
 	const navigate = useNavigate()
@@ -262,6 +263,8 @@ function SearchMemberForDisburseBM_BDCCB() {
 		getBranchList()
 	}
 
+	fetchApproveUapprove()
+
 	}, [disbursementStatus])
 
 
@@ -277,13 +280,16 @@ function SearchMemberForDisburseBM_BDCCB() {
 			>
 				<main className="px-4 h-auto my-10 mx-32">
 
-					<Radiobtn
+					{userDetails[0]?.branch_type != 'H' &&(
+						<Radiobtn
 						data={userDetails[0]?.branch_type === 'H' ? options_Disburs_HeadOffice :  options_Disburs}
 						val={disbursementStatus}
 						onChangeVal={(value) => {
 							onChange(value)
 						}}
 					/>
+					)}
+					
 						{disbursementStatus == 'A' && 
 						<div className="grid grid-cols-4 gap-4">
 						{/* <form onSubmit={formik.handleSubmit}> */}
