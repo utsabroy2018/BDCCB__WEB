@@ -158,10 +158,10 @@ table.table_Custome_2nd thead tr th:first-child{width: auto;}
 
 
 .accept_dis_3{background: #6cbb3f; color: #fff; max-width: 100%;
-  margin-top: 0; padding: 10px 10px; border-radius: 5px; display: inline-block; margin-bottom: 0; font-size: 14px;}
+  margin-top: 0; padding: 10px 10px; border-radius: 5px; display: inline-block; margin-bottom: 20px; font-size: 14px;}
 
 .pending_dis_3{background: #be4444; color: #fff; max-width: 100%;
-  margin-top: 0; padding: 10px 10px; border-radius: 5px; display: inline-block; margin-bottom: 0; font-size: 14px;}
+  margin-top: 0; padding: 10px 10px; border-radius: 5px; display: inline-block; margin-bottom: 20px; font-size: 14px;}
 
 .radioBtn_Signup .ant-radio-group{margin-top: -8px; margin-left: -10px;}
 
@@ -178,5 +178,23 @@ table.table_Custome_2nd thead tr th:first-child{width: auto;}
 .withdraw_div{background: #d46b0e; color: #fff; 
   margin-top: 0; padding: 1px 5px; border-radius: 3px; display: inline-block; margin-bottom: 0; font-size: 11px;}
 
+.customeTxt_Unapprove{position: absolute;
+  left: 25px;
+  top: -18px;
+  font-size: 14px;
+  padding: 4px 15px;
+  font-weight: 700;
+  color: #fff !important;
+  border: rgba(240, 82, 82, 0.5) solid 1px !important;
+  background: #be4444;}
 
+.customeTxt_Approve{position: absolute;
+  left: 25px;
+  top: -18px;
+  font-size: 14px;
+  padding: 4px 15px;
+  font-weight: 700;
+  color: #fff !important;
+  border: rgba(164, 195, 54, 0.5) solid 1px !important;
+  background: #4a7939;}
 

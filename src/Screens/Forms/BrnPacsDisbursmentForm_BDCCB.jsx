@@ -359,8 +359,9 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 			created_by: loanAppData?.created_by,
 			created_date: formatDateToYYYYMMDD_CurrentDT(new Date(loanAppData?.created_date)),
 			group_total: loanAppData?.tot_grp,
-			sb_acc_no: loanAppData?.members?.[0]?.sb_acc_no || "",
-			shg_id: loanAppData?.members?.[0]?.group_name || "",
+			sb_acc_no: loanAppData?.members[0]?.sb_acc_no || "",
+			shg_id: loanAppData?.members[0]?.group_name || "",
+			sb_balance: loanAppData?.members[0]?.grp_balance || "",
 
 			// 🔥 THIS IS IMPORTANT
 			rows: formattedRows.length > 0
@@ -886,7 +887,8 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 						className="text-blue-800 dark:text-gray-400"
 						spinning={loading}
 					>
-						{/* {JSON.stringify(loanAppData, 2)}  */}
+						{/* {JSON.stringify(loanAppData, 2)} ///////////////// */}
+						{/* {JSON.stringify(formValues, 2)}  */}
 						{/* {JSON.stringify(PACS_SHGList[0], 2)}  */}
 
 						{/* {JSON.stringify(PACS_SHGList, null, 2)} */}
@@ -1260,40 +1262,7 @@ function BrnPacsDisbursmentForm_BDCCB({ flag }) {
 													{/* {JSON.stringify(formik.values.shg_id, 2)}  */}
 													{/* {JSON.stringify(SHGList[0]?.code, 2)}  */}
 
-													{/* <label for="loan_to" class="block mb-2 text-sm capitalize font-bold text-slate-800
-									 dark:text-gray-100">Select Group</label>
 													
-													<Select
-														showSearch
-														placeholder="Choose Group"
-														style={{ width: "100%" }}
-														optionFilterProp="children"
-														name={`shg_id`}
-														onChange={(value) => {
-															formik.setFieldValue(`shg_id`, value);
-															fetchGroupData(value);
-														}}
-
-														onBlur={() =>
-															formik.setFieldTouched(`shg_id`, true)
-														}
-
-														filterOption={(input, option) =>
-															option?.children
-																?.toLowerCase()
-																.includes(input.toLowerCase())
-														}
-													>
-														<Select.Option value="" disabled>
-															Choose Group
-														</Select.Option>
-
-														{SHGList?.map((data) => (
-															<Select.Option key={data.code} value={data.code}>
-																{data.name}
-															</Select.Option>
-														))}
-													</Select> */}
 												</>
 											)}
 

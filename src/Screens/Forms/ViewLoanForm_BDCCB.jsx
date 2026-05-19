@@ -80,6 +80,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	const [actionType, setActionType] = useState(""); 
 	const [rej_res, setRejRes] = useState("")
 
+	// const [LoanApproveORUnApprov, setLoanApproveORUnApprov] = useState("U")
 	const [LoanApproveORUnApprov, setLoanApproveORUnApprov] = useState(loanAppData?.approval_status)
 
 	const [FormData, setFormData] = useState(() => [])
@@ -239,7 +240,8 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	}
 
 	const formik = useFormik({
-		initialValues: initialValues,
+		// initialValues: initialValues,
+		initialValues: + params.id > 0 ? formValues : initialValues,
 		onSubmit,
 		validationSchema,
 		validateOnChange: true,
@@ -266,6 +268,41 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 		return data.ip
 	}
 
+
+	const fetchFullAcceptForm = async () => {
+
+		const formattedRows = loanAppData?.members?.map(row => ({
+			mem_loan_id: row.mem_loan_id || "",
+			sb_acc_no: row.sb_acc_no || "",
+			shg_id: row.group_code || "",
+			member_id: row.member_id || "",
+			amount: row.disburse_amt || "",
+			group_name: row.group_name || "",
+			member_name: row.member_name || "",
+		}));
+
+		setValues({
+			society_loan_acc: loanAppData?.society_details?.society_acc_no,
+			sanction_dt: loanAppData?.society_details?.sanction_dt,
+			sanction_No: loanAppData?.society_details?.sanction_no,
+			period_month: loanAppData?.society_details?.period,
+			current_roi: loanAppData?.society_details?.curr_roi,
+			ovd_roi: loanAppData?.society_details?.penal_roi,
+			disburse_date: loanAppData?.society_details?.disb_dt,
+			// members: [],
+		});
+
+		setGroupData(loanAppData?.member_details)
+		
+		formik.setFieldValue(
+				"members",
+				loanAppData?.member_details?.map((item) => ({
+					group_code: loanAppData?.group_code,
+					member_id: item?.member_code,
+					disburse_amt: item?.disb_amt,
+				}))
+			)
+	};
 
 
 	const approveDisbursement = async () => {
@@ -371,52 +408,51 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 		setLoading(false)
 	}
 
-	// const rejectDisbursement = async () => {
-	
-	// const member_ids = groupData[0]?.members.map(item => ({
-	// loan_id: item.mem_loan_id,
-	// disb_amt: item.disburse_amt,
-	// trans_id: item.tran_id,
-	// member_id: item.member_id,
-	// }));
+	const checkGroupStatus = async () => {
+		setLoading(true)
+		
+		const ip = await getClientIP()
 
-	// setLoading(true)
+		const creds = {
+		tenant_id: userDetails[0]?.tenant_id,
+		group_code: loanAppData?.group_code,
+		}
 
-	// const ip = await getClientIP()
+// 		  "tenant_id" : "",
+//   "group_code" : 
 
-	// const creds = {
-	// // ccb_loan_id: groupData[0]?.loan_id,
-	// // loan_id: groupData[0]?.loan_id,
-	// // trans_id: 0,
-	// // group_code: groupData[0]?.group_code,
 
-	// loan_id: [groupData[0]?.loan_id],
-	// trans_id: '0',
-	// group_code: [groupData[0]?.group_code],
-	// // reject_remarks: rej_res,
-	// member_reject: member_ids,
-	// created_by: userDetails[0]?.emp_id,
-	// ip_address: ip,
-	// }
+		const tokenValue = await getLocalStoreTokenDts(navigate);
 
-	// // console.log(creds, 'formDataformDataformDataformData', 'reject');
-	// // return;
-
-	// await saveMasterData({
-	// endpoint: "loan/reject_pacs_disbursement",
-	// creds,
-	// navigate,
-	// successMsg: "Transaction Accepted",
-	// onSuccess: () => navigate(-1),
-
-	// // 🔥 fully dynamic failure handling
-	// failureRedirect: routePaths.LANDING,
-	// clearStorage: true,
-	// })
-
-	// setLoading(false)
-
-	// }
+		await axios
+			.post(`${url_bdccb}/loan/check_grp_status`, creds, {
+			headers: {
+			Authorization: `${tokenValue?.token}`, // example header
+			"Content-Type": "application/json", // optional
+			},
+			})
+			.then((res) => {
+			console.log(res?.data, 'checkGroupStatuscheckGroupStatus');
+			if(res?.data?.success){
+				if(res?.data?.approved){
+					setLoanApproveORUnApprov('A')
+				} else {
+					setLoanApproveORUnApprov('U')
+				}
+			
+			} else {
+			navigate(routePaths.LANDING)
+			localStorage.clear()
+			}
+							
+			
+			})
+			.catch((err) => {
+				console.log(err, 'checkGroupStatuscheckGroupStatus');
+				Message("error", "Some error occurred while fetching group form")
+			})
+		setLoading(false)
+	}
 
 	const rejectDisbursement = async () => {
 		setLoading(true)
@@ -460,12 +496,6 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 	}
 
 	const saveGroupData = async () => {
-
-		// FormData
-	
-			// if (formik.values.rows.reduce((sum, r) => sum + Number(r.amount || 0), 0) > Number(formik.values.disb_amt)) {
-			// 	return Message("error", "Total Amount Greater Than Disbursement Amount")
-			// }
 			const formattedRows = FormData?.members?.map(row => ({
 				group_code: row.group_code,
 				member_id: row.member_id,
@@ -494,6 +524,9 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 				created_by : userDetails[0]?.emp_id,
   				ip_address : ip,
 			}
+
+			console.log(creds, 'credscredscredscreds__');
+			
 	
 			await saveMasterData({
 				endpoint: "loan/save_society_level_disburse",
@@ -528,12 +561,17 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 
 
 	useEffect(()=>{
+		checkGroupStatus()
 		if(LoanApproveORUnApprov == "A"){
+			if(loanAppData?.member_details.length < 1){
 			fetchMemberDetails()
+			}
 		}
+		// fetchMemberDetails()
 
-		fetchMemberDetails()
-		
+		if(loanAppData?.member_details.length > 0){
+			fetchFullAcceptForm()
+		}
 	}, [])
 
 	useEffect(() => {
@@ -566,23 +604,33 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						Accepted Transaction </div>)}
 						{LoanApproveORUnApprov == 'U' && (<div className="pending_dis_3"><SyncOutlined style={{ color: "#fff", marginRight: 6 }} />
 						Unapproved Transaction </div>)}
-						<div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
-						{/* {JSON.stringify(LoanApproveORUnApprov, null, 2)} fdghfghfhg	 */}
-						{/* {JSON.stringify(groupData, null, 2)} fdghfghfhg */}
-						{/* {JSON.stringify(userDetails[0], null, 2)} fdghfghfhg */}
 						
-						{/* {JSON.stringify(loanAppData, 2)}  */}
+						{/* <div className="grid gap-4 sm:grid-cols-3 sm:gap-6"> */}
+						
+						{/* {JSON.stringify(loanAppData, 2)} ///
+						{JSON.stringify(loanAppData?.member_details, 2)}  */}
 				
 						
 						
 						
-							<div className="text-[#DA4167] text-lg font-bold sm:col-span-3 mb-0"> Group Loan Details</div>
-						
-							<div className="sm:col-span-1">
+							{/* <div className="text-[#DA4167] text-lg font-bold sm:col-span-3 mb-0"> Group Loan Details</div> */}
+
+							{/* <div className="sm:col-span-3 mt-6">
+							<Tag color="#2563eb" className="text-white mb-3 font-bold">
+																		Add Group Details
+																	</Tag>
+																	</div> */}
+
+							
+							<div className={LoanApproveORUnApprov == 'U' ? `grid grid-cols-12 gap-5 mb-3 p-5 bg-red-100 border border-red-500/50 rounded-md relative` : `grid grid-cols-12 gap-5 mb-3 p-5 bg-green-100 border border-green-500/50 rounded-md relative`}>
+							{/* <div className="grid grid-cols-12 gap-3 mb-3 p-3 bg-pink-100 border border-pink-500/50 rounded-md relative"> */}
+							<Tag className={LoanApproveORUnApprov == 'U' ? `customeTxt_Unapprove` : `customeTxt_Approve`}>Group Loan Details</Tag>
+																	
+							<div className="col-span-4">
 							<TDInputTemplateBr
 							placeholder="Unapproved Amount"
 							type="text"
-							label="Unapproved Amount"
+							label={LoanApproveORUnApprov == 'U' ? `Unapproved Amount` : `Approved Disburse Amount`}
 							name="unapprovedAmount_new"
 							handleChange={formik.handleChange}
 							handleBlur={formik.handleBlur}
@@ -593,7 +641,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 								
 							</div>
 
-							<div className="sm:col-span-1">
+							<div className="col-span-4">
 							<TDInputTemplateBr
 									type="text"
 									label="Group Name"
@@ -606,7 +654,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 								/>
 							</div>
 
-							<div className="sm:col-span-1">
+							<div className="col-span-4">
 							<TDInputTemplateBr
 									type="text"
 									label="Group SB A/C"
@@ -618,8 +666,9 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 									disabled
 								/>
 							</div>
+							</div>
 
-						</div>
+						{/* </div> */}
 
 						{LoanApproveORUnApprov == 'U' &&(	
 						<div className="flex justify-center  sm:gap-6 mt-8">
@@ -654,8 +703,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 						)} 
 						
 					</div>
-
-					{LoanApproveORUnApprov == "A" &&(
+					{LoanApproveORUnApprov == 'A' &&(
 					<form onSubmit={formik.handleSubmit} className={`${isOverdue == 'Y' ? 'mt-5' : ''}`}>
 
 					<div className="flex flex-col justify-start gap-5">
@@ -673,7 +721,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 					handleChange={formik.handleChange}
 					handleBlur={formik.handleBlur}
 					formControlName={formik.values.society_loan_acc}
-					// disabled={loanAppData?.approval_status == 'U' ? false : true}
+					// disabled={loanAppData?.member_details.length < 1 ? false : true}
 					mode={1}
 					/>
 					{formik.errors.society_loan_acc && formik.touched.society_loan_acc ? (
@@ -875,8 +923,6 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 					Members in this Group
 					</div>
 
-
-					
 					{/* {JSON.stringify(groupData, 2)} */}
 
 					<Spin spinning={loading}>
@@ -957,11 +1003,14 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 					</div>
 					)}
 					</div>
+					{loanAppData?.member_details.length < 1 &&(
 					<BtnComp
 					mode="A"
 					onReset={formik.resetForm}
 					param={params?.id}
 					/>
+					)}
+					
 
 
 
@@ -988,7 +1037,7 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 					}}
 					/>
 
-				 <div className="flex justify-start gap-4 bg-white p-4">
+				 {/* <div className="flex justify-start gap-4 bg-white p-4">
 						<Tooltip title="Export to Excel">
 							<button
 								onClick={() => handleExportMembers(groupData)}
@@ -1002,65 +1051,12 @@ function ViewLoanForm_BDCCB({ groupDataArr }) {
 							</button>
 						</Tooltip>
 
-					</div>
+					</div> */}
 
 
 			</Spin>
 
-			{/* <DialogBox
-				flag={4}
-				onPress={() => setVisible(!visible)}
-				visible={visible}
-				onPressYes={() => {
-					// editGroup()
-					setVisible(!visible)
-				}}
-				onPressNo={() => setVisible(!visible)}
-			/> */}
-
-			{/* <Modal
-				// width={{
-				// 	xs: '90%',
-				// 	sm: '80%',
-				// 	md: '70%',
-				// 	lg: '60%',
-				// 	xl: '50%',
-				// 	xxl: '40%',
-				// 	}}
-				title="Overdue Details"
-				okButtonProps={null}
-				open={openModal}
-				onCancel={() => setOpenModal(false)}>
-					<table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-								<thead className="text-xs text-white uppercase bg-slate-800 dark:bg-gray-700 dark:text-gray-400">
-									<tr>
-										<th scope="col" className="px-6 py-3 font-semibold">
-											Overdue Amount
-										</th>
-										<th scope="col" className="px-6 py-3 font-semibold">
-											Overdue Date
-										</th>
-										
-									</tr>
-								</thead>
-								<tbody>
-									{loanDtls.map((item, i) => (
-										<tr
-											key={i}
-											className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-slate-50 dark:hover:bg-gray-600"
-										>
-											
-											<td className="px-6 py-4">{item?.od_amt ? item?.od_amt : '0.00'}</td>
-											<td className="px-6 py-4">
-												{item?.od_date ? moment(item?.od_date).format("DD-MM-YYYY") : "N/A"}
-											</td>
-											
-										</tr>
-									))}
-									
-								</tbody>
-							</table>
-			</Modal> */}
+			
 
 		</>
 	)
