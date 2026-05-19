@@ -110,7 +110,7 @@
                 // console.log("RESSSSS", res?.data)
                 if(res?.data?.success){
 
-                console.log(creds, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.data.length)
+                // console.log(creds, "RESSSSSssssssssssssssssssssssssssssssssssss", res?.data?.data)
 
                 if(res?.data?.data.length > 0){
                     setRemainDisburseAmt(res?.data?.data)
@@ -524,15 +524,30 @@
                                 iconViewColor={MD2Colors.pink500}
                                 iconViewBorderColor={MD2Colors.pink200}
                             /> */}
+                            <TouchableOpacity
+                            activeOpacity={0.7}
+                            disabled={remainDisburseAmt[0] == 0}
+                            style={{
+                                opacity: remainDisburseAmt[0] == 0 ? 0.8 : 1
+                            }}
+                            onPress={() => {
+                                navigation.dispatch(
+                                    CommonActions.navigate({
+                                        name: navigationRoutes.depositWithdrawScreen,
+                                    }),
+                                )
+                            }}
+                            >
                             <ListCard
                                 title={`S.B.`}
-                                // subtitle={`Rs. ${totalBankRecovery || 0}/-`}
-                                subtitle={`Rs. 0/-`}
+                                subtitle={`Rs. ${remainDisburseAmt[0]?.sb_balance || 0}/-`}
+                                // subtitle={`Rs. 0/-`}
                                 position={-1}
                                 icon='bank'
                                 iconViewColor={MD2Colors.blue500}
                                 iconViewBorderColor={MD2Colors.blue200}
                             />
+                            </TouchableOpacity>
 
                             {/* <Text>{remainDisburseAmt[0]}</Text> */}
 

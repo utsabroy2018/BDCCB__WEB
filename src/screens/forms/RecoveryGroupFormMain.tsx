@@ -21,6 +21,7 @@ import { BASE_URL } from '../../config/config'
 import dayjs from 'dayjs'
 import { AppStore } from '../../context/AppContext'
 import { SCREEN_HEIGHT } from 'react-native-normalize'
+import LoadingOverlay from '../../components/LoadingOverlay'
 
 // const RecoveryGroupFormMain = ({ fetchedData, approvalStatus = "U" }) => {
 const RecoveryGroupFormMain = () => {
@@ -71,22 +72,7 @@ const RecoveryGroupFormMain = () => {
     const { handleLogout } = useContext<any>(AppStore)
     const [fetchedData, setFetchedData] = useState<any>(() => ({}))
 
-    // const groupTypes = [
-    //     {
-    //         title: "SHG",
-    //         func: () => {
-    //             handleFormChange("groupType", "S");
-    //             handleFormChange("groupTypeName", "SHG")
-    //         }
-    //     },
-    //     {
-    //         title: "JLG",
-    //         func: () => {
-    //             handleFormChange("groupType", "J");
-    //             handleFormChange("groupTypeName", "JLG")
-    //         }
-    //     }
-    // ]
+   
 
     const handleFormChange = (field: string, value: any) => {
         setFormData((prev) => ({
@@ -94,80 +80,12 @@ const RecoveryGroupFormMain = () => {
             [field]: value,
         }))
     }
-    // useEffect(() => {
-    //     console.log("Recovery Group Form useEffect called")
-    // }, [])
-    // useEffect(() => {
-    //     if (error) {
-    //         Alert.alert("Turn on Geolocation", "Give access to Location or Turn on GPS from app settings.", [{
-    //             text: "Go to Settings",
-    //             onPress: () => { navigation.dispatch(CommonActions.goBack()); Linking.openSettings() }
-    //         }])
-    //     }
-    // }, [isFocused, error])
-
-
-    // useEffect(() => {
-    //     console.log("APPROVAL STATUS", approvalStatus)
-    //     if (location?.latitude && location.longitude && approvalStatus === "A") {
-    //         console.log("LOCATION CHANGED, FETCHING GEO ADDRESS...")
-    //         // fetchGeoLocaltionAddress()
-    //     }
-    // }, [location])
-
-    // const requestBluetoothPermissions = async () => {
-    //     if (Platform.OS === 'android') {
-    //         try {
-    //             const granted = await PermissionsAndroid.requestMultiple([
-    //                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-    //                 PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-    //                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    //             ]);
-
-    //             if (
-    //                 granted['android.permission.BLUETOOTH_SCAN'] === PermissionsAndroid.RESULTS.GRANTED &&
-    //                 granted['android.permission.BLUETOOTH_CONNECT'] === PermissionsAndroid.RESULTS.GRANTED
-    //             ) {
-    //                 console.log('Bluetooth permissions granted.');
-    //             } else {
-    //                 console.log('Bluetooth permissions denied.');
-    //             }
-    //         } catch (err) {
-    //             console.error(err);
-    //         }
-    //     }
-    // };
-
-    // const requestNearbyDevicesPermission = async () => {
-    //     if (Platform.OS === 'android') {
-    //         try {
-    //             const granted = await PermissionsAndroid.request(
-    //                 PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES
-    //             );
-    //             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //                 console.log('Nearby devices permission granted.');
-    //             } else {
-    //                 console.log('Nearby devices permission denied.');
-    //             }
-    //         } catch (err) {
-    //             console.error(err);
-    //         }
-    //     }
-    // };
-
-    // const requestPermissions = async () => {
-    //     await requestBluetoothPermissions();
-    //     await requestNearbyDevicesPermission();
-    // };
-
-    // useEffect(() => {
-    //     requestPermissions()
-    // }, [])
+    
 
 
     const fetchLoanDetailsData = async () => {
         // setBanks([]);
-        setLoading(true)
+        setLoading(true);
 
         const creds = {
             tenant_id : loginStore?.tenant_id,
@@ -351,10 +269,6 @@ const RecoveryGroupFormMain = () => {
         //
     }
 
-    // useEffect(() => {
-    //     setCanTxnCheckFlag('F')
-    // }, [memberDetailsArray, formData.txnDate])
-
      const getClientIP = async () => {
         const res = await fetch("https://api.ipify.org?format=json")
         const data = await res.json()
@@ -363,7 +277,7 @@ const RecoveryGroupFormMain = () => {
 
     const sendRecoveryEMI = async () => {
 
-        // setLoading(true)
+        setLoading(true)
 
         var memberDetailsArray_new = memberDetailsArray
         // .filter(m => m.isChecked === true)
@@ -387,18 +301,8 @@ const RecoveryGroupFormMain = () => {
         created_by : loginStore?.emp_id,
         ip_address: ip,
         members: memberDetailsArray_new
-        // members: memberDetailsArray.map(m => ({
-        //     mem_trn_id: 0,
-        //     mem_loan_id: m.mem_loan_id,
-        //     principal_amt: m.principal_amt,
-        //     cr_amt: m.loan_amt,
-        //     sb_amt: m.sb_amt,
-        // }))
     };
 
-    // console.log("===== EMI RECOVERY DATA =====Colect", memberDetailsArray_new, 'enddddddddddddddddd');
-    // // console.log(JSON.stringify(payload, null, 2));
-    // return;
 
     await axios.post(ADDRESSES.SAVE_GRP_RECOVERY, payload, {
             headers: {
@@ -423,23 +327,7 @@ const RecoveryGroupFormMain = () => {
                 Alert.alert("Alert", res?.data?.msg)
             }
             
-            // console.log("Loan recovery EMI installment done.", res?.data)
-            // await handlePrint(res?.data?.msg)
-
-            // console.log('lllll', res?.data?.msg, 'dddddddddddddddd', res?.data?.not_inserted_row);
-            
-
-            // navigation.dispatch(
-            //             CommonActions.navigate({
-            //                 name: navigationRoutes.recoveryGroupScreenResult,
-            //                 params: {
-            //                 resultData: res?.data?.msg,
-            //                 not_inserted_row: res?.data?.not_inserted_row,
-            //                 },
-            //             }),
-            //         )
-
-            // navigation.goBack()
+           
         }).catch(err => {
             ToastAndroid.show("Some error occurred while submitting EMI.", ToastAndroid.SHORT)
             console.log("Some error occurred while submitting EMI.", err)
@@ -447,7 +335,7 @@ const RecoveryGroupFormMain = () => {
         // বিঃ দ্রঃ - দোয়া করে এই রিসিটটির একটি ফটোকপি রাখবেন। 
 
         // console.log("JJJJJJJJJJJJJJJJJJJJ", transformedObj)
-        setLoading(false)
+        setLoading(false);
     }
 
 
@@ -869,7 +757,7 @@ const totalAmount = memberDetailsArray?.reduce(
 
                 </View>
             </ScrollView>
-
+          {loading && <LoadingOverlay />}
         </SafeAreaView>
     )
 }

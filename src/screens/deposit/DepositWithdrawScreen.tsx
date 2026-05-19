@@ -20,7 +20,7 @@ import {
 } from 'react-native-paper';
 
 import axios from 'axios';
-import { CommonActions, useNavigation } from '@react-navigation/native';
+import { CommonActions, useIsFocused, useNavigation } from '@react-navigation/native';
 
 import { loginStorage } from '../../storage/appStorage';
 import { ADDRESSES } from '../../config/api_list';
@@ -30,6 +30,7 @@ import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 import HeadingComp from '../../components/HeadingComp';
 import normalize, { SCREEN_HEIGHT, SCREEN_WIDTH } from 'react-native-normalize';
 import ButtonPaper from '../../components/ButtonPaper';
+import LoadingOverlay from '../../components/LoadingOverlay';
 
 const DepositWithdrawScreen = () => {
   const theme = usePaperColorScheme();
@@ -49,6 +50,7 @@ const DepositWithdrawScreen = () => {
   const [memberRows, setMemberRows] = useState<any[]>([]);
   const [societySrchMsg, setSocietySrchMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const isFocused = useIsFocused()
 
 // Direct / Member removed
 // By default always Member
@@ -66,7 +68,7 @@ const directMember = 'M';
 
   const fetchGroupDetails = async () => {
 
-      // setLoading(true);
+      setLoading(true);
       setGroupDetails([]);
       setMemberRows([]);
       setSocietySrchMsg('');
@@ -91,6 +93,8 @@ const directMember = 'M';
       ).then(res => {
         
       if(res?.data?.success){
+        console.log(res?.data?.data?.[0]?.memb_dt, 'gggggggggggggggggggggg');
+        
         setGroupDetails(res?.data?.data || []);
 
         if (res?.data?.data?.[0]?.memb_dt?.length > 0) {
@@ -107,13 +111,13 @@ const directMember = 'M';
         }
       } else {
         setSocietySrchMsg(res?.data?.msg);
+        // setLoading(false);
       }
         
       })
       .catch(err => {
-      console.log('<<<<<<', err);
       });
-      setIsLoading(false);
+      setLoading(false);
 
 };
 
@@ -144,10 +148,15 @@ const directMember = 'M';
   };
 
 
+  const getClientIP = async () => {
+		const res = await fetch("https://api.ipify.org?format=json")
+		const data = await res.json()
+		return data.ip
+	}
 
 const submitTransaction = async () => {
 
-  setIsLoading(true);
+  setLoading(true);
 
     const formattedRows = memberRows?.map((row: any) => ({
       member_id: row?.member_id,
@@ -155,6 +164,8 @@ const submitTransaction = async () => {
       member_balance: row?.member_balance,
       amount: row?.member_amount || 0,
     }));
+
+    const ip = await getClientIP()
 
     const total_cr_amt = memberRows?.reduce(
       (sum: number, r: any) =>
@@ -172,7 +183,7 @@ const submitTransaction = async () => {
       dep_with_flag: depositWithdrawStatus,
       cr_amt: total_cr_amt,
       created_by: loginStore?.emp_id,
-      created_ip: '0.0.0.0',
+      created_ip: ip,
       members: formattedRows,
     };
 
@@ -202,7 +213,7 @@ const submitTransaction = async () => {
       .catch(err => {
         console.log('<<<<<<', err);
       });
-    setIsLoading(false);
+    setLoading(false);
     
 };
 
@@ -217,9 +228,13 @@ useEffect(() => {
   // }
 }, [depositWithdrawStatus]);
 
-useEffect(() => {
-fetchGroupDetails()
-}, []);
+
+
+  useEffect(() => {
+      if(isFocused){
+      fetchGroupDetails()
+      }
+  }, [isFocused])
 
 
 
@@ -526,7 +541,7 @@ fetchGroupDetails()
                 mode="contained-tonal"
                 buttonColor={theme.colors.secondary}
                 textColor={theme.colors.onSecondary}
-                loading={isLoading}
+                // loading={isLoading}
                 disabled={isDisabled}>
                 SUBMIT
               </ButtonPaper>
@@ -535,7 +550,7 @@ fetchGroupDetails()
 
         </View>
       </ScrollView>
-
+      {loading && <LoadingOverlay />}
     </SafeAreaView>
   );
 };
