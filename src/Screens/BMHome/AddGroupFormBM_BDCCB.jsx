@@ -29,7 +29,7 @@ function AddGroupFormBM_BDCCB() {
 				<div className=" p-5 w-full min-h-screen rounded-3xl">
 					<div className="w-auto mx-14 my-4">
 						<FormHeader
-							text={`${params?.id == 0 ? "Add Group" : "Edit/Preview Group"}`}
+							text={`${params?.id == 0 ? "Add Group" : "Edit/Preview Group 666"}`}
 							mode={2}
 						/>
 					</div>

@@ -65,6 +65,17 @@ const group_trans_process = [
 	}
 ]
 
+const economicActivites = [
+	{
+		label: "Yes",
+		value: "Y",
+	},
+	{
+		label: "No",
+		value: "N",
+	}
+]
+
 function GroupExtendedForm({ groupDataArr }) {
 
 	const containerStyle = {
@@ -109,6 +120,7 @@ function GroupExtendedForm({ groupDataArr }) {
 	const [PACKSList, setPACKSList] = useState([]);
 	const [socityEditTimeBranch, setSocityEditTimeBranch] = useState([]);
 	const [pinCodeList, setPinCodeList] = useState(() => [])
+	const [economicActivitesData, setEconomicActivitesData] = useState("Y")
 
 
 	const initialValues = {
@@ -150,6 +162,11 @@ function GroupExtendedForm({ groupDataArr }) {
 		// console.log("radio1 checked", e)
 		setDirectIndirectStatus(e)
 
+	}
+
+	const onChange_Economic = (e) => {
+		// console.log("radio1 checked", e)
+		setEconomicActivitesData(e)		
 	}
 
 
@@ -336,6 +353,7 @@ function GroupExtendedForm({ groupDataArr }) {
 						members: res?.data?.data[0]?.memb_dt
 
 					})
+					setEconomicActivitesData(res?.data?.data[0]?.economic_activity)	
 
 					setSocityEditTimeBranch([
 
@@ -387,7 +405,7 @@ function GroupExtendedForm({ groupDataArr }) {
 
 
 				if (res?.data?.success) {
-					console.log(res?.data?.data, 'resresresresresresres', 'll', params?.id, res?.data?.data);
+					console.log(res?.data?.data[0]?.economic_activity, 'resresresresresresres', 'll', params?.id, res?.data?.data);
 
 
 					setValues({
@@ -411,9 +429,11 @@ function GroupExtendedForm({ groupDataArr }) {
 						gp_id: res?.data?.data[0]?.gp_id,
 						village_id: res?.data?.data[0]?.village_id,
 						branch_code: res?.data?.data[0]?.branch_code,
-						members: res?.data?.data[0]?.memb_dt
+						members: res?.data?.data[0]?.memb_dt,
 
 					})
+
+					setEconomicActivitesData(res?.data?.data[0]?.economic_activity)	
 
 					setBranchList([
 						{
@@ -476,6 +496,7 @@ function GroupExtendedForm({ groupDataArr }) {
 			village_id: formData?.village_id || 0,
 			pin_no: formData?.g_pin,
 			// sb_ac_no: formData?.g_acc1,
+			economic_activity: economicActivitesData,
 			members: formData?.members,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
@@ -526,6 +547,7 @@ function GroupExtendedForm({ groupDataArr }) {
 			gp_id: formData?.gp_id,
 			village_id: formData?.village_id || 0,
 			pin_no: formData?.g_pin,
+			economic_activity: economicActivitesData,
 			// sb_ac_no: formData?.g_acc1,
 			members: formData?.members,
 			created_by: userDetails[0]?.emp_id,
@@ -1303,6 +1325,19 @@ function GroupExtendedForm({ groupDataArr }) {
 						
 					</div> */}
 							{/* {directIndirectStatus == 'D' &&( */}
+
+							<div className="sm:col-span-4 economicActivitesClass">
+							<label for="branch_id" class="block mb-2 text-sm capitalize font-bold text-slate-800
+							dark:text-gray-100"> Economic Activites *</label>
+							<Radiobtn
+							data={economicActivites}
+							val={economicActivitesData}
+							onChangeVal={(value) => {
+							onChange_Economic(value)
+							}}
+							/>
+												</div>
+
 							<div className="sm:col-span-2">
 								<TDInputTemplateBr
 									placeholder="Select Branch"

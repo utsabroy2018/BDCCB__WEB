@@ -91,6 +91,18 @@ const casteOptions = [
   { code: "OBCB", name: "OBC B" },
 ];
 
+const economicActivites = [
+	{
+		label: "Yes",
+		value: "Y",
+	},
+	{
+		label: "No",
+		value: "N",
+	}
+]
+
+
 function MemberExtendedForm_BDCCB({ groupDataArr }) {
 
 	const containerStyle = {
@@ -139,6 +151,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 	const [groupsDetails, setGroupsDetails] = useState(() => [])
 	const [groupDetailsModal, setGroupDetailsModal] = useState(false);
 	const [groupValue, setGroupValue] = useState('');
+	// const [economicActivitesData, setEconomicActivitesData] = useState("Y")
 
 
 	const initialValues = {
@@ -177,6 +190,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 				gender_field: "",
 				religion_field: "",
 				caste_field: "",
+				economic_activity: "Y"
 			}
 		],
 	}
@@ -188,6 +202,11 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		setDirectIndirectStatus(e)
 
 	}
+
+	// const onChange_Economic = (e) => {
+	// 	// console.log("radio1 checked", e)
+	// 	setEconomicActivitesData(e)		
+	// }
 
 
 	const validationSchema = Yup.object({
@@ -541,6 +560,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 		address: item.address || "",
 		gp_leader_flag: item.gp_leader_flag || "N",
 		asst_gp_leader_flag: item.asst_gp_leader_flag || "N",
+		economic_activity: item.economic_activity || "Y"
 		}));
 
 
@@ -559,16 +579,7 @@ function MemberExtendedForm_BDCCB({ groupDataArr }) {
 			pacs_id: userDetails[0]?.user_type == 'B' ? '0' : groupsDetails?.pacs_id || 0,
 			created_by: userDetails[0]?.emp_id,
 			ip_address: ip,
-
 			members: member_ids,
-
-
-			// "group_code" : "70097",
-			// "branch_code": "7",
-			// "tenant_id":"2",
-			// "pacs_id":"0",
-			// "created_by": "Lokesh",
-			// "ip_address" : "12.23.23.23",
 
 		}
 
@@ -1454,6 +1465,23 @@ const hasErrorStatus =
 										</label>
 									</div>
 
+									{/* Radion Economic Activities */}
+									<div className="col-span-6 economicActivitesClass flex flex-col gap-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start' }}>
+									<label className="block mb-2 text-sm capitalize font-bold text-slate-800 dark:text-gray-100">
+									Economic Activities *
+									</label>
+
+									<Radiobtn
+									data={economicActivites}
+									val={member.economic_activity}
+									onChangeVal={(value) => {
+									formik.setFieldValue(
+									`members[${index}].economic_activity`,
+									value
+									);
+									}}
+									/>
+									</div>
 
 									{/* Name */}
 									<div className="col-span-2">

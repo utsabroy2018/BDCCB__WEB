@@ -91,6 +91,17 @@ const casteOptions = [
   { code: "OBCB", name: "OBC B" },
 ];
 
+const economicActivites = [
+	{
+		label: "Yes",
+		value: "Y",
+	},
+	{
+		label: "No",
+		value: "N",
+	}
+]
+
 function MemberEditExtendedForm({ groupDataArr }) {
 
 	const containerStyle = {
@@ -176,6 +187,7 @@ function MemberEditExtendedForm({ groupDataArr }) {
 				gender_field: "",
 				religion_field: "",
 				caste_field: "",
+				economic_activity: "Y"
 			}
 		],
 	}
@@ -524,6 +536,7 @@ function MemberEditExtendedForm({ groupDataArr }) {
 		address: item.address || "",
 		gp_leader_flag: item.gp_leader_flag || "N",
 		asst_gp_leader_flag: item.asst_gp_leader_flag || "N",
+		economic_activity: item.economic_activity || "Y"
 		}));
 
 
@@ -592,7 +605,7 @@ function MemberEditExtendedForm({ groupDataArr }) {
 		}
 
 
-		console.log(creds, 'credscredscredscreds', formData);
+		// console.log(creds, 'credscredscredscreds__SAVE', formData);
 
 		// return;
 
@@ -1529,7 +1542,24 @@ const hasErrorStatus =
 																	Assistant Leader
 																</label>
 															</div>
-						
+
+															{/* Radion Economic Activities */}
+															<div className="col-span-6 economicActivitesClass flex flex-col gap-1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'start' }}>
+															<label className="block mb-2 text-sm capitalize font-bold text-slate-800 dark:text-gray-100">
+															Economic Activities *
+															</label>
+
+															<Radiobtn
+															data={economicActivites}
+															val={member.economic_activity}
+															onChangeVal={(value) => {
+															formik.setFieldValue(
+															`members[${index}].economic_activity`,
+															value
+															);
+															}}
+															/>
+															</div>					
 						
 															{/* Name */}
 															<div className="col-span-2">

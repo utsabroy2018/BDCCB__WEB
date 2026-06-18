@@ -65,6 +65,17 @@ const group_trans_process = [
 	}
 ]
 
+const economicActivites = [
+	{
+		label: "Yes",
+		value: "Y",
+	},
+	{
+		label: "No",
+		value: "N",
+	}
+]
+
 function AddGroupExtendedForm_BDCCB({ groupDataArr }) {
 
 const containerStyle = {
@@ -109,6 +120,7 @@ const containerStyle = {
 	const [branchList, setBranchList] = useState([]);
 	const [PACKSList, setPACKSList] = useState([]);
 	const [socityEditTimeBranch, setSocityEditTimeBranch] = useState([]);
+	const [economicActivitesData, setEconomicActivitesData] = useState("Y")
 
 
 	const initialValues = {
@@ -151,6 +163,12 @@ const containerStyle = {
 		setDirectIndirectStatus(e)
 		
 	}
+
+	const onChange_Economic = (e) => {
+		// console.log("radio1 checked", e)
+		setEconomicActivitesData(e)		
+	}
+	
 
 	
 	const validationSchema = Yup.object({
@@ -221,27 +239,10 @@ const containerStyle = {
 
 
 	useEffect(() => {
-		// if (params?.id > 0) {
-		// 	if(userDetails[0]?.user_type == 'B'){
-		// 	fetchGroupDetails()
-		// 	}
-
-		// 	if(userDetails[0]?.user_type == 'P'){
-		// 	fetchGroupDetails_ForPacs()
-		// 	}
-			
-		// }
 		fetchSahayikaList()
-
 	}, [])
 
 	useEffect(()=>{
-		// if(userDetails[0]?.user_type != "P"){
-		// fetchBranch_Group()
-		// }
-
-		console.log(userDetails[0], 'jjjjjjjjjjjjjjjjjjjjjjjjjj');
-		
 
 		if(userDetails[0]?.user_type === 'P' && params?.id > 0){
 			return;
@@ -474,6 +475,7 @@ const containerStyle = {
 				gp_id: formData?.gp_id,
 				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
+				economic_activity: economicActivitesData,
 				// sb_ac_no: formData?.g_acc1,
 				members: formData?.members,
 				created_by: userDetails[0]?.emp_id,
@@ -520,6 +522,7 @@ const containerStyle = {
 				village_id: formData?.village_id || 0,
 				pin_no: formData?.g_pin,
 				saving_acc_no: formData?.saving_acc_no,
+				economic_activity: economicActivitesData,
 				pacs_id: userDetails[0]?.user_type == 'B' ? '111' : formData?.packs_id,
 				created_by: userDetails[0]?.emp_id,
 				ip_address: ip,
@@ -527,8 +530,7 @@ const containerStyle = {
 				// members: formData?.members,
 				}
 
-				console.log(creds, 'credscredscredscreds', formData);
-
+				// console.log(creds, 'credscredscredscreds', economicActivitesData);
 				// return;
 				
 			
@@ -616,7 +618,6 @@ const containerStyle = {
 			})
 			.then((res) => {
 
-				console.log(res?.data?.data, 'xxxxxxxxxxxxxxxxxxx_____________branch', 'branch');
 			if(res?.data?.success){
 			// if(userDetails[0]?.user_type == "P"){
 
@@ -1138,6 +1139,19 @@ const checkSBAccNoExists = async (sbAcc, index) => {
 							{/* {JSON.stringify(branchList, null, 2)} */}
 					
 					{/* {directIndirectStatus == 'D' &&( */}
+
+					<div className="sm:col-span-4 economicActivitesClass">
+					<label for="branch_id" class="block mb-2 text-sm capitalize font-bold text-slate-800
+				 dark:text-gray-100"> Economic Activites *</label>
+					<Radiobtn
+					data={economicActivites}
+					val={economicActivitesData}
+					onChangeVal={(value) => {
+					onChange_Economic(value)
+					}}
+					/>
+					</div>
+					
 					<div className="sm:col-span-2">
 					<TDInputTemplateBr
 					placeholder="Select Branch"
