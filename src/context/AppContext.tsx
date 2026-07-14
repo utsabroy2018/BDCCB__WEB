@@ -35,14 +35,14 @@ const AppContext = ({ children }) => {
             // branch_code:branch,
         }
 
-        console.log(creds, 'credscredscredscreds');
+        // console.log(creds, 'credscredscredscreds');
         
 
         await axios.post(`${ADDRESSES.LOGIN}`, creds).then(res => {
             // if (res?.data?.suc === 1) {
             if (res?.data?.success) {    
                     ToastAndroid.show(`${res?.data?.msg}`, ToastAndroid.SHORT);
-                    console.log(res?.data?.user_dtls[0], 'bbbbbbbbbbbbbbbbbbb', res?.data);
+                    // console.log(res?.data?.user_dtls[0], 'bbbbbbbbbbbbbbbbbbb', res?.data);
                     
                     if(userId == 2){
                         const dt = {
@@ -51,7 +51,7 @@ const AppContext = ({ children }) => {
                             branch_name:branchName,
                             token: res?.data?.token
                         };
-                        console.log('startttttttt', res?.data?.user_dtls[0], 'bbbbbbbbbbbbbbbbbbb', JSON.stringify(dt), 'endddddddd');
+                        // console.log('startttttttt', res?.data?.user_dtls[0], 'bbbbbbbbbbbbbbbbbbb', JSON.stringify(dt), 'endddddddd');
                         loginStorage.set("login-data", JSON.stringify(dt));
                         setIsLogin(true);
                     } else {
@@ -69,7 +69,7 @@ const AppContext = ({ children }) => {
                                     token: res?.data?.token,
                                     };
 
-                        console.log(res?.data?.token, 'startttttttt', 'bbbbbbbbbbbbbbbbbbb', dt_, 'endddddddd');
+                        // console.log(res?.data?.token, 'startttttttt', 'bbbbbbbbbbbbbbbbbbb', dt_, 'endddddddd');
                         
 
                         loginStorage.set("login-data", JSON.stringify(dt_));
@@ -141,30 +141,34 @@ const AppContext = ({ children }) => {
 
 
     const handleLogout = async () => {
-        const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "");
-        console.log(loginStore);
-        const creds = {
-			emp_id: loginStore?.emp_id,
-			modified_by: loginStore?.emp_id,
-			in_out_flag:"O",
-			flag:'A',
-            branch_code:loginStore?.brn_code
-		}
-        console.log(creds)
-		await axios.post(`${ADDRESSES.LOGOUT_APP}`, creds).then(res => {
-            console.log(res?.data?.msg)
-            if(res?.data?.suc == 1){
-                loginStorage.clearAll();
-                branchStorage.clearAll();
-                setIsLogin(false)
-            }
-            else{
-                 ToastAndroid.show(`Something went wrong while logging in.`, ToastAndroid.SHORT)
-            }
+        loginStorage.clearAll();
+        branchStorage.clearAll();
+        setIsLogin(false)
+
+        // const loginStore = JSON.parse(loginStorage?.getString("login-data") ?? "");
+        // console.log(loginStore);
+        // const creds = {
+		// 	emp_id: loginStore?.emp_id,
+		// 	modified_by: loginStore?.emp_id,
+		// 	in_out_flag:"O",
+		// 	flag:'A',
+        //     branch_code:loginStore?.brn_code
+		// }
+        // console.log(creds)
+		// await axios.post(`${ADDRESSES.LOGOUT_APP}`, creds).then(res => {
+        //     console.log(res?.data?.msg)
+        //     if(res?.data?.suc == 1){
+        //         loginStorage.clearAll();
+        //         branchStorage.clearAll();
+        //         setIsLogin(false)
+        //     }
+        //     else{
+        //          ToastAndroid.show(`Something went wrong while logging in.`, ToastAndroid.SHORT)
+        //     }
            
-        }).catch(err=>{
-            ToastAndroid.show(`Something went wrong while logging in.`, ToastAndroid.SHORT)
-        })
+        // }).catch(err=>{
+        //     ToastAndroid.show(`Something went wrong while logging in.`, ToastAndroid.SHORT)
+        // })
         
     }
 

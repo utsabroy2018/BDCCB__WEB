@@ -91,7 +91,8 @@ const RecoveryGroupFormMain = () => {
             tenant_id : loginStore?.tenant_id,
             branch_id : loginStore?.brn_code,
             emp_id : loginStore?.emp_id,
-        }
+            }
+
 
         await axios.post(ADDRESSES.FETCH_LOAN_DETAILS, creds, {
             headers: {
@@ -104,6 +105,7 @@ const RecoveryGroupFormMain = () => {
             // console.log("Array LALALALLA syart", res?.data?.data, 'Array endddddddddd', loginStore)
 
             if(res?.data?.success) {
+                
                 setFetchedData(res?.data?.data)
                 //  setMemberDetailsArray(res?.data?.data[0]?.members)
                 setMemberDetailsArray(

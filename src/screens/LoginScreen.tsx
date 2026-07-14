@@ -153,8 +153,8 @@ const LoginScreen = () => {
     const login = () => {
         const branchName = branch.find(el => el.code === selectedBranch)?.name || "";
         // handleLogin(username, password, selectedBranch, userId, branchName, fcmToken)
-        // handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup+'-'+username, password, selectedBranch, userId, branchName)
-        handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup, password, selectedBranch, userId, branchName)
+        // handleLogin(selectedBlock+'-'+selectedSociety+'-'+selectedGroup, password, selectedBranch, userId, branchName)
+        handleLogin(selectedGroup, password, selectedBranch, userId, branchName)
     }
 
 
@@ -282,7 +282,7 @@ const fetchBlocks = async () => {
             });
 
             // if (res?.request?.status === 200) {
-            console.log(res?.data?.data, 'gggggggggggggggggggggggg');
+            // console.log(res?.data?.data, 'gggggggggggggggggggggggg');
             if (res?.data?.success) {
             // console.log(res?.data?.data, 'gggggggggggggggggggggggg');
             // setBlockList(res?.data?.data);
@@ -459,6 +459,7 @@ const handleOpen = (name) => {
 
                         // ❌ remove MODAL
                         listMode="MODAL"
+                        searchable={true}
 
                         style={{ zIndex: activeDropdown === "block" ? 65000 : 35000 }}
                         dropDownContainerStyle={{ zIndex: activeDropdown === "block" ? 65000 : 35000 }}
@@ -482,7 +483,7 @@ const handleOpen = (name) => {
                         fontWeight: "600", 
                         marginBottom: 5 
                         }}>
-                        Select Society
+                        Select Society/Branch
                         </Text>
                         <DropDownPicker
                         placeholder="Select Society"
@@ -494,6 +495,7 @@ const handleOpen = (name) => {
                         setValue={setSelectedSociety}
                         schema={{ label: 'name', value: 'code' }}
                         listMode="MODAL"
+                        searchable={true}
                         
                         style={{ zIndex: activeDropdown === "society" ? 65000 : 35000 }}
                         dropDownContainerStyle={{ zIndex: activeDropdown === "society" ? 65000 : 35000 }}
@@ -529,6 +531,12 @@ const handleOpen = (name) => {
                         setValue={setSelectedGroup}
                         schema={{ label: 'name', value: 'code' }}
                         listMode="MODAL"
+                        // Enable Search
+                        searchable={true}
+                        // searchPlaceholder="Search Block..."
+                        // searchContainerStyle={{
+                        // borderColor: theme.colors.outlineVariant,
+                        // }}
                         // style={{ zIndex: 3000 }}
                         // dropDownContainerStyle={{ zIndex: 3000 }}
                         style={{ zIndex: activeDropdown === "group" ? 65000 : 35000 }}
